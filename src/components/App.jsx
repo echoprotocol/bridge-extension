@@ -5,6 +5,7 @@ import Header from './layout/Header';
 import Footer from './layout/Footer';
 
 import ModalConfirm from './modals/Confirm';
+import Navbar from './layout/Navbar';
 
 class App extends React.Component {
 
@@ -20,6 +21,7 @@ class App extends React.Component {
 			<div className="tempWrap">
 				<div className="appWrap">
 					<Header />
+					<Navbar />
 					<div className="content">
 						{children}
 					</div>
