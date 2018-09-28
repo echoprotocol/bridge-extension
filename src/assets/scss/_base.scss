@@ -3,7 +3,7 @@ ul {
     margin: 0;
     list-style-type: none;
 }
-.tempWrap {
+.temp-wrap {
     height: 100vh;
     width: 100vw;
     display: flex;
@@ -11,7 +11,7 @@ ul {
     justify-content: center;
 }
 
- .appWrap {
+ .app-wrap {
      background-color: $colorBgLight;
      width: 362px;
      height: 591px;

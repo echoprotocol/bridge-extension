@@ -18,8 +18,8 @@ class App extends React.Component {
 	render() {
 		const { children } = this.props;
 		return (
-			<div className="tempWrap">
-				<div className="appWrap">
+			<div className="temp-wrap">
+				<div className="app-wrap">
 					<Header />
 					<Navbar />
 					<div className="content">

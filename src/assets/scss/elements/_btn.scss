@@ -10,6 +10,7 @@
     background-color $speed,
     border $speed,
     color $speed;
+    padding: 0;
     &.disabled {
           pointer-events: none;
           border: 1px solid $colorDisabled;
@@ -37,11 +38,10 @@
         content: '';
         position: absolute;
         transition: top $speed,
-                    right $speed,
-                    bottom $speed,
-                    left $speed,
-                    border $speed;
-        border-radius: $angular;
+                    right $speed /2,
+                    bottom $speed /2,
+                    left $speed;
+        border-radius: $angular + 2px;
         top: 0;
         right: 0;
         bottom: 0;
@@ -62,7 +62,7 @@
 
 // Btns
 
-%btnPrimary {
+%btnIn {
     @extend %btn;
     background-color: #16d6aa;
     border-radius: $angularMax;
@@ -82,96 +82,95 @@
         }
     }
 }
- 
-.btnDarkPrimary {
-    @extend %btnPrimary;
-    &:not(.disabled) {
-       @include onBtnFocus (
-            $angularMax,
-            2px,
-            2px,
-            #4c5c60
-       );
+
+.btn {
+    &-dark-primary {
+        @extend %btnIn;
+        &:not(.disabled) {
+           @include onBtnFocus (
+                $angularMax,
+                2px,
+                2px,
+                #4c5c60
+           );
+        }
     }
-}
- 
-.btnLightPrimary {
-    @extend %btnPrimary;
-    &:not(.disabled) {
-       @include onBtnFocus(
-            $angularMax,
-            2px,
-            2px,
-            #d0d5d7
-       );
+    &-in-light {
+        @extend %btnIn;
+        &:not(.disabled) {
+           @include onBtnFocus(
+                $angularMax,
+                2px,
+                2px,
+                #d0d5d7
+           );
+        }
     }
-}
- 
-.btnInverted {
-    @extend %btn;
-    background-color: #344148;
-    border-radius: $angularMax;
-    border: 1px solid #344148;
-    font-size: 12px;
-    color: #16d6aa;
-    &:not(.disabled) {
-        &:hover {
-            border: 1px solid #21292e;
-            background-color: #21292e;
-        }
-        &:active {
-            border: 1px solid #253b3b;
-            background-color: #253b3b;
-            color: #24957b;
-        }
-        @include onBtnFocus (
-            $angularMax,
-            2px,
-            2px,
-            #d0d5d7
-        );
-    }
-}
- 
-.btnTransparent {
-    @extend %btn;
-    background-color: transparent;
-    color: #535e65;
-    border-radius: $angularMax;
-    border: 1px solid #c3c7cc;
-    font-size: 12px;
-    &:not(.disabled) {
-        &:hover {
-            border: 1px solid #a6abb1;
-        }
-        &:focus {
-            background-color: transparent;
-            border: 1px solid #c3c7cc;
-        }
-        &:active {
-            border: 1px solid #c4c6c9;
-            background-color: #e1e3e4;
-            color: #9aa1a4;
-        }
-        &:not(:active) {
+    &-inverted {
+        @extend %btn;
+        background-color: #344148;
+        border-radius: $angularMax;
+        border: 1px solid #344148;
+        font-size: 12px;
+        color: #16d6aa;
+        &:not(.disabled) {
+            &:hover {
+                border: 1px solid #21292e;
+                background-color: #21292e;
+            }
+            &:active {
+                border: 1px solid #253b3b;
+                background-color: #253b3b;
+                color: #24957b;
+            }
             @include onBtnFocus (
                 $angularMax,
                 2px,
-                1px,
-                #dde1e4
+                2px,
+                #d0d5d7
             );
+        }
+    }
+    &-transparent {
+        @extend %btn;
+        background-color: transparent;
+        color: #535e65;
+        border-radius: $angularMax;
+        border: 1px solid #c3c7cc;
+        font-size: 12px;
+        &:not(.disabled) {
+            &:hover {
+                border: 1px solid #a6abb1;
+            }
+            &:focus {
+                background-color: transparent;
+                border: 1px solid #c3c7cc;
+            }
+            &:active {
+                border: 1px solid #c4c6c9;
+                background-color: #e1e3e4;
+                color: #9aa1a4;
+            }
+            &:not(:active) {
+                @include onBtnFocus (
+                    $angularMax,
+                    2px,
+                    1px,
+                    #dde1e4
+                );
+            }
         }
     }
 }
 
 // Btns wrap
 
-.oneBtnWrap {
+.one-btn-wrap {
     display: flex;
-    .btnDarkPrimary,
-    .btnLightPrimary,
-    .btnTransparent,
-    .btnInverted {
+    .btn-in-dark,
+    .btn-in-light,
+    .btn-transparent,
+    .btn-inverted {
        min-width: 200px;
        &.compact {
           min-width: 150px;     
@@ -179,17 +178,17 @@
     }
  }
  
- .twoBtnWrap {
+ .two-btn-wrap {
     display: flex;
     button {
        &:not(:last-child) {
           margin-right: 12px;
        }
     }
-    .btnDarkPrimary,
-    .btnLightPrimary,
-    .btnTransparent,
-    .btnInverted {
+    .btn-in-dark,
+    .btn-in-light,
+    .btn-transparent,
+    .btn-inverted {
        min-width: 145px;
     }
  }
