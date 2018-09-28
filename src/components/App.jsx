@@ -10,23 +10,23 @@ class App extends React.Component {
 
 	renderModals() {
 		return (
-			<div>
-				<ModalConfirm />
-			</div>
+			<ModalConfirm />
 		);
 	}
 
 	render() {
 		const { children } = this.props;
 		return (
-			<div className="wrapper">
-				<Header />
-				<div className="content">
-					{children}
-				</div>
-				<Footer />
+			<div className="tempWrap">
+				<div className="appWrap">
+					<Header />
+					<div className="content">
+						{children}
+					</div>
+					<Footer />
 
-				{this.renderModals()}
+					{this.renderModals()}
+				</div>
 			</div>
 		);
 	}

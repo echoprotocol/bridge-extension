@@ -7,8 +7,11 @@ class AboutPage extends React.Component {
 
 		return (
 			<div className="about_page">
-				About Page Content
-				<br />
+				<div className="wrap">
+					<div className="oneBtnWrap">
+						<button className="btnLightPrimary compact">SEND</button>
+					</div>
+				</div>
 				<Link to="/">Back to home</Link>
 			</div>
 		);

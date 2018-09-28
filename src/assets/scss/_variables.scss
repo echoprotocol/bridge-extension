@@ -1,26 +1,25 @@
-// Colors
-// -------------------------
-$white:					#fff;
-$black:					#000;
-$gray:					#a0a0a0;
-$c-accent:              #3db5bd;
-$c-accent2:             #11d6ff;
-$c-accent3:             #07aed0;
-$c-error:               #dd5d5d;
-$c-focus:               #96C8DA;
 
-$c-link:                $c-accent3;
-$c-link-hover:          darken($c-link, 5%);
 
-// Scaffolding
-// -------------------------
-$text-color:            #40424c;
-$text-color-muted:      #8a8a8a;
-$global-bg:             #f3f3f7;
-$bs-def:                0 2px 6px rgba(0, 0, 0, 0.1);
-$bs-def-inset:          inset 0 2px 4px rgba(0, 0, 0, 0.06);
+$colorBgDark:       rgb(43, 61, 66); // #2b3d42;
+$colorBgLight:      rgb(234, 239, 241); // #eaeff1; 
+$colorLink:         rgb(93, 101, 105); // #5d6569
+$colorLinkFocus:    rgb(125, 137, 142); // #7d898e
+$colorLinkHover: $colorLinkFocus;
 
-// Typography
-// -------------------------
-$ff-lato:  	     		'Lato', sans-serif;
-$ff-def:                 $ff-lato;
+$colorError:        rgb(235, 44, 78); // #eb2c4e
+
+$colorShadow:       rgba(82, 92, 96, .5); // #525c60
+$colorOutline: $colorShadow;
+
+$colorDisabled:     rgba(97, 104, 108, .5); // #61686c
+
+$colorFontPrimary:  rgb(61, 73, 76); // #3d494c;
+
+$fontPrimary: Helvetica;
+$fontSize:  1;
+$fontUnit: 1em;
+
+$angularMin: 3px;
+$angularMax: 16px;
+
+$speed: .3s;
