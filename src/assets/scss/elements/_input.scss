@@ -1,8 +1,33 @@
 %input {
+    width: 100%;
     border: 0;
-    border-bottom: 1px solid #000;
+    background-color: transparent;
+    text-align: center;
+    height: 42px;
+    line-height: 42px;
+    z-index: 2;
 }
 
 .wrap {
     padding: 20px;
+}
+.input {
+    text-align: center;
+    position: relative;
+    height: 50px;
+    display: flex;
+    align-items: flex-end;
+    .label {
+        right: 0;
+        left: 0;
+        position: absolute;
+        top: 0;
+        line-height: 50px;
+        transition: line-height $speed;
+    }
+    input {
+        @extend %input;
+        border-bottom: 1px solid #000;
+        
+    }
 }
