@@ -31,11 +31,15 @@ class BridgeInput extends React.Component {
 
 			<div className={classnames('input-wrap', this.props.theme)} >
 				<Input
-					label="Repeat PIN"
-					error
+					label={this.props.labelText}
+					type="password"
 					onFocus={() => this.onFocus()}
 					onBlur={(e) => this.onBlur(e)}
-					className={classnames({ up: this.state.up }, { focused: this.state.focus })}
+					className={classnames(
+						{ up: this.state.up },
+						{ focused: this.state.focus },
+						this.props.position,
+					)}
 				/>
 				<div className="error-message">Somthing went wrong</div>
 			</div>
@@ -47,11 +51,14 @@ class BridgeInput extends React.Component {
 
 BridgeInput.propTypes = {
 	theme: PropTypes.string,
-
+	position: PropTypes.string,
+	labelText: PropTypes.string,
 };
 
 BridgeInput.defaultProps = {
-	theme: 'asdasd',
+	theme: 'light',
+	position: '',
+	labelText: '',
 };
 
 export default BridgeInput;

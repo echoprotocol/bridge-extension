@@ -87,7 +87,8 @@
 }
 
 .btn {
-    &-dark-primary {
+    
+    &-in-dark {
         @extend %btnIn;
         &:not(.disabled) {
            @include onBtnFocus (
@@ -114,6 +115,7 @@
            );
         }
     }
+
     &-inverted {
         @extend %btn;
         background-color: #344148;
@@ -139,6 +141,7 @@
             );
         }
     }
+
     &-transparent {
         @extend %btn;
         background-color: transparent;
@@ -169,34 +172,40 @@
             }
         }
     }
+
 }
 
 // Btns wrap
 
 .one-btn-wrap {
     display: flex;
+
     .btn-in-dark,
     .btn-in-light,
     .btn-transparent,
     .btn-inverted {
-       min-width: 200px;
-       &.compact {
-          min-width: 150px;     
-       }
+        min-width: 200px;
+        &.compact {
+            min-width: 150px;     
+        }
     }
+
  }
  
  .two-btn-wrap {
     display: flex;
+
     button {
-       &:not(:last-child) {
-          margin-right: 12px;
-       }
+        &:not(:last-child) {
+            margin-right: 12px;
+        }
     }
+
     .btn-in-dark,
     .btn-in-light,
     .btn-transparent,
     .btn-inverted {
-       min-width: 145px;
+        min-width: 145px;
     }
+
  }

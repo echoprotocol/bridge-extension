@@ -11,11 +11,12 @@ class AboutPage extends React.Component {
 		return (
 			<div className="about-page">
 				<div className="wrap">
-					<BridgeInput theme="input-light" />
+
+					<BridgeInput theme="input-light" position="left" labelText="From" />
 					<br />
 					<div className="one-btn-wrap">
 						<Button
-							className="btn-in-light"
+							className="btn-in-dark"
 							content={<span className="btn-text">Create</span>}
 						/>
 					</div>
