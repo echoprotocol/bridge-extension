@@ -6,6 +6,9 @@
     height: 42px;
     line-height: 42px;
     z-index: 2;
+    font-family: FNMedium;
+    font-size: 16px;
+    transition: color $speed;
 }
 
 .wrap {
@@ -17,17 +20,123 @@
     height: 50px;
     display: flex;
     align-items: flex-end;
+    &.left {
+        text-align: left;
+    }
+    &.up {
+        .label {
+            line-height: 12px;
+            font-size: 14px;
+        }
+    }
+    &-light {
+        .input {
+            &:not(.disabled):not(.error) {
+                input {
+                    color: #3d4b52;
+                }
+    
+
+                &:hover {
+
+                    &:after {
+                        background-color: #848e95;
+                    }
+                }
+                &.up,
+                &.focused {
+
+                    &:after {
+                        background-color: #606c74;
+                    }
+                }
+            }
+            &:not(.up):not(.disabled) {
+                &:hover {
+                    .label {
+                        margin-top: -2px;
+                    }
+                }
+            }
+            &:hover:not(.disabled){
+                .label {
+                    color: #80888c;
+                }
+            }
+            &.up,
+            &.focused {
+                .label {
+                    color: #80888c;
+                }
+            }
+ 
+            .label {
+                color: #92999e;
+            }
+
+            &.disabled {
+
+            }
+
+            &.error {
+                input {
+                    color: $colorError;
+                }
+                &:after {
+                    background-color: $colorError;
+                }
+                & + .error-message {
+                    font-size: 15px;
+                    margin-top: 15px;
+                    opacity: 1;
+                }
+                    
+            }
+
+            &.up,
+            &.focused {
+                &:after {
+                    height: 2px;
+                }
+            }
+        } 
+    }
     .label {
         right: 0;
         left: 0;
         position: absolute;
         top: 0;
         line-height: 50px;
-        transition: line-height $speed;
+        font-size: 18px;
+        transition: line-height $speed, font-size $speed, color $speed, margin .1s;
+        font-family: FNMedium;
     }
+
+    // BORDER
+    &:after {
+        right: 0;
+        left: 0;
+        content: "";
+        position: absolute;
+        bottom: 1px;
+        background-color: #c8cfd2;
+        height: 1px;
+        transition: background-color $speed;
+    }
+
     input {
         @extend %input;
-        border-bottom: 1px solid #000;
-        
     }
+
+}
+
+// error-message
+
+.error-message {
+    color:  $colorError;
+    font-family: FNBook;
+    font-size: 0;
+    opacity: 0;
+    transition: font-size $speed, opacity $speed;
+    text-align: center;
 }

@@ -22,9 +22,7 @@ class App extends React.Component {
 				<div className="app-wrap">
 					<Header />
 					<Navbar />
-					<div className="content">
-						{children}
-					</div>
+					{children}
 					<Footer />
 
 					{this.renderModals()}

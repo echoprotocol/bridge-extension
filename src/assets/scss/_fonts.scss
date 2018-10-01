@@ -1,25 +1,24 @@
 @font-face {
-    font-family: 'icomoon';
-    src:  url('../fonts/icomoon.eot?5x5mc8');
-    src:  url('../fonts/icomoon.eot?5x5mc8#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon.ttf?5x5mc8') format('truetype'),
-    url('../fonts/icomoon.woff?5x5mc8') format('woff'),
-    url('../fonts/icomoon.svg?5x5mc8#icomoon') format('svg');
-    font-weight: normal;
-    font-style: normal;
+    font-family: FNBold;
+    src: url('../fonts/FuturaNew/FuturaNewBold.otf') format('opentype');
 }
 
-[class^="icon-"], [class*=" icon-"] {
-    /* use !important to prevent issues with browser extensions that change fonts */
-    font-family: 'icomoon' !important;
-    speak: none;
-    font-style: normal;
-    font-weight: normal;
-    font-variant: normal;
-    text-transform: none;
-    line-height: 1;
+@font-face {
+    font-family: FNBook;
+    src: url('../fonts/FuturaNew/FuturaNewBook.otf') format('opentype');
+}
 
-    /* Better Font Rendering =========== */
-    -webkit-font-smoothing: antialiased;
-    -moz-osx-font-smoothing: grayscale;
+@font-face {
+    font-family: FNDemi;
+    src: url('../fonts/FuturaNew/FuturaNewDemi.otf') format('opentype');
+}
+
+@font-face {
+    font-family: FNHeavy;
+    src: url('../fonts/FuturaNew/FuturaNewHeavy.otf') format('opentype');
+}
+
+@font-face {
+    font-family: FNMedium;
+    src: url('../fonts/FuturaNew/FuturaNewMedium.otf') format('opentype');
 }
