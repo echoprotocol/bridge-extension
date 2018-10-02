@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 import {
 	FORM_SIGN_UP,
+	FORM_SIGN_IN,
 } from '../constants/FormConstants';
 
 const DEFAULT_FIELDS = Map({
@@ -18,6 +19,16 @@ const DEFAULT_FORM_FIELDS = {
 			error: null,
 		},
 		wif: '',
+	}),
+	[FORM_SIGN_IN]: Map({
+		accountName: {
+			value: '',
+			error: null,
+		},
+		password: {
+			value: '',
+			error: null,
+		},
 	}),
 };
 
