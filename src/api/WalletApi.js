@@ -42,6 +42,8 @@ export const validateAccountExist = (
 				if (matches) {
 					accountName =
                         accountName.substr(0, matches.index) + (parseInt(matches[0], 10) + 1);
+				} else {
+					accountName += 1;
 				}
 
 				account = await validateAccountExist(
