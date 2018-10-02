@@ -25,8 +25,11 @@ export const validateAccountExist = (
 	limit = 50,
 ) => {
 	if (requestsCount === 10) {
-		return requestsCount;
+		return 'Account name is already taken';
 	}
+
+	let account = null;
+
 	instance.dbApi().exec('lookup_accounts', [accountName, limit])
 		.then(async (result) => {
 			if (!result.find((i) => i[0] === accountName) && shouldExist) {
@@ -34,13 +37,27 @@ export const validateAccountExist = (
 			}
 
 			if (result.find((i) => i[0] === accountName) && !shouldExist) {
-				await validateAccountExist(instance, accountName, shouldExist, requestsCount += 1);
-				return 'Account name is already taken';
+
+				const matches = accountName.match(/\d+$/);
+				if (matches) {
+					accountName =
+                        accountName.substr(0, matches.index) + (parseInt(matches[0], 10) + 1);
+				}
+
+				account = await validateAccountExist(
+					instance,
+					accountName,
+					shouldExist,
+					requestsCount += 1,
+				);
+
+				return account;
 			}
 
-			return null;
+			return account;
 		});
-	return null;
+
+	return account;
 };
 
 export const createWallet = async (account) => {
