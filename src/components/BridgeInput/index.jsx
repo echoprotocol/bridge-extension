@@ -24,6 +24,26 @@ class BridgeInput extends React.Component {
 		}
 	}
 
+	renderError() {
+		return (
+			<React.Fragment>
+
+				<div className="message-error">
+					{ this.props.errorText}
+				</div>
+
+				{
+					this.props.hintText.length > 0 ?
+						<div className="message-hint">
+                            You can try
+							<span> { this.props.hintText } </span>
+						</div> : null
+				}
+
+			</React.Fragment>
+		);
+
+	}
 
 	render() {
 
@@ -32,7 +52,8 @@ class BridgeInput extends React.Component {
 			<div className={classnames('input-wrap', this.props.theme)} >
 				<Input
 					label={this.props.labelText}
-					type="password"
+					type={this.props.type}
+					error={this.props.error}
 					onFocus={() => this.onFocus()}
 					onBlur={(e) => this.onBlur(e)}
 					className={classnames(
@@ -41,7 +62,8 @@ class BridgeInput extends React.Component {
 						this.props.position,
 					)}
 				/>
-				<div className="error-message">Somthing went wrong</div>
+				{ this.props.error ? this.renderError() : null }
+				<div className="message-description">{ this.props.descriptionText }</div>
 			</div>
 
 		);
@@ -51,14 +73,24 @@ class BridgeInput extends React.Component {
 
 BridgeInput.propTypes = {
 	theme: PropTypes.string,
+	error: PropTypes.bool,
+	type: PropTypes.string,
 	position: PropTypes.string,
 	labelText: PropTypes.string,
+	errorText: PropTypes.string,
+	hintText: PropTypes.string,
+	descriptionText: PropTypes.string,
 };
 
 BridgeInput.defaultProps = {
 	theme: 'light',
+	error: false,
+	type: 'text',
 	position: '',
 	labelText: '',
+	errorText: '',
+	hintText: '',
+	descriptionText: '',
 };
 
 export default BridgeInput;

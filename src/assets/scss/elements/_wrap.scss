@@ -1,0 +1,45 @@
+.temp-wrap {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-wrap {
+    background-color: $colorBgLight;
+    width: 362px;
+    height: 591px;
+    border-radius: $angularMin;
+    overflow: auto;
+    &.light {
+        background-color: $colorBgLight;
+    }
+    &.dark {
+        background-color: $colorBgDark;
+    }
+
+}
+
+.page-wrap {
+    min-height: 348px;
+    margin-top: 70px;
+    padding: 0 28px 35px;
+    position: relative;
+    .one-input-wrap {
+        .input-wrap {
+            margin-top: 60px;
+        }
+    }
+    .two-input-wrap {
+        .input-wrap {
+            margin-top: 40px;
+        }
+    }
+}
+.page-action-wrap {
+    height: 70px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}

@@ -1,3 +1,6 @@
+// BTNS: btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy, btn-noborder
+// SIZE: compact
+// STATE: error, disabled
 
 %btn {
     @extend %noSelection;
@@ -16,13 +19,16 @@
     padding: 0;
     &.disabled {
           pointer-events: none;
-          border: 1px solid $colorDisabled;
+          border: 2px solid $colorDisabled;
           background-color: transparent;
-          color: $colorDisabled;
+          color: #b6b9be;
     }
     &.compact {
        height: 25px;
-       
+       .btn-text {
+           font-size: 10px;
+           letter-spacing: 2.2px;
+       }
     }
 }
 
@@ -67,6 +73,7 @@
 
 %btnIn {
     @extend %btn;
+    font-family: FNBold;
     background-color: #16d6aa;
     border-radius: $angularMax;
  
@@ -173,9 +180,69 @@
         }
     }
 
+    &-copy {
+        @extend %btn;
+        font-family: FNMedium;
+        background-color: #ffffff;
+        color: #535e65;
+        border-radius: $angularMax;
+        border: 1px solid #c3c7cc;
+        font-size: 12px;
+        width: 200px;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        height: 25px;
+        top: 0;
+        right: 0;
+    }
+
 }
 
 // Btns wrap
+
+.btn-copy-wrap {
+    position: relative;
+    width: 200px;
+    display: flex;
+    height: 25px;
+    justify-content: flex-end;
+    transform: width $speed;
+    border: 0;
+    border-radius: $angularMax;
+    transition: width $speed;
+
+    &:not(.copied) {
+        @include onBtnFocus (
+            $angularMax,
+            2px,
+            0px,
+            #dde1e4
+        );
+    }
+    &:active {
+        .btn-copy {
+            background-color: #efeff0;
+        }
+    }
+    &.copied {
+        width: 226px;
+    }
+    &:after {
+        border-radius: $angularMax;
+        content: "";
+        position: absolute;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        top: 0;
+        height: 23px;
+        background-color: #efeff0;
+        border: 1px solid #efeff0;
+    }
+}
 
 .one-btn-wrap {
     display: flex;
@@ -208,4 +275,4 @@
         min-width: 145px;
     }
 
- }
+}

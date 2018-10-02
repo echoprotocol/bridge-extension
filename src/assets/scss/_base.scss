@@ -3,18 +3,5 @@ ul {
     margin: 0;
     list-style-type: none;
 }
-.temp-wrap {
-    height: 100vh;
-    width: 100vw;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
 
- .app-wrap {
-     background-color: $colorBgLight;
-     width: 362px;
-     height: 591px;
-     border-radius: $angularMin;
-     overflow: hidden;
- }
+
