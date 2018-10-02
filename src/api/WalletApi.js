@@ -73,3 +73,48 @@ export const createWallet = async (account) => {
 
 	return active.privateKey.toWif();
 };
+
+export const importWallet = (account, password, roles = ['active', 'owner', 'memo']) => {
+
+	const privateKey = getKeyFromWif(password);
+	let passKey;
+
+	if (privateKey) {
+		passKey = {
+			privateKey,
+			publicKey: privateKey.toPublicKey().toString(),
+		};
+	}
+
+	if (!account) { return null; }
+
+	account = account.toJS();
+	roles.forEach((role) => {
+		if (!privateKey) {
+			passKey = generateKeyFromPassword(account.name, role, password);
+		}
+
+		switch (role) {
+			case 'memo':
+				if (account.options.memo_key !== passKey.publicKey) {
+					return 'Invalid password';
+				}
+				break;
+			case 'active':
+				if (account.active.key_auths[0][0] !== passKey.publicKey) {
+					return 'Invalid password';
+				}
+				break;
+			case 'owner':
+				if (account.owner.key_auths[0][0] !== passKey.publicKey) {
+					return 'Invalid password';
+				}
+				break;
+			default: break;
+		}
+
+		return null;
+	});
+
+	return null;
+};
