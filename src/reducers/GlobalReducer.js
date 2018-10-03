@@ -14,6 +14,23 @@ export default createModule({
 
 	}),
 	transformations: {
+		set: {
+			reducer: (state, { payload }) => {
+				state = state.set(payload.field, payload.value);
+
+				return state;
+			},
+		},
+
+		setIn: {
+			reducer: (state, { payload }) => {
+				Object.keys(payload.params).forEach((field) => {
+					state = state.setIn([payload.field, field], payload.params[field]);
+				});
+
+				return state;
+			},
+		},
 		setGlobalLoading: {
 			reducer: (state, { payload }) => {
 				state = state.set('globalLoading', payload.globalLoading);

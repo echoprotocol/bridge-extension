@@ -45,8 +45,12 @@ class WifComponent extends React.Component {
 }
 
 WifComponent.propTypes = {
-	wif: PropTypes.object.isRequired,
-	accountName: PropTypes.string.isRequired,
+	wif: PropTypes.string.isRequired,
+	accountName: PropTypes.string,
+};
+
+WifComponent.defaultProps = {
+	accountName: '',
 };
 
 export default connect(
