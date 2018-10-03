@@ -17,7 +17,7 @@ export const getKeyFromWif = (wif) => {
 	}
 };
 
-export const validateAccountExist = (
+export const validateAccountExist = async (
 	instance,
 	accountName,
 	shouldExist,
@@ -28,38 +28,33 @@ export const validateAccountExist = (
 		return 'Account name is already taken';
 	}
 
-	let account = null;
+	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);
 
-	instance.dbApi().exec('lookup_accounts', [accountName, limit])
-		.then(async (result) => {
-			if (!result.find((i) => i[0] === accountName) && shouldExist) {
-				return 'Account not found';
-			}
+	if (!result.find((i) => i[0] === accountName) && shouldExist) {
+		return 'Account not found';
+	}
 
-			if (result.find((i) => i[0] === accountName) && !shouldExist) {
+	if (result.find((i) => i[0] === accountName) && !shouldExist) {
 
-				const matches = accountName.match(/\d+$/);
-				if (matches) {
-					accountName =
-                        accountName.substr(0, matches.index) + (parseInt(matches[0], 10) + 1);
-				} else {
-					accountName += 1;
-				}
+		const matches = accountName.match(/\d+$/);
+		if (matches) {
+			accountName =
+                accountName.substr(0, matches.index) + (parseInt(matches[0], 10) + 1);
+		} else {
+			accountName += 1;
+		}
 
-				account = await validateAccountExist(
-					instance,
-					accountName,
-					shouldExist,
-					requestsCount += 1,
-				);
+		accountName = await validateAccountExist(
+			instance,
+			accountName,
+			shouldExist,
+			requestsCount += 1,
+		);
 
-				return account;
-			}
+		return accountName;
+	}
 
-			return account;
-		});
-
-	return account;
+	return accountName;
 };
 
 export const createWallet = async (account) => {

@@ -2,6 +2,7 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { applyMiddleware, combineReducers, createStore, compose } from 'redux';
 import { Provider } from 'react-redux';
+import thunk from 'redux-thunk';
 
 import createHistory from 'history/createBrowserHistory';
 
@@ -27,6 +28,7 @@ const store = createStore(
 		echojs: EchoJSReducer.reducer,
 	}), {},
 	compose(
+		applyMiddleware(thunk),
 		applyMiddleware(middleware),
 		window.devToolsExtension ? window.devToolsExtension() : (f) => f,
 	),

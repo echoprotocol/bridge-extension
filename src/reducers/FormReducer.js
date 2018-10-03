@@ -2,9 +2,7 @@ import { createModule } from 'redux-modules';
 import { Map } from 'immutable';
 import _ from 'lodash';
 
-import {
-	FORM_SIGN_UP,
-} from '../constants/FormConstants';
+import { FORM_SIGN_UP } from '../constants/FormConstants';
 
 const DEFAULT_FIELDS = Map({
 	error: null,

@@ -30,6 +30,7 @@
     "react-router-redux": "^5.0.0-alpha.9",
     "redux": "^3.7.2",
     "redux-modules": "^1.1.0",
+    "redux-thunk": "^2.3.0",
     "semantic-ui-react": "^0.78.3",
     "uglifyjs-webpack-plugin": "^1.2.2"
   },

@@ -6,7 +6,7 @@ import { FORM_SIGN_UP } from '../constants/FormConstants';
 
 import { validateAccountExist, createWallet } from '../api/WalletApi';
 
-const createAccount = (accountName) => async (dispatch, getState) => {
+const createAccount = ({ accountName }) => async (dispatch, getState) => {
 	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
 
 	if (accountNameError) {
@@ -20,11 +20,10 @@ const createAccount = (accountName) => async (dispatch, getState) => {
 		dispatch(toggleLoading(FORM_SIGN_UP, true));
 
 		accountNameError = await validateAccountExist(instance, accountName, false);
-
-		if (accountNameError) {
-			dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
-			return;
-		}
+		// if (accountNameError) {
+		// 	dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
+		// 	return;
+		// }
 
 		const wif = await createWallet(accountName);
 
