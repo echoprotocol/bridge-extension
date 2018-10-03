@@ -36,6 +36,7 @@ export default createModule({
 	name: 'form',
 	initialState: Map({
 		[FORM_SIGN_UP]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_SIGN_UP]),
+		[FORM_SIGN_IN]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_SIGN_IN]),
 	}),
 	transformations: {
 		set: {

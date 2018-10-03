@@ -45,6 +45,23 @@ module.exports = {
 				},
 			},
 			{
+				test: /\.(svg|jpeg|jpg|png|ico|webmanifest)$/,
+				use: {
+					loader: 'file-loader',
+					options: {
+						name: 'images/[name].[ext]',
+					},
+				},
+			},
+			{
+				test: /\.(woff|woff2|eot|ttf|otf)$/,
+				loader: 'url-loader?limit=100000',
+			},
+			{
+				test: /\.css$/,
+				use: ['style-loader', 'css-loader'],
+			},
+			{
 				test: /\.scss$/,
 				use: extractSass.extract({
 					use: [{
@@ -55,10 +72,6 @@ module.exports = {
 					// use style-loader in development
 					fallback: 'style-loader',
 				}),
-			},
-			{
-				test: /\.(png|woff|woff2|eot|ttf|svg)$/,
-				loader: 'url-loader?limit=100000',
 			},
 		],
 	},

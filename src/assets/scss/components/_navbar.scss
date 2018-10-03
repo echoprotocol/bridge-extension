@@ -1,0 +1,17 @@
+.navbar {
+    border-top: 1px solid #31393d;
+    position: relative;
+    height: 63px;
+    background-image: url(../images/navbarBg.jpg);
+    &:before {
+        position: absolute;
+        right: 0;
+        left: 0;
+        top: 0;
+        display: block;
+        content: "";
+        background-color: rgba(#85daa7, .03);
+        height: 1px;
+        
+    }
+}

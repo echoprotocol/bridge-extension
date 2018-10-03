@@ -5,7 +5,7 @@ class Header extends React.PureComponent {
 	render() {
 
 		return (
-			<div className="header" />
+			<header className="header" />
 		);
 	}
 

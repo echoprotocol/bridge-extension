@@ -12,6 +12,17 @@ export const setValue = (form, field, value) => (dispatch) => {
 };
 
 /**
+ * Set value by field for object {value, error}
+ * @param form
+ * @param field
+ * @param value
+ * @returns {Function}
+ */
+export const setFormValue = (form, field, value) => (dispatch) => {
+	dispatch(FormReducer.actions.setFormValue({ form, field, value }));
+};
+
+/**
  * Set error by field form
  * @param form
  * @param field

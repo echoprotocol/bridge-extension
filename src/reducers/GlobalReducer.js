@@ -6,9 +6,31 @@ export default createModule({
 	initialState: Map({
 		globalLoading: true,
 		loading: false,
+		error: null,
+		activeUser: new Map({
+			id: '',
+			name: '',
+		}),
 
 	}),
 	transformations: {
+		set: {
+			reducer: (state, { payload }) => {
+				state = state.set(payload.field, payload.value);
+
+				return state;
+			},
+		},
+
+		setIn: {
+			reducer: (state, { payload }) => {
+				Object.keys(payload.params).forEach((field) => {
+					state = state.setIn([payload.field, field], payload.params[field]);
+				});
+
+				return state;
+			},
+		},
 		setGlobalLoading: {
 			reducer: (state, { payload }) => {
 				state = state.set('globalLoading', payload.globalLoading);

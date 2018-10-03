@@ -17,29 +17,67 @@ export const getKeyFromWif = (wif) => {
 	}
 };
 
-export const validateAccountExist = (
+export const validateAccountExist = async (
 	instance,
 	accountName,
 	shouldExist,
 	requestsCount = 0,
 	limit = 50,
 ) => {
+
 	if (requestsCount === 10) {
-		return requestsCount;
+		return {
+			example: '',
+			errorText: 'Account with such name already exists.',
+		};
 	}
-	instance.dbApi().exec('lookup_accounts', [accountName, limit])
-		.then(async (result) => {
-			if (!result.find((i) => i[0] === accountName) && shouldExist) {
-				return 'Account not found';
-			}
 
-			if (result.find((i) => i[0] === accountName) && !shouldExist) {
-				await validateAccountExist(instance, accountName, shouldExist, requestsCount += 1);
-				return 'Account name is already taken';
-			}
+	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);
 
-			return null;
-		});
+	if (!result.find((i) => i[0] === accountName) && shouldExist) {
+		return 'Account not found';
+	}
+
+	if (result.find((i) => i[0] === accountName) && !shouldExist) {
+
+		const matches = accountName.match(/\d+$/);
+		if (matches) {
+			accountName =
+                accountName.substr(0, matches.index) + (parseInt(matches[0], 10) + 1);
+		} else {
+			accountName += 1;
+		}
+
+		const { example, errorText } = await validateAccountExist(
+			instance,
+			accountName,
+			shouldExist,
+			requestsCount += 1,
+		);
+
+		return { example, errorText };
+	}
+
+	if (requestsCount === 0) {
+		accountName = null;
+	}
+
+	return {
+		example: accountName,
+		errorText: accountName && 'Account with such name already exists.',
+	};
+};
+
+export const validateImportAccountExist = async (
+	instance,
+	accountName,
+	limit = 50,
+) => {
+	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);
+
+	if (!result.find((i) => i[0] === accountName)) {
+		return 'Account not found';
+	}
 	return null;
 };
 
@@ -89,6 +127,9 @@ export const importWallet = (account, password, roles = ['active', 'owner', 'mem
 	if (!account) { return null; }
 
 	account = account.toJS();
+
+	let passError = null;
+
 	roles.forEach((role) => {
 		if (!privateKey) {
 			passKey = generateKeyFromPassword(account.name, role, password);
@@ -97,17 +138,17 @@ export const importWallet = (account, password, roles = ['active', 'owner', 'mem
 		switch (role) {
 			case 'memo':
 				if (account.options.memo_key !== passKey.publicKey) {
-					return 'Invalid password';
+					passError = 'Invalid password';
 				}
 				break;
 			case 'active':
 				if (account.active.key_auths[0][0] !== passKey.publicKey) {
-					return 'Invalid password';
+					passError = 'Invalid password';
 				}
 				break;
 			case 'owner':
 				if (account.owner.key_auths[0][0] !== passKey.publicKey) {
-					return 'Invalid password';
+					passError = 'Invalid password';
 				}
 				break;
 			default: break;
@@ -116,5 +157,5 @@ export const importWallet = (account, password, roles = ['active', 'owner', 'mem
 		return null;
 	});
 
-	return null;
+	return passError;
 };

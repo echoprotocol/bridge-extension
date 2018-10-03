@@ -3,16 +3,22 @@ import { EchoJSActions } from 'echojs-redux';
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 
 import { setFormError, toggleLoading, setValue } from './FormActions';
+import { initAccount } from './GlobalActions';
 
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
 
-import { validateAccountExist, createWallet, importWallet } from '../api/WalletApi';
+import {
+	validateAccountExist,
+	createWallet,
+	importWallet,
+	validateImportAccountExist,
+} from '../api/WalletApi';
 
-export const createAccount = (accountName) => async (dispatch, getState) => {
+export const createAccount = ({ accountName }) => async (dispatch, getState) => {
 	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
 
 	if (accountNameError) {
-		dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
+		dispatch(setFormError(FORM_SIGN_UP, 'accountName', { example: '', errorText: accountNameError }));
 		return;
 	}
 
@@ -23,14 +29,16 @@ export const createAccount = (accountName) => async (dispatch, getState) => {
 
 		accountNameError = await validateAccountExist(instance, accountName, false);
 
-		if (accountNameError) {
+		if (accountNameError.errorText) {
 			dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
 			return;
 		}
 
-		const wif = await createWallet(accountName);
+		const wif = await createWallet(accountNameError.example || accountName);
 
 		dispatch(setValue(FORM_SIGN_UP, 'wif', wif));
+
+		dispatch(initAccount(accountName, 'devnet'));
 
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_UP, 'error', err));
@@ -40,7 +48,7 @@ export const createAccount = (accountName) => async (dispatch, getState) => {
 
 };
 
-export const authUser = ({ accountName, password }) => async (dispatch, getState) => {
+export const importAccount = ({ accountName, password }) => async (dispatch, getState) => {
 	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
 	let passwordError = ValidateAccountHelper.validatePassword(password);
 
@@ -56,7 +64,8 @@ export const authUser = ({ accountName, password }) => async (dispatch, getState
 
 	try {
 		const instance = getState().echojs.getIn(['system', 'instance']);
-		accountNameError = await validateAccountExist(instance, accountName, true);
+		accountNameError = await validateImportAccountExist(instance, accountName, true);
+
 
 		if (accountNameError) {
 			dispatch(setFormError(FORM_SIGN_IN, 'accountName', accountNameError));
@@ -72,6 +81,8 @@ export const authUser = ({ accountName, password }) => async (dispatch, getState
 		if (passwordError) {
 			dispatch(setFormError(FORM_SIGN_IN, 'password', passwordError));
 		}
+
+		dispatch(initAccount(accountName, 'devnet'));
 
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_IN, 'error', err));
