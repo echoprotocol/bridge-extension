@@ -1,0 +1,232 @@
+%input {
+    width: 100%;
+    border: 0;
+    background-color: transparent;
+    text-align: center;
+    z-index: 2;
+    font-family: FNMedium;
+    font-size: 16px;
+    transition: color $speed, margin $speed;
+    padding: 0;
+}
+
+.wrap {
+    padding: 20px;
+}
+.input {
+    text-align: center;
+    position: relative;
+    height: 50px;
+    display: flex;
+    align-items: flex-end;
+    &.left {
+        text-align: left;
+        input {
+            text-align: left;
+        }
+    }
+    &.up {
+        .label {
+            line-height: 12px;
+            font-size: 14px;
+        }
+    }
+
+    &.up,
+    &.focused {
+        &:after {
+            height: 2px;
+        }
+        input {
+            height: 25px;
+            margin-bottom: 8px;
+        }
+    }
+
+    &.error {
+        input {
+            color: $colorError;
+        }
+        input[type="password" i] {
+            color: $colorError !important;
+        }
+        & + .error-message {
+            font-size: 15px;
+            margin-top: 15px;
+            opacity: 1;
+            height: auto;
+            padding-bottom: 2px;
+        }
+            
+    }
+
+    &-light {
+        .input {
+            &.error {
+                &:after {
+                    background-color: #f2a3b1;
+                }
+                &.up,
+                &.focused,
+                &:hover {
+                    &:after {
+                        background-color: $colorError;
+                    }
+                }
+            }
+            
+            &:after {
+                background-color: #c8cfd2;
+            }
+            
+            .label {
+                color: #92999e;
+            }
+ 
+            &:not(.disabled):not(.error) {
+
+                input {
+                    color: #3d4b52;
+                }
+    
+                &:hover {
+                    &:after {
+                        background-color: #848e95;
+                    }
+                }
+                &.up,
+                &.focused {
+                    &:after {
+                        background-color: #606c74;
+                    }
+                }
+            }
+
+            &:hover:not(.disabled){
+                .label {
+                    color: #80888c;
+                }
+            }
+            &.up,
+            &.focused {
+                .label {
+                    color: #80888c;
+                }
+            }
+ 
+        }
+
+    }
+    &-dark {
+        .input {
+
+            &.error {
+                &:after {
+                    background-color: #96364a;
+                }
+                &.up,
+                &.focused,
+                &:hover {
+                    &:after {
+                        background-color: $colorError;
+                    }
+                }
+            }
+
+            .label {
+                color: #b4b5ba;
+            }
+
+            &:not(.disabled):not(.error) {
+
+                &:after {
+                    background-color: #596569;
+                }
+
+                input {
+                    color: #b4b5ba;
+                }
+    
+                &:hover {
+                    input {
+                        color: #ffffff;
+                    }
+                    &:after {
+                        background-color: #9ba2a5;
+                    }
+                }
+                &.up,
+                &.focused {
+                    input {
+                        color: #ffffff;
+                    }
+                    &:after {
+                        background-color: #9ba2a5;
+                    }
+                }
+            }
+
+            &:hover:not(.disabled){
+                .label {
+                    color: #c8c9ce;
+                }
+            }
+
+            &.up,
+            &.focused {
+                .label {
+                    color: #c8c9ce;
+                }
+            }
+ 
+
+        } 
+    }
+
+    .label {
+        right: 0;
+        left: 0;
+        position: absolute;
+        top: 0;
+        line-height: 50px;
+        font-size: 18px;
+        will-change: transform;
+
+        transition: line-height $speed, font-size $speed, color $speed;
+        font-family: FNMedium;
+    }
+
+    // BORDER
+    &:after {
+        right: 0;
+        left: 0;
+        content: "";
+        position: absolute;
+        bottom: 1px;
+        height: 1px;
+        transition: background-color $speed;
+    }
+
+    input {
+        @extend %input;
+        height: 42px;
+    }
+
+}
+
+// error-message
+
+.error-message {
+    color:  $colorError;
+    font-family: FNBook;
+    font-size: 0;
+    opacity: 0;
+    transition: font-size $speed, opacity $speed $speed;
+    text-align: center;
+    height: 0;
+    overflow: hidden;
+}
+
+input[type="password" i] {
+    letter-spacing: -5px !important;
+}

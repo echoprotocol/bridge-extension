@@ -5,28 +5,28 @@ import Header from './layout/Header';
 import Footer from './layout/Footer';
 
 import ModalConfirm from './modals/Confirm';
+import Navbar from './layout/Navbar';
 
 class App extends React.Component {
 
 	renderModals() {
 		return (
-			<div>
-				<ModalConfirm />
-			</div>
+			<ModalConfirm />
 		);
 	}
 
 	render() {
 		const { children } = this.props;
 		return (
-			<div className="wrapper">
-				<Header />
-				<div className="content">
+			<div className="temp-wrap">
+				<div className="app-wrap">
+					<Header />
+					<Navbar />
 					{children}
-				</div>
-				<Footer />
+					<Footer />
 
-				{this.renderModals()}
+					{this.renderModals()}
+				</div>
 			</div>
 		);
 	}
