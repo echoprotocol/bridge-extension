@@ -1,6 +1,7 @@
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 
 import { setFormError, toggleLoading, setValue } from './FormActions';
+import { initAccount } from './GlobalActions';
 
 import { FORM_SIGN_UP } from '../constants/FormConstants';
 
@@ -10,7 +11,7 @@ const createAccount = ({ accountName }) => async (dispatch, getState) => {
 	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
 
 	if (accountNameError) {
-		dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
+		dispatch(setFormError(FORM_SIGN_UP, 'accountName', { example: '', errorText: accountNameError }));
 		return;
 	}
 
@@ -20,14 +21,17 @@ const createAccount = ({ accountName }) => async (dispatch, getState) => {
 		dispatch(toggleLoading(FORM_SIGN_UP, true));
 
 		accountNameError = await validateAccountExist(instance, accountName, false);
-		// if (accountNameError) {
-		// 	dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
-		// 	return;
-		// }
 
-		const wif = await createWallet(accountName);
+		if (accountNameError.errorText) {
+			dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
+			return;
+		}
+
+		const wif = await createWallet(accountNameError.example || accountName);
 
 		dispatch(setValue(FORM_SIGN_UP, 'wif', wif));
+
+		dispatch(initAccount(accountName, 'devnet'));
 
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_UP, 'error', err));

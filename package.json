@@ -11,6 +11,7 @@
   },
   "dependencies": {
     "autoprefixer": "^8.1.0",
+    "classnames": "^2.2.6",
     "config": "^1.30.0",
     "echojs-lib": "^0.1.6",
     "echojs-redux": "^0.1.10",
@@ -22,6 +23,7 @@
     "lodash": "^4.17.11",
     "prop-types": "^15.6.1",
     "react": "^16.2.0",
+    "react-copy-to-clipboard": "^5.0.1",
     "react-dom": "^16.2.0",
     "react-hot-loader": "^4.0.0",
     "react-redux": "^5.0.7",

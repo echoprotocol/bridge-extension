@@ -1,0 +1,315 @@
+// BTNS: btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy, btn-noborder, btn-nav
+// SIZE: compact
+// STATE: error, disabled
+
+%btn {
+    @extend %noSelection;
+    font-family: FNBold;
+    text-transform: uppercase;
+    line-height: 0;
+    position: relative;
+    cursor: pointer;
+    letter-spacing: 3px;
+    font-size: 11px;
+    height: 34px;
+    transition:
+    background-color $speed,
+    border $speed,
+    color $speed;
+    will-change: transition;
+    padding: 0;
+    &.disabled {
+          pointer-events: none;
+          border: 2px solid $colorDisabled;
+          background-color: transparent;
+          color: #b6b9be;
+    }
+    &.compact {
+       height: 25px;
+       font-size: 10px;
+
+       .btn-text {
+           letter-spacing: 2.2px;
+       }
+    }
+}
+
+@mixin onBtnFocus (
+    $angular,
+    $outerBorderWidth,
+    $innerBorderWidth,
+    $color
+    ) {
+    display: inline-block;
+    position: relative;
+    
+    @include hardwareAccel();
+    
+    &:before {
+        content: '';
+        position: absolute;
+        transition: top $speed,
+                    right $speed /2,
+                    bottom $speed /2,
+                    left $speed;
+        border-radius: $angular + 2px;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    &:not(:active) {
+        &:focus {
+            &:before {
+                border: $outerBorderWidth solid $color;
+                top: -($outerBorderWidth + $innerBorderWidth);
+                right: -($outerBorderWidth + $innerBorderWidth);
+                bottom: -($outerBorderWidth + $innerBorderWidth);
+                left: -($outerBorderWidth + $innerBorderWidth);
+            }
+        }
+    }
+}
+
+// Btns
+
+%btnIn {
+    @extend %btn;
+    font-family: FNBold;
+    background-color: #16d6aa;
+    border-radius: $angularMax;
+    border: 1px solid #16d6aa;
+    color: #324046;
+    &:not(.disabled) {
+        &:hover {
+            border: 1px solid #35e8bb;
+            background-color: #35e8bb;
+        }
+        &:active {
+            border: 1px solid #00c198;
+            background-color: #00c198;
+            color: rgb(47, 112, 98);
+        }
+    }
+}
+
+.btn {
+    
+    &-in-dark {
+        @extend %btnIn;
+        &:not(.disabled) {
+           @include onBtnFocus (
+                $angularMax,
+                2px,
+                2px,
+                #4c5c60
+           );
+        }
+    }
+
+    &-text {
+        margin-right: -3px;
+    }
+    
+    &-in-light {
+        @extend %btnIn;
+        &:not(.disabled) {
+           @include onBtnFocus(
+                $angularMax,
+                2px,
+                2px,
+                #d0d5d7
+           );
+        }
+    }
+
+    &-inverted {
+        @extend %btn;
+        background-color: #344148;
+        border-radius: $angularMax;
+        border: 1px solid #344148;
+
+        color: #16d6aa;
+        &:not(.disabled) {
+            &:hover {
+                border: 1px solid #21292e;
+                background-color: #21292e;
+            }
+            &:active {
+                border: 1px solid #253b3b;
+                background-color: #253b3b;
+                color: #24957b;
+            }
+            @include onBtnFocus (
+                $angularMax,
+                2px,
+                2px,
+                #d0d5d7
+            );
+        }
+    }
+
+    &-transparent {
+        @extend %btn;
+        background-color: transparent;
+        color: #535e65;
+        border-radius: $angularMax;
+        border: 1px solid #c3c7cc;
+
+        &:not(.disabled) {
+            &:hover {
+                border: 1px solid #a6abb1;
+            }
+            &:focus {
+                background-color: transparent;
+                border: 1px solid #c3c7cc;
+            }
+            &:active {
+                border: 1px solid #c4c6c9;
+                background-color: #e1e3e4;
+                color: #9aa1a4;
+            }
+            &:not(:active) {
+                @include onBtnFocus (
+                    $angularMax,
+                    2px,
+                    1px,
+                    #dde1e4
+                );
+            }
+        }
+    }
+
+    &-copy {
+        @extend %btn;
+        font-family: FNMedium;
+        background-color: #ffffff;
+        color: #535e65;
+        border-radius: $angularMax;
+        border: 1px solid #c3c7cc;
+
+        width: 200px;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        height: 25px;
+        top: 0;
+        right: 0;
+    }
+    &-noborder {
+        @extend %btn;
+        background-color: transparent;
+        color: #7e8489;
+        border: 1px solid transparent;
+        border-radius: $angularMax;
+    }
+    &-nav {
+        background-color: transparent;
+        width: 30px;
+        height: 30px;
+        border: 0;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+            div {
+                background-color: #88a5a6;
+            }
+        }
+        &:active {
+            div {
+                background-color: #506869;
+            }
+            
+        }
+        div {
+            height: 2px;
+            width: 14px;
+            background-color: #5c7071;
+            margin-left: 1px;
+            transition: background-color $speed;
+            &:not(:last-child) {
+                margin-bottom: 3px;
+            }
+        }
+    }
+
+}
+
+// Btns wrap
+
+.btn-copy-wrap {
+    position: relative;
+    width: 200px;
+    display: flex;
+    height: 25px;
+    justify-content: flex-end;
+    transform: width $speed;
+    border: 0;
+    border-radius: $angularMax;
+    transition: width $speed;
+
+    &:not(.copied) {
+        @include onBtnFocus (
+            $angularMax,
+            2px,
+            0px,
+            #dde1e4
+        );
+    }
+    &:active {
+        .btn-copy {
+            background-color: #efeff0;
+        }
+    }
+    &.copied {
+        width: 226px;
+    }
+    &:after {
+        border-radius: $angularMax;
+        content: "";
+        position: absolute;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        top: 0;
+        height: 23px;
+        background-color: #efeff0;
+        border: 1px solid #efeff0;
+    }
+}
+
+.one-btn-wrap {
+    display: flex;
+
+    .btn-in-dark,
+    .btn-in-light,
+    .btn-transparent,
+    .btn-inverted {
+        min-width: 200px;
+        &.compact {
+            min-width: 150px;     
+        }
+    }
+
+ }
+ 
+ .two-btn-wrap {
+    display: flex;
+
+    button {
+        &:not(:last-child) {
+            margin-right: 12px;
+        }
+    }
+
+    .btn-in-dark,
+    .btn-in-light,
+    .btn-transparent,
+    .btn-inverted {
+        min-width: 145px;
+    }
+
+}

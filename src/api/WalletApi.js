@@ -24,8 +24,12 @@ export const validateAccountExist = async (
 	requestsCount = 0,
 	limit = 50,
 ) => {
+
 	if (requestsCount === 10) {
-		return 'Account name is already taken';
+		return {
+			example: '',
+			errorText: 'Account with such name already exists.',
+		};
 	}
 
 	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);
@@ -44,17 +48,24 @@ export const validateAccountExist = async (
 			accountName += 1;
 		}
 
-		accountName = await validateAccountExist(
+		const { example, errorText } = await validateAccountExist(
 			instance,
 			accountName,
 			shouldExist,
 			requestsCount += 1,
 		);
 
-		return accountName;
+		return { example, errorText };
 	}
 
-	return accountName;
+	if (requestsCount === 0) {
+		accountName = null;
+	}
+
+	return {
+		example: accountName,
+		errorText: accountName && 'Account with such name already exists.',
+	};
 };
 
 export const createWallet = async (account) => {
