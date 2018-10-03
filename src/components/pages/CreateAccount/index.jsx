@@ -44,7 +44,7 @@ class CreateAccount extends React.Component {
 					<div className="icon-person" />
 					<div className="one-input-wrap">
 						<BridgeInput
-							error
+							// error
 							theme="input-light"
 							labelText="Account name"
 							errorText="Account with such name already exists."
@@ -68,7 +68,7 @@ class CreateAccount extends React.Component {
 
 	render() {
 		return (
-			this.renderWelcome()
+			this.renderLogin()
 		);
 
 	}

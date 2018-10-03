@@ -28,12 +28,14 @@
     position: relative;
     .one-input-wrap {
         .input-wrap {
-            margin-top: 60px;
+            margin-top: 80px;
         }
     }
     .two-input-wrap {
         .input-wrap {
-            margin-top: 40px;
+            &:first-child {
+                margin-top: 45px;
+            }
         }
     }
 }

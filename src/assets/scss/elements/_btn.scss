@@ -1,4 +1,4 @@
-// BTNS: btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy, btn-noborder
+// BTNS: btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy, btn-noborder, btn-nav
 // SIZE: compact
 // STATE: error, disabled
 
@@ -16,6 +16,7 @@
     background-color $speed,
     border $speed,
     color $speed;
+    will-change: transition;
     padding: 0;
     &.disabled {
           pointer-events: none;
@@ -25,8 +26,9 @@
     }
     &.compact {
        height: 25px;
+       font-size: 10px;
+
        .btn-text {
-           font-size: 10px;
            letter-spacing: 2.2px;
        }
     }
@@ -76,9 +78,7 @@
     font-family: FNBold;
     background-color: #16d6aa;
     border-radius: $angularMax;
- 
     border: 1px solid #16d6aa;
-    font-size: 12px;
     color: #324046;
     &:not(.disabled) {
         &:hover {
@@ -128,7 +128,7 @@
         background-color: #344148;
         border-radius: $angularMax;
         border: 1px solid #344148;
-        font-size: 12px;
+
         color: #16d6aa;
         &:not(.disabled) {
             &:hover {
@@ -155,7 +155,7 @@
         color: #535e65;
         border-radius: $angularMax;
         border: 1px solid #c3c7cc;
-        font-size: 12px;
+
         &:not(.disabled) {
             &:hover {
                 border: 1px solid #a6abb1;
@@ -187,7 +187,7 @@
         color: #535e65;
         border-radius: $angularMax;
         border: 1px solid #c3c7cc;
-        font-size: 12px;
+
         width: 200px;
         z-index: 1;
         display: flex;
@@ -197,6 +197,43 @@
         height: 25px;
         top: 0;
         right: 0;
+    }
+    &-noborder {
+        @extend %btn;
+        background-color: transparent;
+        color: #7e8489;
+        border: 1px solid transparent;
+        border-radius: $angularMax;
+    }
+    &-nav {
+        background-color: transparent;
+        width: 30px;
+        height: 30px;
+        border: 0;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+            div {
+                background-color: #88a5a6;
+            }
+        }
+        &:active {
+            div {
+                background-color: #506869;
+            }
+            
+        }
+        div {
+            height: 2px;
+            width: 14px;
+            background-color: #5c7071;
+            margin-left: 1px;
+            transition: background-color $speed;
+            &:not(:last-child) {
+                margin-bottom: 3px;
+            }
+        }
     }
 
 }

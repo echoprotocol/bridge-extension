@@ -13,7 +13,7 @@ class ImportAccount extends React.Component {
 					<div className="icon-person" />
 					<div className="two-input-wrap">
 						<BridgeInput
-							error
+							// error
 							theme="input-light"
 							labelText="Account name"
 							errorText="Account with such name already exists."
@@ -21,7 +21,7 @@ class ImportAccount extends React.Component {
 						/>
 						<BridgeInput
 							type="password"
-							error
+							// error
 							errorText="Invalid password."
 							theme="input-light"
 							labelText="WIF key / password"
