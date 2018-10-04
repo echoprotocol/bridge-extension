@@ -9,9 +9,10 @@
     transform: translateZ(0);
 }
  
-%noSelection {
-    -webkit-user-select: none;
+@mixin noSelection() {
     -moz-user-select: none;
     -khtml-user-select: none;
+    -webkit-user-select: none;
     -ms-user-select: none;
+    user-select: none;
 }

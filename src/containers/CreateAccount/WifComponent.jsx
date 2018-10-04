@@ -3,9 +3,9 @@ import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import BridgeBtnCopy from '../../BridgeBtnCopy';
+import BridgeBtnCopy from '../../components/BridgeBtnCopy/index';
 
-import { FORM_SIGN_UP } from '../../../constants/FormConstants';
+import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 class WifComponent extends React.Component {
 

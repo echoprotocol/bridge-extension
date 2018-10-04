@@ -2,11 +2,13 @@ import { EchoJSActions } from 'echojs-redux';
 
 import history from '../history';
 
+import { getObject } from './BalanceActions';
+
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import { INDEX_PATH, WIF_PATH } from '../constants/RouterConstants';
 
-const connection = () => async (dispatch) => {
+export const connection = () => async (dispatch) => {
 	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
 
 	try {
@@ -34,6 +36,8 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 		const { id, name } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
 
+		// EchoJSActions.setSubscribe({ types: ['objects', 'block', 'accounts'], method: getObject });
+
 		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name } }));
 
 		if (INDEX_PATH.includes(history.location.pathname)) {
@@ -48,4 +52,23 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 	}
 };
 
-export default connection;
+export const addAccount = (accountName, networkName) => (dispatch) => {
+	let accounts = localStorage.getItem(`accounts_${networkName}`);
+	accounts = accounts ? JSON.parse(accounts) : [];
+	accounts.push({ name: accountName, active: false });
+
+	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
+
+	dispatch(initAccount(accountName, networkName));
+};
+
+export const isAccountAdded = (accountName, networkName) => {
+	let accounts = localStorage.getItem(`accounts_${networkName}`);
+	accounts = accounts ? JSON.parse(accounts) : [];
+
+	if (accounts.find(({ name }) => name === accountName)) {
+		return 'Account already added';
+	}
+
+	return null;
+};

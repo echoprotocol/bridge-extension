@@ -5,8 +5,8 @@ import classnames from 'classnames';
 
 class BridgeInput extends React.Component {
 
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 
 		this.state = {
 			up: false,
@@ -36,7 +36,7 @@ class BridgeInput extends React.Component {
 					this.props.hintText.length > 0 ?
 						<div className="message-hint">
                             You can try
-							<span> { this.props.hintText } </span>
+							<span role="button" tabIndex="0" onClick={this.props.onClick} onKeyPress={this.props.onClick}> { this.props.hintText } </span>
 						</div> : null
 				}
 
@@ -83,6 +83,7 @@ BridgeInput.propTypes = {
 	hintText: PropTypes.string,
 	descriptionText: PropTypes.string,
 	onChange: PropTypes.func,
+	onClick: PropTypes.func,
 };
 
 BridgeInput.defaultProps = {
@@ -96,6 +97,7 @@ BridgeInput.defaultProps = {
 	hintText: '',
 	descriptionText: '',
 	onChange: null,
+	onClick: null,
 };
 
 export default BridgeInput;

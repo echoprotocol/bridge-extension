@@ -3,12 +3,12 @@ import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { createAccount } from '../../../actions/AuthActions';
+import { createAccount } from '../../actions/AuthActions';
+import { setFormValue } from '../../actions/FormActions';
 
-import BridgeInput from '../../BridgeInput';
+import BridgeInput from '../../components/BridgeInput';
 
-import { FORM_SIGN_UP } from '../../../constants/FormConstants';
-import { setFormValue } from '../../../actions/FormActions';
+import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 class CreateAccount extends React.Component {
 
@@ -25,6 +25,14 @@ class CreateAccount extends React.Component {
 		if (field) {
 			this.props.setFormValue(field, value);
 		}
+	}
+
+	onClick(e) {
+		const { accountName } = this.props;
+
+		const field = e.target.name;
+
+		this.props.setFormValue(field, accountName);
 	}
 
 	renderLogin() {
@@ -45,6 +53,7 @@ class CreateAccount extends React.Component {
 							descriptionText="Unique name will be used to make transaction"
 							value={accountName.value}
 							onChange={(e) => this.onChange(e)}
+							onClick={(e) => this.onClick(e)}
 						/>
 					</div>
 				</div>
