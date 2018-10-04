@@ -1,6 +1,12 @@
+// BTNS:
+// btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy,
+// btn-noborder, btn-nav, btn-logout
+
+// SIZE: compact
+// STATE: error, disabled
 
 %btn {
-    @extend %noSelection;
+    @include noSelection();
     font-family: FNBold;
     text-transform: uppercase;
     line-height: 0;
@@ -13,16 +19,21 @@
     background-color $speed,
     border $speed,
     color $speed;
+    will-change: transition;
     padding: 0;
     &.disabled {
           pointer-events: none;
-          border: 1px solid $colorDisabled;
+          border: 2px solid $colorDisabled;
           background-color: transparent;
-          color: $colorDisabled;
+          color: #b6b9be;
     }
     &.compact {
        height: 25px;
-       
+       font-size: 10px;
+
+       .btn-text {
+           letter-spacing: 2.2px;
+       }
     }
 }
 
@@ -67,11 +78,10 @@
 
 %btnIn {
     @extend %btn;
+    font-family: FNBold;
     background-color: #16d6aa;
     border-radius: $angularMax;
- 
     border: 1px solid #16d6aa;
-    font-size: 12px;
     color: #324046;
     &:not(.disabled) {
         &:hover {
@@ -121,7 +131,7 @@
         background-color: #344148;
         border-radius: $angularMax;
         border: 1px solid #344148;
-        font-size: 12px;
+
         color: #16d6aa;
         &:not(.disabled) {
             &:hover {
@@ -148,7 +158,7 @@
         color: #535e65;
         border-radius: $angularMax;
         border: 1px solid #c3c7cc;
-        font-size: 12px;
+
         &:not(.disabled) {
             &:hover {
                 border: 1px solid #a6abb1;
@@ -173,9 +183,124 @@
         }
     }
 
+    &-copy {
+        @extend %btn;
+        font-family: FNMedium;
+        background-color: #ffffff;
+        color: #535e65;
+        border-radius: $angularMax;
+        border: 1px solid #c3c7cc;
+
+        width: 200px;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        height: 25px;
+        top: 0;
+        right: 0;
+    }
+    &-noborder {
+        @extend %btn;
+        background-color: transparent;
+        color: #7e8489;
+        border: 1px solid transparent;
+        border-radius: $angularMax;
+    }
+    &-nav {
+        background-color: transparent;
+        width: 30px;
+        height: 30px;
+        border: 0;
+        cursor: pointer;
+
+        &:hover,
+        &:focus {
+            div {
+                background-color: #88a5a6;
+            }
+        }
+        &:active {
+            div {
+                background-color: #506869;
+            }
+            
+        }
+        div {
+            height: 2px;
+            width: 14px;
+            background-color: #5c7071;
+            margin-left: 1px;
+            transition: background-color $speed;
+            &:not(:last-child) {
+                margin-bottom: 3px;
+            }
+        }
+    }
+    &-logout {
+        background-color: transparent;
+        border: 0;
+        border-radius: $angularMin;
+        width: 33px;
+        height: 33px;
+        color: rgba(#fff, .4);
+        transition: background-color $speed, color $speed;
+        cursor: pointer;
+        &:hover {
+            background-color: #3a4a4e;
+            color: #fff;
+        }
+        &:before {
+            content: '\e32e';
+
+        }
+    }
+
 }
 
 // Btns wrap
+
+.btn-copy-wrap {
+    position: relative;
+    width: 200px;
+    display: flex;
+    height: 25px;
+    justify-content: flex-end;
+    transform: width $speed;
+    border: 0;
+    border-radius: $angularMax;
+    transition: width $speed;
+
+    &:not(.copied) {
+        @include onBtnFocus (
+            $angularMax,
+            2px,
+            0px,
+            #dde1e4
+        );
+    }
+    &:active {
+        .btn-copy {
+            background-color: #efeff0;
+        }
+    }
+    &.copied {
+        width: 226px;
+    }
+    &:after {
+        border-radius: $angularMax;
+        content: "";
+        position: absolute;
+        right: 0;
+        left: 0;
+        bottom: 0;
+        top: 0;
+        height: 23px;
+        background-color: #efeff0;
+        border: 1px solid #efeff0;
+    }
+}
 
 .one-btn-wrap {
     display: flex;
@@ -208,4 +333,4 @@
         min-width: 145px;
     }
 
- }
+}

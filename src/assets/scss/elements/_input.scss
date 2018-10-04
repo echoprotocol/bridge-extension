@@ -8,27 +8,37 @@
     font-size: 16px;
     transition: color $speed, margin $speed;
     padding: 0;
+    letter-spacing: 1.8px;
 }
 
-.wrap {
-    padding: 20px;
-}
 .input {
     text-align: center;
     position: relative;
-    height: 50px;
+    height: 48px;
     display: flex;
     align-items: flex-end;
+    letter-spacing: 1px;
+    margin-right: -1px;
+    &-wrap {
+        text-align: center;
+        & + .input-wrap {
+            margin-top: 24px;
+        }
+    }
     &.left {
         text-align: left;
-        input {
+        
+        input,
+        .input-wrap {
             text-align: left;
         }
     }
     &.up {
         .label {
-            line-height: 12px;
-            font-size: 14px;
+            line-height: 1px;
+            font-size: 12px;
+            letter-spacing: 1.2px;
+            left: 3px;
         }
     }
 
@@ -39,7 +49,7 @@
         }
         input {
             height: 25px;
-            margin-bottom: 8px;
+            margin-bottom: 13px;
         }
     }
 
@@ -49,15 +59,7 @@
         }
         input[type="password" i] {
             color: $colorError !important;
-        }
-        & + .error-message {
-            font-size: 15px;
-            margin-top: 15px;
-            opacity: 1;
-            height: auto;
-            padding-bottom: 2px;
-        }
-            
+        }   
     }
 
     &-light {
@@ -188,10 +190,9 @@
         left: 0;
         position: absolute;
         top: 0;
-        line-height: 50px;
-        font-size: 18px;
+        line-height: 47px;
+        font-size: 17px;
         will-change: transform;
-
         transition: line-height $speed, font-size $speed, color $speed;
         font-family: FNMedium;
     }
@@ -214,17 +215,49 @@
 
 }
 
-// error-message
+// message
 
-.error-message {
-    color:  $colorError;
-    font-family: FNBook;
-    font-size: 0;
-    opacity: 0;
-    transition: font-size $speed, opacity $speed $speed;
-    text-align: center;
-    height: 0;
-    overflow: hidden;
+.message {
+    &-error {
+        color:  $colorError;
+        font-family: FNBook;
+        animation: fadeIn $speed;
+        text-align: center;
+        letter-spacing: 1px;
+        font-size: 15px;
+        margin-top: 14px;
+        & + .message-description {
+            margin-top: 32px;
+        }
+        & + .message-hint {
+            display: block;
+        }
+    }
+    &-hint {
+        margin-top: 6px;
+        font-family: FNBook;
+        font-size: 15px;
+        color: #3b454a;
+        letter-spacing: 1px;
+        animation: fadeIn $speed;
+        span {
+            font-family: FNMedium;
+        }
+
+        & + .message-description {
+            margin-top: 32px;
+        }
+    }
+    &-description {
+        font-family: FNBook;
+        font-size: 14px;
+        color: #9ca1a5;
+        margin: 11px auto 0;
+        letter-spacing: 1.32px;
+        line-height: 21px;
+        max-width: 238px;
+        padding-left: 3px;
+    }
 }
 
 input[type="password" i] {

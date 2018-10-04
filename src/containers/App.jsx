@@ -1,19 +1,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import Header from './layout/Header';
-import Footer from './layout/Footer';
-
-import ModalConfirm from './modals/Confirm';
-import Navbar from './layout/Navbar';
+import Header from '../components/Header';
+import Navbar from '../components/Navbar';
 
 class App extends React.Component {
 
-	renderModals() {
-		return (
-			<ModalConfirm />
-		);
-	}
 
 	render() {
 		const { children } = this.props;
@@ -23,9 +15,7 @@ class App extends React.Component {
 					<Header />
 					<Navbar />
 					{children}
-					<Footer />
 
-					{this.renderModals()}
 				</div>
 			</div>
 		);
