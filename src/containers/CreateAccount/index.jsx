@@ -1,7 +1,7 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
-import BridgeInput from '../../BridgeInput';
-import BridgeBtnCopy from '../../BridgeBtnCopy';
+import BridgeInput from '../../components/BridgeInput';
+import BridgeBtnCopy from '../../components/BridgeBtnCopy';
 
 class CreateAccount extends React.Component {
 
@@ -68,7 +68,8 @@ class CreateAccount extends React.Component {
 
 	render() {
 		return (
-			this.renderLogin()
+		// this.renderLogin()
+			this.renderWelcome()
 		);
 
 	}

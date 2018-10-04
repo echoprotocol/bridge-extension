@@ -5,8 +5,8 @@ import classnames from 'classnames';
 
 class BridgeInput extends React.Component {
 
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 
 		this.state = {
 			up: false,
