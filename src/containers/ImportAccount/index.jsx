@@ -1,6 +1,6 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
-import BridgeInput from '../../BridgeInput';
+import BridgeInput from '../../components/BridgeInput';
 
 class ImportAccount extends React.Component {
 

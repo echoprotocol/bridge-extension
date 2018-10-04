@@ -6,8 +6,8 @@ import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 class BridgeBtnCopy extends React.Component {
 
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 
 		this.state = {
 			copied: false,
@@ -36,7 +36,7 @@ class BridgeBtnCopy extends React.Component {
 						<React.Fragment>
 							<div className={classnames('btn-copy', { compact: this.props.compact })} >
 								<i className="icon-copy" />
-								<span className="btn-text">Copy to clipboadrd</span>
+								<span className="btn-text">Copy to clipboard</span>
 							</div>
 						</React.Fragment>
 					}

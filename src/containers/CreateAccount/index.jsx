@@ -3,12 +3,12 @@ import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import createAccount from '../../../actions/AuthActions';
+import { setFormValue } from '../../actions/FormActions';
+import createAccount from '../../actions/AuthActions';
 
-import BridgeInput from '../../BridgeInput';
+import BridgeInput from '../../components/BridgeInput';
 
-import { FORM_SIGN_UP } from '../../../constants/FormConstants';
-import { setFormValue } from '../../../actions/FormActions';
+import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 class CreateAccount extends React.Component {
 
