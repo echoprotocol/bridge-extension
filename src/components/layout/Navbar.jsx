@@ -1,9 +1,28 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
+import { withRouter } from 'react-router';
+
+import { HEADER_TITLE } from '../../constants/GlobalConstants';
 
 class Navbar extends React.PureComponent {
 
+	renderTitle() {
+		const { location } = this.props;
+
+		const item = HEADER_TITLE.find((title) => {
+			if (title.path === location.pathname) {
+				return true;
+			} else if (title.path.split('/')[1] === location.pathname.split('/')[1]) {
+				return true;
+			}
+			return false;
+		});
+		return item || '';
+	}
+
 	render() {
+		const { title, link } = this.renderTitle();
 
 		return (
 			<div className="navbar">
@@ -20,10 +39,13 @@ class Navbar extends React.PureComponent {
 							}
 						/>
 					</li>
-					<li className="page-title">Create account</li>
-					<li className="link-nav">
-						<a href="#">Import account</a>
-					</li>
+					<li className="page-title">{title}</li>
+					{
+						link &&
+						<li className="link-nav">
+							<a href={link.value}>{link.name}</a>
+						</li>
+					}
 				</ul>
 			</div>
 		);
@@ -31,4 +53,8 @@ class Navbar extends React.PureComponent {
 
 }
 
-export default Navbar;
+Navbar.propTypes = {
+	location: PropTypes.object.isRequired,
+};
+
+export default withRouter(Navbar);

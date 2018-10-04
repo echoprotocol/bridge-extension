@@ -10,13 +10,15 @@ import { FORM_SIGN_UP } from '../../../constants/FormConstants';
 class WifComponent extends React.Component {
 
 	render() {
+		const { accountName, wif } = this.props;
+
 		return (
 			<React.Fragment>
 				<div className="page-wrap" >
 					<div className="icon-person-in" />
 
 					<div className="hi-text">
-						<div>{this.props.accountName},</div>
+						<div>{accountName},</div>
 						<span>welcome to Bridge!</span>
 					</div>
 					<div className="instruction-text">
@@ -24,7 +26,7 @@ class WifComponent extends React.Component {
                         You <br /> will need it to restore account.
 					</div>
 					<div className="wif-wrap">
-						<div className="wif">{this.props.wif}</div>
+						<div className="wif">{wif}</div>
 						<BridgeBtnCopy compact />
 
 					</div>
