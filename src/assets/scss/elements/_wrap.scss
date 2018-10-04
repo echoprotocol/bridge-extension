@@ -12,6 +12,7 @@
     height: 591px;
     border-radius: $angularMin;
     position: relative;
+    overflow: hidden;
     &.light {
         background-color: $colorBgLight;
     }

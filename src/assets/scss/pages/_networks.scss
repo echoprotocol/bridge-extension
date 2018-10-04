@@ -20,3 +20,25 @@
     height: 28px;
     margin: 0 auto auto;
 }
+
+.success {
+    &-text {
+        text-align: center;
+        font-family: FNMedium;
+        font-size: 22px;
+        color: #3E4851;
+        letter-spacing: 1px;
+        margin-top: 86px;
+    }
+    &-desc {
+        font-family: FNBook;
+        color: #3F4A52;
+        text-align: center;
+        max-width: 230px;
+        margin: 19px auto 0;
+        font-size: 14px;
+        letter-spacing: 1px;
+        line-height: 17px;
+        
+    }
+}

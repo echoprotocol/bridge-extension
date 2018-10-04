@@ -46,6 +46,11 @@ class AddNetwork extends React.Component {
 		return (
 			<div className="page">
 				<div className="icon-network" />
+				<div className="success-text"> Success </div>
+				<div className="success-desc">
+                    Network <span>Hallelujah</span> was succesfully created
+				</div>
+
 			</div>
 		);
 	}
