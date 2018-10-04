@@ -97,7 +97,6 @@ class UserDropdown extends React.PureComponent {
 		return (
 			<Dropdown
 				className="dropdown-user"
-				open
 				trigger={
 					<div className="dropdown-trigger">
 						<span className="user-icon-wrap" />
