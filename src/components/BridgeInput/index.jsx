@@ -10,18 +10,20 @@ class BridgeInput extends React.Component {
 
 		this.state = {
 			up: false,
-			focus: false,
+			filled: false,
 		};
 	}
 
 	onFocus() {
-		this.setState({ up: true, focus: true });
+		this.setState({ up: true });
 	}
 
-	onBlur(e) {
-		if (!this.state.focus || (e.target.value.length < 1)) {
-			this.setState({ up: false, focus: false });
-		}
+	onChange(e) {
+		this.setState({ filled: !!e.target.value.length });
+	}
+
+	onBlur() {
+		this.setState({ up: false });
 	}
 
 	renderError() {
@@ -55,10 +57,12 @@ class BridgeInput extends React.Component {
 					type={this.props.type}
 					error={this.props.error}
 					onFocus={() => this.onFocus()}
-					onBlur={(e) => this.onBlur(e)}
+					onChange={(e) => this.onChange(e)}
+					onBlur={() => this.onBlur()}
 					className={classnames(
 						{ up: this.state.up },
 						{ focused: this.state.focus },
+						{ filled: this.state.filled },
 						this.props.position,
 					)}
 				/>

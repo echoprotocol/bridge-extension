@@ -5,7 +5,7 @@
     background-color: #dfe2e4;
     padding: 0 15px;
     & + .page-wrap {
-        padding-top: 35px;
+        padding-top: 25px;
         max-height: 443px;
         .page {
             min-height: 338px;
@@ -39,6 +39,12 @@
         font-size: 14px;
         letter-spacing: 1px;
         line-height: 17px;
-        
+        & + .one-btn-wrap {
+            margin: 40px 0 0 -8px;
+            .btn-transparent.compact {
+                min-width: 155px;
+            }
+            justify-content: center;
+        }
     }
 }

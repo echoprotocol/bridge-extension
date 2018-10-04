@@ -31,10 +31,11 @@ class AddNetwork extends React.Component {
 				</div>
 				<div className="page-action-wrap">
 					<div className="one-btn-wrap" >
-						<Button
+						{/* <Button
 							className="btn-in-light"
 							content={<span className="btn-text">Create</span>}
-						/>
+                        /> */}
+
 					</div>
 				</div>
 
@@ -50,7 +51,13 @@ class AddNetwork extends React.Component {
 				<div className="success-desc">
                     Network <span>Hallelujah</span> was succesfully created
 				</div>
-
+				<div className="one-btn-wrap">
+					<Button
+						compact
+						className="btn-transparent"
+						content={<span className="btn-text">ADD ACCOUNT</span>}
+					/>
+				</div>
 			</div>
 		);
 	}
@@ -66,8 +73,8 @@ class AddNetwork extends React.Component {
 				</div>
 				<div className="page-wrap">
 					{
-						this.renderSuccess()
-						/* {this.renderForm()} */
+						// this.renderSuccess()
+						this.renderForm()
 					}
 				</div>
 
