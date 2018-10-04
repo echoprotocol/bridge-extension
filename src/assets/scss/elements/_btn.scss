@@ -1,9 +1,12 @@
-// BTNS: btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy, btn-noborder, btn-nav
+// BTNS:
+// btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy,
+// btn-noborder, btn-nav, btn-logout
+
 // SIZE: compact
 // STATE: error, disabled
 
 %btn {
-    @extend %noSelection;
+    @include noSelection();
     font-family: FNBold;
     text-transform: uppercase;
     line-height: 0;
@@ -233,6 +236,24 @@
             &:not(:last-child) {
                 margin-bottom: 3px;
             }
+        }
+    }
+    &-logout {
+        background-color: transparent;
+        border: 0;
+        border-radius: $angularMin;
+        width: 33px;
+        height: 33px;
+        color: rgba(#fff, .4);
+        transition: background-color $speed, color $speed;
+        cursor: pointer;
+        &:hover {
+            background-color: #3a4a4e;
+            color: #fff;
+        }
+        &:before {
+            content: '\e32e';
+
         }
     }
 

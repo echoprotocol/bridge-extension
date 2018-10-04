@@ -4,12 +4,13 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
-import { importAccount } from '../../../actions/AuthActions';
-import { setFormValue } from '../../../actions/FormActions';
+import { importAccount } from '../../actions/AuthActions';
+import { setFormValue } from '../../actions/FormActions';
 
-import BridgeInput from '../../BridgeInput';
+import { FORM_SIGN_IN } from '../../constants/FormConstants';
 
-import { FORM_SIGN_IN } from '../../../constants/FormConstants';
+import BridgeInput from '../../components/BridgeInput';
+
 
 class ImportAccount extends React.Component {
 
