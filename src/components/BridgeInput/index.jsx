@@ -63,7 +63,7 @@ class BridgeInput extends React.Component {
 					)}
 				/>
 				{ this.props.error ? this.renderError() : null }
-				<div className="message-description">{ this.props.descriptionText }</div>
+				{ this.props.descriptionText ? <div className="message-description">{ this.props.descriptionText }</div> : null }
 			</div>
 
 		);

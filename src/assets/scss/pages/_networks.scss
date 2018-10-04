@@ -1,0 +1,22 @@
+.return-block {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    background-color: #dfe2e4;
+    padding: 0 15px;
+    & + .page-wrap {
+        padding-top: 35px;
+        max-height: 443px;
+        .page {
+            min-height: 338px;
+        }
+    }
+}
+
+.icon-network {
+    background-color: #e3e6e8;
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    margin: 0 auto auto;
+}

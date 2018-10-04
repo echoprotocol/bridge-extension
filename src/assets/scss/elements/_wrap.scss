@@ -11,7 +11,7 @@
     width: 362px;
     height: 591px;
     border-radius: $angularMin;
-    overflow: auto;
+    position: relative;
     &.light {
         background-color: $colorBgLight;
     }
@@ -22,21 +22,20 @@
 }
 
 .page-wrap {
-    min-height: 348px;
-    margin-top: 70px;
-    padding: 0 28px 35px;
-    position: relative;
-    .one-input-wrap {
-        .input-wrap {
-            margin-top: 80px;
-        }
+    padding-top: 70px;
+    max-height: 488px;
+    overflow: auto;
+    .page {
+        padding: 0 28px 35px;
+        position: relative;
+        min-height: 348px;
     }
-    .two-input-wrap {
-        .input-wrap {
-            &:first-child {
-                margin-top: 45px;
-            }
-        }
+    .one-input-wrap {
+        margin-top: 80px;
+    }
+    .two-input-wrap,
+    .three-input-wrap {
+        margin-top: 45px;
     }
 }
 .page-action-wrap {
