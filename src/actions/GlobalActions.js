@@ -6,7 +6,7 @@ import GlobalReducer from '../reducers/GlobalReducer';
 
 import { INDEX_PATH, WIF_PATH } from '../constants/RouterConstants';
 
-const connection = () => async (dispatch) => {
+export const connection = () => async (dispatch) => {
 	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
 
 	try {
@@ -48,4 +48,12 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 	}
 };
 
-export default connection;
+export const addAccount = (accountName, networkName) => (dispatch) => {
+	let accounts = localStorage.getItem(`accounts_${networkName}`);
+	accounts = accounts ? JSON.parse(accounts) : [];
+	accounts.push({ name: accountName, active: false });
+
+	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
+
+	dispatch(initAccount(accountName, networkName));
+};

@@ -1,11 +1,13 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Dimmer } from 'semantic-ui-react';
 
-import connection from '../actions/GlobalActions';
+import { connection } from '../actions/GlobalActions';
 
 import Header from '../components/Header';
 import Navbar from '../components/Navbar';
+import { FORM_SIGN_UP } from '../constants/FormConstants';
 
 class App extends React.Component {
 
@@ -13,7 +15,7 @@ class App extends React.Component {
 		this.props.connection();
 	}
 
-	render() {
+	renderChildren() {
 		const { children } = this.props;
 		return (
 			<div className="temp-wrap">
@@ -27,17 +29,26 @@ class App extends React.Component {
 		);
 	}
 
+	render() {
+		// Uncomment for dimmer
+		// const { loading } = this.props;
+
+		return this.renderChildren();
+		// return loading ? <Dimmer /> : this.renderChildren();
+	}
+
 }
 
 App.propTypes = {
 	children: PropTypes.element.isRequired,
+	loading: PropTypes.bool.isRequired,
 	connection: PropTypes.func.isRequired,
 };
 
 export default connect(
 	(state) => ({
 		globalLoading: state.global.get('globalLoading'),
-		loading: state.global.get('loading'),
+		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
 	}),
 	(dispatch) => ({
 		connection: () => dispatch(connection()),

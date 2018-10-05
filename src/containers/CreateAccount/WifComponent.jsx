@@ -3,11 +3,17 @@ import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import { clearForm } from '../../actions/FormActions';
+
 import BridgeBtnCopy from '../../components/BridgeBtnCopy/index';
 
 import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 class WifComponent extends React.Component {
+
+	componentWillUnmount() {
+		this.props.clearForm();
+	}
 
 	render() {
 		const { accountName, wif } = this.props;
@@ -49,6 +55,7 @@ class WifComponent extends React.Component {
 WifComponent.propTypes = {
 	wif: PropTypes.string.isRequired,
 	accountName: PropTypes.string,
+	clearForm: PropTypes.func.isRequired,
 };
 
 WifComponent.defaultProps = {
@@ -58,7 +65,9 @@ WifComponent.defaultProps = {
 export default connect(
 	(state) => ({
 		wif: state.form.getIn([FORM_SIGN_UP, 'wif']),
-		activeUser: state.global.getIn(['activeUser', 'name']),
+		accountName: state.global.getIn(['activeUser', 'name']),
 	}),
-	() => ({}),
+	(dispatch) => ({
+		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
+	}),
 )(WifComponent);

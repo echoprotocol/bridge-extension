@@ -23,7 +23,6 @@ export const HEADER_TITLE = [
 	},
 	{
 		path: WIF_PATH,
-		title: 'Wif',
 	},
 ];
 
