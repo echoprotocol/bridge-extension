@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Dimmer } from 'semantic-ui-react';
+// import { Dimmer } from 'semantic-ui-react';
 
 import { connection } from '../actions/GlobalActions';
 
@@ -41,7 +41,7 @@ class App extends React.Component {
 
 App.propTypes = {
 	children: PropTypes.element.isRequired,
-	loading: PropTypes.bool.isRequired,
+	// loading: PropTypes.bool.isRequired,
 	connection: PropTypes.func.isRequired,
 };
 

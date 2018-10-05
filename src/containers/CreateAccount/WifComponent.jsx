@@ -24,7 +24,7 @@ class WifComponent extends React.Component {
 					<div className="icon-person-in" />
 
 					<div className="hi-text">
-						<div>{accountName},</div>
+						<div>{accountName.value},</div>
 						<span>welcome to Bridge!</span>
 					</div>
 					<div className="instruction-text">
@@ -41,6 +41,7 @@ class WifComponent extends React.Component {
 					<div className="one-btn-wrap" >
 						<Button
 							className="btn-in-light"
+							onClick={() => this.props.history.goBack()}
 							content={<span className="btn-text">Proceed</span>}
 						/>
 					</div>
@@ -54,18 +55,15 @@ class WifComponent extends React.Component {
 
 WifComponent.propTypes = {
 	wif: PropTypes.string.isRequired,
-	accountName: PropTypes.string,
+	accountName: PropTypes.object.isRequired,
+	history: PropTypes.object.isRequired,
 	clearForm: PropTypes.func.isRequired,
-};
-
-WifComponent.defaultProps = {
-	accountName: '',
 };
 
 export default connect(
 	(state) => ({
 		wif: state.form.getIn([FORM_SIGN_UP, 'wif']),
-		accountName: state.global.getIn(['activeUser', 'name']),
+		accountName: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 	}),
 	(dispatch) => ({
 		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),

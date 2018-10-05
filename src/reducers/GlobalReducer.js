@@ -11,6 +11,11 @@ export default createModule({
 			id: '',
 			name: '',
 		}),
+		network: new Map({
+			name: '',
+			registrator: '',
+			url: '',
+		}),
 
 	}),
 	transformations: {
