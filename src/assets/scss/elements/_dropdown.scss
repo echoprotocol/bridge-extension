@@ -21,15 +21,22 @@
         @include noSelection();
 
 
-        // START USER DROPDOWN
-        &-user {
+        &-user,
+        &-network {
             .menu {
                 width: 350px;
+                margin: 1px 6px 0;
+                right: 0;
+                box-shadow: 0px 0px 21px 0px rgba(#213034, .9);
+            }
+
+
+        }
+        // USER DROPDOWN
+        &-user {
+            .menu {
                 padding: 5px;
                 background-color: #36454a;
-                box-shadow: 0px 0px 21px 0px rgba(#213034, .9);
-                margin: 1px auto 0;
-                right: 0;
             }
             .item {
                 &:nth-last-child(4) {
@@ -190,7 +197,16 @@
             }
 
         }
-        // STOP USER DROPDOWN
+
+        // NETWORK DROPDOWN
+
+        &-network {
+            .menu {
+                background-color: #36454a;
+                padding: 5px;
+                left: auto;
+            }
+        }
 
     }
 }
