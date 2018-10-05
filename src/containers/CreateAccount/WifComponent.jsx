@@ -33,7 +33,7 @@ class WifComponent extends React.Component {
 					</div>
 					<div className="wif-wrap">
 						<div className="wif">{wif}</div>
-						<BridgeBtnCopy compact />
+						<BridgeBtnCopy compact text={wif} />
 
 					</div>
 				</div>

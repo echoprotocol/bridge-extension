@@ -2,14 +2,14 @@ import React from 'react';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
-import { Link } from 'react-router-dom';
 import history from '../../history';
 
 import { HEADER_TITLE } from '../../constants/GlobalConstants';
 
 class Navbar extends React.PureComponent {
 
-	onClick(link) {
+	onClick(e, link) {
+		e.preventDefault();
 		history.push(link);
 	}
 
@@ -29,9 +29,6 @@ class Navbar extends React.PureComponent {
 
 	render() {
 		const { title, link } = this.renderTitle();
-
-		const { location } = this.props;
-		const parsedLocation = `/${location.pathname.split('/')[1]}`;
 
 		return (
 			<div className="navbar">
@@ -54,8 +51,9 @@ class Navbar extends React.PureComponent {
 					{
 						link &&
 						<li className="link-nav">
-							<span role="button" tabIndex="0" onClick={() => this.onClick(link.value)} onKeyPress={() => this.onClick(link.value)} >{link.name}</span>
-							{/* <a href={link.value}>{link.name}</a> */}
+							<a onClick={(e) => this.onClick(e, link.value)} href="#">
+								{link.name}
+							</a>
 						</li>
 					}
 				</ul>
