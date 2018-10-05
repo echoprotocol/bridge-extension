@@ -206,6 +206,71 @@
                 padding: 5px;
                 left: auto;
             }
+            .network {
+                &-item {
+                    display: block;
+                    margin-top: -1px;
+                    color: #828C94;
+                    position: relative;
+                    span {
+                        &:before {
+                            display: block;
+                            content: "";
+                            top: 0;
+                            right: -6px;
+                            left: -6px;
+                            bottom: 0;
+                            background-color: red;
+                            position: absolute;
+                            z-index: -1;
+                        }
+                    }
+
+                    &:hover,
+                    &.active {
+                        .network-item-wrap {
+                            background-color: #414f53;
+                            color: #ADB4BA;
+                            &:before {
+                                background-color: #414f53;
+    
+                            }
+                            &:after {
+                                background-color: #414f53;
+                            }
+                        }
+
+                    }
+                    &-wrap {
+                        height: 36px;
+                        display: flex;
+                        flex-direction: column;
+                        align-items: center;
+                        &:before,
+                        &:after {
+                            background-color: #3d4c50;
+                            width: 310px;
+                            margin: auto;
+                            content: "";
+                            height: 1px;
+                            display: block;
+                            transition: background-color $speed;
+                        }
+                    }
+
+
+                    & + div:first-of-type {
+                        margin-top: 15px;
+                        &:before {
+                            display: none;
+                        }
+                    }
+                }
+                &-title {
+                    font-size: 14px;
+                }
+            }
+
         }
 
     }

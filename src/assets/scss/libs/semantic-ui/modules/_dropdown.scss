@@ -45,10 +45,8 @@
   text-align: left;
   border: 1px solid rgba(34, 36, 38, 0.15);
   border-radius: 0.28571429rem;
-  -webkit-transition: opacity 0.1s ease;
-  transition: opacity 0.1s ease;
   z-index: 11;
-  will-change: transform, opacity;
+  will-change: transform;
 }
 .ui.dropdown .menu > * {
   white-space: nowrap;
