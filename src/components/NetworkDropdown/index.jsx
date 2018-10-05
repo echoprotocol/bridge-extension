@@ -127,7 +127,7 @@ class NetworkDropdown extends React.PureComponent {
 		return (
 			<Dropdown
 				className="dropdown-network"
-				open
+				// open
 				trigger={
 					<div className="dropdown-trigger">
 						<span className="user-icon-wrap" />
