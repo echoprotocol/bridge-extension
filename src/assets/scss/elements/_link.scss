@@ -45,7 +45,6 @@
     &-return {
         @extend %link;
         font-family: FNBold;
-        margin: 0 0 -3px 0;
         color: #39494C;
         min-width: 89px;
         text-transform: uppercase;
@@ -62,10 +61,10 @@
             height: 14px;
             display: flex;
             align-items: center;
-            &:before {
-                content: "←";
-            }
-            margin-right: 13px;
+            margin-right: 10px;
+            & + .link-text {
+                    margin: 0 -5px 0 4px;
+            } 
         }
         &:hover {
             color: #626e70;

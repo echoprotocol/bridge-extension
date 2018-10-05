@@ -19,7 +19,6 @@
     background-color $speed,
     border $speed,
     color $speed;
-    will-change: transition;
     padding: 0;
     &.disabled {
           pointer-events: none;
@@ -215,30 +214,22 @@
         height: 30px;
         border: 0;
         cursor: pointer;
+        font-size: 18px;
+        color: #5c7071;
+        transition: color linear $speed;
+        -webkit-transform: translateZ(0);
 
         &:hover,
         &:focus {
-            div {
-                background-color: #88a5a6;
-            }
+            color: #88a5a6;
+
         }
+
         &:active {
-            div {
-                background-color: #506869;
-            }
-            
-        }
-        div {
-            height: 2px;
-            width: 14px;
-            background-color: #5c7071;
-            margin-left: 1px;
-            transition: background-color $speed;
-            &:not(:last-child) {
-                margin-bottom: 3px;
-            }
+            color: #506869;
         }
     }
+    
     &-logout {
         background-color: transparent;
         border: 0;
@@ -253,8 +244,9 @@
             color: #fff;
         }
         &:before {
-            content: '\e32e';
-
+            content: $icon-exit;
+            font-size: 20px;
+            margin: 1px -3px 0 0;
         }
     }
 

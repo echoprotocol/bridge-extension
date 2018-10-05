@@ -10,7 +10,10 @@ class AddNetwork extends React.Component {
 			<React.Fragment>
 
 				<div className="page">
-					<div className="icon-network" />
+					<div className="icon-pageNetwork">
+						<span className="path1" />
+						<span className="path2" />
+					</div>
 
 					<div className="three-input-wrap">
 						<BridgeInput
