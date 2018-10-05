@@ -1,50 +1,48 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+
+import { createAccount } from '../../actions/AuthActions';
+import { setFormValue } from '../../actions/FormActions';
+
 import BridgeInput from '../../components/BridgeInput';
-import BridgeBtnCopy from '../../components/BridgeBtnCopy';
+
+import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 class CreateAccount extends React.Component {
 
-	renderWelcome() {
-		return (
-			<React.Fragment>
-				<div className="icon-pageAccount-in" />
-
-				<div className="page-wrap" >
-					<div className="page">
-
-						<div className="hi-text">
-							<div>Homerushko564,</div>
-							<span>welcome to Bridge!</span>
-						</div>
-						<div className="instruction-text">
-                        Save your WIF key and don’t loose it.
-                        You <br /> will need it to restore account.
-						</div>
-						<div className="wif-wrap">
-							<div className="wif">5Kb8kLf9zgWQnogidDA76MzPL6TsZZY36hWXMssSzNydYXYB9KF</div>
-							<BridgeBtnCopy compact />
-
-						</div>
-					</div>
-					<div className="page-action-wrap">
-						<div className="one-btn-wrap" >
-							<Button
-								className="btn-in-light"
-								content={<span className="btn-text">Proceed</span>}
-							/>
-						</div>
-					</div>
-				</div>
-
-			</React.Fragment>
-		);
+	onCreate() {
+		this.props.createAccount({ accountName: this.props.accountName.value.trim() });
 	}
 
+	onChange(e) {
+		const field = e.target.name;
+
+		let { value } = e.target;
+		value = value.toLowerCase();
+
+		if (field) {
+			this.props.setFormValue(field, value);
+		}
+	}
+
+	onClick(e) {
+		const { accountName } = this.props;
+
+		const field = e.target.name;
+
+		this.props.setFormValue(field, accountName);
+	}
+
+
 	renderLogin() {
+		const { accountName } = this.props;
+
 		return (
 			<React.Fragment>
 				<div className="page-wrap">
+
 					<div className="page">
 						<div className="icon-pageAccount">
 							<span className="path1" />
@@ -52,12 +50,16 @@ class CreateAccount extends React.Component {
 						</div>
 						<div className="one-input-wrap">
 							<BridgeInput
-							// error
+								error={!!accountName.error}
+								name="accountName"
 								theme="input-light"
 								labelText="Account name"
-								errorText="Account with such name already exists."
-								hintText="Homersipmson23"
+								errorText={accountName.error && accountName.error.errorText}
+								hintText={accountName.error && accountName.error.example}
 								descriptionText="Unique name will be used to make transaction"
+								value={accountName.value}
+								onChange={(e) => this.onChange(e)}
+								onClick={(e) => this.onClick(e)}
 							/>
 						</div>
 					</div>
@@ -66,6 +68,9 @@ class CreateAccount extends React.Component {
 							<Button
 								className="btn-in-light"
 								content={<span className="btn-text">Create</span>}
+								type="submit"
+								onClick={(e) => this.onCreate(e)}
+								disabled={this.props.loading}
 							/>
 						</div>
 					</div>
@@ -79,11 +84,26 @@ class CreateAccount extends React.Component {
 	render() {
 		return (
 			this.renderLogin()
-			// this.renderWelcome()
 		);
 
 	}
 
 }
 
-export default CreateAccount;
+CreateAccount.propTypes = {
+	loading: PropTypes.bool.isRequired,
+	accountName: PropTypes.object.isRequired,
+	createAccount: PropTypes.func.isRequired,
+	setFormValue: PropTypes.func.isRequired,
+};
+
+export default connect(
+	(state) => ({
+		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
+		accountName: state.form.getIn([FORM_SIGN_UP, 'accountName']),
+	}),
+	(dispatch) => ({
+		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_UP, field, value)),
+		createAccount: (value) => dispatch(createAccount(value)),
+	}),
+)(CreateAccount);

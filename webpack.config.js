@@ -99,4 +99,9 @@ module.exports = {
 		HTMLWebpackPluginConfig,
 		extractSass,
 	],
+	node: {
+		fs: 'empty',
+		net: 'empty',
+		tls: 'empty',
+	},
 };

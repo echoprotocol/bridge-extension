@@ -1,8 +1,11 @@
 import React from 'react';
 import { Route } from 'react-router';
 
+import { IMPORT_ACCOUNT_PATH, INDEX_PATH, WIF_PATH } from './constants/RouterConstants';
+
 import App from './containers/App';
 import CreateAccount from './containers/CreateAccount';
+import WifComponent from './containers/CreateAccount/WifComponent';
 import ImportAccount from './containers/ImportAccount';
 import AddNetwork from './containers/AddNetwork';
 
@@ -13,9 +16,13 @@ export default class Routes extends React.Component {
 		return (
 			<App>
 				<div>
-					<Route exact path="/" component={CreateAccount} />
-					<Route exact path="/import-account" component={ImportAccount} />
+
+					<Route exact path={INDEX_PATH} component={CreateAccount} />
+					<Route exact path={WIF_PATH} component={WifComponent} />
+					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
+
 					<Route exact path="/add-network" component={AddNetwork} />
+
 				</div>
 			</App>
 		);

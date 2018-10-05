@@ -20,6 +20,7 @@ class BridgeInput extends React.Component {
 
 	onChange(e) {
 		this.setState({ filled: !!e.target.value.length });
+		this.props.onChange(e);
 	}
 
 	onBlur() {
@@ -38,7 +39,13 @@ class BridgeInput extends React.Component {
 					this.props.hintText.length > 0 ?
 						<div className="message-hint">
                             You can try
-							<span> { this.props.hintText } </span>
+							<span
+								role="button"
+								tabIndex="0"
+								onClick={this.props.onClick}
+								onKeyPress={this.props.onClick}
+							> { this.props.hintText }
+							</span>
 						</div> : null
 				}
 
@@ -48,17 +55,19 @@ class BridgeInput extends React.Component {
 	}
 
 	render() {
-
 		return (
 
 			<div className={classnames('input-wrap', this.props.theme)} >
 				<Input
+					name={this.props.name}
 					label={this.props.labelText}
 					type={this.props.type}
 					error={this.props.error}
 					onFocus={() => this.onFocus()}
+
+					onBlur={(e) => this.onBlur(e)}
 					onChange={(e) => this.onChange(e)}
-					onBlur={() => this.onBlur()}
+
 					className={classnames(
 						{ up: this.state.up },
 						{ focused: this.state.focus },
@@ -76,6 +85,7 @@ class BridgeInput extends React.Component {
 }
 
 BridgeInput.propTypes = {
+	name: PropTypes.string,
 	theme: PropTypes.string,
 	error: PropTypes.bool,
 	type: PropTypes.string,
@@ -84,9 +94,12 @@ BridgeInput.propTypes = {
 	errorText: PropTypes.string,
 	hintText: PropTypes.string,
 	descriptionText: PropTypes.string,
+	onChange: PropTypes.func,
+	onClick: PropTypes.func,
 };
 
 BridgeInput.defaultProps = {
+	name: '',
 	theme: 'light',
 	error: false,
 	type: 'text',
@@ -95,6 +108,8 @@ BridgeInput.defaultProps = {
 	errorText: '',
 	hintText: '',
 	descriptionText: '',
+	onChange: null,
+	onClick: null,
 };
 
 export default BridgeInput;
