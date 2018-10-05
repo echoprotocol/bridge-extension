@@ -37,9 +37,11 @@ class ImportAccount extends React.Component {
 	}
 
 	isDisabledSubmit() {
-		const { accountName, password } = this.props;
+		const { accountName, password, loading } = this.props;
 
-		if ((!accountName.value || accountName.error) || (!password.value || password.error)) {
+		if ((!accountName.value || accountName.error)
+			|| (!password.value || password.error)
+			|| loading) {
 			return true;
 		}
 
@@ -93,16 +95,22 @@ class ImportAccount extends React.Component {
 }
 
 ImportAccount.propTypes = {
+	loading: PropTypes.bool,
 	accountName: PropTypes.object.isRequired,
 	password: PropTypes.object.isRequired,
 	importAccount: PropTypes.func.isRequired,
 	setFormValue: PropTypes.func.isRequired,
 };
 
+ImportAccount.defaultProps = {
+	loading: false,
+};
+
 export default connect(
 	(state) => ({
 		accountName: state.form.getIn([FORM_SIGN_IN, 'accountName']),
 		password: state.form.getIn([FORM_SIGN_IN, 'password']),
+		loading: state.form.getIn([FORM_SIGN_IN, 'loading']),
 	}),
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_IN, field, value)),

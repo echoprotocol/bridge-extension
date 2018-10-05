@@ -71,6 +71,17 @@ export const connection = () => async (dispatch) => {
 	}
 };
 
+export const isAccountAdded = (accountName, networkName) => {
+	let accounts = localStorage.getItem(`accounts_${networkName}`);
+	accounts = accounts ? JSON.parse(accounts) : [];
+
+	if (accounts.find(({ name }) => name === accountName)) {
+		return 'Account already added';
+	}
+
+	return null;
+};
+
 export const addAccount = (accountName, networkName) => (dispatch) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];

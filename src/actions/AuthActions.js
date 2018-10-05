@@ -3,7 +3,7 @@ import { EchoJSActions } from 'echojs-redux';
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 
 import { setFormError, toggleLoading, setValue } from './FormActions';
-import { addAccount } from './GlobalActions';
+import { addAccount, isAccountAdded } from './GlobalActions';
 
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
 
@@ -69,6 +69,9 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 
 		accountNameError = await validateImportAccountExist(instance, accountName, true);
 
+		if (!accountNameError) {
+			accountNameError = isAccountAdded(accountName, network.name);
+		}
 
 		if (accountNameError) {
 			dispatch(setFormError(FORM_SIGN_IN, 'accountName', accountNameError));
@@ -83,6 +86,7 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 
 		if (passwordError) {
 			dispatch(setFormError(FORM_SIGN_IN, 'password', passwordError));
+			return;
 		}
 
 		dispatch(addAccount(accountName, network.name));
