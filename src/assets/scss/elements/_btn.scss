@@ -263,8 +263,7 @@
     transform: width $speed;
     border: 0;
     border-radius: $angularMax;
-    transition: width $speed;
-
+    transition: width $speed / 2;
     &:not(.copied) {
         @include onBtnFocus (
             $angularMax,
