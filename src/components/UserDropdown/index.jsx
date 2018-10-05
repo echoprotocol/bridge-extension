@@ -98,7 +98,10 @@ class UserDropdown extends React.PureComponent {
 				className="dropdown-user"
 				trigger={
 					<div className="dropdown-trigger">
-						<span className="user-icon-wrap" />
+						<div className="user-icon-wrap">
+							<i aria-hidden="true" className="icon-ava7" />
+
+						</div>
 						<i aria-hidden="true" className="dropdown icon" />
 					</div>
 				}

@@ -19,34 +19,42 @@ class WifComponent extends React.Component {
 		const { accountName, wif } = this.props;
 
 		return (
+
+
 			<React.Fragment>
+				<div className="icon-pageAccount-in" />
+
 				<div className="page-wrap" >
-					<div className="icon-person-in" />
+					<div className="page">
 
-					<div className="hi-text">
-						<div>{accountName.value},</div>
-						<span>welcome to Bridge!</span>
-					</div>
-					<div className="instruction-text">
-                        Save your WIF key and don’t loose it.
-                        You <br /> will need it to restore account.
-					</div>
-					<div className="wif-wrap">
-						<div className="wif">{wif}</div>
-						<BridgeBtnCopy compact text={wif} />
+						<div className="hi-text">
+							<div>{accountName.value},</div>
+							<span>welcome to Bridge!</span>
+						</div>
+						<div className="instruction-text">
+                            Save your WIF key and don’t loose it.
+                            You <br /> will need it to restore account.
+						</div>
+						<div className="wif-wrap">
+							<div className="wif">{wif}</div>
+							<BridgeBtnCopy compact text={wif} />
 
+						</div>
+					</div>
+					<div className="page-action-wrap">
+						<div className="one-btn-wrap" >
+							<Button
+								className="btn-in-light"
+								onClick={() => this.props.history.goBack()}
+								content={<span className="btn-text">Proceed</span>}
+							/>
+						</div>
 					</div>
 				</div>
-				<div className="page-action-wrap">
-					<div className="one-btn-wrap" >
-						<Button
-							className="btn-in-light"
-							onClick={() => this.props.history.goBack()}
-							content={<span className="btn-text">Proceed</span>}
-						/>
-					</div>
-				</div>
+
 			</React.Fragment>
+
+
 		);
 
 	}

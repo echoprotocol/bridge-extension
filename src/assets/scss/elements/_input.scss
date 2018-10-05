@@ -6,7 +6,7 @@
     z-index: 2;
     font-family: FNMedium;
     font-size: 16px;
-    transition: color $speed, margin $speed;
+    transition: color $speed, padding $speed;
     padding: 0;
     letter-spacing: 1.8px;
 }
@@ -33,25 +33,24 @@
             text-align: left;
         }
     }
-    &.up {
+
+    &.up,
+    &.filled {
         .label {
             line-height: 1px;
             font-size: 12px;
             letter-spacing: 1.2px;
             left: 3px;
         }
+
+        input {
+            height: 30px;
+            padding-bottom: 15px;
+        }
+
     }
 
-    &.up,
-    &.focused {
-        &:after {
-            height: 2px;
-        }
-        input {
-            height: 25px;
-            margin-bottom: 13px;
-        }
-    }
+
 
     &.error {
         input {
@@ -96,9 +95,9 @@
                         background-color: #848e95;
                     }
                 }
-                &.up,
-                &.focused {
-                    &:after {
+                &.up {
+                    &:after,
+                    &:before {
                         background-color: #606c74;
                     }
                 }
@@ -109,8 +108,7 @@
                     color: #80888c;
                 }
             }
-            &.up,
-            &.focused {
+            &.up {
                 .label {
                     color: #80888c;
                 }
@@ -127,7 +125,6 @@
                     background-color: #96364a;
                 }
                 &.up,
-                &.focused,
                 &:hover {
                     &:after {
                         background-color: $colorError;
@@ -162,7 +159,8 @@
                     input {
                         color: #ffffff;
                     }
-                    &:after {
+                    &:after,
+                    &:before {
                         background-color: #9ba2a5;
                     }
                 }
@@ -174,8 +172,7 @@
                 }
             }
 
-            &.up,
-            &.focused {
+            &.up {
                 .label {
                     color: #c8c9ce;
                 }
@@ -206,6 +203,16 @@
         bottom: 1px;
         height: 1px;
         transition: background-color $speed;
+    }
+    &:before {
+        right: 0;
+        left: 0;
+        content: "";
+        position: absolute;
+        bottom: 2px;
+        height: 1px;
+        transition: background-color $speed;
+        background-color: transparent;
     }
 
     input {

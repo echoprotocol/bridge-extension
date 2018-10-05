@@ -51,43 +51,49 @@ class ImportAccount extends React.Component {
 		const { accountName, password } = this.props;
 
 		return (
-			<div className="about-page">
+			<React.Fragment>
 				<div className="page-wrap">
-					<div className="icon-person" />
-					<div className="two-input-wrap">
-						<BridgeInput
-							error={!!accountName.error}
-							name="accountName"
-							theme="input-light"
-							labelText="Account name"
-							errorText={accountName.error}
-							value={accountName.value}
-							onChange={(e) => this.onChange(e, true)}
-						/>
-						<BridgeInput
-							error={!!password.error}
-							name="password"
-							type="password"
-							errorText={password.error}
-							theme="input-light"
-							labelText="WIF key / password"
-							value={password.value}
-							onChange={(e) => this.onChange(e)}
-						/>
+
+					<div className="page">
+						<div className="icon-pageAccount" />
+						<div className="two-input-wrap">
+							<BridgeInput
+								error={!!accountName.error}
+								name="accountName"
+								theme="input-light"
+								labelText="Account name"
+								errorText={accountName.error}
+								value={accountName.value}
+								onChange={(e) => this.onChange(e, true)}
+							/>
+							<BridgeInput
+								error={!!password.error}
+								name="password"
+								type="password"
+								errorText={password.error}
+								theme="input-light"
+								labelText="WIF key / password"
+								value={password.value}
+								onChange={(e) => this.onChange(e)}
+							/>
+						</div>
+					</div>
+					<div className="page-action-wrap">
+						<div className="one-btn-wrap" >
+							<Button
+								disabled={this.isDisabledSubmit()}
+								className={classnames('btn-in-dark', { disabled: this.isDisabledSubmit() })}
+								content={<span className="btn-text">Import</span>}
+								type="submit"
+								onClick={(e) => this.onImport(e)}
+							/>
+						</div>
 					</div>
 				</div>
-				<div className="page-action-wrap">
-					<div className="one-btn-wrap" >
-						<Button
-							disabled={this.isDisabledSubmit()}
-							className={classnames('btn-in-dark', { disabled: this.isDisabledSubmit() })}
-							content={<span className="btn-text">Import</span>}
-							type="submit"
-							onClick={(e) => this.onImport(e)}
-						/>
-					</div>
-				</div>
-			</div>
+
+
+			</React.Fragment>
+
 		);
 	}
 
