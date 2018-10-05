@@ -24,21 +24,22 @@ export const createAccount = ({ accountName }) => async (dispatch, getState) => 
 
 	try {
 		const instance = getState().echojs.getIn(['system', 'instance']);
+		const network = getState().global.getIn(['network']).toJS();
 
 		dispatch(toggleLoading(FORM_SIGN_UP, true));
 
-		accountNameError = await validateAccountExist(instance, accountName, false);
+		accountNameError = await validateAccountExist(instance, accountName);
 
 		if (accountNameError.errorText) {
 			dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
 			return;
 		}
 
-		const wif = await createWallet(accountNameError.example || accountName);
+		const wif = await createWallet(network.registrator, accountNameError.example || accountName);
 
 		dispatch(setValue(FORM_SIGN_UP, 'wif', wif));
 
-		dispatch(addAccount(accountName, 'devnet'));
+		dispatch(addAccount(accountName, network.name));
 
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_UP, 'error', err));
@@ -64,10 +65,12 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 
 	try {
 		const instance = getState().echojs.getIn(['system', 'instance']);
+		const network = getState().global.getIn(['network']).toJS();
+
 		accountNameError = await validateImportAccountExist(instance, accountName, true);
 
 		if (!accountNameError) {
-			accountNameError = isAccountAdded(accountName, 'devnet');
+			accountNameError = isAccountAdded(accountName, network.name);
 		}
 
 		if (accountNameError) {
@@ -83,9 +86,10 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 
 		if (passwordError) {
 			dispatch(setFormError(FORM_SIGN_IN, 'password', passwordError));
+			return;
 		}
 
-		dispatch(addAccount(accountName, 'devnet'));
+		dispatch(addAccount(accountName, network.name));
 
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_IN, 'error', err));

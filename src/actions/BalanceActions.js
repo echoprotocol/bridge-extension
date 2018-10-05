@@ -1,5 +1,5 @@
-import { List } from 'immutable';
 import { EchoJSActions } from 'echojs-redux';
+import { List } from 'immutable';
 
 import BalanceReducer from '../reducers/BalanceReducer';
 

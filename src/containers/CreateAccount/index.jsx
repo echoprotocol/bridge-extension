@@ -64,6 +64,7 @@ class CreateAccount extends React.Component {
 							content={<span className="btn-text">Create</span>}
 							type="submit"
 							onClick={(e) => this.onCreate(e)}
+							disabled={this.props.loading}
 						/>
 					</div>
 				</div>
@@ -82,6 +83,7 @@ class CreateAccount extends React.Component {
 }
 
 CreateAccount.propTypes = {
+	loading: PropTypes.bool.isRequired,
 	accountName: PropTypes.object.isRequired,
 	createAccount: PropTypes.func.isRequired,
 	setFormValue: PropTypes.func.isRequired,
@@ -89,6 +91,7 @@ CreateAccount.propTypes = {
 
 export default connect(
 	(state) => ({
+		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
 		accountName: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 	}),
 	(dispatch) => ({

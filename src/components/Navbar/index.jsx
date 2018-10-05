@@ -3,10 +3,16 @@ import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { NavLink } from 'react-router-dom'
 import { withRouter } from 'react-router';
+import history from '../../history';
 
 import { HEADER_TITLE } from '../../constants/GlobalConstants';
 
 class Navbar extends React.PureComponent {
+
+	onClick(e, link) {
+		e.preventDefault();
+		history.push(link);
+	}
 
 	renderTitle() {
 		const { location } = this.props;
@@ -24,6 +30,7 @@ class Navbar extends React.PureComponent {
 
 	render() {
 		const { title, link } = this.renderTitle();
+		// console.log(link.value);
 
 		return (
 			<div className="navbar">
@@ -40,11 +47,16 @@ class Navbar extends React.PureComponent {
 							}
 						/>
 					</li>
-					<li className="page-title">{title}</li>
+					{
+						title &&
+						<li className="page-title">{title}</li>}
 					{
 						link &&
 						<li className="link-nav">
-							<a href={link.value}>{link.name}</a>
+							{/*<NavLink to={link.value}>fgdg</NavLink>*/}
+							<a onClick={(e) => this.onClick(e, link.value)} href="#">
+								{link.name}
+							</a>
 						</li>
 					}
 				</ul>

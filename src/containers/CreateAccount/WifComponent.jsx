@@ -3,11 +3,17 @@ import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import BridgeBtnCopy from '../../components/BridgeBtnCopy/index';
+import { clearForm } from '../../actions/FormActions';
+
+import BridgeBtnCopy from '../../components/BridgeBtnCopy';
 
 import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 class WifComponent extends React.Component {
+
+	componentWillUnmount() {
+		this.props.clearForm();
+	}
 
 	render() {
 		const { accountName, wif } = this.props;
@@ -18,7 +24,7 @@ class WifComponent extends React.Component {
 					<div className="icon-person-in" />
 
 					<div className="hi-text">
-						<div>{accountName},</div>
+						<div>{accountName.value},</div>
 						<span>welcome to Bridge!</span>
 					</div>
 					<div className="instruction-text">
@@ -27,7 +33,7 @@ class WifComponent extends React.Component {
 					</div>
 					<div className="wif-wrap">
 						<div className="wif">{wif}</div>
-						<BridgeBtnCopy compact />
+						<BridgeBtnCopy compact text={wif} />
 
 					</div>
 				</div>
@@ -35,6 +41,7 @@ class WifComponent extends React.Component {
 					<div className="one-btn-wrap" >
 						<Button
 							className="btn-in-light"
+							onClick={() => this.props.history.goBack()}
 							content={<span className="btn-text">Proceed</span>}
 						/>
 					</div>
@@ -48,17 +55,17 @@ class WifComponent extends React.Component {
 
 WifComponent.propTypes = {
 	wif: PropTypes.string.isRequired,
-	accountName: PropTypes.string,
-};
-
-WifComponent.defaultProps = {
-	accountName: '',
+	accountName: PropTypes.object.isRequired,
+	history: PropTypes.object.isRequired,
+	clearForm: PropTypes.func.isRequired,
 };
 
 export default connect(
 	(state) => ({
 		wif: state.form.getIn([FORM_SIGN_UP, 'wif']),
-		activeUser: state.global.getIn(['activeUser', 'name']),
+		accountName: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 	}),
-	() => ({}),
+	(dispatch) => ({
+		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
+	}),
 )(WifComponent);

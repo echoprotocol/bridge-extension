@@ -56,3 +56,12 @@ export const toggleLoading = (form, field, loading) => (dispatch) => {
 		value: loading,
 	}));
 };
+
+/**
+ * Clear form
+ * @param {String} form
+ * @returns {Function}
+ */
+export const clearForm = (form) => (dispatch) => {
+	dispatch(FormReducer.actions.clearForm({ form }));
+};

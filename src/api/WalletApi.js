@@ -20,7 +20,6 @@ export const getKeyFromWif = (wif) => {
 export const validateAccountExist = async (
 	instance,
 	accountName,
-	shouldExist,
 	requestsCount = 0,
 	limit = 50,
 ) => {
@@ -34,11 +33,7 @@ export const validateAccountExist = async (
 
 	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);
 
-	if (!result.find((i) => i[0] === accountName) && shouldExist) {
-		return 'Account not found';
-	}
-
-	if (result.find((i) => i[0] === accountName) && !shouldExist) {
+	if (result.find((i) => i[0] === accountName)) {
 
 		const matches = accountName.match(/\d+$/);
 		if (matches) {
@@ -51,7 +46,6 @@ export const validateAccountExist = async (
 		const { example, errorText } = await validateAccountExist(
 			instance,
 			accountName,
-			shouldExist,
 			requestsCount += 1,
 		);
 
@@ -81,14 +75,14 @@ export const validateImportAccountExist = async (
 	return null;
 };
 
-export const createWallet = async (account) => {
+export const createWallet = async (registrator, account) => {
 	const password = (`P${key.get_random_key().toWif()}`).substr(0, 45);
 
 	const owner = generateKeyFromPassword(account, 'owner', password);
 	const active = generateKeyFromPassword(account, 'active', password);
 	const memo = generateKeyFromPassword(account, 'memo', password);
 
-	let response = await fetch('https://echo-tmp-wallet.pixelplex.io/faucet/registration', {
+	let response = await fetch(registrator, {
 		method: 'post',
 		mode: 'cors',
 		headers: {
