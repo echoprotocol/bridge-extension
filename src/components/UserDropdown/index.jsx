@@ -6,6 +6,7 @@ import classnames from 'classnames';
 
 import { formatAmount } from '../../helpers/FormatHelper';
 import { initAccount, removeAccount } from '../../actions/GlobalActions';
+import UserIcon from '../UserIcon';
 
 class UserDropdown extends React.PureComponent {
 
@@ -38,7 +39,7 @@ class UserDropdown extends React.PureComponent {
 		}) => {
 			const content = (
 				<div key={name} className="user-item-wrap">
-					<div className="user-icon-wrap" />
+					<UserIcon color="green" avatar="ava7" />
 					<div className="user-name">{name}</div>
 					<div className={classnames('user-balance', { positive: !!amount })}>{formatAmount(amount, precision, symbol) || '0 ECHO'}</div>
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
@@ -98,10 +99,8 @@ class UserDropdown extends React.PureComponent {
 				className="dropdown-user"
 				trigger={
 					<div className="dropdown-trigger">
-						<div className="user-icon-wrap">
-							<i aria-hidden="true" className="icon-ava7" />
+						<UserIcon color="green" avatar="ava7" />
 
-						</div>
 						<i aria-hidden="true" className="dropdown icon" />
 					</div>
 				}
