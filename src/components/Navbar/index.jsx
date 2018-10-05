@@ -9,16 +9,7 @@ class Navbar extends React.PureComponent {
 			<div className="navbar">
 				<ul>
 					<li className="btn-nav-wrap" >
-						<Button
-							className="btn-nav"
-							content={
-								<React.Fragment>
-									<div />
-									<div />
-									<div />
-								</React.Fragment>
-							}
-						/>
+						<Button className="icon-menu btn-nav" />
 					</li>
 					<li className="page-title">Create account</li>
 					<li className="link-nav">

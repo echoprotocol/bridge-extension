@@ -11,7 +11,7 @@ class ImportAccount extends React.Component {
 			<React.Fragment>
 				<div className="page-wrap">
 					<div className="page">
-						<div className="icon-person" />
+						<div className="icon-pageAccount" />
 						<div className="two-input-wrap">
 							<BridgeInput
 							// error

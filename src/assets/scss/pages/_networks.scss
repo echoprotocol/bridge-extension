@@ -3,7 +3,7 @@
     display: flex;
     align-items: center;
     background-color: #dfe2e4;
-    padding: 0 15px;
+    padding: 0 20px;
     & + .page-wrap {
         padding-top: 25px;
         max-height: 443px;
@@ -13,12 +13,15 @@
     }
 }
 
-.icon-network {
-    background-color: #e3e6e8;
+.icon-pageNetwork {
     border-radius: 50%;
     width: 28px;
     height: 28px;
     margin: 0 auto auto;
+    font-size: 32px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
 }
 
 .success {

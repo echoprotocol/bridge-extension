@@ -8,7 +8,7 @@ class CreateAccount extends React.Component {
 	renderWelcome() {
 		return (
 			<React.Fragment>
-				<div className="icon-person-in" />
+				<div className="icon-pageAccount-in" />
 
 				<div className="page-wrap" >
 					<div className="page">
@@ -46,7 +46,10 @@ class CreateAccount extends React.Component {
 			<React.Fragment>
 				<div className="page-wrap">
 					<div className="page">
-						<div className="icon-person" />
+						<div className="icon-pageAccount">
+							<span className="path1" />
+							<span className="path2" />
+						</div>
 						<div className="one-input-wrap">
 							<BridgeInput
 							// error
