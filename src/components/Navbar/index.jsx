@@ -24,7 +24,6 @@ class Navbar extends React.PureComponent {
 
 	render() {
 		const { title, link } = this.renderTitle();
-		// console.log(link.value);
 
 		return (
 			<div className="navbar">

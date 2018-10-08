@@ -7,7 +7,7 @@ import { getPreviewBalances, initBalances } from './BalanceActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { IMPORT_ACCOUNT_PATH } from '../constants/RouterConstants';
+import { IMPORT_ACCOUNT_PATH, WIF_PATH, INDEX_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
 export const initAccount = (accountName, networkName) => async (dispatch) => {
@@ -46,6 +46,10 @@ export const addAccount = (accountName, networkName) => (dispatch) => {
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
 	dispatch(initAccount(accountName, networkName));
+
+	if (INDEX_PATH.includes(history.location.pathname)) {
+		history.push(WIF_PATH);
+	}
 };
 
 export const connection = () => async (dispatch) => {
