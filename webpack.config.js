@@ -10,7 +10,7 @@ const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 });
 
 const extractSass = new ExtractTextPlugin({
-	filename: '[name].[contenthash].css',
+	filename: '[name].[hash].css',
 	disable: process.env.NODE_ENV === 'local',
 });
 const { version } = require('./package.json');
@@ -18,11 +18,14 @@ const { version } = require('./package.json');
 module.exports = {
 	entry: {
 		app: path.resolve('src/index.js'),
+		content: path.resolve('src/utils/contentscript.js'),
+		inpage: path.resolve('src/utils/inpage.js'),
+		importer: path.resolve('src/utils/importer.js'),
 	},
 	output: {
-		publicPath: '/',
-		path: path.resolve('dist'),
-		filename: `[name].${version}.js`,
+		publicPath: process.env.ELECTRON ? './' : '',
+		path: process.env.ELECTRON ? path.resolve('build') : path.resolve('dist'),
+		filename: '[name].js',
 		pathinfo: process.env.NODE_ENV === 'local',
 		sourceMapFilename: '[name].js.map',
 		chunkFilename: '[name].bundle.js',
@@ -57,27 +60,15 @@ module.exports = {
 				}),
 			},
 			{
-				test: /\.(png|woff|woff2|eot|ttf|svg)$/,
+				test: /\.(png|woff|woff2|eot|ttf|otf|svg)$/,
 				loader: 'url-loader?limit=100000',
 			},
 		],
 	},
-	optimization: {
-		splitChunks: {
-			cacheGroups: {
-				default: false,
-				commons: {
-					test: /[\\/]node_modules[\\/]/,
-					name: 'vendor',
-					chunks: 'all',
-				},
-			},
-		},
-	},
 	resolve: {
 		modules: [
-			path.resolve('src'),
 			'node_modules',
+			path.resolve('src'),
 		],
 		extensions: ['.js', '.jsx', '.json'],
 	},
@@ -86,4 +77,9 @@ module.exports = {
 		HTMLWebpackPluginConfig,
 		extractSass,
 	],
+	node: {
+		fs: 'empty',
+		net: 'empty',
+		tls: 'empty',
+	},
 };

@@ -1,0 +1,28 @@
+{
+  "short_name": "React App",
+  "name": "React Extension",
+  "manifest_version": 2,
+  "browser_action": {
+    "default_popup": "./dist/index.html",
+    "default_title": "React Ext"
+  },
+  "version": "1.0",
+  "content_scripts": [
+    {
+      "matches": [
+        "file://*/*",
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "dist/content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "web_accessible_resources": [
+    "dist/inpage.js",
+    "dist/importer.js"
+  ]
+}
