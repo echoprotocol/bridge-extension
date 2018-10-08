@@ -1,5 +1,7 @@
 import { PrivateKey, key } from 'echojs-lib';
 
+import { userCrypto } from '../actions/GlobalActions';
+
 export const generateKeyFromPassword = (accountName, role, password) => {
 	const seed = `${accountName}${role}${password}`;
 	const privateKey = PrivateKey.fromSeed(seed);
@@ -77,6 +79,8 @@ export const validateImportAccountExist = async (
 
 export const createWallet = async (registrator, account) => {
 	const password = (`P${key.get_random_key().toWif()}`).substr(0, 45);
+	// TODO change crypto password
+	// const password = userCrypto.generateWIF();
 
 	const owner = generateKeyFromPassword(account, 'owner', password);
 	const active = generateKeyFromPassword(account, 'active', password);

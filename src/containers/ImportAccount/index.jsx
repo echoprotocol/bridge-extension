@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 import { importAccount } from '../../actions/AuthActions';
-import { setFormValue } from '../../actions/FormActions';
+import { clearForm, setFormValue, toggleLoading } from '../../actions/FormActions';
 
 import { FORM_SIGN_IN } from '../../constants/FormConstants';
 
@@ -13,7 +13,13 @@ import BridgeInput from '../../components/BridgeInput';
 
 class ImportAccount extends React.Component {
 
+	componentWillUnmount() {
+    	this.props.clearForm();
+	}
+
 	onImport() {
+		this.props.toggleLoading(true);
+
 		const { accountName, password } = this.props;
 
 		this.props.importAccount({
@@ -48,7 +54,7 @@ class ImportAccount extends React.Component {
 	}
 
 	render() {
-		const { accountName, password } = this.props;
+		const { accountName, password, loading } = this.props;
 
 		return (
 			<Form>
@@ -59,6 +65,7 @@ class ImportAccount extends React.Component {
 						<div className="two-input-wrap">
 							<BridgeInput
 								error={!!accountName.error}
+								disabled={loading}
 								name="accountName"
 								theme="input-light"
 								labelText="Account name"
@@ -68,6 +75,7 @@ class ImportAccount extends React.Component {
 							/>
 							<BridgeInput
 								error={!!password.error}
+								disabled={loading}
 								name="password"
 								type="password"
 								errorText={password.error}
@@ -102,6 +110,8 @@ ImportAccount.propTypes = {
 	password: PropTypes.object.isRequired,
 	importAccount: PropTypes.func.isRequired,
 	setFormValue: PropTypes.func.isRequired,
+	toggleLoading: PropTypes.func.isRequired,
+	clearForm: PropTypes.func.isRequired,
 };
 
 ImportAccount.defaultProps = {
@@ -117,5 +127,7 @@ export default connect(
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_IN, field, value)),
 		importAccount: (value) => dispatch(importAccount(value)),
+		toggleLoading: (value) => dispatch(toggleLoading(FORM_SIGN_IN, value)),
+		clearForm: () => dispatch(clearForm(FORM_SIGN_IN)),
 	}),
 )(ImportAccount);

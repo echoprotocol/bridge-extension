@@ -14,6 +14,7 @@ const DEFAULT_FIELDS = Map({
 		registrator: '',
 		url: '',
 	}),
+	cryptoError: null,
 });
 
 export default createModule({

@@ -10,6 +10,10 @@ import GlobalReducer from '../reducers/GlobalReducer';
 import { IMPORT_ACCOUNT_PATH, WIF_PATH, INDEX_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
+import Crypto from '../services/crypto';
+
+export const userCrypto = new Crypto();
+
 export const initAccount = (accountName, networkName) => async (dispatch) => {
 	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
 

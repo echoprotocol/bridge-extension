@@ -3,7 +3,7 @@ import { EchoJSActions } from 'echojs-redux';
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 
 import { setFormError, toggleLoading, setValue } from './FormActions';
-import { addAccount, isAccountAdded } from './GlobalActions';
+import { addAccount, isAccountAdded, userCrypto } from './GlobalActions';
 
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
 
@@ -13,6 +13,8 @@ import {
 	importWallet,
 	validateImportAccountExist,
 } from '../api/WalletApi';
+
+import GlobalReducer from '../reducers/GlobalReducer';
 
 export const createAccount = ({ accountName }) => async (dispatch, getState) => {
 	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
@@ -26,8 +28,6 @@ export const createAccount = ({ accountName }) => async (dispatch, getState) => 
 		const instance = getState().echojs.getIn(['system', 'instance']);
 		const network = getState().global.getIn(['network']).toJS();
 
-		dispatch(toggleLoading(FORM_SIGN_UP, true));
-
 		accountNameError = await validateAccountExist(instance, accountName);
 
 		if (accountNameError.errorText) {
@@ -35,7 +35,14 @@ export const createAccount = ({ accountName }) => async (dispatch, getState) => 
 			return;
 		}
 
+		if (userCrypto.isLocked) {
+			dispatch(GlobalReducer.actions.set({ field: 'cryptoError', value: 'Account locked' }));
+			return;
+		}
+
 		const wif = await createWallet(network.registrator, accountNameError.example || accountName);
+
+		userCrypto.importByWIF(wif);
 
 		dispatch(setValue(FORM_SIGN_UP, 'wif', wif));
 
