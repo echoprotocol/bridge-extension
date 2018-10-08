@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'semantic-ui-react';
+import { Button, Form } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -39,7 +39,7 @@ class CreateAccount extends React.Component {
 		const { accountName } = this.props;
 
 		return (
-			<React.Fragment>
+			<Form>
 				<div className="page-wrap">
 					<div className="icon-person" />
 					<div className="one-input-wrap">
@@ -68,7 +68,7 @@ class CreateAccount extends React.Component {
 						/>
 					</div>
 				</div>
-			</React.Fragment>
+			</Form>
 
 		);
 	}

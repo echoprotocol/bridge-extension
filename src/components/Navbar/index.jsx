@@ -1,18 +1,12 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-import { NavLink } from 'react-router-dom'
 import { withRouter } from 'react-router';
-import history from '../../history';
+import { Link } from 'react-router-dom';
 
 import { HEADER_TITLE } from '../../constants/GlobalConstants';
 
 class Navbar extends React.PureComponent {
-
-	onClick(e, link) {
-		e.preventDefault();
-		history.push(link);
-	}
 
 	renderTitle() {
 		const { location } = this.props;
@@ -20,7 +14,7 @@ class Navbar extends React.PureComponent {
 		const item = HEADER_TITLE.find((title) => {
 			if (title.path === location.pathname) {
 				return true;
-			} else if (title.path.split('/')[1] === location.pathname.split('/')[1]) {
+			} else if (title.path.split('/')[2] === location.pathname.split('/')[2]) {
 				return true;
 			}
 			return false;
@@ -30,7 +24,6 @@ class Navbar extends React.PureComponent {
 
 	render() {
 		const { title, link } = this.renderTitle();
-		// console.log(link.value);
 
 		return (
 			<div className="navbar">
@@ -53,10 +46,7 @@ class Navbar extends React.PureComponent {
 					{
 						link &&
 						<li className="link-nav">
-							{/*<NavLink to={link.value}>fgdg</NavLink>*/}
-							<a onClick={(e) => this.onClick(e, link.value)} href="#">
-								{link.name}
-							</a>
+							<Link to={link.value}>{link.name}</Link>
 						</li>
 					}
 				</ul>

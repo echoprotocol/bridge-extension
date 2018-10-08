@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 
-import { formatAmount } from '../../helpers/FormatHelper';
+import FormatHelper from '../../helpers/FormatHelper';
 import { initAccount, removeAccount } from '../../actions/GlobalActions';
 
 class UserDropdown extends React.PureComponent {
@@ -40,7 +40,7 @@ class UserDropdown extends React.PureComponent {
 				<div key={name} className="user-item-wrap">
 					<div className="user-icon-wrap" />
 					<div className="user-name">{name}</div>
-					<div className={classnames('user-balance', { positive: !!amount })}>{formatAmount(amount, precision, symbol) || '0 ECHO'}</div>
+					<div className={classnames('user-balance', { positive: !!amount })}>{FormatHelper.formatAmount(amount, precision, symbol) || '0 ECHO'}</div>
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
 				</div>
 			);

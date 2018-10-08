@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'semantic-ui-react';
+import { Button, Form } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
@@ -51,7 +51,7 @@ class ImportAccount extends React.Component {
 		const { accountName, password } = this.props;
 
 		return (
-			<div className="about-page">
+			<Form>
 				<div className="page-wrap">
 					<div className="icon-person" />
 					<div className="two-input-wrap">
@@ -87,7 +87,7 @@ class ImportAccount extends React.Component {
 						/>
 					</div>
 				</div>
-			</div>
+			</Form>
 		);
 	}
 

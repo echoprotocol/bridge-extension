@@ -7,7 +7,7 @@ import { getPreviewBalances, initBalances } from './BalanceActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { INDEX_PATH, WIF_PATH } from '../constants/RouterConstants';
+import { IMPORT_ACCOUNT_PATH, WIF_PATH, INDEX_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
 export const initAccount = (accountName, networkName) => async (dispatch) => {
@@ -30,10 +30,6 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name } }));
 
-		if (INDEX_PATH.includes(history.location.pathname)) {
-			history.push(WIF_PATH);
-		}
-
 		await dispatch(initBalances(networkName));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
@@ -52,6 +48,10 @@ export const addAccount = (accountName, networkName) => (dispatch) => {
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
 	dispatch(initAccount(accountName, networkName));
+
+	if (INDEX_PATH.includes(history.location.pathname)) {
+		history.push(WIF_PATH);
+	}
 };
 
 export const connection = () => async (dispatch) => {
@@ -69,6 +69,9 @@ export const connection = () => async (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
 
 	try {
+		if (IMPORT_ACCOUNT_PATH !== history.location.pathname) {
+			history.push(IMPORT_ACCOUNT_PATH);
+		}
 		await dispatch(EchoJSActions.connect(network.url));
 		let accounts = localStorage.getItem(`accounts_${network.name}`);
 

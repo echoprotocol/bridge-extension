@@ -1,19 +1,30 @@
 import React from 'react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+
 import UserDropdown from '../UserDropdown';
 
 class Header extends React.PureComponent {
 
 	render() {
-
+		const { preview } = this.props;
 
 		return (
 			<header className="header">
-				<UserDropdown />
+				{preview.length ? <UserDropdown /> : null}
 			</header>
 		);
 	}
 
 }
 
-export default Header;
+Header.propTypes = {
+	preview: PropTypes.array.isRequired,
+};
 
+export default connect(
+	(state) => ({
+		preview: state.balance.get('preview').toJS(),
+	}),
+	() => ({}),
+)(Header);
