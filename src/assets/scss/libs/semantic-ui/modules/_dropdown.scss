@@ -83,7 +83,9 @@
 ---------------*/
 
 .ui.dropdown .menu > .item {
-  position: relative;
+    &:not(.disabled):not(.user-create):not(.user-import) {
+        position: relative;
+    }
   cursor: pointer;
 }
 .ui.dropdown .menu > .item:first-child {
@@ -819,7 +821,6 @@ select.ui.dropdown {
 .ui.dropdown .menu > .disabled.item {
   cursor: default;
   pointer-events: none;
-  position: initial;
   z-index: 0;
 }
 

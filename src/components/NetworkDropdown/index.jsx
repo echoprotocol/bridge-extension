@@ -1,11 +1,29 @@
 import React from 'react';
 import { Dropdown, Button } from 'semantic-ui-react';
+import NetworkInfo from './NetworkInfo';
 import UserIcon from '../UserIcon';
 
 class NetworkDropdown extends React.PureComponent {
 
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			opened: false,
+		};
+	}
+
+	onOpen() {
+		this.setState({ opened: true });
+	}
+
+	onClose() {
+		this.setState({ opened: false });
+	}
+
 	onDropdownChange(e, value) {
 		console.log(e, value);
+
 	}
 
 	render() {
@@ -161,27 +179,43 @@ class NetworkDropdown extends React.PureComponent {
 			{
 				value: 'add-net',
 				key: 'add-net',
+				className: 'last-element',
 				as: 'a',
 				content: '+ Add Network',
+			},
+			{
+				value: 'network-info',
+				key: 'network-info',
+				className: 'network-info',
+				disabled: true,
+				as: 'span',
+				content: <NetworkInfo />,
 			},
 		];
 
 		return (
-			<Dropdown
-				className="dropdown-network"
-				open
-				trigger={
-					<div className="dropdown-trigger">
-						<UserIcon color="green" avatar="ava7" />
-						<i aria-hidden="true" className="dropdown icon" />
-					</div>
-				}
+			<React.Fragment>
+				<Dropdown
+					className="dropdown-network"
+					onOpen={() => this.onOpen()}
+					onClose={() => this.onClose()}
+					trigger={
+						<div className="dropdown-trigger">
+							<div className="current-network">
+								<span className="cut">{this.state.height}Main Network</span>
+							</div>
+							<i aria-hidden="true" className="dropdown icon" />
+						</div>
+					}
+					onChange={(e, { value }) => this.onDropdownChange(e, value)}
+					options={options}
+					selectOnBlur={false}
+					icon={false}
+				/>
 
-				onChange={(e, { value }) => this.onDropdownChange(e, value)}
-				options={options}
-				selectOnBlur={false}
-				icon={false}
-			/>
+				{ !this.state.opened ? <NetworkInfo /> : null}
+
+			</React.Fragment>
 
 		);
 	}

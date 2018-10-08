@@ -244,7 +244,7 @@
     &-logout {
         background-color: transparent;
         border: 0;
-        border-radius: $angularMin;
+        border-radius: 50%;
         width: 33px;
         height: 33px;
         color: rgba(#fff, .4);
@@ -258,12 +258,12 @@
             content: $icon-exit;
             font-size: 20px;
             margin: 1px -3px 0 0;
+            display: block;
         }
     }
 
     &-round-close {
-        // background-color: #363f42;
-        background-color: red;
+        background-color: transparent;
         border-radius: 50%;
         height: 23px;
         width: 23px;
@@ -272,6 +272,17 @@
         display: flex;
         align-items: center;
         justify-content: center;
+        margin: 0 7px 0 -7px;
+        transition: background-color $speed;
+        cursor: pointer;
+        &:hover {
+            background-color: #363f42;
+
+        }
+        &:before {
+            display: block;
+            margin: 3px -1px 0 0;
+        }
     }
 
 }
