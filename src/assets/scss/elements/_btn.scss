@@ -1,6 +1,6 @@
 // BTNS:
 // btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy,
-// btn-noborder, btn-nav, btn-logout
+// btn-noborder, btn-nav, btn-logout, btn-round-close
 
 // SIZE: compact
 // STATE: error, disabled
@@ -200,7 +200,17 @@
         height: 25px;
         top: 0;
         right: 0;
+        transition: color $speed, background-color $speed;
+        &.compact {
+            .btn-text {
+                letter-spacing: 2.3px;
+                font-size: 11px;
+                margin: 1px 0 0 0;
+            }
+        }
+
     }
+
     &-noborder {
         @extend %btn;
         background-color: transparent;
@@ -208,6 +218,7 @@
         border: 1px solid transparent;
         border-radius: $angularMax;
     }
+
     &-nav {
         background-color: transparent;
         width: 30px;
@@ -250,6 +261,19 @@
         }
     }
 
+    &-round-close {
+        // background-color: #363f42;
+        background-color: red;
+        border-radius: 50%;
+        height: 23px;
+        width: 23px;
+        border: 0;
+        color: #adb3b9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+    }
+
 }
 
 // Btns wrap
@@ -264,7 +288,7 @@
     border: 0;
     border-radius: $angularMax;
     transition: width $speed;
-
+    
     &:not(.copied) {
         @include onBtnFocus (
             $angularMax,
@@ -278,12 +302,27 @@
             background-color: #efeff0;
         }
     }
+    &:hover {
+        .btn-copy {
+            background-color: #f9f9fa;
+        }
+    }
     &.copied {
         width: 226px;
     }
+    
     &:after {
         border-radius: $angularMax;
-        content: "";
+        content: "\e913";
+        font-family: '#{$icomoon-font-family}';
+        speak: none;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
         position: absolute;
         right: 0;
         left: 0;
@@ -292,6 +331,12 @@
         height: 23px;
         background-color: #efeff0;
         border: 1px solid #efeff0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        color: #b4b8bc;
+        padding-left: 6px;
+        font-size: 15px;
     }
 }
 

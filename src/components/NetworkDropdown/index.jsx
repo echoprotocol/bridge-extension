@@ -1,5 +1,6 @@
 import React from 'react';
-import { Dropdown } from 'semantic-ui-react';
+import { Dropdown, Button } from 'semantic-ui-react';
+import UserIcon from '../UserIcon';
 
 class NetworkDropdown extends React.PureComponent {
 
@@ -13,36 +14,62 @@ class NetworkDropdown extends React.PureComponent {
 			{
 				value: 'net0',
 				key: 'net0',
-				as: 'span',
+				as: 'section',
 				className: 'network-item',
 				content:
 
 	<div className="network-item-wrap">
-		<div className="network-title">Main Network</div>
+		<div className="network-content">
+
+			<div className="network-title">Main Network</div>
+			<ul className="accounts">
+				<li>No accounts</li>
+			</ul>
+		</div>
 	</div>,
 
 			},
 			{
 				value: 'net1',
 				key: 'net1',
-				as: 'span',
+				as: 'section',
 				className: 'network-item',
 				content:
 
 	<div className="network-item-wrap">
-		<div className="network-title">Test Network</div>
+		<div className="network-content">
+			<div className="network-title">Test Network</div>
+			<ul className="accounts">
+				<li>
+					<UserIcon color="green" avatar="ava7" />
+				</li>
+				<li>
+					<UserIcon color="yellow" avatar="ava3" />
+				</li>
+				<li>
+					<UserIcon color="pink" avatar="ava8" />
+				</li>
+			</ul>
+		</div>
 	</div>,
 
 			},
 			{
 				value: 'net2',
 				key: 'net2',
-				as: 'span',
+				as: 'section',
 				className: 'network-item',
 				content:
 
 	<div className="network-item-wrap">
-		<div className="network-title">Dev Network</div>
+		<div className="network-content">
+			<div className="network-title">Dev Network</div>
+			<ul className="accounts">
+				<li>
+					<UserIcon color="pink" avatar="ava8" />
+				</li>
+			</ul>
+		</div>
 	</div>,
 
 			},
@@ -59,7 +86,13 @@ class NetworkDropdown extends React.PureComponent {
 	<React.Fragment>
 		<div className="network-item-bg" />
 		<div className="network-item-wrap">
-			<div className="network-title">Whitepowernet</div>
+			<div className="network-content">
+				<Button className="btn-round-close" />
+				<div className="network-title">
+                Whitepowernet
+				</div>
+
+			</div>
 		</div>
 	</React.Fragment>,
 
@@ -73,7 +106,10 @@ class NetworkDropdown extends React.PureComponent {
 		<div className="network-item-bg" />
 		<div className="network-item-hover" />
 		<div className="network-item-wrap">
-			<div className="network-title">Hellelujahnet</div>
+			<div className="network-content">
+				<Button className="btn-round-close" />
+				<div className="network-title">Hellelujahnet</div>
+			</div>
 		</div>
 	</React.Fragment>,
 
@@ -87,7 +123,10 @@ class NetworkDropdown extends React.PureComponent {
 		<div className="network-item-bg" />
 		<div className="network-item-hover" />
 		<div className="network-item-wrap">
-			<div className="network-title">Homersimpsonnet</div>
+			<div className="network-content">
+				<Button className="btn-round-close" />
+				<div className="network-title">Homersimpsonnet</div>
+			</div>
 		</div>
 	</React.Fragment>,
 
@@ -100,7 +139,10 @@ class NetworkDropdown extends React.PureComponent {
 	<React.Fragment>
 		<div className="network-item-bg" />
 		<div className="network-item-wrap">
-			<div className="network-title">Mytestnet</div>
+			<div className="network-content">
+				<Button className="btn-round-close" />
+				<div className="network-title">Mytestnet</div>
+			</div>
 		</div>
 	</React.Fragment>,
 
@@ -109,7 +151,7 @@ class NetworkDropdown extends React.PureComponent {
 			{
 				value: 'fake-element',
 				key: 'fake-element',
-				as: 'section',
+				as: 'span',
 				disabled: true,
 				content:
 	<React.Fragment>
@@ -127,10 +169,10 @@ class NetworkDropdown extends React.PureComponent {
 		return (
 			<Dropdown
 				className="dropdown-network"
-				// open
+				open
 				trigger={
 					<div className="dropdown-trigger">
-						<span className="user-icon-wrap" />
+						<UserIcon color="green" avatar="ava7" />
 						<i aria-hidden="true" className="dropdown icon" />
 					</div>
 				}

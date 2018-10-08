@@ -202,6 +202,18 @@
                 background-color: #36454a;
                 padding: 5px;
                 left: auto;
+
+                section:first-of-type {
+                    .network-item-wrap {
+                        margin-top: 8px;
+                        &:before {
+                            display: none;
+                        }
+                    }
+                }
+
+
+
             }
             .network {
                 &-item {
@@ -209,19 +221,6 @@
                     margin-top: -1px;
                     color: #828C94;
                     position: relative;
-                    span {
-                        &:before {
-                            display: block;
-                            content: "";
-                            top: 0;
-                            right: -6px;
-                            left: -6px;
-                            bottom: 0;
-                            background-color: red;
-                            position: absolute;
-                            z-index: -1;
-                        }
-                    }
 
                     &:hover,
                     &.active {
@@ -230,7 +229,6 @@
                             color: #ADB4BA;
                             &:before {
                                 background-color: #414f53;
-    
                             }
                             &:after {
                                 background-color: #414f53;
@@ -242,29 +240,73 @@
                         height: 36px;
                         display: flex;
                         flex-direction: column;
-                        align-items: center;
+                        align-items: flex-start;
+                        justify-content: space-between;
                         &:before,
                         &:after {
                             background-color: #3d4c50;
                             width: 310px;
-                            margin: auto;
                             content: "";
                             height: 1px;
+                            margin: 0 auto;
                             display: block;
                             transition: background-color $speed;
                         }
                     }
 
-
+                    &-bg {
+                        position: absolute;
+                        right: -6px;
+                        left: -6px;
+                        bottom: 0;
+                        top: 0;
+                        background-color: #343d40;
+                        z-index: -1;
+                    }
                     & + div:first-of-type {
                         margin-top: 15px;
-                        &:before {
-                            display: none;
+                        .network-item-bg {
+                            top: -7px;
+                        }
+                        .network-item-wrap {
+                            &:before {
+                                display: none;
+                            }
+                        }
+                    }
+                    
+                    
+                    & + div:last-of-type {
+                        .network-item-bg {
+                            bottom: -7px;
+                        }
+                        .network-item-wrap {
+                            &:after {
+                                display: none;
+                            }
+                        }
+                    }
+
+
+                }
+                &-content {
+                    display: flex;
+                    margin: auto;
+                    width: 100%;
+                    max-width: 310px;
+                    .accounts {
+                        display: flex;
+                        margin-left: auto;
+                        li {
+                            &:not(:last-child) {
+                                margin-right: 6px;
+                            }
                         }
                     }
                 }
                 &-title {
                     font-size: 14px;
+                    margin: auto 0;
                 }
             }
 
