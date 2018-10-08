@@ -24,21 +24,13 @@ class Navbar extends React.PureComponent {
 
 	render() {
 		const { title, link } = this.renderTitle();
+		// console.log(link.value);
 
 		return (
 			<div className="navbar">
 				<ul>
 					<li className="btn-nav-wrap" >
-						<Button
-							className="btn-nav"
-							content={
-								<React.Fragment>
-									<div />
-									<div />
-									<div />
-								</React.Fragment>
-							}
-						/>
+						<Button className="icon-menu btn-nav" />
 					</li>
 					{
 						title &&

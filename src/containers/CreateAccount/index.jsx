@@ -27,36 +27,52 @@ class CreateAccount extends React.Component {
 		}
 	}
 
+	onClick(e) {
+		const { accountName } = this.props;
+
+		const field = e.target.name;
+
+		this.props.setFormValue(field, accountName);
+	}
+
+
 	renderLogin() {
 		const { accountName } = this.props;
 
 		return (
 			<Form>
 				<div className="page-wrap">
-					<div className="icon-person" />
-					<div className="one-input-wrap">
-						<BridgeInput
-							error={!!accountName.error}
-							name="accountName"
-							theme="input-light"
-							labelText="Account name"
-							errorText={accountName.error && accountName.error.errorText}
-							hintText={accountName.error && accountName.error.example}
-							descriptionText="Unique name will be used to make transaction"
-							value={accountName.value}
-							onChange={(e) => this.onChange(e)}
-						/>
+
+					<div className="page">
+						<div className="icon-pageAccount">
+							<span className="path1" />
+							<span className="path2" />
+						</div>
+						<div className="one-input-wrap">
+							<BridgeInput
+								error={!!accountName.error}
+								name="accountName"
+								theme="input-light"
+								labelText="Account name"
+								errorText={accountName.error && accountName.error.errorText}
+								hintText={accountName.error && accountName.error.example}
+								descriptionText="Unique name will be used to make transaction"
+								value={accountName.value}
+								onChange={(e) => this.onChange(e)}
+								onClick={(e) => this.onClick(e)}
+							/>
+						</div>
 					</div>
-				</div>
-				<div className="page-action-wrap">
-					<div className="one-btn-wrap" >
-						<Button
-							className="btn-in-light"
-							content={<span className="btn-text">Create</span>}
-							type="submit"
-							onClick={(e) => this.onCreate(e)}
-							disabled={this.props.loading}
-						/>
+					<div className="page-action-wrap">
+						<div className="one-btn-wrap" >
+							<Button
+								className="btn-in-light"
+								content={<span className="btn-text">Create</span>}
+								type="submit"
+								onClick={(e) => this.onCreate(e)}
+								disabled={this.props.loading}
+							/>
+						</div>
 					</div>
 				</div>
 			</Form>

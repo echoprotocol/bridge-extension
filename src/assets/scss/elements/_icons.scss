@@ -3,5 +3,11 @@
     width: 21px;
     border-radius: 50%;
     background-color: #16d6aa;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    [class*="icon-ava"] {
+        color: #3f4c4e;
+        font-size: 19px;
+    }
 }

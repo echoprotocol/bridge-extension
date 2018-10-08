@@ -1,9 +1,13 @@
-.icon-person {
-    background-color: #e3e6e8;
+.icon-pageAccount {
     border-radius: 50%;
     width: 28px;
     height: 28px;
     margin: 0 auto auto;
+    font-size: 32px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
     &-in {
         height: 86px;
         width: 86px;
@@ -13,8 +17,6 @@
         position: absolute;
         right: 0;
         left: 0;
-        top: -70px;
-
     }
 }
 

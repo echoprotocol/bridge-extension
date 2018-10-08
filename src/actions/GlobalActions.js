@@ -3,11 +3,11 @@ import { Map } from 'immutable';
 
 import history from '../history';
 
-import { initBalances } from './BalanceActions';
+import { getPreviewBalances, initBalances } from './BalanceActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { IMPORT_ACCOUNT_PATH, WIF_PATH } from '../constants/RouterConstants';
+import { IMPORT_ACCOUNT_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
 export const initAccount = (accountName, networkName) => async (dispatch) => {
@@ -36,6 +36,16 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 			dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
 		}, 1000);
 	}
+};
+
+export const addAccount = (accountName, networkName) => (dispatch) => {
+	let accounts = localStorage.getItem(`accounts_${networkName}`);
+	accounts = accounts ? JSON.parse(accounts) : [];
+	accounts.push({ name: accountName, active: false, icon: Math.floor(Math.random() * 15) + 1 });
+
+	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
+
+	dispatch(initAccount(accountName, networkName));
 };
 
 export const connection = () => async (dispatch) => {
@@ -70,14 +80,31 @@ export const connection = () => async (dispatch) => {
 	}
 };
 
-export const addAccount = (accountName, networkName) => (dispatch) => {
+export const isAccountAdded = (accountName, networkName) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];
-	accounts.push({ name: accountName, active: false, icon: 'coming soon' });
 
+	if (accounts.find(({ name }) => name === accountName)) {
+		return 'Account already added';
+	}
+
+	return null;
+};
+
+export const removeAccount = (accountName, networkName) => async (dispatch, getState) => {
+	const activeAccountName = getState().global.getIn(['activeUser', 'name']);
+
+	let accounts = localStorage.getItem(`accounts_${networkName}`);
+	accounts = accounts ? JSON.parse(accounts) : [];
+
+	accounts = accounts.filter(({ name }) => name !== accountName);
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
-	dispatch(initAccount(accountName, networkName));
+	if (activeAccountName === accountName && accounts[0]) {
+		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
 
-	history.push(WIF_PATH);
+		dispatch(initAccount(accounts[0].name, networkName));
+	} else {
+		dispatch(getPreviewBalances(networkName));
+	}
 };

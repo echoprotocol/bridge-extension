@@ -2,9 +2,11 @@ import React from 'react';
 import { Dropdown, Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
+import classnames from 'classnames';
 
 import { formatAmount } from '../../helpers/FormatHelper';
-import { initAccount } from '../../actions/GlobalActions';
+import { initAccount, removeAccount } from '../../actions/GlobalActions';
+import UserIcon from '../UserIcon';
 
 class UserDropdown extends React.PureComponent {
 
@@ -21,18 +23,26 @@ class UserDropdown extends React.PureComponent {
 		}
 	}
 
+	onRemoveAccount(e, name) {
+		e.stopPropagation();
+
+		const { networkName } = this.props;
+
+		this.props.removeAccount(name, networkName);
+	}
+
 	renderList() {
 		const { preview, accountName } = this.props;
 
 		return preview.map(({
-			name, balance: { amount, precision, symbol },
+			name, balance: { amount, precision, symbol }, icon,
 		}) => {
 			const content = (
 				<div key={name} className="user-item-wrap">
-					<div className="user-icon-wrap" />
+					<UserIcon color="green" avatar={`ava${icon}`} />
 					<div className="user-name">{name}</div>
-					<div className="user-balance">{formatAmount(amount, precision, symbol) || '0 ECHO'}</div>
-					<Button className="btn-logout" />
+					<div className={classnames('user-balance', { positive: !!amount })}>{formatAmount(amount, precision, symbol) || '0 ECHO'}</div>
+					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
 				</div>
 			);
 
@@ -84,13 +94,13 @@ class UserDropdown extends React.PureComponent {
 			},
 		];
 
-
 		return (
 			<Dropdown
 				className="dropdown-user"
 				trigger={
 					<div className="dropdown-trigger">
-						<span className="user-icon-wrap" />
+						<UserIcon color="green" avatar="ava7" />
+
 						<i aria-hidden="true" className="dropdown icon" />
 					</div>
 				}
@@ -109,6 +119,7 @@ UserDropdown.propTypes = {
 	networkName: PropTypes.string.isRequired,
 	preview: PropTypes.array.isRequired,
 	initAccount: PropTypes.func.isRequired,
+	removeAccount: PropTypes.func.isRequired,
 };
 
 export default connect(
@@ -119,6 +130,7 @@ export default connect(
 	}),
 	(dispatch) => ({
 		initAccount: (name, network) => dispatch(initAccount(name, network)),
+		removeAccount: (name, network) => dispatch(removeAccount(name, network)),
 	}),
 )(UserDropdown);
 

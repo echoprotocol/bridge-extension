@@ -11,7 +11,6 @@ import { FORM_SIGN_IN } from '../../constants/FormConstants';
 
 import BridgeInput from '../../components/BridgeInput';
 
-
 class ImportAccount extends React.Component {
 
 	onImport() {
@@ -37,9 +36,11 @@ class ImportAccount extends React.Component {
 	}
 
 	isDisabledSubmit() {
-		const { accountName, password } = this.props;
+		const { accountName, password, loading } = this.props;
 
-		if ((!accountName.value || accountName.error) || (!password.value || password.error)) {
+		if ((!accountName.value || accountName.error)
+			|| (!password.value || password.error)
+			|| loading) {
 			return true;
 		}
 
@@ -52,38 +53,41 @@ class ImportAccount extends React.Component {
 		return (
 			<Form>
 				<div className="page-wrap">
-					<div className="icon-person" />
-					<div className="two-input-wrap">
-						<BridgeInput
-							error={!!accountName.error}
-							name="accountName"
-							theme="input-light"
-							labelText="Account name"
-							errorText={accountName.error}
-							value={accountName.value}
-							onChange={(e) => this.onChange(e, true)}
-						/>
-						<BridgeInput
-							error={!!password.error}
-							name="password"
-							type="password"
-							errorText={password.error}
-							theme="input-light"
-							labelText="WIF key / password"
-							value={password.value}
-							onChange={(e) => this.onChange(e)}
-						/>
+
+					<div className="page">
+						<div className="icon-pageAccount" />
+						<div className="two-input-wrap">
+							<BridgeInput
+								error={!!accountName.error}
+								name="accountName"
+								theme="input-light"
+								labelText="Account name"
+								errorText={accountName.error}
+								value={accountName.value}
+								onChange={(e) => this.onChange(e, true)}
+							/>
+							<BridgeInput
+								error={!!password.error}
+								name="password"
+								type="password"
+								errorText={password.error}
+								theme="input-light"
+								labelText="WIF key / password"
+								value={password.value}
+								onChange={(e) => this.onChange(e)}
+							/>
+						</div>
 					</div>
-				</div>
-				<div className="page-action-wrap">
-					<div className="one-btn-wrap" >
-						<Button
-							disabled={this.isDisabledSubmit()}
-							className={classnames('btn-in-dark', { disabled: this.isDisabledSubmit() })}
-							content={<span className="btn-text">Import</span>}
-							type="submit"
-							onClick={(e) => this.onImport(e)}
-						/>
+					<div className="page-action-wrap">
+						<div className="one-btn-wrap" >
+							<Button
+								disabled={this.isDisabledSubmit()}
+								className={classnames('btn-in-dark', { disabled: this.isDisabledSubmit() })}
+								content={<span className="btn-text">Import</span>}
+								type="submit"
+								onClick={(e) => this.onImport(e)}
+							/>
+						</div>
 					</div>
 				</div>
 			</Form>
@@ -93,16 +97,22 @@ class ImportAccount extends React.Component {
 }
 
 ImportAccount.propTypes = {
+	loading: PropTypes.bool,
 	accountName: PropTypes.object.isRequired,
 	password: PropTypes.object.isRequired,
 	importAccount: PropTypes.func.isRequired,
 	setFormValue: PropTypes.func.isRequired,
 };
 
+ImportAccount.defaultProps = {
+	loading: false,
+};
+
 export default connect(
 	(state) => ({
 		accountName: state.form.getIn([FORM_SIGN_IN, 'accountName']),
 		password: state.form.getIn([FORM_SIGN_IN, 'password']),
+		loading: state.form.getIn([FORM_SIGN_IN, 'loading']),
 	}),
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_IN, field, value)),
