@@ -3,9 +3,12 @@ import { Dropdown, Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { withRouter } from 'react-router';
+import { Link } from 'react-router-dom';
 
 import FormatHelper from '../../helpers/FormatHelper';
 import { initAccount, removeAccount } from '../../actions/GlobalActions';
+import { IMPORT_ACCOUNT_PATH, INDEX_PATH } from '../../constants/RouterConstants';
 
 class UserDropdown extends React.PureComponent {
 
@@ -77,7 +80,7 @@ class UserDropdown extends React.PureComponent {
 				className: ' user-create',
 				content: (
 					<React.Fragment>
-						<a href="">create</a>
+						<Link to={INDEX_PATH}>create</Link>
 					</React.Fragment>
 				),
 			},
@@ -87,7 +90,8 @@ class UserDropdown extends React.PureComponent {
 				className: 'user-import',
 				content: (
 					<React.Fragment>
-						<a href="">import</a>
+						<Link to={IMPORT_ACCOUNT_PATH}>import
+						</Link>
 					</React.Fragment>
 				),
 			},
@@ -120,7 +124,7 @@ UserDropdown.propTypes = {
 	removeAccount: PropTypes.func.isRequired,
 };
 
-export default connect(
+export default withRouter(connect(
 	(state) => ({
 		preview: state.balance.get('preview').toJS(),
 		accountName: state.global.getIn(['activeUser', 'name']),
@@ -130,5 +134,5 @@ export default connect(
 		initAccount: (name, network) => dispatch(initAccount(name, network)),
 		removeAccount: (name, network) => dispatch(removeAccount(name, network)),
 	}),
-)(UserDropdown);
+)(UserDropdown));
 

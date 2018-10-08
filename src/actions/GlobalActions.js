@@ -110,6 +110,9 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
 		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
 
 		dispatch(initAccount(accounts[0].name, networkName));
+	} else if (!accounts.length) {
+		dispatch(GlobalReducer.actions.logout());
+		dispatch(getPreviewBalances(networkName));
 	} else {
 		dispatch(getPreviewBalances(networkName));
 	}
