@@ -7,7 +7,7 @@ import { initBalances } from './BalanceActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { INDEX_PATH, WIF_PATH } from '../constants/RouterConstants';
+import { IMPORT_ACCOUNT_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
 export const initAccount = (accountName, networkName) => async (dispatch) => {
@@ -27,10 +27,6 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 		const { id, name } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
 
 		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name } }));
-
-		if (INDEX_PATH.includes(history.location.pathname)) {
-			history.push(WIF_PATH);
-		}
 
 		await dispatch(initBalances(networkName));
 	} catch (err) {
@@ -57,6 +53,7 @@ export const connection = () => async (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
 
 	try {
+        history.push(IMPORT_ACCOUNT_PATH);
 		await dispatch(EchoJSActions.connect(network.url));
 		let accounts = localStorage.getItem(`accounts_${network.name}`);
 
