@@ -14,6 +14,7 @@ export const getPreviewBalances = (networkName) => async (dispatch) => {
      *  		precision,
      *  	},
      *  	name,
+	 *  	icon,
      *  }]
      */
 
@@ -22,7 +23,7 @@ export const getPreviewBalances = (networkName) => async (dispatch) => {
 
 	const { symbol, precision } = (await dispatch(EchoJSActions.fetch('1.3.0'))).toJS();
 
-	const balances = accounts.map(async ({ name }) => {
+	const balances = accounts.map(async ({ name, icon }) => {
 		const account = (await dispatch(EchoJSActions.fetch(name))).toJS();
 
 		const preview = {
@@ -32,6 +33,7 @@ export const getPreviewBalances = (networkName) => async (dispatch) => {
 				precision,
 			},
 			name,
+			icon,
 		};
 
 		if (account && account.balances && account.balances['1.3.0']) {
@@ -54,8 +56,4 @@ export const getPreviewBalances = (networkName) => async (dispatch) => {
 
 export const initBalances = (networkName) => async (dispatch) => {
 	await dispatch(getPreviewBalances(networkName));
-};
-
-export const resetBalance = () => (dispatch) => {
-	dispatch(BalanceReducer.actions.reset());
 };

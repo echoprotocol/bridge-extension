@@ -7,6 +7,7 @@ const DEFAULT_FIELDS = Map({
 	activeUser: new Map({
 		id: '',
 		name: '',
+		icon: '',
 	}),
 	network: new Map({
 		name: '',

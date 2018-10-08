@@ -15,10 +15,15 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 	try {
 		let accounts = localStorage.getItem(`accounts_${networkName}`);
+		let icon = null;
 
 		accounts = accounts ? JSON.parse(accounts) : [];
 		accounts = accounts.map((i) => {
-			i.active = i.name === accountName;
+			i.active = false;
+			if (i.name === accountName) {
+				i.active = true;
+				({ icon } = i);
+			}
 			return i;
 		});
 
@@ -26,9 +31,7 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 		const { id, name } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
 
-		// EchoJSActions.setSubscribe({ types: ['objects', 'block', 'accounts'], method: getObject });
-
-		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name } }));
+		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name, icon } }));
 
 		await dispatch(initBalances(networkName));
 	} catch (err) {
@@ -43,7 +46,7 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 export const addAccount = (accountName, networkName) => (dispatch) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];
-	accounts.push({ name: accountName, active: false });
+	accounts.push({ name: accountName, active: false, icon: Math.floor(Math.random() * 15) + 1 });
 
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
