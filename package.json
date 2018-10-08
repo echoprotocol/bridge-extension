@@ -13,6 +13,8 @@
 		"autoprefixer": "^8.1.0",
 		"classnames": "^2.2.6",
 		"config": "^1.30.0",
+		"crypto-random-string": "^1.0.0",
+		"echojs-lib": "^0.1.7",
 		"file-loader": "^1.1.11",
 		"history": "^4.7.2",
 		"immutable": "^3.8.2",
