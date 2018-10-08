@@ -3,19 +3,25 @@ import { Dropdown, Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { withRouter } from 'react-router';
+import { Link } from 'react-router-dom';
+
+import { initAccount, removeAccount } from '../../actions/GlobalActions';
 
 import FormatHelper from '../../helpers/FormatHelper';
-import { initAccount, removeAccount } from '../../actions/GlobalActions';
+
+import { IMPORT_ACCOUNT_PATH, INDEX_PATH } from '../../constants/RouterConstants';
+
 import UserIcon from '../UserIcon';
 
 class UserDropdown extends React.PureComponent {
 
 	onDropdownChange(e, name) {
 		const handledKey = e.key || e.type;
-		const { accountName, networkName } = this.props;
+		const { activeUser, networkName } = this.props;
 
 		if (['click', 'Enter'].includes(handledKey)) {
-			if (accountName === name) {
+			if (activeUser.name === name) {
 				return;
 			}
 
@@ -32,7 +38,7 @@ class UserDropdown extends React.PureComponent {
 	}
 
 	renderList() {
-		const { preview, accountName } = this.props;
+		const { preview, activeUser } = this.props;
 
 		return preview.map(({
 			name, balance: { amount, precision, symbol }, icon,
@@ -51,12 +57,14 @@ class UserDropdown extends React.PureComponent {
 				key: name,
 				className: 'user-item',
 				content,
-				selected: accountName === name,
+				selected: activeUser.name === name,
 			});
 		});
 	}
 
 	render() {
+		const { activeUser } = this.props;
+
 		const optionsEnd = [
 			{
 				value: 'fake-element',
@@ -78,7 +86,7 @@ class UserDropdown extends React.PureComponent {
 				className: ' user-create',
 				content: (
 					<React.Fragment>
-						<a href="">create</a>
+						<Link to={INDEX_PATH}>create</Link>
 					</React.Fragment>
 				),
 			},
@@ -88,7 +96,8 @@ class UserDropdown extends React.PureComponent {
 				className: 'user-import',
 				content: (
 					<React.Fragment>
-						<a href="">import</a>
+						<Link to={IMPORT_ACCOUNT_PATH}>import
+						</Link>
 					</React.Fragment>
 				),
 			},
@@ -99,7 +108,7 @@ class UserDropdown extends React.PureComponent {
 				className="dropdown-user"
 				trigger={
 					<div className="dropdown-trigger">
-						<UserIcon color="green" avatar="ava7" />
+						<UserIcon color="green" avatar={`ava${activeUser.icon}`} />
 
 						<i aria-hidden="true" className="dropdown icon" />
 					</div>
@@ -115,22 +124,21 @@ class UserDropdown extends React.PureComponent {
 }
 
 UserDropdown.propTypes = {
-	accountName: PropTypes.string.isRequired,
+	activeUser: PropTypes.object.isRequired,
 	networkName: PropTypes.string.isRequired,
 	preview: PropTypes.array.isRequired,
 	initAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
 };
 
-export default connect(
+export default withRouter(connect(
 	(state) => ({
 		preview: state.balance.get('preview').toJS(),
-		accountName: state.global.getIn(['activeUser', 'name']),
+		activeUser: state.global.get('activeUser').toJS(),
 		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
 		initAccount: (name, network) => dispatch(initAccount(name, network)),
 		removeAccount: (name, network) => dispatch(removeAccount(name, network)),
 	}),
-)(UserDropdown);
-
+)(UserDropdown));

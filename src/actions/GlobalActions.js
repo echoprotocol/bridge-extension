@@ -15,10 +15,15 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 	try {
 		let accounts = localStorage.getItem(`accounts_${networkName}`);
+		let icon = null;
 
 		accounts = accounts ? JSON.parse(accounts) : [];
 		accounts = accounts.map((i) => {
-			i.active = i.name === accountName;
+			i.active = false;
+			if (i.name === accountName) {
+				i.active = true;
+				({ icon } = i);
+			}
 			return i;
 		});
 
@@ -26,7 +31,7 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 		const { id, name } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
 
-		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name } }));
+		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name, icon } }));
 
 		await dispatch(initBalances(networkName));
 	} catch (err) {
@@ -108,6 +113,9 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
 		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
 
 		dispatch(initAccount(accounts[0].name, networkName));
+	} else if (!accounts.length) {
+		dispatch(GlobalReducer.actions.logout());
+		dispatch(getPreviewBalances(networkName));
 	} else {
 		dispatch(getPreviewBalances(networkName));
 	}
