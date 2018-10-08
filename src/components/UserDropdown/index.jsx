@@ -134,7 +134,7 @@ UserDropdown.propTypes = {
 export default withRouter(connect(
 	(state) => ({
 		preview: state.balance.get('preview').toJS(),
-		activeUser: state.global.get('activeUser'),
+		activeUser: state.global.get('activeUser').toJS(),
 		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
