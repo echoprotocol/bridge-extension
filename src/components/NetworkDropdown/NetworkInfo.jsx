@@ -7,9 +7,18 @@ class NetworkInfo extends React.PureComponent {
 
 		return (
 			<ul className="network-info">
-				<li>1</li>
-				<li>2</li>
-				<li>3</li>
+				<li>
+					<div>Block</div>
+					<div>5282942</div>
+				</li>
+				<li>
+					<div>Faucet</div>
+					<div>1.234.234.34</div>
+				</li>
+				<li>
+					<div>Addres</div>
+					<div>192.168.1.02</div>
+				</li>
 			</ul>
 
 		);

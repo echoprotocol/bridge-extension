@@ -1,7 +1,6 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-import { NavLink } from 'react-router-dom'
 import { withRouter } from 'react-router';
 import history from '../../history';
 
@@ -44,7 +43,6 @@ class Navbar extends React.PureComponent {
 					{
 						link &&
 						<li className="link-nav">
-							{/*<NavLink to={link.value}>fgdg</NavLink>*/}
 							<a onClick={(e) => this.onClick(e, link.value)} href="#">
 								{link.name}
 							</a>
