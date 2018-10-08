@@ -7,6 +7,7 @@ import { changeNetwork, deleteNetwork } from '../../actions/GlobalActions';
 
 import { NETWORKS } from '../../constants/GlobalConstants';
 
+import classnames from 'classnames';
 import NetworkInfo from './NetworkInfo';
 import UserIcon from '../UserIcon';
 
@@ -20,17 +21,17 @@ class NetworkDropdown extends React.PureComponent {
 		};
 	}
 
-	onDropdownChange(e, value) {
-		if ((e.type !== 'click' && e.keyCode !== 13) || e.target.id === 'btn-dlt') {
-			return;
-		}
-
-		if (value === 'custom') {
-			// this.props.history.push(NETWORKS_PATH);
-		} else {
-			this.onChangeNetwork(value);
-		}
-	}
+	// onDropdownChange(e, value) {
+	// 	if ((e.type !== 'click' && e.keyCode !== 13) || e.target.id === 'btn-dlt') {
+	// 		return;
+	// 	}
+    //
+	// 	if (value === 'custom') {
+	// 		// this.props.history.push(NETWORKS_PATH);
+	// 	} else {
+	// 		this.onChangeNetwork(value);
+	// 	}
+	// }
 
 	onDeleteNetwork(network, e) {
 		e.preventDefault();
@@ -99,6 +100,11 @@ class NetworkDropdown extends React.PureComponent {
 
 	onClose() {
 		this.setState({ opened: false });
+	}
+
+	onDropdownChange(e, value) {
+		console.log(e, value);
+
 	}
 
 	render() {
@@ -182,7 +188,7 @@ class NetworkDropdown extends React.PureComponent {
 			<div className="network-content">
 				<Button className="btn-round-close" />
 				<div className="network-title">
-                Whitepowernet
+			            Whitepowernet
 				</div>
 
 			</div>
@@ -249,12 +255,14 @@ class NetworkDropdown extends React.PureComponent {
 				content:
 	<React.Fragment>
 		<div className="network-body" />
+		<div className="network-footer" />
+		<div className="network-footer-area" />
 	</React.Fragment>,
 			},
 			{
 				value: 'add-net',
 				key: 'add-net',
-				className: 'last-element',
+				className: 'add-network',
 				as: 'a',
 				content: '+ Add Network',
 			},
@@ -271,12 +279,13 @@ class NetworkDropdown extends React.PureComponent {
 		return (
 			<React.Fragment>
 				<Dropdown
+					// open
 					className="dropdown-network"
 					onOpen={() => this.onOpen()}
 					onClose={() => this.onClose()}
 					trigger={
 						<div className="dropdown-trigger">
-							<div className="current-network">
+							<div className={classnames('current-network', { connected: true })}>
 								<span className="cut">{this.state.height}Main Network</span>
 							</div>
 							<i aria-hidden="true" className="dropdown icon" />

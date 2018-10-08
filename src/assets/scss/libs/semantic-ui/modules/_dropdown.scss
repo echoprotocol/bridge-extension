@@ -83,7 +83,7 @@
 ---------------*/
 
 .ui.dropdown .menu > .item {
-    &:not(.disabled):not(.user-create):not(.user-import) {
+    &:not(.disabled):not(.user-create):not(.user-import):not(.add-network) {
         position: relative;
     }
   cursor: pointer;
