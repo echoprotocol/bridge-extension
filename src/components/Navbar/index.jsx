@@ -15,7 +15,6 @@ class Navbar extends React.PureComponent {
 			if (title.path === location.pathname) {
 				return true;
 			} else if (title.path.split('/')[2] === location.pathname.split('/')[2]) {
-				console.log(title.path.split('/')[2], location.pathname.split('/')[2]);
 				return true;
 			}
 			return false;
