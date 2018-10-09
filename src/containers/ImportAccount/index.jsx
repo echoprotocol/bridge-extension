@@ -14,7 +14,7 @@ import BridgeInput from '../../components/BridgeInput';
 class ImportAccount extends React.Component {
 
 	componentWillUnmount() {
-    	this.props.clearForm();
+		this.props.clearForm();
 	}
 
 	onImport() {

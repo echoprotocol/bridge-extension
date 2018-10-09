@@ -28,4 +28,8 @@ export default class Crypto {
 		return transaction;
 	}
 
+	isLocked() {
+		return false;
+	}
+
 }

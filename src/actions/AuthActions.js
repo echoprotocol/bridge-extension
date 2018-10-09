@@ -35,7 +35,7 @@ export const createAccount = ({ accountName }) => async (dispatch, getState) => 
 			return;
 		}
 
-		if (userCrypto.isLocked) {
+		if (userCrypto.isLocked()) {
 			dispatch(GlobalReducer.actions.set({ field: 'cryptoError', value: 'Account locked' }));
 			return;
 		}
@@ -62,11 +62,13 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 
 	if (accountNameError) {
 		dispatch(setFormError(FORM_SIGN_IN, 'accountName', accountNameError));
+		dispatch(toggleLoading(FORM_SIGN_IN, false));
 		return;
 	}
 
 	if (passwordError) {
 		dispatch(setFormError(FORM_SIGN_IN, 'password', passwordError));
+		dispatch(toggleLoading(FORM_SIGN_IN, false));
 		return;
 	}
 
@@ -85,9 +87,12 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 			return;
 		}
 
-		dispatch(toggleLoading(FORM_SIGN_IN, true));
-
 		const account = await dispatch(EchoJSActions.fetch(accountName));
+
+		if (userCrypto.isLocked()) {
+			dispatch(GlobalReducer.actions.set({ field: 'cryptoError', value: 'Account locked' }));
+			return;
+		}
 
 		passwordError = importWallet(account, password);
 
@@ -95,6 +100,11 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 			dispatch(setFormError(FORM_SIGN_IN, 'password', passwordError));
 			return;
 		}
+
+		if (userCrypto.isWIF(password)) {
+			userCrypto.importByWIF(password);
+		}
+		userCrypto.importByPassword(accountName, password);
 
 		dispatch(addAccount(accountName, network.name));
 

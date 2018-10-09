@@ -1,7 +1,5 @@
 import { PrivateKey, key } from 'echojs-lib';
 
-import { userCrypto } from '../actions/GlobalActions';
-
 export const generateKeyFromPassword = (accountName, role, password) => {
 	const seed = `${accountName}${role}${password}`;
 	const privateKey = PrivateKey.fromSeed(seed);
@@ -107,6 +105,7 @@ export const createWallet = async (registrator, account) => {
 		throw response.errors.join();
 	}
 
+	// return password;
 	return active.privateKey.toWif();
 };
 
