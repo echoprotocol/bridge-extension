@@ -1,13 +1,23 @@
 import { Aes, PrivateKey } from 'echojs-lib';
 import random from 'crypto-random-string';
+import EventEmitter from 'events';
 
 import Storage from './storage';
 
 const storage = new Storage();
-let TIMEOUT = 10 * 60 * 1000;
-let aes;
 
-class CryptoSecret {
+class AesStorage {
+
+	/**
+	 *  @constructor
+	 *
+	 * 	Init aes and timeout variables.
+	 */
+	constructor() {
+		this.aes = null;
+		this.TIMEOUT = 10 * 60 * 1000;
+		this.emitter = () => {};
+	}
 
 	/**
 	 *  @method getRandomBuffer
@@ -18,14 +28,14 @@ class CryptoSecret {
 	 *
 	 *  @return {Buffer} randomBuffer
 	 */
-	static getRandomBuffer() {
+	async getRandomBuffer() {
 		let randomBuffer = Buffer.from(random(32));
-		let randomKey = storage.get('randomKey');
+		let randomKey = await storage.get('randomKey');
 
 		if (randomKey) {
-			randomBuffer = aes.decryptHexToBuffer(randomKey);
+			randomBuffer = this.aes.decryptHexToBuffer(randomKey);
 		} else {
-			randomKey = aes.encryptToHex(randomBuffer);
+			randomKey = this.aes.encryptToHex(randomBuffer);
 			storage.set('randomKey', randomKey);
 		}
 
@@ -33,14 +43,96 @@ class CryptoSecret {
 	}
 
 	/**
-	 *  @method aesRequired
+	 *  @method timeout
+	 *
+	 *  Set timeout, when it expired - clear aes object.
+	 *
+	 *  @param {Number} milliseconds - optional
+	 */
+	timeout(milliseconds) {
+		if (milliseconds) {
+			this.TIMEOUT = milliseconds;
+		}
+
+		setTimeout(() => { this.clear(); }, this.TIMEOUT);
+	}
+
+	/**
+	 *  @method get
+	 *
+	 *  Set aes object.
+	 *
+	 *  @param {String} pin
+	 *  @param {Function} emitter
+	 *  @param {Number} milliseconds - optional
+	 */
+	async set(pin, emitter, milliseconds) {
+		if (!pin || typeof pin !== 'string') {
+			throw new Error('Key required.');
+		}
+
+		if (!emitter || typeof emitter !== 'function') {
+			throw new Error('Event emitter required.');
+		}
+
+		this.emitter = emitter;
+
+		this.aes = Aes.fromSeed(pin);
+		const randomBuffer = await this.getRandomBuffer();
+		this.aes = Aes.fromSeed(randomBuffer);
+		this.emitter('unlocked');
+
+		this.timeout(milliseconds);
+	}
+
+	/**
+	 *  @method get
+	 *
+	 *  Get aes object.
+	 */
+	get() {
+		return this.aes;
+	}
+
+	/**
+	 *  @method clear
+	 *
+	 *  Clear aes object.
+	 */
+	clear() {
+		this.aes = null;
+		this.emitter('locked');
+	}
+
+	/**
+	 *  @method required
 	 *
 	 *  If aes is empty, throw error.
 	 */
-	static aesRequired() {
-		if (!aes) {
+	required() {
+		if (!this.aes) {
 			throw new Error('Unlock required.');
 		}
+	}
+
+}
+
+const privateAES = new AesStorage();
+
+class Crypto extends EventEmitter {
+
+	/**
+	 *  @constructor
+	 *
+	 * 	Create aes and set expired timout
+	 *
+	 *  @param {String} pin
+	 *  @param {Number} milliseconds - optional
+	 */
+	constructor(pin, milliseconds) {
+		super();
+
+		privateAES.set(pin, this.emit, milliseconds);
 	}
 
 	/**
@@ -52,51 +144,30 @@ class CryptoSecret {
 	 *  @param {String} password
 	 *  @param {String} role - optional
 	 *
-	 *  @return {PrivateKey} privateKey
+	 *  @return {WIF} privateKey
 	 */
 	static getPrivateKey(username, password, role = 'active') {
 		const seed = `${username}${role}${password}`;
 		const privateKey = PrivateKey.fromSeed(seed);
-		return privateKey;
+		return privateKey.toWif();
 	}
 
 	/**
-	 *  @method timeout
+	 *  @method isWIF
 	 *
-	 *  Set timeout, when it expired - clear aes object
+	 *  Check string is WIF.
 	 *
-	 *  @param {Number} milliseconds - optional
+	 *  @param {String} passwordOrWIF
+	 *
+	 *  @return {Boolean} isWIF
 	 */
-	static timeout(milliseconds) {
-		if (milliseconds) {
-			TIMEOUT = milliseconds;
+	static isWIF(passwordOrWIF) {
+		try {
+			PrivateKey.fromWif(passwordOrWIF);
+			return true;
+		} catch (err) {
+			return false;
 		}
-
-		setTimeout(() => { aes = null; }, TIMEOUT);
-	}
-
-}
-
-export default class Crypto {
-
-	/**
-	 *  @constructor
-	 *
-	 * 	Create aes and set expired timout
-	 *
-	 *  @param {String} pin
-	 *  @param {Number} milliseconds - optional
-	 */
-	constructor(pin, milliseconds) {
-		if (!pin || typeof pin !== 'string') {
-			throw new Error('Key required.');
-		}
-
-		aes = Aes.fromSeed(pin);
-		const randomBuffer = CryptoSecret.getRandomBuffer();
-		aes = Aes.fromSeed(randomBuffer);
-
-		CryptoSecret.timeout(milliseconds);
 	}
 
 	/**
@@ -107,7 +178,7 @@ export default class Crypto {
 	 *  @return {String} privateKeyWIF
 	 */
 	generateWIF() {
-		CryptoSecret.aesRequired();
+		privateAES.required();
 
 		const privateKey = PrivateKey.fromSeed(random(32));
 
@@ -124,9 +195,10 @@ export default class Crypto {
 	 *  @param {String} wif
 	 */
 	importByWIF(wif) {
-		CryptoSecret.aesRequired();
+		privateAES.required();
 
 		const privateKey = PrivateKey.fromWif(wif);
+		const aes = privateAES.get();
 		const encryptedPrivateKey = aes.encryptToHex(privateKey.toBuffer());
 		const publicKey = privateKey.toPublicKey();
 
@@ -144,32 +216,10 @@ export default class Crypto {
 	 *  @param {String} password
 	 */
 	importByPassword(username, password) {
-		CryptoSecret.aesRequired();
+		privateAES.required();
 
-		const privateKey = CryptoSecret.getPrivateKey(username, password);
-		const encryptedPrivateKey = aes.encryptToHex(privateKey.toBuffer());
-		const publicKey = privateKey.toPublicKey();
-
-		storage.set(publicKey.toString(), encryptedPrivateKey);
-
-	}
-
-	/**
-	 *  @method isWIF
-	 *
-	 *  Check string is WIF.
-	 *
-	 *  @param {String} passwordOrWIF
-	 *
-	 *  @return {Boolean} isWIF
-	 */
-	isWIF(passwordOrWIF) {
-		try {
-			PrivateKey.fromWif(passwordOrWIF);
-			return true;
-		} catch (err) {
-			return false;
-		}
+		const privateKeyWIF = this.getPrivateKey(username, password);
+		this.importByWIF(privateKeyWIF);
 	}
 
 	/**
@@ -180,15 +230,7 @@ export default class Crypto {
 	 *  @param {String} pin
 	 */
 	unlock(pin) {
-		if (!pin || typeof pin !== 'string') {
-			throw new Error('Key required.');
-		}
-
-		aes = Aes.fromSeed(pin);
-		const randomBuffer = CryptoSecret.getRandomBuffer();
-		aes = Aes.fromSeed(randomBuffer);
-
-		CryptoSecret.timeout();
+		privateAES.set(pin);
 	}
 
 	/**
@@ -197,7 +239,7 @@ export default class Crypto {
 	 *  Delete aes object.
 	 */
 	lock() {
-		aes = null;
+		privateAES.clear();
 	}
 
 	/**
@@ -208,7 +250,7 @@ export default class Crypto {
 	 *  @return {Boolean} isLocked
 	 */
 	isLocked() {
-		return !aes;
+		return !privateAES.get();
 	}
 
 	/**
@@ -221,17 +263,16 @@ export default class Crypto {
 	 *
 	 *  @return {Transaction} signedTransaction
 	 */
-	sign(transaction, publicKeyString) {
-		if (!aes) {
-			throw new Error('Unlock required.');
-		}
+	async sign(transaction, publicKeyString) {
+		privateAES.required();
 
-		const encryptedPrivateKey = storage.get(publicKeyString);
+		const encryptedPrivateKey = await storage.get(publicKeyString);
 
 		if (!encryptedPrivateKey) {
 			throw new Error('Key not found.');
 		}
 
+		const aes = privateAES.get();
 		const privateKeyBuffer = aes.decryptHexToBuffer(encryptedPrivateKey);
 		const privateKey = PrivateKey.fromBuffer(privateKeyBuffer);
 
@@ -240,3 +281,5 @@ export default class Crypto {
 	}
 
 }
+
+export default Crypto;

@@ -15,6 +15,7 @@
 		"config": "^1.30.0",
 		"crypto-random-string": "^1.0.0",
 		"echojs-lib": "^0.1.7",
+		"events": "^3.0.0",
 		"file-loader": "^1.1.11",
 		"history": "^4.7.2",
 		"immutable": "^3.8.2",
