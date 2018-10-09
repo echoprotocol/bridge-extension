@@ -45,10 +45,8 @@
   text-align: left;
   border: 1px solid rgba(34, 36, 38, 0.15);
   border-radius: 0.28571429rem;
-  -webkit-transition: opacity 0.1s ease;
-  transition: opacity 0.1s ease;
   z-index: 11;
-  will-change: transform, opacity;
+  will-change: transform;
 }
 .ui.dropdown .menu > * {
   white-space: nowrap;
@@ -85,7 +83,9 @@
 ---------------*/
 
 .ui.dropdown .menu > .item {
-  position: relative;
+    &:not(.disabled):not(.user-create):not(.user-import):not(.add-network) {
+        position: relative;
+    }
   cursor: pointer;
 }
 .ui.dropdown .menu > .item:first-child {
@@ -821,7 +821,6 @@ select.ui.dropdown {
 .ui.dropdown .menu > .disabled.item {
   cursor: default;
   pointer-events: none;
-  position: initial;
   z-index: 0;
 }
 

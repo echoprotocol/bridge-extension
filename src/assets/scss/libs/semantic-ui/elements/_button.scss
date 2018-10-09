@@ -195,28 +195,6 @@
   border-top-color: #767676;
 }
 
-/*-------------------
-      Disabled
---------------------*/
-
-.ui.buttons .disabled.button,
-.ui.disabled.button,
-.ui.button:disabled,
-.ui.disabled.button:hover,
-.ui.disabled.active.button {
-  cursor: default;
-  opacity: 0.45 !important;
-  background-image: none !important;
-  -webkit-box-shadow: none !important;
-          box-shadow: none !important;
-  pointer-events: none !important;
-}
-
-/* Basic Group With Disabled */
-.ui.basic.buttons .ui.disabled.button {
-  border-color: rgba(34, 36, 38, 0.5);
-}
-
 
 /*******************************
              Types
@@ -235,7 +213,7 @@
   z-index: 1;
 }
 .ui.animated.button .content {
-  will-change: transform, opacity;
+  will-change: transform;
 }
 .ui.animated.button .visible.content {
   position: relative;
