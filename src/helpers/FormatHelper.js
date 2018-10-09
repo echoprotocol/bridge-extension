@@ -1,3 +1,7 @@
+import utf8 from 'utf8';
+
+import { events } from '../constants/LogEventConstants';
+
 export default class FormatHelper {
 
 	static toFixed(value, precision) {
@@ -29,6 +33,43 @@ export default class FormatHelper {
             + (precision ? postfix : '');
 
 		return symbol ? `${resultNumber} ${symbol}` : resultNumber;
+	}
+
+	static toUtf8(hex) {
+		let str = '';
+
+		for (let i = 0; i < hex.length; i += 2) {
+			const code = parseInt(hex.substr(i, 2), 16);
+			if (code !== 0) {
+				str += String.fromCharCode(code);
+			}
+		}
+		let result = str;
+		try {
+			result = utf8.decode(str);
+		} catch (error) {
+			result = str;
+		}
+		return result;
+	}
+
+	static toInt(hex) {
+		return parseInt(hex, 16);
+	}
+
+	static logParser(log) {
+		if (!log || !log.length) return [];
+		return log.map((l) => {
+			const contractId = parseInt(l.address.slice(2), 16);
+			const event = events[l.log[0]] || l.log[0];
+			const params = l.log.slice(1);
+			return { contractId, event, params };
+		});
+	}
+
+	static getLog(result) {
+		const trReceipt = result.tr_receipt;
+		return trReceipt ? trReceipt.log : null;
 	}
 
 }

@@ -35,7 +35,7 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 		const { id, name } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
 
-		EchoJSActions.setSubscribe({ types: ['objects', 'block', 'accounts'], method: getObject });
+		// EchoJSActions.setSubscribe({ types: ['objects', 'block', 'accounts'], method: getObject });
 
 		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name, icon } }));
 

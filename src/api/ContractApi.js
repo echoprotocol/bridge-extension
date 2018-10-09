@@ -2,7 +2,7 @@ import {
 	getMethodId,
 	getMethod,
 } from '../helpers/ContractHelper';
-import { toInt, toUtf8 } from '../helpers/FormatHelper';
+import FormatHelper from '../helpers/FormatHelper';
 
 //	TODO methods should be in echojs-lib!!!
 //	please, don't export them and use only as private methods at contract api
@@ -15,8 +15,6 @@ export const getResult = (instance, resultId) => instance.dbApi().exec(
 	'get_contract_result',
 	[resultId],
 );
-
-const getContractInfo = (instance, contract) => instance.dbApi().exec('get_contract', [contract]);
 //	end
 
 export const getContractResult = (instance, resultId) => getResult(instance, resultId);
@@ -31,7 +29,7 @@ export const getTokenBalance = async (instance, accountId, contractId) => {
 		getMethod(method, args),
 	);
 
-	return toInt(result);
+	return FormatHelper.toInt(result);
 };
 
 export const getTokenSymbol = async (instance, accountId, contractId) => {
@@ -43,7 +41,7 @@ export const getTokenSymbol = async (instance, accountId, contractId) => {
 		getMethodId(method),
 	);
 
-	return toUtf8(result.substr(-64));
+	return FormatHelper.toUtf8(result.substr(-64));
 };
 
 export const getTokenPrecision = async (instance, accountId, contractId) => {
@@ -55,14 +53,5 @@ export const getTokenPrecision = async (instance, accountId, contractId) => {
 		getMethodId(method),
 	);
 
-	return toInt(result);
+	return FormatHelper.toInt(result);
 };
-
-export const getContractConstant = (instance, contractId, accountId, method) => getContractProp(
-	instance,
-	contractId,
-	accountId,
-	method,
-);
-
-export const getContract = (instance, contractId) => getContractInfo(instance, contractId);

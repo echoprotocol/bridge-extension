@@ -12,7 +12,17 @@ import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 class CreateAccount extends React.Component {
 
+	constructor(props) {
+		super(props);
+		this.state = {
+			disableLoading: false,
+		};
+	}
+
 	onCreate() {
+		this.setState({
+			disableLoading: true,
+		});
 		this.props.toggleLoading(true);
 
 		this.props.createAccount({ accountName: this.props.accountName.value.trim() });
@@ -40,6 +50,7 @@ class CreateAccount extends React.Component {
 
 	renderLogin() {
 		const { accountName, loading } = this.props;
+		const { disableLoading } = this.state;
 
 		return (
 			<Form>
@@ -73,7 +84,7 @@ class CreateAccount extends React.Component {
 								content={<span className="btn-text">Create</span>}
 								type="submit"
 								onClick={(e) => this.onCreate(e)}
-								disabled={this.props.loading}
+								disabled={disableLoading}
 							/>
 						</div>
 					</div>

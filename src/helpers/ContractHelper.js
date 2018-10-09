@@ -1,7 +1,7 @@
 import { keccak256 } from 'js-sha3';
 
 import operations from '../constants/OperationsConstants';
-import { getLog, logParser } from './FormatHelper';
+import FormatHelper from './FormatHelper';
 
 const zero64String = '0000000000000000000000000000000000000000000000000000000000000000';
 
@@ -145,10 +145,10 @@ export const checkBlockTransaction = (accountId, op, tokens) => {
 };
 
 export const checkTransactionResult = (accountId, result) => {
-	const log = getLog(result);
+	const log = FormatHelper.getLog(result);
 	if (!log) return false;
 	const accountIdNumber = Number(accountId.split('.')[2]);
-	return logParser(log).some((e) => {
+	return FormatHelper.logParser(log).some((e) => {
 		if (e.event === 'transfer') {
 			return e.params.map((p) => parseInt(p, 16)).includes(accountIdNumber);
 		}
