@@ -36,7 +36,7 @@ class AesStorage {
 			randomBuffer = this.aes.decryptHexToBuffer(randomKey);
 		} else {
 			randomKey = this.aes.encryptToHex(randomBuffer);
-			storage.set('randomKey', randomKey);
+			await storage.set('randomKey', randomKey);
 		}
 
 		return randomBuffer;
@@ -122,20 +122,6 @@ const privateAES = new AesStorage();
 class Crypto extends EventEmitter {
 
 	/**
-	 *  @constructor
-	 *
-	 * 	Create aes and set expired timout
-	 *
-	 *  @param {String} pin
-	 *  @param {Number} milliseconds - optional
-	 */
-	constructor(pin, milliseconds) {
-		super();
-
-		privateAES.set(pin, this.emit, milliseconds);
-	}
-
-	/**
 	 *  @method getPrivateKey
 	 *
 	 *  Generate private key from seed, using in desktop app.
@@ -171,6 +157,18 @@ class Crypto extends EventEmitter {
 	}
 
 	/**
+	 *  @method createAES
+	 *
+	 * 	Create aes and set expired timout
+	 *
+	 *  @param {String} pin
+	 *  @param {Number} milliseconds - optional
+	 */
+	async createAES(pin, milliseconds) {
+		await privateAES.set(pin, this.emit, milliseconds);
+	}
+
+	/**
 	 *  @method generateWIF
 	 *
 	 * 	Generate random string and private key from this seed.
@@ -194,7 +192,7 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @param {String} wif
 	 */
-	importByWIF(wif) {
+	async importByWIF(wif) {
 		privateAES.required();
 
 		const privateKey = PrivateKey.fromWif(wif);
@@ -202,7 +200,7 @@ class Crypto extends EventEmitter {
 		const encryptedPrivateKey = aes.encryptToHex(privateKey.toBuffer());
 		const publicKey = privateKey.toPublicKey();
 
-		storage.set(publicKey.toString(), encryptedPrivateKey);
+		await storage.set(publicKey.toString(), encryptedPrivateKey);
 	}
 
 	/**
@@ -215,11 +213,11 @@ class Crypto extends EventEmitter {
 	 *  @param {String} username
 	 *  @param {String} password
 	 */
-	importByPassword(username, password) {
+	async importByPassword(username, password) {
 		privateAES.required();
 
 		const privateKeyWIF = this.getPrivateKey(username, password);
-		this.importByWIF(privateKeyWIF);
+		await this.importByWIF(privateKeyWIF);
 	}
 
 	/**
@@ -229,8 +227,8 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @param {String} pin
 	 */
-	unlock(pin) {
-		privateAES.set(pin);
+	async unlock(pin) {
+		await privateAES.set(pin, this.emit);
 	}
 
 	/**
