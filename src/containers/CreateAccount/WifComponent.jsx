@@ -44,7 +44,7 @@ class WifComponent extends React.Component {
 					<div className="page-action-wrap">
 						<div className="one-btn-wrap" >
 							<Button
-								className="btn-in-light"
+								className="btn-in-light proceed"
 								onClick={() => this.props.history.goBack()}
 								content={<span className="btn-text">Proceed</span>}
 							/>
