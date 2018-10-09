@@ -29,6 +29,8 @@ export const createAccount = ({ accountName }) => async (dispatch, getState) => 
 		const instance = getState().echojs.getIn(['system', 'instance']);
 		const network = getState().global.getIn(['network']).toJS();
 
+		dispatch(GlobalReducer.actions.set({ field: 'accountLoading', value: true }));
+
 		accountNameError = await validateAccountExist(instance, accountName);
 
 		if (accountNameError.errorText) {
@@ -52,7 +54,7 @@ export const createAccount = ({ accountName }) => async (dispatch, getState) => 
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_UP, 'error', err));
 	} finally {
-		dispatch(toggleLoading(FORM_SIGN_UP, false));
+		dispatch(GlobalReducer.actions.set({ field: 'accountLoading', value: false }));
 	}
 
 };
@@ -63,19 +65,19 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 
 	if (accountNameError) {
 		dispatch(setFormError(FORM_SIGN_IN, 'accountName', accountNameError));
-		dispatch(toggleLoading(FORM_SIGN_IN, false));
 		return;
 	}
 
 	if (passwordError) {
 		dispatch(setFormError(FORM_SIGN_IN, 'password', passwordError));
-		dispatch(toggleLoading(FORM_SIGN_IN, false));
 		return;
 	}
 
 	try {
 		const instance = getState().echojs.getIn(['system', 'instance']);
 		const network = getState().global.getIn(['network']).toJS();
+
+		dispatch(GlobalReducer.actions.set({ field: 'accountLoading', value: true }));
 
 		accountNameError = await validateImportAccountExist(instance, accountName, true);
 
@@ -116,7 +118,7 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_IN, 'error', err));
 	} finally {
-		dispatch(toggleLoading(FORM_SIGN_IN, false));
+		dispatch(GlobalReducer.actions.set({ field: 'accountLoading', value: false }));
 	}
 
 };

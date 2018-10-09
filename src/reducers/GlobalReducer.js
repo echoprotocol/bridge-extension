@@ -4,6 +4,7 @@ import _ from 'lodash';
 
 const DEFAULT_FIELDS = Map({
 	globalLoading: false,
+	accountLoading: false,
 	error: null,
 	activeUser: new Map({
 		id: '',
@@ -43,12 +44,6 @@ export default createModule({
 			reducer: (state, { payload }) => {
 				state = state.set('globalLoading', payload.globalLoading);
 
-				return state;
-			},
-		},
-		setLoading: {
-			reducer: (state, { payload }) => {
-				state = state.set('loading', !!payload);
 				return state;
 			},
 		},

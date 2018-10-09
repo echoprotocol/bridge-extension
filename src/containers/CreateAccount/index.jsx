@@ -2,9 +2,10 @@ import React from 'react';
 import { Button, Form } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
 import { createAccount } from '../../actions/AuthActions';
-import { clearForm, setFormValue, toggleLoading } from '../../actions/FormActions';
+import { clearForm, setFormValue } from '../../actions/FormActions';
 
 import BridgeInput from '../../components/BridgeInput';
 
@@ -17,8 +18,6 @@ class CreateAccount extends React.Component {
 	}
 
 	onCreate() {
-		this.props.toggleLoading(true);
-
 		this.props.createAccount({ accountName: this.props.accountName.value.trim() });
 	}
 
@@ -43,7 +42,8 @@ class CreateAccount extends React.Component {
 
 
 	renderLogin() {
-		const { accountName, loading } = this.props;
+		const { accountName, accountLoading } = this.props;
+		console.log(accountLoading);
 
 		return (
 			<Form>
@@ -57,7 +57,6 @@ class CreateAccount extends React.Component {
 						<div className="one-input-wrap">
 							<BridgeInput
 								error={!!accountName.error}
-								disabled={loading}
 								name="accountName"
 								theme="input-light"
 								labelText="Account name"
@@ -73,11 +72,11 @@ class CreateAccount extends React.Component {
 					<div className="page-action-wrap">
 						<div className="one-btn-wrap" >
 							<Button
-								className="btn-in-light"
+								className={classnames('btn-in-light', { loading: accountLoading })}
 								content={<span className="btn-text">Create</span>}
 								type="submit"
 								onClick={(e) => this.onCreate(e)}
-								disabled={this.props.loading}
+								disabled={accountLoading}
 							/>
 						</div>
 					</div>
@@ -97,23 +96,21 @@ class CreateAccount extends React.Component {
 }
 
 CreateAccount.propTypes = {
-	loading: PropTypes.bool.isRequired,
 	accountName: PropTypes.object.isRequired,
+	accountLoading: PropTypes.bool.isRequired,
 	createAccount: PropTypes.func.isRequired,
 	setFormValue: PropTypes.func.isRequired,
-	toggleLoading: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
 };
 
 export default connect(
 	(state) => ({
-		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
+		accountLoading: state.global.get('accountLoading'),
 		accountName: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 	}),
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_UP, field, value)),
 		createAccount: (value) => dispatch(createAccount(value)),
-		toggleLoading: (value) => dispatch(toggleLoading(FORM_SIGN_UP, value)),
 		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
 	}),
 )(CreateAccount);

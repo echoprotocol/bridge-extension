@@ -1,5 +1,6 @@
 .header {
     height: 40px;
     background-image: url(../images/headerBg.jpg);
-
+    display: flex;
+    justify-content: space-between;
 }

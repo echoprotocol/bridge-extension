@@ -42,9 +42,7 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {
-		setTimeout(() => {
-			dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
-		}, 1000);
+		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
 	}
 };
 

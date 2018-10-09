@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 import { importAccount } from '../../actions/AuthActions';
-import { clearForm, setFormValue, toggleLoading } from '../../actions/FormActions';
+import { clearForm, setFormValue } from '../../actions/FormActions';
 
 import { FORM_SIGN_IN } from '../../constants/FormConstants';
 
@@ -18,8 +18,6 @@ class ImportAccount extends React.Component {
 	}
 
 	onImport() {
-		this.props.toggleLoading(true);
-
 		const { accountName, password } = this.props;
 
 		this.props.importAccount({
@@ -110,7 +108,6 @@ ImportAccount.propTypes = {
 	password: PropTypes.object.isRequired,
 	importAccount: PropTypes.func.isRequired,
 	setFormValue: PropTypes.func.isRequired,
-	toggleLoading: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
 };
 
@@ -127,7 +124,6 @@ export default connect(
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_IN, field, value)),
 		importAccount: (value) => dispatch(importAccount(value)),
-		toggleLoading: (value) => dispatch(toggleLoading(FORM_SIGN_IN, value)),
 		clearForm: () => dispatch(clearForm(FORM_SIGN_IN)),
 	}),
 )(ImportAccount);

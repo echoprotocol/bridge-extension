@@ -1,6 +1,6 @@
 // BTNS:
 // btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy,
-// btn-noborder, btn-nav, btn-logout
+// btn-noborder, btn-nav, btn-logout, btn-round-close
 
 // SIZE: compact
 // STATE: error, disabled
@@ -26,6 +26,39 @@
           background-color: transparent;
           color: #b6b9be;
     }
+
+    &.loading {
+        background-color: #dfe2e4 !important;
+        color: #dfe2e4 !important;
+        border-color: #dfe2e4 !important;
+        pointer-events: none;
+        z-index: 1005;
+        overflow: hidden;
+
+        &:after {
+            content: '';
+            display: block;
+            height: 2px;
+            width: 130px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+
+            background: linear-gradient(to right, rgba(175,179,185,1) 0%,rgba(191,195,200,1) 36%,rgba(212,216,219,0.63) 83%,rgba(220,223,226,0.63) 100%);
+            animation: loader 0.75s infinite normal linear;
+        }
+        
+        @keyframes loader {
+            from {
+                right: -120%;
+            }
+
+            to {
+                right: 120%;
+            }
+        }
+    }
+
     &.compact {
        height: 25px;
        font-size: 10px;
@@ -200,7 +233,17 @@
         height: 25px;
         top: 0;
         right: 0;
+        transition: color $speed, background-color $speed;
+        &.compact {
+            .btn-text {
+                letter-spacing: 2.3px;
+                font-size: 11px;
+                margin: 1px 0 0 0;
+            }
+        }
+
     }
+
     &-noborder {
         @extend %btn;
         background-color: transparent;
@@ -208,6 +251,7 @@
         border: 1px solid transparent;
         border-radius: $angularMax;
     }
+
     &-nav {
         background-color: transparent;
         width: 30px;
@@ -233,7 +277,7 @@
     &-logout {
         background-color: transparent;
         border: 0;
-        border-radius: $angularMin;
+        border-radius: 50%;
         width: 33px;
         height: 33px;
         color: rgba(#fff, .4);
@@ -247,6 +291,30 @@
             content: $icon-exit;
             font-size: 20px;
             margin: 1px -3px 0 0;
+            display: block;
+        }
+    }
+
+    &-round-close {
+        background-color: transparent;
+        border-radius: 50%;
+        height: 23px;
+        width: 23px;
+        border: 0;
+        color: #adb3b9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 7px 0 -7px;
+        transition: background-color $speed;
+        cursor: pointer;
+        &:hover {
+            background-color: #363f42;
+
+        }
+        &:before {
+            display: block;
+            margin: 3px -1px 0 0;
         }
     }
 
@@ -277,12 +345,27 @@
             background-color: #efeff0;
         }
     }
+    &:hover {
+        .btn-copy {
+            background-color: #f9f9fa;
+        }
+    }
     &.copied {
         width: 226px;
     }
+    
     &:after {
         border-radius: $angularMax;
-        content: "";
+        content: "\e913";
+        font-family: '#{$icomoon-font-family}';
+        speak: none;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
         position: absolute;
         right: 0;
         left: 0;
@@ -291,6 +374,12 @@
         height: 23px;
         background-color: #efeff0;
         border: 1px solid #efeff0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        color: #b4b8bc;
+        padding-left: 6px;
+        font-size: 15px;
     }
 }
 
