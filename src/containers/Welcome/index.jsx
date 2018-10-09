@@ -3,20 +3,12 @@ import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { clearForm } from '../../actions/FormActions';
+import BridgeBtnCopy from '../../components/BridgeBtnCopy/index';
 
-import BridgeBtnCopy from '../../components/BridgeBtnCopy';
-
-import { FORM_SIGN_UP } from '../../constants/FormConstants';
-
-class WifComponent extends React.Component {
-
-	componentWillUnmount() {
-		this.props.clearForm();
-	}
+class Welcome extends React.Component {
 
 	render() {
-		const { accountName, wif } = this.props;
+		const { accountName, wif, isCreate } = this.props;
 
 		return (
 
@@ -27,21 +19,26 @@ class WifComponent extends React.Component {
 				<div className="page-wrap" >
 					<div className="page">
 						<div className="hi-text">
-							<div>{accountName.value},</div>
+							<div>{accountName},</div>
 							<span>welcome to Bridge!</span>
 						</div>
-						<div className="instruction-text">
+						{
+							isCreate &&
+							<React.Fragment>
+								<div className="instruction-text">
                             Save your WIF key and don’t loose it.
                             You <br /> will need it to restore account.
-						</div>
-						<div className="wif-wrap">
-							<div className="wif">{wif}</div>
-							<BridgeBtnCopy compact text={wif} />
+								</div>
+								<div className="wif-wrap">
+									<div className="wif">{wif}</div>
+									<BridgeBtnCopy compact text={wif} />
 
-						</div>
+								</div>
+							</React.Fragment>
+						}
 					</div>
 					<div className="page-action-wrap">
-						<div className="one-btn-wrap" >
+						<div className="one-btn-wrap">
 							<Button
 								className="btn-in-light"
 								onClick={() => this.props.history.goBack()}
@@ -60,19 +57,18 @@ class WifComponent extends React.Component {
 
 }
 
-WifComponent.propTypes = {
+Welcome.propTypes = {
 	wif: PropTypes.string.isRequired,
-	accountName: PropTypes.object.isRequired,
+	accountName: PropTypes.string.isRequired,
+	isCreate: PropTypes.bool.isRequired,
 	history: PropTypes.object.isRequired,
-	clearForm: PropTypes.func.isRequired,
 };
 
 export default connect(
 	(state) => ({
-		wif: state.form.getIn([FORM_SIGN_UP, 'wif']),
-		accountName: state.form.getIn([FORM_SIGN_UP, 'accountName']),
+		wif: state.welcome.get('wif'),
+		isCreate: state.welcome.get('isCreate'),
+		accountName: state.global.getIn(['activeUser', 'name']),
 	}),
-	(dispatch) => ({
-		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
-	}),
-)(WifComponent);
+	() => ({}),
+)(Welcome);

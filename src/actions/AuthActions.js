@@ -15,6 +15,7 @@ import {
 } from '../api/WalletApi';
 
 import GlobalReducer from '../reducers/GlobalReducer';
+import WelcomeReducer from '../reducers/WelcomeReducer';
 
 export const createAccount = ({ accountName }) => async (dispatch, getState) => {
 	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
@@ -44,7 +45,7 @@ export const createAccount = ({ accountName }) => async (dispatch, getState) => 
 
 		userCrypto.importByWIF(wif);
 
-		dispatch(setValue(FORM_SIGN_UP, 'wif', wif));
+		dispatch(WelcomeReducer.actions.set({ field: 'wif', value: wif }));
 
 		dispatch(addAccount(accountName, network.name));
 
@@ -94,7 +95,11 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 			return;
 		}
 
-		passwordError = importWallet(account, password);
+		if (userCrypto.isWIF(password)) {
+			passwordError = importWallet(password);
+		} else {
+			passwordError = importWallet(account, password);
+		}
 
 		if (passwordError) {
 			dispatch(setFormError(FORM_SIGN_IN, 'password', passwordError));

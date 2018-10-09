@@ -5,7 +5,7 @@ import { IMPORT_ACCOUNT_PATH, INDEX_PATH, WIF_PATH } from './constants/RouterCon
 
 import App from './containers/App';
 import CreateAccount from './containers/CreateAccount';
-import WifComponent from './containers/CreateAccount/WifComponent';
+import WifComponent from './containers/Welcome/index';
 import ImportAccount from './containers/ImportAccount';
 import AddNetwork from './containers/AddNetwork';
 

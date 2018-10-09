@@ -18,7 +18,6 @@ const DEFAULT_FORM_FIELDS = {
 			value: '',
 			error: null,
 		},
-		wif: '',
 	}),
 	[FORM_SIGN_IN]: Map({
 		accountName: {

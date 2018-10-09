@@ -16,8 +16,8 @@ export default class Crypto {
 		return { username, password };
 	}
 
-	isWIF(password) {
-		return password;
+	isWIF() {
+		return false;
 	}
 
 	unlock(pin) {

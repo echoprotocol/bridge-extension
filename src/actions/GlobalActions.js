@@ -6,6 +6,7 @@ import history from '../history';
 import { getPreviewBalances, initBalances } from './BalanceActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
+import WelcomeReducer from '../reducers/WelcomeReducer';
 
 import { IMPORT_ACCOUNT_PATH, WIF_PATH, INDEX_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
@@ -57,8 +58,9 @@ export const addAccount = (accountName, networkName) => (dispatch) => {
 	dispatch(initAccount(accountName, networkName));
 
 	if (INDEX_PATH.includes(history.location.pathname)) {
-		history.push(WIF_PATH);
+		dispatch(WelcomeReducer.actions.set({ field: 'isCreate', value: true }));
 	}
+	history.push(WIF_PATH);
 };
 
 export const connection = () => async (dispatch) => {
