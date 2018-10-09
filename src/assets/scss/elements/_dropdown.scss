@@ -7,11 +7,7 @@
         z-index: 2;
     }
     .icon {
-        font-family: 'Dropdown';
         transition: color $speed;
-        &:before {
-            content: '\F0D7';
-        }
     }
 }
 
@@ -182,8 +178,9 @@
                         }
                     }
                     .icon {
-                        margin-left: 8px;
+                        margin: 3px 5px 0 7px;
                         color: #495b5f;
+                        font-size: 11px;
                     }
             
                 }

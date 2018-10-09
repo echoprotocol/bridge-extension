@@ -10,18 +10,21 @@ class BridgeInput extends React.Component {
 
 		this.state = {
 			up: false,
-			focus: false,
+			filled: false,
 		};
 	}
 
 	onFocus() {
-		this.setState({ up: true, focus: true });
+		this.setState({ up: true });
 	}
 
-	onBlur(e) {
-		if (!this.state.focus || (e.target.value.length < 1)) {
-			this.setState({ up: false, focus: false });
-		}
+	onChange(e) {
+		this.setState({ filled: !!e.target.value.length });
+		this.props.onChange(e);
+	}
+
+	onBlur() {
+		this.setState({ up: false });
 	}
 
 	renderError() {
@@ -36,7 +39,13 @@ class BridgeInput extends React.Component {
 					this.props.hintText.length > 0 ?
 						<div className="message-hint">
                             You can try
-							<span> { this.props.hintText } </span>
+							<span
+								role="button"
+								tabIndex="0"
+								onClick={this.props.onClick}
+								onKeyPress={this.props.onClick}
+							> { this.props.hintText }
+							</span>
 						</div> : null
 				}
 
@@ -46,24 +55,29 @@ class BridgeInput extends React.Component {
 	}
 
 	render() {
-
 		return (
 
 			<div className={classnames('input-wrap', this.props.theme)} >
 				<Input
+					name={this.props.name}
 					label={this.props.labelText}
 					type={this.props.type}
 					error={this.props.error}
 					onFocus={() => this.onFocus()}
+
 					onBlur={(e) => this.onBlur(e)}
+					onChange={(e) => this.onChange(e)}
+					disabled={this.props.disabled}
+
 					className={classnames(
 						{ up: this.state.up },
 						{ focused: this.state.focus },
+						{ filled: this.state.filled },
 						this.props.position,
 					)}
 				/>
 				{ this.props.error ? this.renderError() : null }
-				<div className="message-description">{ this.props.descriptionText }</div>
+				{ this.props.descriptionText ? <div className="message-description">{ this.props.descriptionText }</div> : null }
 			</div>
 
 		);
@@ -72,25 +86,33 @@ class BridgeInput extends React.Component {
 }
 
 BridgeInput.propTypes = {
+	name: PropTypes.string,
 	theme: PropTypes.string,
 	error: PropTypes.bool,
+	disabled: PropTypes.bool,
 	type: PropTypes.string,
 	position: PropTypes.string,
 	labelText: PropTypes.string,
 	errorText: PropTypes.string,
 	hintText: PropTypes.string,
 	descriptionText: PropTypes.string,
+	onChange: PropTypes.func,
+	onClick: PropTypes.func,
 };
 
 BridgeInput.defaultProps = {
+	name: '',
 	theme: 'light',
 	error: false,
+	disabled: false,
 	type: 'text',
 	position: '',
 	labelText: '',
 	errorText: '',
 	hintText: '',
 	descriptionText: '',
+	onChange: null,
+	onClick: null,
 };
 
 export default BridgeInput;

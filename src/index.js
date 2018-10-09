@@ -2,17 +2,16 @@ import React from 'react';
 import ReactDOM from 'react-dom';
 import { applyMiddleware, combineReducers, createStore, compose } from 'redux';
 import { Provider } from 'react-redux';
-
-import createHistory from 'history/createBrowserHistory';
+import thunk from 'redux-thunk';
 
 import { ConnectedRouter, routerMiddleware, routerReducer } from 'react-router-redux';
+import { EchoJSReducer } from 'echojs-redux';
 
 import reducers from './reducers';
 import Routes from './routes'; // Or wherever you keep your reducers
 import './assets/loader';
 
-// Create a history of your choosing (we're using a browser history in this case)
-const history = createHistory();
+import history from './history';
 
 // Build the middleware for intercepting and dispatching navigation actions
 const middleware = routerMiddleware(history);
@@ -23,8 +22,10 @@ const store = createStore(
 	combineReducers({
 		...reducers,
 		router: routerReducer,
+		echojs: EchoJSReducer.reducer,
 	}), {},
 	compose(
+		applyMiddleware(thunk),
 		applyMiddleware(middleware),
 		window.devToolsExtension ? window.devToolsExtension() : (f) => f,
 	),
