@@ -4,17 +4,13 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { createAccount } from '../../actions/AuthActions';
-import { clearForm, setFormValue, toggleLoading } from '../../actions/FormActions';
+import { setFormValue, toggleLoading } from '../../actions/FormActions';
 
 import BridgeInput from '../../components/BridgeInput';
 
 import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 class CreateAccount extends React.Component {
-
-	componentWillUnmount() {
-		this.props.clearForm();
-	}
 
 	onCreate() {
 		this.props.toggleLoading(true);
@@ -102,7 +98,6 @@ CreateAccount.propTypes = {
 	createAccount: PropTypes.func.isRequired,
 	setFormValue: PropTypes.func.isRequired,
 	toggleLoading: PropTypes.func.isRequired,
-	clearForm: PropTypes.func.isRequired,
 };
 
 export default connect(
@@ -114,6 +109,5 @@ export default connect(
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_UP, field, value)),
 		createAccount: (value) => dispatch(createAccount(value)),
 		toggleLoading: (value) => dispatch(toggleLoading(FORM_SIGN_UP, value)),
-		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
 	}),
 )(CreateAccount);

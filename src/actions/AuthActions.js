@@ -21,6 +21,7 @@ export const createAccount = ({ accountName }) => async (dispatch, getState) => 
 
 	if (accountNameError) {
 		dispatch(setFormError(FORM_SIGN_UP, 'accountName', { example: '', errorText: accountNameError }));
+		dispatch(toggleLoading(FORM_SIGN_UP, false));
 		return;
 	}
 
