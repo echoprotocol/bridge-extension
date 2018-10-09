@@ -3,7 +3,7 @@ import { Map } from 'immutable';
 
 import history from '../history';
 
-import { getPreviewBalances, initBalances } from './BalanceActions';
+import { getObject, getPreviewBalances, initBalances } from './BalanceActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -34,6 +34,8 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 		localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
 		const { id, name } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
+
+		EchoJSActions.setSubscribe({ types: ['objects', 'block', 'accounts'], method: getObject });
 
 		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name, icon } }));
 
