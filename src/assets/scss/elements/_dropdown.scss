@@ -202,6 +202,7 @@
         // NETWORK DROPDOWN
 
         &-network {
+            margin-left: auto;
             &.hover-trigger {
                 & + .network-info {
                     opacity: 1;
