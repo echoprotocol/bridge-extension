@@ -67,6 +67,7 @@ class BridgeInput extends React.Component {
 
 					onBlur={(e) => this.onBlur(e)}
 					onChange={(e) => this.onChange(e)}
+					disabled={this.props.disabled}
 
 					className={classnames(
 						{ up: this.state.up },
@@ -88,6 +89,7 @@ BridgeInput.propTypes = {
 	name: PropTypes.string,
 	theme: PropTypes.string,
 	error: PropTypes.bool,
+	disabled: PropTypes.bool,
 	type: PropTypes.string,
 	position: PropTypes.string,
 	labelText: PropTypes.string,
@@ -102,6 +104,7 @@ BridgeInput.defaultProps = {
 	name: '',
 	theme: 'light',
 	error: false,
+	disabled: false,
 	type: 'text',
 	position: '',
 	labelText: '',

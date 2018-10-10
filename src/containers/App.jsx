@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 // import { Dimmer } from 'semantic-ui-react';
 
-import { connection } from '../actions/GlobalActions';
+import { connect as connectTo } from '../actions/ChainStoreAction';
 
 import Header from '../components/Header';
 import Navbar from '../components/Navbar';
@@ -51,6 +51,6 @@ export default connect(
 		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
 	}),
 	(dispatch) => ({
-		connection: () => dispatch(connection()),
+		connection: () => dispatch(connectTo()),
 	}),
 )(App);

@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'semantic-ui-react';
+import { Button, Form } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
@@ -37,10 +37,10 @@ class CreateAccount extends React.Component {
 
 
 	renderLogin() {
-		const { accountName } = this.props;
+		const { accountName, loading } = this.props;
 
 		return (
-			<React.Fragment>
+			<Form>
 				<div className="page-wrap">
 
 					<div className="page">
@@ -51,6 +51,7 @@ class CreateAccount extends React.Component {
 						<div className="one-input-wrap">
 							<BridgeInput
 								error={!!accountName.error}
+								disabled={loading}
 								name="accountName"
 								theme="input-light"
 								labelText="Account name"
@@ -75,8 +76,7 @@ class CreateAccount extends React.Component {
 						</div>
 					</div>
 				</div>
-
-			</React.Fragment>
+			</Form>
 
 		);
 	}

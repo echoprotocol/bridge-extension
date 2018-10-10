@@ -53,6 +53,7 @@ class NetworkDropdown extends React.PureComponent {
 
 	getList() {
 		const { name } = this.props.network;
+		// class selected
 		const options = NETWORKS.map((n) => ({
 			value: 'net0',
 			key: 'net0',

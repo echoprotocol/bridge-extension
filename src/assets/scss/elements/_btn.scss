@@ -21,10 +21,12 @@
     color $speed;
     padding: 0;
     &.disabled {
-          pointer-events: none;
-          border: 2px solid $colorDisabled;
-          background-color: transparent;
-          color: #b6b9be;
+        pointer-events: none;
+        border: 2px solid $colorDisabled;
+        background-color: transparent;
+        color: #b6b9be;
+        transition: none;
+
     }
     &.compact {
        height: 25px;
@@ -298,8 +300,7 @@
     transform: width $speed;
     border: 0;
     border-radius: $angularMax;
-    transition: width $speed;
-    
+    transition: width $speed / 2;
     &:not(.copied) {
         @include onBtnFocus (
             $angularMax,
@@ -321,7 +322,7 @@
     &.copied {
         width: 226px;
     }
-    
+
     &:after {
         border-radius: $angularMax;
         content: "\e913";

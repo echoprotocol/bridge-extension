@@ -1,3 +1,5 @@
+require('babel-polyfill');
+
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
@@ -89,8 +91,8 @@ module.exports = {
 	},
 	resolve: {
 		modules: [
-			path.resolve('src'),
 			'node_modules',
+			path.resolve('src'),
 		],
 		extensions: ['.js', '.jsx', '.json'],
 	},

@@ -26,7 +26,6 @@ class WifComponent extends React.Component {
 
 				<div className="page-wrap" >
 					<div className="page">
-
 						<div className="hi-text">
 							<div>{accountName.value},</div>
 							<span>welcome to Bridge!</span>
