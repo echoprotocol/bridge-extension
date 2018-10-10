@@ -1,0 +1,17 @@
+.wallet-nav {
+    height: 45px;
+    display: flex;
+    align-items: center;
+    background-color: #dfe2e4;
+    padding: 0 20px;
+    & + .page-wrap {
+        padding-top: 25px;
+        height: 443px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .page {
+            min-height: 332px;
+        }
+    }
+}

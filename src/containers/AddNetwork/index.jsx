@@ -34,10 +34,10 @@ class AddNetwork extends React.Component {
 				</div>
 				<div className="page-action-wrap">
 					<div className="one-btn-wrap" >
-						{/* <Button
+						<Button
 							className="btn-in-light"
 							content={<span className="btn-text">Create</span>}
-                        /> */}
+						/>
 
 					</div>
 				</div>
