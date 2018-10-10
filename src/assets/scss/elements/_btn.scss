@@ -20,14 +20,47 @@
     border $speed,
     color $speed;
     padding: 0;
-    &.disabled {
-        pointer-events: none;
-        border: 2px solid $colorDisabled;
-        background-color: transparent;
-        color: #b6b9be;
-        transition: none;
 
+    &.disabled {
+          pointer-events: none;
+          border: 2px solid $colorDisabled;
+          background-color: transparent;
+          color: #b6b9be;
+          transition: none;
     }
+
+    &.loading {
+        background-color: #dfe2e4 !important;
+        color: #dfe2e4 !important;
+        border-color: #dfe2e4 !important;
+        pointer-events: none;
+        z-index: 1005;
+        overflow: hidden;
+
+        &:after {
+            content: '';
+            display: block;
+            height: 2px;
+            width: 130px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+
+            background: linear-gradient(to left, rgba(175,179,185,1) 0%,rgba(191,195,200,1) 36%,rgba(212,216,219,0.63) 83%,rgba(220,223,226,0.63) 100%);
+            animation: loader 0.75s infinite normal linear;
+        }
+
+        @keyframes loader {
+            from {
+                left: -120%;
+            }
+
+            to {
+                left: 120%;
+            }
+        }
+    }
+
     &.compact {
        height: 25px;
        font-size: 10px;
@@ -215,10 +248,34 @@
 
     &-noborder {
         @extend %btn;
+        &:not(.disabled) {
+            @include onBtnFocus(
+                 $angularMax,
+                 2px,
+                 0px,
+                 #d0d5d7
+            );
+        }
         background-color: transparent;
-        color: #7e8489;
+        color: #3e494f;
         border: 1px solid transparent;
         border-radius: $angularMax;
+        &:hover {
+            color: #3b4952;
+            background-color: #dfe2e4;
+            border: 2px solid transparent;
+        }
+
+        &:active {
+            background-color: #d8dcde;
+            color: #798086;
+            border: 2px solid transparent;
+        }
+
+        i {
+            margin-right: 13px;
+        }
+
     }
 
     &-nav {
@@ -358,6 +415,7 @@
     .btn-in-dark,
     .btn-in-light,
     .btn-transparent,
+    .btn-noborder,
     .btn-inverted {
         min-width: 200px;
         &.compact {
@@ -379,6 +437,7 @@
     .btn-in-dark,
     .btn-in-light,
     .btn-transparent,
+    .btn-noborder,
     .btn-inverted {
         min-width: 145px;
     }

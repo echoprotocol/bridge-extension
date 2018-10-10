@@ -15,9 +15,9 @@ import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
 import { IMPORT_ACCOUNT_PATH } from '../constants/RouterConstants';
 
 export const subscribe = () => (dispatch) => {
-	ChainStoreCacheNames.forEach((field) => {
-		const value = ChainStore[field];
-		dispatch(BlockchainReducer.actions.set({ field, value }));
+	ChainStoreCacheNames.forEach(({ origin, custom }) => {
+		const value = ChainStore[origin];
+		dispatch(BlockchainReducer.actions.set({ custom, value }));
 	});
 };
 
@@ -42,8 +42,8 @@ export const connect = () => async (dispatch) => {
 		let accounts = localStorage.getItem(`accounts_${network.name}`);
 
 		accounts = accounts ? JSON.parse(accounts) : [];
-		// const value = await fetch('1.2.1');
-
+		const value = await fetchChain('2.1.0');
+		console.log(value.toJS())
 		if (!accounts.length) {
 			history.push(IMPORT_ACCOUNT_PATH);
 			return;

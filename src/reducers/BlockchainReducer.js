@@ -1,23 +1,28 @@
 import { createModule } from 'redux-modules';
 import { Set, Map } from 'immutable';
+import _ from 'lodash';
 
 const DEFAULT_FIELDS = Map({
-	objects_by_id: new Map(),
-	accounts_by_name: new Map(),
-	assets_by_symbol: new Map(),
-	account_ids_by_key: Map(),
-	account_ids_by_account: Map(),
+	subbedAccounts: new Set(),
+	subbedWitnesses: new Set(),
+	subbedCommittee: new Set(),
 
-	balance_objects_by_address: new Map(),
-	get_account_refs_of_keys_calls: new Set(),
-	get_account_refs_of_accounts_calls: new Set(),
-	account_history_requests: new Map(),
-	witness_by_account_id: new Map(),
-	committee_by_account_id: new Map(),
-	objects_by_vote_id: new Map(),
-	fetching_get_full_accounts: new Map(),
-	get_full_accounts_subscriptions: new Map(),
-	block_requests: new Map(),
+	objectsById: new Map(),
+	accountsByName: new Map(),
+	assetsBySymbol: new Map(),
+	accountIdsByKey: Map(),
+	accountIdsByAccount: Map(),
+
+	balanceObjectsByAddress: new Map(),
+	getAccountRefsOfKeysCalls: new Set(),
+	getAccountRefsOfAccountsCalls: new Set(),
+	accountHistoryRequests: new Map(),
+	witnessByAccountId: new Map(),
+	committeeByAccountId: new Map(),
+	objectsByVoteId: new Map(),
+	fetchingGetFullAccounts: new Map(),
+	getFullAccountsSubscriptions: new Map(),
+	blockRequests: new Map(),
 });
 
 export default createModule({

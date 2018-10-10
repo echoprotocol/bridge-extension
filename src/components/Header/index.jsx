@@ -12,8 +12,7 @@ class Header extends React.PureComponent {
 
 		return (
 			<header className="header">
-				{/*{preview.length ? <UserDropdown /> : null}*/}
-				<UserDropdown />
+				{preview.length ? <UserDropdown /> : null}
 				<NetworkDropdown />
 			</header>
 		);

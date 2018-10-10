@@ -1,7 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-// import { Dimmer } from 'semantic-ui-react';
+import { Dimmer } from 'semantic-ui-react';
 
 import { connect as connectTo } from '../actions/ChainStoreAction';
 
@@ -16,7 +16,7 @@ class App extends React.Component {
 	}
 
 	renderChildren() {
-		const { children } = this.props;
+		const { children, loading } = this.props;
 		return (
 			<div className="temp-wrap">
 				<div className="app-wrap">
@@ -24,25 +24,32 @@ class App extends React.Component {
 					<Navbar />
 					{children}
 
+					{/* Dimmer */}
+					{
+						(loading) && <Dimmer active inverted />
+					}
+
+
+					{/* Добавить класс loading на кнопку */}
 				</div>
 			</div>
 		);
 	}
 
 	render() {
-		// Uncomment for dimmer
-		// const { loading } = this.props;
-
 		return this.renderChildren();
-		// return loading ? <Dimmer /> : this.renderChildren();
 	}
 
 }
 
 App.propTypes = {
 	children: PropTypes.element.isRequired,
-	// loading: PropTypes.bool.isRequired,
+	loading: PropTypes.bool,
 	connection: PropTypes.func.isRequired,
+};
+
+App.defaultProps = {
+	loading: false,
 };
 
 export default connect(

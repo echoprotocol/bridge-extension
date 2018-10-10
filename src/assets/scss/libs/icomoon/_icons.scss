@@ -1,3 +1,9 @@
+.icon-arrowDown {
+    &:before {
+      content: $icon-arrowDown;
+    }
+}
+
 .icon-menu {
     &:before {
       content: $icon-menu; 

@@ -2,12 +2,12 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Dropdown, Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
 import { changeNetwork, deleteNetwork } from '../../actions/GlobalActions';
 
 import { NETWORKS } from '../../constants/GlobalConstants';
 
-import classnames from 'classnames';
 import NetworkInfo from './NetworkInfo';
 import UserIcon from '../UserIcon';
 
@@ -18,6 +18,7 @@ class NetworkDropdown extends React.PureComponent {
 
 		this.state = {
 			opened: false,
+			hover: false,
 		};
 	}
 
@@ -25,7 +26,7 @@ class NetworkDropdown extends React.PureComponent {
 	// 	if ((e.type !== 'click' && e.keyCode !== 13) || e.target.id === 'btn-dlt') {
 	// 		return;
 	// 	}
-    //
+	//
 	// 	if (value === 'custom') {
 	// 		// this.props.history.push(NETWORKS_PATH);
 	// 	} else {
@@ -51,50 +52,6 @@ class NetworkDropdown extends React.PureComponent {
 		this.props.changeNetwork(network);
 	}
 
-	getList() {
-		const { name } = this.props.network;
-		// class selected
-		const options = NETWORKS.map((n) => ({
-			value: 'net0',
-			key: 'net0',
-			as: 'section',
-			className: 'network-item',
-			content: (
-				<div className="network-item-wrap">
-					<div className="network-content">
-						<div className="network-title">{n.name}</div>
-						<ul className="accounts">
-							<li>No accounts</li>
-						</ul>
-					</div>
-				</div>
-			),
-		}));
-
-		options.concat(this.props.networks.map((n) => ({
-			value: 'custom-net0',
-			key: 'custom-net0',
-			className: 'network-item',
-			content: (
-				<React.Fragment>
-					<div className="network-item-bg" />
-					<div className="network-item-wrap">
-						<div className="network-content">
-							<Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(n.name, e)} />
-							<div className="network-title">
-								{n.name}
-							</div>
-
-						</div>
-					</div>
-				</React.Fragment>
-			),
-		})));
-
-
-		return options;
-	}
-
 	onOpen() {
 		this.setState({ opened: true });
 	}
@@ -108,184 +65,105 @@ class NetworkDropdown extends React.PureComponent {
 
 	}
 
-	render() {
-		const options = [
-			// DEFAULT  NEWORKS:
-			{
-				value: 'net0',
-				key: 'net0',
-				as: 'section',
-				className: 'network-item',
-				content:
+	onToggleHoverClose() {
+		this.setState({ hover: !this.state.hover });
+	}
 
-	<div className="network-item-wrap">
-		<div className="network-content">
+	netInfoAir(options) {
+		if (options.length === 6) {
+			return ((options.length - 2) * 37) + 115;
+		}
+		return ((options.length - 2) * 37) + 110;
+	}
 
-			<div className="network-title">Main Network</div>
-			<ul className="accounts">
-				<li>No accounts</li>
-			</ul>
-		</div>
-	</div>,
+	getList() {
+		const { name } = this.props.network;
 
-			},
-			{
-				value: 'net1',
-				key: 'net1',
-				as: 'section',
-				className: 'network-item',
-				content:
-
-	<div className="network-item-wrap">
-		<div className="network-content">
-			<div className="network-title">Test Network</div>
-			<ul className="accounts">
-				<li>
-					<UserIcon color="green" avatar="ava7" />
-				</li>
-				<li>
-					<UserIcon color="yellow" avatar="ava3" />
-				</li>
-				<li>
-					<UserIcon color="pink" avatar="ava8" />
-				</li>
-			</ul>
-		</div>
-	</div>,
-
-			},
-			{
-				value: 'net2',
-				key: 'net2',
-				as: 'section',
-				className: 'network-item',
-				content:
-
-	<div className="network-item-wrap">
-		<div className="network-content">
-			<div className="network-title">Dev Network</div>
-			<ul className="accounts">
-				<li>
-					<UserIcon color="pink" avatar="ava8" />
-				</li>
-			</ul>
-		</div>
-	</div>,
-
-			},
-
-			// CUSTOM  NEWORKS:
-			// У кастомных стей у объектов нет свойств: as: 'span'
-
-
-			{
-				value: 'custom-net0',
-				key: 'custom-net0',
-				className: 'network-item',
-				content:
-	<React.Fragment>
-		<div className="network-item-bg" />
-		<div className="network-item-wrap">
-			<div className="network-content">
-				<Button className="btn-round-close" />
-				<div className="network-title">
-			            Whitepowernet
+		const options = NETWORKS.map((n) => ({
+			value: n.name,
+			key: n.name,
+			as: 'section',
+			className: classnames('network-item', { active: n.name === name }),
+			content: (
+				<div className="network-item-wrap">
+					<div className="network-content">
+						<div className="network-title">{n.name}</div>
+						<ul className="accounts">
+							<li>
+								<UserIcon color="green" avatar="ava7" />
+							</li>
+							<li>
+								<UserIcon color="yellow" avatar="ava3" />
+							</li>
+							<li>
+								<UserIcon color="pink" avatar="ava8" />
+							</li>
+						</ul>
+					</div>
 				</div>
+			),
+		}));
 
-			</div>
-		</div>
-	</React.Fragment>,
+		options.concat(this.props.networks.map((n) => ({
+			value: n.name,
+			key: n.name,
+			className: classnames('network-item', { active: n.name === name }),
+			content: (
+				<React.Fragment>
+					<div className="network-item-bg" />
+					<div className="network-item-wrap">
+						<div className="network-content">
+							<Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(n.name, e)} />
+							<div className="network-title">
+								{n.name}
+							</div>
+							<ul className="accounts">
+								<li>No accounts</li>
+							</ul>
+						</div>
+					</div>
+				</React.Fragment>
+			),
+		})));
 
-			},
-			{
-				value: 'custom-net1',
-				key: 'custom-net1',
-				className: 'network-item',
-				content:
-	<React.Fragment>
-		<div className="network-item-bg" />
-		<div className="network-item-hover" />
-		<div className="network-item-wrap">
-			<div className="network-content">
-				<Button className="btn-round-close" />
-				<div className="network-title">Hellelujahnet</div>
-			</div>
-		</div>
-	</React.Fragment>,
+		options.push({
+			value: 'add-net',
+			key: 'add-net',
+			className: 'add-network',
+			as: 'button',
+			content: '+ Add Network',
+		});
 
-			},
-			{
-				value: 'custom-net2',
-				key: 'custom-net2',
-				className: 'network-item',
-				content:
-	<React.Fragment>
-		<div className="network-item-bg" />
-		<div className="network-item-hover" />
-		<div className="network-item-wrap">
-			<div className="network-content">
-				<Button className="btn-round-close" />
-				<div className="network-title">Homersimpsonnet</div>
-			</div>
-		</div>
-	</React.Fragment>,
+		options.push({
+			value: 'fake-element',
+			key: 'fake-element',
+			as: 'span',
+			disabled: true,
+			content: (
+				<React.Fragment>
+					<div className="network-body" />
+					<div className="network-footer" />
+				</React.Fragment>
+			),
+		});
+		return options;
+	}
 
-			},
-			{
-				value: 'custom-net3',
-				key: 'custom-net3',
-				className: 'network-item',
-				content:
-	<React.Fragment>
-		<div className="network-item-bg" />
-		<div className="network-item-wrap">
-			<div className="network-content">
-				<Button className="btn-round-close" />
-				<div className="network-title">Mytestnet</div>
-			</div>
-		</div>
-	</React.Fragment>,
-
-			},
-
-			{
-				value: 'fake-element',
-				key: 'fake-element',
-				as: 'span',
-				disabled: true,
-				content:
-	<React.Fragment>
-		<div className="network-body" />
-		<div className="network-footer" />
-		<div className="network-footer-area" />
-	</React.Fragment>,
-			},
-			{
-				value: 'add-net',
-				key: 'add-net',
-				className: 'add-network',
-				as: 'a',
-				content: '+ Add Network',
-			},
-			{
-				value: 'network-info',
-				key: 'network-info',
-				className: 'network-info',
-				disabled: true,
-				as: 'span',
-				content: <NetworkInfo />,
-			},
-		];
+	render() {
 
 		return (
 			<React.Fragment>
 				<Dropdown
-					// open
-					className="dropdown-network"
+
+					className={classnames('dropdown-network', { 'hover-trigger': this.state.hover })}
 					onOpen={() => this.onOpen()}
 					onClose={() => this.onClose()}
 					trigger={
-						<div className="dropdown-trigger">
+						<div
+							className="dropdown-trigger"
+							onMouseEnter={() => this.onToggleHoverClose()}
+							onMouseLeave={() => this.onToggleHoverClose()}
+						>
 							<div className={classnames('current-network', { connected: true })}>
 								<span className="cut">{this.state.height}Main Network</span>
 							</div>
@@ -293,12 +171,12 @@ class NetworkDropdown extends React.PureComponent {
 						</div>
 					}
 					onChange={(e, { value }) => this.onDropdownChange(e, value)}
-					options={options}
+					options={this.getList()}
 					selectOnBlur={false}
 					icon={false}
 				/>
 
-				{ !this.state.opened ? <NetworkInfo /> : null}
+				{ !this.state.opened ? <NetworkInfo /> : <NetworkInfo />}
 
 			</React.Fragment>
 
