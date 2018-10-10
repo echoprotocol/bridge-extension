@@ -1,12 +1,15 @@
 
 import React from 'react';
+import PropTypes from 'prop-types';
 
 class NetworkInfo extends React.PureComponent {
 
 	render() {
-
+		const networkStyle = {
+			top: this.props.netAir,
+		};
 		return (
-			<ul className="network-info">
+			<ul className="network-info" style={networkStyle}>
 				<li>
 					<div>Block</div>
 					<div>5282942</div>
@@ -25,6 +28,12 @@ class NetworkInfo extends React.PureComponent {
 	}
 
 }
+NetworkInfo.propTypes = {
+	netAir: PropTypes.number,
+};
+NetworkInfo.defaultProps = {
+	netAir: 40,
+};
 
 export default NetworkInfo;
 

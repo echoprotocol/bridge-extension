@@ -9,6 +9,7 @@
     .icon {
         transition: color $speed;
     }
+
 }
 
 .ui {
@@ -31,6 +32,9 @@
                 margin: 1px 6px 0;
                 right: 0;
                 box-shadow: 0px 0px 21px 0px rgba(#213034, .9);
+                max-height: 350px;
+                overflow-x: hidden;
+                overflow-y: auto;
             }
 
             .dropdown {
@@ -67,23 +71,7 @@
                         background-color: transparent;
                     }
                 }
-                .create-sub,
-                .import-sub {
-                    text-transform: uppercase;
-                    letter-spacing: 2.2px;
-                    font-size: 10px;
-                    position: absolute;
-                    bottom: 21px;
-                    z-index: 2;
-                    color: #fff;
-                }
-                .create-sub {
-                    left: 18px;
-                }
-                .import-sub {
-                    left: 168px;
-
-                }
+                
             }
             .user {
                 &-item {
@@ -154,42 +142,43 @@
                     top: 0;
                     bottom: 0;
                     left: 0;
+                    z-index: -1;
                 }
                 &-footer {
                     background-color: #263538;
-                    width: 100%;
+                    width: 350px;
                     height: 53px;
-                    position: absolute;
-                    right: 0;
-                    left: 0;
-                    bottom: 0;
-                    &-area {
-                        height: 61px;
-                    } 
+                    margin: -47px -6px -5px -6px;
+                    z-index: -1;
                 }
                 &-import,
                 &-create {
                     text-transform: uppercase;
                     letter-spacing: 2.2px;
                     font-size: 10px;
-                    bottom: 21px;
+                    margin: 32px 18px 13px;
+                    display: inline-block;
 
-                    &.item {
-                        position: absolute;
-                    }
                     a {
                         color: #61D3AD;
                     }
                 }
 
                 &-create {
-                    left: 118px;
                     color: #E4E6E8;
+                    margin-right: 8px;
+                    &:before {
+                        content: "Add account:";
+                        margin-right: 6px;
+                    }
 
                 }
                 &-import {
-                    left: 186px;
+                    margin-left: 0;
                     color: #828C94;
+                    &:before {
+                        content: "or";
+                    }
                     a {
                         margin-left: 6px;
                     }
@@ -213,7 +202,14 @@
         // NETWORK DROPDOWN
 
         &-network {
+            &.hover-trigger {
+                & + .network-info {
+                    opacity: 1;
+                    visibility: visible;
+                    z-index: 2;
+                } 
 
+            }
             .dropdown {
                 &-trigger {
                     display: flex;
@@ -224,12 +220,6 @@
                     &:hover {
                         .current-network {
                             &:after {
-                                opacity: 1;
-                            }
-                        }
-                        & + .menu.visible {
-                            .network-info {
-                                visibility: visible;
                                 opacity: 1;
                             }
                         }
@@ -288,14 +278,18 @@
                 background-color: #36454a;
                 padding: 5px;
                 left: auto;
+
                 .add-network {
-                    position: absolute;
+                    background-color: #263538;
                     text-transform: uppercase;
                     letter-spacing: 2.2px;
                     font-size: 10px;
-                    bottom: 21px;
+                    display: inline-block;
                     color: #61D3AD;
-                    left: 18px;
+                    margin: 0 0 15px 18px;
+                    z-index: 22;
+                    border: 0;
+                    padding: 0;
                 }
 
                 section:first-of-type {
@@ -312,11 +306,8 @@
                             display: none;
                         }
                     }
-                    & + .disabled {
-                        .network-footer-area {
-                            height: 55px;
-                            margin-top: 10px;
-                        }
+                    & + .add-network {
+                        margin: 32px 18px 12px;
                     }
                 }
 
@@ -425,6 +416,7 @@
                 &-info {
                     right: 0;
                     left: 0;
+                    z-index: -1;
                 }
                 &-body {
                     position: absolute;
@@ -432,30 +424,30 @@
                     right: 0;
                     left: 0;
                     bottom: 0;
+                    z-index: -4;
+                    
                 }
                 &-footer {
-                    right: 0;
-                    left: 0;
-                    bottom: 0;
-                    height: 60px;
-                    position: absolute;
                     background-color: #263538;
-                    &-area {
-                        height: 30px;
-
-                    }
+                    width: 350px;
+                    height: 53px;
+                    margin: -47px -6px -5px -6px;
+                    z-index: -1;
                 }
             }
+            // &:not(.active) {
+            //     &:hover {
+            //         & + .network-info {
+            //             opacity: 1;
+            //             visibility: visible;
+            //             z-index: 2;
+                        
+            //         }
+            //     }
+            // }
 
-            &:hover {
-                & + .network-info {
-                    opacity: 1;
-                    visibility: visible;
-                }
-            }
 
             & + .network-info {
-                z-index: 2;
                 top: 40px;
                 right: 6px;
                 left: 6px;
