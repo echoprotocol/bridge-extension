@@ -43,7 +43,6 @@ class CreateAccount extends React.Component {
 
 	renderLogin() {
 		const { accountName, accountLoading } = this.props;
-		console.log(accountLoading);
 
 		return (
 			<Form>

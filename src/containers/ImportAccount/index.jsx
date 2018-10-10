@@ -40,11 +40,11 @@ class ImportAccount extends React.Component {
 	}
 
 	isDisabledSubmit() {
-		const { accountName, password, loading } = this.props;
+		const { accountName, password, accountLoading } = this.props;
 
 		if ((!accountName.value || accountName.error)
 			|| (!password.value || password.error)
-			|| loading) {
+			|| accountLoading) {
 			return true;
 		}
 
@@ -52,7 +52,7 @@ class ImportAccount extends React.Component {
 	}
 
 	render() {
-		const { accountName, password, loading } = this.props;
+		const { accountName, password, accountLoading } = this.props;
 
 		return (
 			<Form>
@@ -63,7 +63,6 @@ class ImportAccount extends React.Component {
 						<div className="two-input-wrap">
 							<BridgeInput
 								error={!!accountName.error}
-								disabled={loading}
 								name="accountName"
 								theme="input-light"
 								labelText="Account name"
@@ -73,7 +72,6 @@ class ImportAccount extends React.Component {
 							/>
 							<BridgeInput
 								error={!!password.error}
-								disabled={loading}
 								name="password"
 								type="password"
 								errorText={password.error}
@@ -88,7 +86,7 @@ class ImportAccount extends React.Component {
 						<div className="one-btn-wrap" >
 							<Button
 								disabled={this.isDisabledSubmit()}
-								className={classnames('btn-in-dark', { disabled: this.isDisabledSubmit() })}
+								className={classnames('btn-in-dark', { disabled: this.isDisabledSubmit() }, { loading: accountLoading })}
 								content={<span className="btn-text">Import</span>}
 								type="submit"
 								onClick={(e) => this.onImport(e)}
@@ -103,7 +101,7 @@ class ImportAccount extends React.Component {
 }
 
 ImportAccount.propTypes = {
-	loading: PropTypes.bool,
+	accountLoading: PropTypes.bool.isRequired,
 	accountName: PropTypes.object.isRequired,
 	password: PropTypes.object.isRequired,
 	importAccount: PropTypes.func.isRequired,
@@ -111,15 +109,11 @@ ImportAccount.propTypes = {
 	clearForm: PropTypes.func.isRequired,
 };
 
-ImportAccount.defaultProps = {
-	loading: false,
-};
-
 export default connect(
 	(state) => ({
 		accountName: state.form.getIn([FORM_SIGN_IN, 'accountName']),
 		password: state.form.getIn([FORM_SIGN_IN, 'password']),
-		loading: state.form.getIn([FORM_SIGN_IN, 'loading']),
+		accountLoading: state.global.get('accountLoading'),
 	}),
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_IN, field, value)),
