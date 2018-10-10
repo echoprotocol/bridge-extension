@@ -10,7 +10,7 @@ const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 });
 
 const extractSass = new ExtractTextPlugin({
-	filename: '[name].[contenthash].css',
+	filename: '[name].[hash].css',
 	disable: process.env.NODE_ENV === 'local',
 });
 const { version } = require('./package.json');
@@ -89,8 +89,8 @@ module.exports = {
 	},
 	resolve: {
 		modules: [
-			path.resolve('src'),
 			'node_modules',
+			path.resolve('src'),
 		],
 		extensions: ['.js', '.jsx', '.json'],
 	},
