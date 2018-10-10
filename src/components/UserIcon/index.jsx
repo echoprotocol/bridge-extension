@@ -27,7 +27,7 @@ class UserIcon extends React.PureComponent {
 
 UserIcon.propTypes = {
 	avatar: PropTypes.string.isRequired,
-	color: PropTypes,
+	color: PropTypes.string,
 };
 UserIcon.defaultProps = {
 	color: 'green',

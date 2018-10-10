@@ -76,8 +76,8 @@ class AddNetwork extends React.Component {
 				</div>
 				<div className="page-wrap">
 					{
-						// this.renderSuccess()
-						this.renderForm()
+						this.renderSuccess()
+						// this.renderForm()
 					}
 				</div>
 

@@ -11,6 +11,7 @@ class NetworkDropdown extends React.PureComponent {
 
 		this.state = {
 			opened: false,
+			hover: false,
 		};
 	}
 
@@ -25,6 +26,17 @@ class NetworkDropdown extends React.PureComponent {
 	onDropdownChange(e, value) {
 		console.log(e, value);
 
+	}
+
+	onToggleHoverClose() {
+		this.setState({ hover: !this.state.hover });
+	}
+
+	netInfoAir(options) {
+		if (options.length === 6) {
+			return ((options.length - 2) * 37) + 115;
+		}
+		return ((options.length - 2) * 37) + 110;
 	}
 
 	render() {
@@ -108,7 +120,7 @@ class NetworkDropdown extends React.PureComponent {
 			<div className="network-content">
 				<Button className="btn-round-close" />
 				<div className="network-title">
-			            Whitepowernet
+                    Whitepowernet
 				</div>
 
 			</div>
@@ -167,6 +179,14 @@ class NetworkDropdown extends React.PureComponent {
 
 			},
 
+
+			{
+				value: 'add-net',
+				key: 'add-net',
+				className: 'add-network',
+				as: 'button',
+				content: '+ Add Network',
+			},
 			{
 				value: 'fake-element',
 				key: 'fake-element',
@@ -176,35 +196,25 @@ class NetworkDropdown extends React.PureComponent {
 	<React.Fragment>
 		<div className="network-body" />
 		<div className="network-footer" />
-		<div className="network-footer-area" />
 	</React.Fragment>,
 			},
-			{
-				value: 'add-net',
-				key: 'add-net',
-				className: 'add-network',
-				as: 'a',
-				content: '+ Add Network',
-			},
-			{
-				value: 'network-info',
-				key: 'network-info',
-				className: 'network-info',
-				disabled: true,
-				as: 'span',
-				content: <NetworkInfo />,
-			},
 		];
+
+		const netInfoAir = this.netInfoAir(options);
 
 		return (
 			<React.Fragment>
 				<Dropdown
-					// open
-					className="dropdown-network"
+
+					className={classnames('dropdown-network', { 'hover-trigger': this.state.hover })}
 					onOpen={() => this.onOpen()}
 					onClose={() => this.onClose()}
 					trigger={
-						<div className="dropdown-trigger">
+						<div
+							className="dropdown-trigger"
+							onMouseEnter={() => this.onToggleHoverClose()}
+							onMouseLeave={() => this.onToggleHoverClose()}
+						>
 							<div className={classnames('current-network', { connected: true })}>
 								<span className="cut">{this.state.height}Main Network</span>
 							</div>
@@ -217,7 +227,7 @@ class NetworkDropdown extends React.PureComponent {
 					icon={false}
 				/>
 
-				{ !this.state.opened ? <NetworkInfo /> : null}
+				{ !this.state.opened ? <NetworkInfo /> : <NetworkInfo netAir={netInfoAir} />}
 
 			</React.Fragment>
 
