@@ -159,62 +159,6 @@
                 #d0d5d7
            );
         }
-        &.proceed {
-            background-color: transparent;
-            border: none;
-            width: auto;
-            min-width: auto !important;
-            padding-left: 50px;
-            padding-right: 35px;
-            margin-left: 21px;
-            color: #424a52;
-
-            border: 2px solid transparent;
-
-            &:hover {
-                background-color: #dfe2e4;
-                border: 2px solid transparent;            
-            }
-
-            &:active {
-                background-color: #d8dcde;
-                color: rgba(66, 74, 82, 0.7);
-                border: 2px solid transparent;
-
-                &:before {
-                    opacity: 0.7;
-                }
-            }
-
-            &:focus {
-                border-color: #d4d7db;
-                color: rgba(66, 74, 82, 0.7);
-
-                &:before {
-                    opacity: 0.7;
-                    border: none !important;
-                    top: 50% !important;
-                    left: 15px !important;
-                    right: auto !important;
-                    bottom: auto !important;
-                }
-            }
-
-            &:before {
-                content: '';
-                width: 14px;
-                height: 12px;
-                background-image: url(../images/arrow.svg);
-                background-size: contain;
-                background-position: center;
-                background-repeat: no-repeat;
-                transition: none;
-                border: none;
-                top: 50%;
-                left: 15px;
-                transform: translateY(-50%);
-            }
-        }
     }
 
     &-inverted {
@@ -304,10 +248,34 @@
 
     &-noborder {
         @extend %btn;
+        &:not(.disabled) {
+            @include onBtnFocus(
+                 $angularMax,
+                 2px,
+                 0px,
+                 #d0d5d7
+            );
+        }
         background-color: transparent;
-        color: #7e8489;
+        color: #3e494f;
         border: 1px solid transparent;
         border-radius: $angularMax;
+        &:hover {
+            color: #3b4952;
+            background-color: #dfe2e4;
+            border: 2px solid transparent;            
+        }
+
+        &:active {
+            background-color: #d8dcde;
+            color: #798086;
+            border: 2px solid transparent;
+        }
+
+        i {
+            margin-right: 13px;
+        }
+
     }
 
     &-nav {
@@ -447,6 +415,7 @@
     .btn-in-dark,
     .btn-in-light,
     .btn-transparent,
+    .btn-noborder,
     .btn-inverted {
         min-width: 200px;
         &.compact {
@@ -468,6 +437,7 @@
     .btn-in-dark,
     .btn-in-light,
     .btn-transparent,
+    .btn-noborder,
     .btn-inverted {
         min-width: 145px;
     }
