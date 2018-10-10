@@ -1,76 +1,64 @@
 import React from 'react';
 import { Dropdown, Button } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
+import { connect } from 'react-redux';
+import classnames from 'classnames';
+
+import { formatAmount } from '../../helpers/FormatHelper';
+import { initAccount, removeAccount } from '../../actions/GlobalActions';
+import UserIcon from '../UserIcon';
 
 class UserDropdown extends React.PureComponent {
 
-	onDropdownChange(e, value) {
-		console.log(e, value);
+	onDropdownChange(e, name) {
+		const handledKey = e.key || e.type;
+		const { accountName, networkName } = this.props;
+
+		if (['click', 'Enter'].includes(handledKey)) {
+			if (accountName === name) {
+				return;
+			}
+
+			this.props.initAccount(name, networkName);
+		}
+	}
+
+	onRemoveAccount(e, name) {
+		e.stopPropagation();
+
+		const { networkName } = this.props;
+
+		this.props.removeAccount(name, networkName);
+	}
+
+	renderList() {
+		const { preview, accountName } = this.props;
+
+		return preview.map(({
+			name, balance: { amount, precision, symbol },
+		}) => {
+			const content = (
+				<div key={name} className="user-item-wrap">
+					<UserIcon color="green" avatar="ava7" />
+					<div className="user-name">{name}</div>
+					<div className={classnames('user-balance', { positive: !!amount })}>{formatAmount(amount, precision, symbol) || '0 ECHO'}</div>
+					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
+				</div>
+			);
+
+			return ({
+				value: name,
+				key: name,
+				className: 'user-item',
+				content,
+				selected: accountName === name,
+			});
+		});
 	}
 
 	render() {
-		const options = [
-			{
-				value: 'User0',
-				key: 'user0',
-				className: 'user-item',
-				content:
+		const optionsEnd = [
 
-	<div className="user-item-wrap">
-		<div className="user-icon-wrap" />
-		<div className="user-name">Homersimpson</div>
-		<div className="user-balance">0 ECHO</div>
-		<Button className="btn-logout" />
-	</div>,
-
-			},
-			{
-				value: 'User1',
-				key: 'user1',
-				className: 'user-item',
-				content:
-
-	<div className="user-item-wrap">
-		<div className="user-icon-wrap" />
-		<div className="user-name">Jellyjade354</div>
-		<div className="user-balance positive">134.345 ECHO</div>
-		<Button className="btn-logout" />
-	</div>,
-
-			},
-			{
-				value: 'User2',
-				key: 'user2',
-				className: 'user-item',
-				content:
-
-	<div className="user-item-wrap">
-		<div className="user-icon-wrap" />
-		<div className="user-name">HenryHansen125</div>
-		<div className="user-balance">0 ECHO</div>
-		<Button className="btn-logout" />
-	</div>,
-
-			},
-
-			// 1) ТУТ ЗАКАНЧИВАЕТСЯ .map С ЮЗЕРАМИ И КОНКАТИТСЯ С НИЖНИМИ OPTIONS
-			// 2) Сейчас реализовано так, что при нажатию на стрелки (дропдаун меняет state),
-			// поменять поведение, чтобы менялось при нажатии на пробел и на ентер
-			// (Как в Echo Desctop функ-я onChange)
-
-			{
-				value: 'fake-element',
-				key: 'fake-element',
-				disabled: true,
-				content:
-	<React.Fragment>
-		<div className="user-body" />
-		<div className="user-footer-area" />
-		<div className="create-sub">Add account:</div>
-		<div className="import-sub">or</div>
-
-		<div className="user-footer" />
-	</React.Fragment>,
-			},
 			{
 				value: 'create',
 				key: 'create-account',
@@ -87,10 +75,19 @@ class UserDropdown extends React.PureComponent {
 				className: 'user-import',
 				content: (
 					<React.Fragment>
-						{/* <span>or</span> */}
 						<a href="">import</a>
 					</React.Fragment>
 				),
+			},
+			{
+				value: 'fake-element',
+				key: 'fake-element',
+				disabled: true,
+				content:
+	<React.Fragment>
+		<div className="user-body" />
+		<div className="user-footer" />
+	</React.Fragment>,
 			},
 		];
 
@@ -99,12 +96,13 @@ class UserDropdown extends React.PureComponent {
 				className="dropdown-user"
 				trigger={
 					<div className="dropdown-trigger">
-						<span className="user-icon-wrap" />
+						<UserIcon color="green" avatar="ava7" />
+
 						<i aria-hidden="true" className="dropdown icon" />
 					</div>
 				}
 				onChange={(e, { value }) => this.onDropdownChange(e, value)}
-				options={options}
+				options={this.renderList().concat(optionsEnd)}
 				selectOnBlur={false}
 				icon={false}
 			/>
@@ -113,5 +111,23 @@ class UserDropdown extends React.PureComponent {
 
 }
 
-export default UserDropdown;
+UserDropdown.propTypes = {
+	accountName: PropTypes.string.isRequired,
+	networkName: PropTypes.string.isRequired,
+	preview: PropTypes.array.isRequired,
+	initAccount: PropTypes.func.isRequired,
+	removeAccount: PropTypes.func.isRequired,
+};
+
+export default connect(
+	(state) => ({
+		preview: state.balance.get('preview').toJS(),
+		accountName: state.global.getIn(['activeUser', 'name']),
+		networkName: state.global.getIn(['network', 'name']),
+	}),
+	(dispatch) => ({
+		initAccount: (name, network) => dispatch(initAccount(name, network)),
+		removeAccount: (name, network) => dispatch(removeAccount(name, network)),
+	}),
+)(UserDropdown);
 

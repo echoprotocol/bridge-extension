@@ -2,6 +2,40 @@
     height: 21px;
     width: 21px;
     border-radius: 50%;
-    background-color: #16d6aa;
-    display: block;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    &.green {
+        background-color:#16d6aa;
+    }
+
+    &.yellow {
+        background-color: #d3c564;
+    }
+
+    &.lemon {
+        background-color: #cbd376;
+    }
+
+    &.blue {
+        background-color: #7683d3;
+    }
+
+    &.sky {
+        background-color: #76c5d3;
+    }
+
+    &.pink {
+        background-color: #b989cf;
+    }
+
+    &.red {
+        background-color: #d36496;
+    }
+
+    [class*="icon-ava"] {
+        color: #3f4c4e;
+        font-size: 19px;
+    }
 }

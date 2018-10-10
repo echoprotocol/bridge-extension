@@ -1,6 +1,6 @@
 // BTNS:
 // btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy,
-// btn-noborder, btn-nav, btn-logout
+// btn-noborder, btn-nav, btn-logout, btn-round-close
 
 // SIZE: compact
 // STATE: error, disabled
@@ -19,20 +19,55 @@
     background-color $speed,
     border $speed,
     color $speed;
-    will-change: transition;
     padding: 0;
+    
     &.disabled {
           pointer-events: none;
           border: 2px solid $colorDisabled;
           background-color: transparent;
           color: #b6b9be;
+          transition: none;
     }
+
+    &.loading {
+        background-color: #dfe2e4 !important;
+        color: #dfe2e4 !important;
+        border-color: #dfe2e4 !important;
+        pointer-events: none;
+        z-index: 1005;
+        overflow: hidden;
+
+        &:after {
+            content: '';
+            display: block;
+            height: 2px;
+            width: 130px;
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+
+            background: linear-gradient(to left, rgba(175,179,185,1) 0%,rgba(191,195,200,1) 36%,rgba(212,216,219,0.63) 83%,rgba(220,223,226,0.63) 100%);
+            animation: loader 0.75s infinite normal linear;
+        }
+        
+        @keyframes loader {
+            from {
+                left: -120%;
+            }
+
+            to {
+                left: 120%;
+            }
+        }
+    }
+
     &.compact {
        height: 25px;
        font-size: 10px;
 
        .btn-text {
            letter-spacing: 2.2px;
+           font-size: 10px;
        }
     }
 }
@@ -200,48 +235,75 @@
         height: 25px;
         top: 0;
         right: 0;
+        transition: color $speed, background-color $speed;
+        &.compact {
+            .btn-text {
+                letter-spacing: 2.3px;
+                font-size: 11px;
+                margin: 1px 0 0 0;
+            }
+        }
+
     }
+
     &-noborder {
         @extend %btn;
+        &:not(.disabled) {
+            @include onBtnFocus(
+                 $angularMax,
+                 2px,
+                 0px,
+                 #d0d5d7
+            );
+        }
         background-color: transparent;
-        color: #7e8489;
+        color: #3e494f;
         border: 1px solid transparent;
         border-radius: $angularMax;
+        &:hover {
+            color: #3b4952;
+            background-color: #dfe2e4;
+            border: 2px solid transparent;            
+        }
+
+        &:active {
+            background-color: #d8dcde;
+            color: #798086;
+            border: 2px solid transparent;
+        }
+
+        i {
+            margin-right: 13px;
+        }
+
     }
+
     &-nav {
         background-color: transparent;
         width: 30px;
         height: 30px;
         border: 0;
         cursor: pointer;
+        font-size: 18px;
+        color: #5c7071;
+        transition: color linear $speed;
+        -webkit-transform: translateZ(0);
 
         &:hover,
         &:focus {
-            div {
-                background-color: #88a5a6;
-            }
+            color: #88a5a6;
+
         }
+
         &:active {
-            div {
-                background-color: #506869;
-            }
-            
-        }
-        div {
-            height: 2px;
-            width: 14px;
-            background-color: #5c7071;
-            margin-left: 1px;
-            transition: background-color $speed;
-            &:not(:last-child) {
-                margin-bottom: 3px;
-            }
+            color: #506869;
         }
     }
+    
     &-logout {
         background-color: transparent;
         border: 0;
-        border-radius: $angularMin;
+        border-radius: 50%;
         width: 33px;
         height: 33px;
         color: rgba(#fff, .4);
@@ -252,8 +314,33 @@
             color: #fff;
         }
         &:before {
-            content: '\e32e';
+            content: $icon-exit;
+            font-size: 20px;
+            margin: 1px -3px 0 0;
+            display: block;
+        }
+    }
 
+    &-round-close {
+        background-color: transparent;
+        border-radius: 50%;
+        height: 23px;
+        width: 23px;
+        border: 0;
+        color: #adb3b9;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 7px 0 -7px;
+        transition: background-color $speed;
+        cursor: pointer;
+        &:hover {
+            background-color: #363f42;
+
+        }
+        &:before {
+            display: block;
+            margin: 3px -1px 0 0;
         }
     }
 
@@ -270,8 +357,7 @@
     transform: width $speed;
     border: 0;
     border-radius: $angularMax;
-    transition: width $speed;
-
+    transition: width $speed / 2;
     &:not(.copied) {
         @include onBtnFocus (
             $angularMax,
@@ -285,12 +371,27 @@
             background-color: #efeff0;
         }
     }
+    &:hover {
+        .btn-copy {
+            background-color: #f9f9fa;
+        }
+    }
     &.copied {
         width: 226px;
     }
+    
     &:after {
         border-radius: $angularMax;
-        content: "";
+        content: "\e913";
+        font-family: '#{$icomoon-font-family}';
+        speak: none;
+        font-style: normal;
+        font-weight: normal;
+        font-variant: normal;
+        text-transform: none;
+        line-height: 1;
+        -webkit-font-smoothing: antialiased;
+        -moz-osx-font-smoothing: grayscale;
         position: absolute;
         right: 0;
         left: 0;
@@ -299,6 +400,12 @@
         height: 23px;
         background-color: #efeff0;
         border: 1px solid #efeff0;
+        display: flex;
+        align-items: center;
+        justify-content: flex-start;
+        color: #b4b8bc;
+        padding-left: 6px;
+        font-size: 15px;
     }
 }
 
@@ -308,6 +415,7 @@
     .btn-in-dark,
     .btn-in-light,
     .btn-transparent,
+    .btn-noborder,
     .btn-inverted {
         min-width: 200px;
         &.compact {
@@ -329,6 +437,7 @@
     .btn-in-dark,
     .btn-in-light,
     .btn-transparent,
+    .btn-noborder,
     .btn-inverted {
         min-width: 145px;
     }
