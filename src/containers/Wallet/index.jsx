@@ -14,7 +14,7 @@ class Wallet extends React.Component {
 				</div>
 				<div className="page-wrap">
 					<div className="page">
-                    asd
+                        asd
 						<div className="page-action-wrap">
 							<div className="two-btn-wrap" >
 								<Button
