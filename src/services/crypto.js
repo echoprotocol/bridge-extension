@@ -20,26 +20,35 @@ class AesStorage {
 	}
 
 	/**
-	 *  @method getRandomBuffer
+	 *  @method getRandomSeed
 	 *
 	 *  Method get random wallet key.
 	 *  If this is a first launch, generate and save key in storage.
 	 *  Next time get key in storage and decrypt.
 	 *
+	 *  @param {String} pin
+	 *
 	 *  @return {Buffer} randomBuffer
 	 */
-	async getRandomBuffer() {
-		let randomBuffer = Buffer.from(random(32));
-		let randomKey = await storage.get('randomKey');
+	async getRandomSeed(pin) {
+		const privateKey = PrivateKey.fromSeed(pin);
+		const publicKey = privateKey.toPublicKey();
 
-		if (randomKey) {
-			randomBuffer = this.aes.decryptHexToBuffer(randomKey);
+		let encrypted = await storage.get('randomKey');
+		let decrypted = Buffer.from(random(1024), 'hex');
+
+		if (encrypted) {
+			try {
+				decrypted = Aes.decryptWithChecksum(privateKey, publicKey, '', Buffer.from(encrypted, 'hex'));
+			} catch (err) {
+				throw new Error('Invalid pin');
+			}
 		} else {
-			randomKey = this.aes.encryptToHex(randomBuffer);
-			await storage.set('randomKey', randomKey);
+			encrypted = Aes.encryptWithChecksum(privateKey, publicKey, '', decrypted);
+			await storage.set('randomKey', encrypted.toString('hex'));
 		}
 
-		return randomBuffer;
+		return decrypted.toString('hex');
 	}
 
 	/**
@@ -47,13 +56,8 @@ class AesStorage {
 	 *
 	 *  Set timeout, when it expired - clear aes object.
 	 *
-	 *  @param {Number} milliseconds - optional
 	 */
-	timeout(milliseconds) {
-		if (milliseconds) {
-			this.TIMEOUT = milliseconds;
-		}
-
+	timeout() {
 		setTimeout(() => { this.clear(); }, this.TIMEOUT);
 	}
 
@@ -64,9 +68,8 @@ class AesStorage {
 	 *
 	 *  @param {String} pin
 	 *  @param {Function} emitter
-	 *  @param {Number} milliseconds - optional
 	 */
-	async set(pin, emitter, milliseconds) {
+	async set(pin, emitter) {
 		if (!pin || typeof pin !== 'string') {
 			throw new Error('Key required.');
 		}
@@ -77,12 +80,11 @@ class AesStorage {
 
 		this.emitter = emitter;
 
-		this.aes = Aes.fromSeed(pin);
-		const randomBuffer = await this.getRandomBuffer();
-		this.aes = Aes.fromSeed(randomBuffer);
+		const randomSeed = await this.getRandomSeed(pin);
+		this.aes = Aes.fromSeed(randomSeed);
 		this.emitter('unlocked');
 
-		this.timeout(milliseconds);
+		this.timeout();
 	}
 
 	/**
@@ -111,8 +113,14 @@ class AesStorage {
 	 */
 	required() {
 		if (!this.aes) {
+			this.emitter('locked');
+
 			throw new Error('Unlock required.');
 		}
+	}
+
+	setTime(milliseconds) {
+		this.TIMEOUT = milliseconds;
 	}
 
 }
@@ -120,6 +128,17 @@ class AesStorage {
 const privateAES = new AesStorage();
 
 class Crypto extends EventEmitter {
+
+	/**
+	 *  @method setExpiredTime
+	 *
+	 *  Set expired time in milliseconds
+	 *
+	 *  @param {Number} milliseconds
+	 */
+	setExpiredTime(milliseconds) {
+		privateAES.setTime(milliseconds);
+	}
 
 	/**
 	 *  @method getPrivateKey
@@ -132,10 +151,27 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @return {WIF} privateKey
 	 */
-	static getPrivateKey(username, password, role = 'active') {
+	getPrivateKey(username, password, role = 'active') {
 		const seed = `${username}${role}${password}`;
 		const privateKey = PrivateKey.fromSeed(seed);
 		return privateKey.toWif();
+	}
+
+	/**
+	 *  @method getPublicKey
+	 *
+	 *  Generate public key from seed, using in desktop app.
+	 *
+	 *  @param {String} username
+	 *  @param {String} password
+	 *  @param {String} role - optional
+	 *
+	 *  @return {String} publicKey
+	 */
+	getPublicKey(username, password, role = 'active') {
+		const seed = `${username}${role}${password}`;
+		const privateKey = PrivateKey.fromSeed(seed);
+		return privateKey.toPublicKey().toString();
 	}
 
 	/**
@@ -147,25 +183,13 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @return {Boolean} isWIF
 	 */
-	static isWIF(passwordOrWIF) {
+	isWIF(passwordOrWIF) {
 		try {
 			PrivateKey.fromWif(passwordOrWIF);
 			return true;
 		} catch (err) {
 			return false;
 		}
-	}
-
-	/**
-	 *  @method createAES
-	 *
-	 * 	Create aes and set expired timout
-	 *
-	 *  @param {String} pin
-	 *  @param {Number} milliseconds - optional
-	 */
-	async createAES(pin, milliseconds) {
-		await privateAES.set(pin, this.emit, milliseconds);
 	}
 
 	/**
@@ -212,12 +236,17 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @param {String} username
 	 *  @param {String} password
+	 *  @param {String} memoPublicKey
 	 */
-	async importByPassword(username, password) {
+	async importByPassword(username, password, memoPublicKey) {
 		privateAES.required();
 
 		const privateKeyWIF = this.getPrivateKey(username, password);
 		await this.importByWIF(privateKeyWIF);
+
+		if (this.getPublicKey(username, password, 'memo') === memoPublicKey) {
+			await this.importByWIF(this.getPrivateKey(username, password, 'memo'));
+		}
 	}
 
 	/**
@@ -228,7 +257,7 @@ class Crypto extends EventEmitter {
 	 *  @param {String} pin
 	 */
 	async unlock(pin) {
-		await privateAES.set(pin, this.emit);
+		await privateAES.set(pin, this.emit.bind(this));
 	}
 
 	/**
@@ -276,6 +305,17 @@ class Crypto extends EventEmitter {
 
 		transaction.add_signer(privateKey);
 		return transaction;
+	}
+
+	/**
+	 *  @method removePrivateKey
+	 *
+	 *  Remove encrypted private key by public key.
+	 *
+	 *  @param {String} publicKey
+	 */
+	async removePrivateKey(publicKey) {
+		await storage.remove(publicKey);
 	}
 
 }

@@ -4,15 +4,12 @@ import { Map } from 'immutable';
 import history from '../history';
 
 import { getPreviewBalances, initBalances } from './BalanceActions';
+import { unlockCrypto } from './CryptoActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import { IMPORT_ACCOUNT_PATH, WIF_PATH, INDEX_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
-
-import Crypto from '../services/crypto';
-
-export const userCrypto = new Crypto();
 
 export const initAccount = (accountName, networkName) => async (dispatch) => {
 	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
@@ -75,6 +72,9 @@ export const connection = () => async (dispatch) => {
 
 	dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
 
+	// TODO remove in BRG-21
+	dispatch(unlockCrypto());
+
 	try {
 		if (IMPORT_ACCOUNT_PATH !== history.location.pathname) {
 			history.push(IMPORT_ACCOUNT_PATH);
@@ -87,7 +87,7 @@ export const connection = () => async (dispatch) => {
 		const active = accounts.find((i) => i.active) || accounts[0];
 		await dispatch(initAccount(active.name, network.name));
 	} catch (err) {
-		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
+		dispatch(GlobalReducer.actions.set({ field: 'error', value: err.message }));
 	} finally {
 		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
 	}

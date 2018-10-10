@@ -1,21 +1,4 @@
-import { PrivateKey, key } from 'echojs-lib';
-
-export const generateKeyFromPassword = (accountName, role, password) => {
-	const seed = `${accountName}${role}${password}`;
-	const privateKey = PrivateKey.fromSeed(seed);
-	const publicKey = privateKey.toPublicKey().toString();
-
-	return { privateKey, publicKey };
-};
-
-export const getKeyFromWif = (wif) => {
-	try {
-		const privateKey = PrivateKey.fromWif(wif);
-		return privateKey;
-	} catch (err) {
-		return null;
-	}
-};
+import { PrivateKey } from 'echojs-lib';
 
 export const validateAccountExist = async (
 	instance,
@@ -75,14 +58,8 @@ export const validateImportAccountExist = async (
 	return null;
 };
 
-export const createWallet = async (registrator, account) => {
-	const password = (`P${key.get_random_key().toWif()}`).substr(0, 45);
-	// TODO change crypto password
-	// const password = userCrypto.generateWIF();
-
-	const owner = generateKeyFromPassword(account, 'owner', password);
-	const active = generateKeyFromPassword(account, 'active', password);
-	const memo = generateKeyFromPassword(account, 'memo', password);
+export const createWallet = async (registrator, account, wif) => {
+	const publicKey = PrivateKey.fromWif(wif).toPublicKey().toString();
 
 	let response = await fetch(registrator, {
 		method: 'post',
@@ -93,9 +70,9 @@ export const createWallet = async (registrator, account) => {
 		},
 		body: JSON.stringify({
 			name: account,
-			owner_key: owner.publicKey,
-			active_key: active.publicKey,
-			memo_key: memo.publicKey,
+			owner_key: publicKey,
+			active_key: publicKey,
+			memo_key: publicKey,
 		}),
 	});
 
@@ -104,34 +81,4 @@ export const createWallet = async (registrator, account) => {
 	if (!response || (response && response.errors)) {
 		throw response.errors.join();
 	}
-
-	// return password;
-	return active.privateKey.toWif();
-};
-
-export const importWallet = (account, password) => {
-
-	const privateKey = getKeyFromWif(password);
-	let passKey;
-
-	if (privateKey) {
-		passKey = {
-			privateKey,
-			publicKey: privateKey.toPublicKey().toString(),
-		};
-	}
-
-	if (!account) { return null; }
-
-	account = account.toJS();
-
-	if (!privateKey) {
-		passKey = generateKeyFromPassword(account.name, 'active', password);
-	}
-
-	if (account.active.key_auths[0][0] !== passKey.publicKey) {
-		return 'Invalid password';
-	}
-
-	return null;
 };
