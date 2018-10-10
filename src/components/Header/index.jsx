@@ -12,7 +12,7 @@ class Header extends React.PureComponent {
 
 		return (
 			<header className="header">
-				{preview.length ? <UserDropdown /> : null}
+				{preview.size ? <UserDropdown /> : null}
 				<NetworkDropdown />
 			</header>
 		);
@@ -21,12 +21,12 @@ class Header extends React.PureComponent {
 }
 
 Header.propTypes = {
-	preview: PropTypes.array.isRequired,
+	preview: PropTypes.object.isRequired,
 };
 
 export default connect(
 	(state) => ({
-		preview: state.balance.get('preview').toJS(),
+		preview: state.balance.get('preview'),
 	}),
 	() => ({}),
 )(Header);

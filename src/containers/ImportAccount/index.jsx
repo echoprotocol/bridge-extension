@@ -63,6 +63,7 @@ class ImportAccount extends React.Component {
 						<div className="two-input-wrap">
 							<BridgeInput
 								error={!!accountName.error}
+								autoFocus
 								name="accountName"
 								theme="input-light"
 								labelText="Account name"

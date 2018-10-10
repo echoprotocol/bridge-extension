@@ -21,7 +21,7 @@ class UserDropdown extends React.PureComponent {
 		const { activeUser, networkName } = this.props;
 
 		if (['click', 'Enter'].includes(handledKey)) {
-			if (activeUser.name === name) {
+			if (activeUser.get('name') === name) {
 				return;
 			}
 
@@ -57,9 +57,9 @@ class UserDropdown extends React.PureComponent {
 				key: name,
 				className: 'user-item',
 				content,
-				selected: activeUser.name === name,
+				selected: activeUser.get('name') === name,
 			});
-		});
+		}).toArray();
 	}
 
 	render() {
@@ -108,7 +108,7 @@ class UserDropdown extends React.PureComponent {
 				className="dropdown-user"
 				trigger={
 					<div className="dropdown-trigger">
-						<UserIcon color="green" avatar={`ava${activeUser.icon}`} />
+						<UserIcon color="green" avatar={`ava${activeUser.get('icon')}`} />
 
 						<i aria-hidden="true" className="dropdown icon" />
 					</div>
@@ -126,15 +126,15 @@ class UserDropdown extends React.PureComponent {
 UserDropdown.propTypes = {
 	activeUser: PropTypes.object.isRequired,
 	networkName: PropTypes.string.isRequired,
-	preview: PropTypes.array.isRequired,
+	preview: PropTypes.object.isRequired,
 	initAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
 };
 
 export default withRouter(connect(
 	(state) => ({
-		preview: state.balance.get('preview').toJS(),
-		activeUser: state.global.get('activeUser').toJS(),
+		preview: state.balance.get('preview'),
+		activeUser: state.global.get('activeUser'),
 		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({

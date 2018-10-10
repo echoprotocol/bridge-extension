@@ -2,8 +2,8 @@ import { createModule } from 'redux-modules';
 import { Map } from 'immutable';
 
 const DEFAULT_FIELDS = Map({
-	wif: '',
 	isCreate: false,
+	isWelcomeOpen: false,
 });
 
 export default createModule({

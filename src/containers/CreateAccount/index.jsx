@@ -5,7 +5,6 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 import { createAccount } from '../../actions/AuthActions';
-import { setFormValue } from '../../actions/FormActions';
 
 import BridgeInput from '../../components/BridgeInput';
 
@@ -13,8 +12,20 @@ import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 class CreateAccount extends React.Component {
 
-	onCreate() {
-		this.props.createAccount({ accountName: this.props.accountName.value.trim() });
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			accountName: '',
+		};
+	}
+
+	async onCreate() {
+		const { saveWif } = this.props;
+
+		const result = await this.props.createAccount({ accountName: this.state.accountName.trim() });
+
+		saveWif(result);
 	}
 
 	onChange(e) {
@@ -23,21 +34,12 @@ class CreateAccount extends React.Component {
 		let { value } = e.target;
 		value = value.toLowerCase();
 
-		if (field) {
-			this.props.setFormValue(field, value);
-		}
+		this.setState({
+			[field]: value,
+		});
 	}
 
-	onClick(e) {
-		const { accountName } = this.props;
-
-		const field = e.target.name;
-
-		this.props.setFormValue(field, accountName);
-	}
-
-
-	renderLogin() {
+	render() {
 		const { accountName, accountLoading } = this.props;
 
 		return (
@@ -52,13 +54,14 @@ class CreateAccount extends React.Component {
 						<div className="one-input-wrap">
 							<BridgeInput
 								error={!!accountName.error}
+								autoFocus
 								name="accountName"
 								theme="input-light"
 								labelText="Account name"
 								errorText={accountName.error && accountName.error.errorText}
 								hintText={accountName.error && accountName.error.example}
 								descriptionText="Unique name will be used to make transaction"
-								value={accountName.value}
+								value={this.state.accountName}
 								onChange={(e) => this.onChange(e)}
 								onClick={(e) => this.onClick(e)}
 							/>
@@ -81,20 +84,13 @@ class CreateAccount extends React.Component {
 		);
 	}
 
-	render() {
-		return (
-			this.renderLogin()
-		);
-
-	}
-
 }
 
 CreateAccount.propTypes = {
 	accountName: PropTypes.object.isRequired,
 	accountLoading: PropTypes.bool.isRequired,
 	createAccount: PropTypes.func.isRequired,
-	setFormValue: PropTypes.func.isRequired,
+	saveWif: PropTypes.func.isRequired,
 };
 
 export default connect(
@@ -103,7 +99,6 @@ export default connect(
 		accountName: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 	}),
 	(dispatch) => ({
-		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_UP, field, value)),
 		createAccount: (value) => dispatch(createAccount(value)),
 	}),
 )(CreateAccount);

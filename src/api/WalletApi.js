@@ -123,13 +123,11 @@ export const importWallet = (account, password) => {
 
 	if (!account) { return null; }
 
-	account = account.toJS();
-
 	if (!privateKey) {
-		passKey = generateKeyFromPassword(account.name, 'active', password);
+		passKey = generateKeyFromPassword(account.get('name'), 'active', password);
 	}
 
-	if (account.active.key_auths[0][0] !== passKey.publicKey) {
+	if (account.getIn(['active', 'key_auths', '0', '0']) !== passKey.publicKey) {
 		return 'Invalid password';
 	}
 

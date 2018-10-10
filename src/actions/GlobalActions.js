@@ -34,9 +34,12 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 		localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
-		const { id, name } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
+		const fetchedAccount = await dispatch(EchoJSActions.fetch(accountName));
 
-		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name, icon } }));
+		dispatch(GlobalReducer.actions.setIn({
+			field: 'activeUser',
+			params: { id: fetchedAccount.get('id'), name: fetchedAccount.get('name'), icon },
+		}));
 
 		await dispatch(initBalances(networkName));
 	} catch (err) {
@@ -58,7 +61,7 @@ export const addAccount = (accountName, networkName) => (dispatch) => {
 	if (INDEX_PATH.includes(history.location.pathname)) {
 		dispatch(WelcomeReducer.actions.set({ field: 'isCreate', value: true }));
 	}
-	history.push(WIF_PATH);
+	// history.push(WIF_PATH);
 };
 
 export const connection = () => async (dispatch) => {
