@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import query from 'query-string';
-import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
 import {
@@ -12,7 +11,7 @@ import {
 import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 import { createAccount } from '../../actions/AuthActions';
-import { setFormError } from '../../actions/FormActions';
+import { setFormError, clearForm } from '../../actions/FormActions';
 
 import CreateComponent from './CreateComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
@@ -37,11 +36,15 @@ class CreateAccount extends React.Component {
 		}
 	}
 
+	componentWillUnmount() {
+		this.props.clearForm();
+	}
+
 	onChangeName(name) {
 		this.setState({ name });
 
 		if (this.props.name.error) {
-			this.props.setFormError(null);
+			this.props.clearError();
 		}
 	}
 
@@ -96,16 +99,18 @@ CreateAccount.propTypes = {
 	location: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
 	createAccount: PropTypes.func.isRequired,
-	setFormError: PropTypes.func.isRequired,
+	clearError: PropTypes.func.isRequired,
+	clearForm: PropTypes.func.isRequired,
 };
 
-export default withRouter(connect(
+export default connect(
 	(state) => ({
 		loading: state.global.get('loading'),
 		name: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 	}),
 	(dispatch) => ({
 		createAccount: (name) => dispatch(createAccount(name)),
-		setFormError: (error) => dispatch(setFormError(FORM_SIGN_UP, 'accountName', error)),
+		clearError: () => dispatch(setFormError(FORM_SIGN_UP, 'accountName', null)),
+		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
 	}),
-)(CreateAccount));
+)(CreateAccount);
