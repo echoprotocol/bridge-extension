@@ -18,25 +18,18 @@ class BridgeBtnCopy extends React.Component {
 		this.setState({ copied: true });
 	}
 
-	onBlur() {
-
-		this.setState({ copied: false });
-	}
-
-
 	render() {
 
 		return (
 			<CopyToClipboard text={this.props.text} >
 				<Button
 					onClick={() => this.onClick()}
-					onBlur={() => this.onBlur()}
 					className={classnames('btn-copy-wrap', { copied: this.state.copied })}
 					content={
 						<React.Fragment>
 							<div className={classnames('btn-copy', { compact: this.props.compact })} >
 								<i className="icon-copy" />
-								<span className="btn-text">Copy to clipboard</span>
+								<span className="btn-text">{this.state.copied ? 'Copied to clipboard' : 'Copy to clipboard'}</span>
 							</div>
 						</React.Fragment>
 					}

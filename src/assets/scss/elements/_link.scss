@@ -1,0 +1,78 @@
+%link {
+    height: 22px;
+    transition: color $speed;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+@mixin onLinkFocus (
+    $angular,
+    $outerBorderWidth,
+    $innerBorderWidth,
+    $color
+    ) {
+    position: relative;
+    
+    @include hardwareAccel();
+    
+    &:before {
+        content: '';
+        position: absolute;
+        transition: top $speed,
+                    right $speed /2,
+                    bottom $speed /2,
+                    left $speed;
+        border-radius: $angular + 2px;
+        top: 0;
+        right: 0;
+        bottom: 0;
+        left: 0;
+    }
+    &:not(:active) {
+        &:focus {
+            &:before {
+                border: $outerBorderWidth solid $color;
+                top: -($outerBorderWidth + $innerBorderWidth);
+                right: -($outerBorderWidth + $innerBorderWidth);
+                bottom: -($outerBorderWidth + $innerBorderWidth);
+                left: -($outerBorderWidth + $innerBorderWidth);
+            }
+        }
+    }
+}
+
+.link {
+    &-return {
+        @extend %link;
+        font-family: FNBold;
+        color: #39494C;
+        min-width: 89px;
+        text-transform: uppercase;
+        &:not(.disabled) {
+            @include onLinkFocus(
+                 $angularMin,
+                 2px,
+                 0,
+                 #ccd2d6
+            );
+        }
+        i {
+            width: 12px;
+            height: 14px;
+            display: flex;
+            align-items: center;
+            margin-right: 10px;
+            & + .link-text {
+                    margin: 0 -5px 0 4px;
+            } 
+        }
+        &:hover {
+            color: #626e70;
+        }
+    }
+    &-text {
+        font-size: 10px;
+        letter-spacing: 2.5px;
+        display: block;
+    }
+}
