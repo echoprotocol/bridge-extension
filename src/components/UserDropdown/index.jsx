@@ -10,7 +10,7 @@ import { initAccount, removeAccount } from '../../actions/GlobalActions';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
-import { IMPORT_ACCOUNT_PATH, INDEX_PATH } from '../../constants/RouterConstants';
+import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
 
 import UserIcon from '../UserIcon';
 
@@ -73,7 +73,7 @@ class UserDropdown extends React.PureComponent {
 				className: ' user-create',
 				content: (
 					<React.Fragment>
-						<Link to={INDEX_PATH}>create</Link>
+						<Link to={CREATE_ACCOUNT_PATH}>create</Link>
 					</React.Fragment>
 				),
 			},

@@ -15,7 +15,7 @@ class App extends React.Component {
 	}
 
 	renderChildren() {
-		const { children, accountLoading } = this.props;
+		const { children, loading } = this.props;
 		return (
 			<div className="temp-wrap">
 				<div className="app-wrap">
@@ -23,7 +23,7 @@ class App extends React.Component {
 					<Navbar />
 					{children}
 					{
-						(accountLoading) && <Dimmer active inverted />
+						(loading) && <Dimmer active inverted />
 					}
 				</div>
 			</div>
@@ -38,12 +38,12 @@ class App extends React.Component {
 
 App.propTypes = {
 	children: PropTypes.element.isRequired,
-	accountLoading: PropTypes.bool.isRequired,
+	loading: PropTypes.bool.isRequired,
 	connection: PropTypes.func.isRequired,
 };
 export default connect(
 	(state) => ({
-		accountLoading: state.global.get('accountLoading'),
+		loading: state.global.get('loading'),
 	}),
 	(dispatch) => ({
 		connection: () => dispatch(connection()),

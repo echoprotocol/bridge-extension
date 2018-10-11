@@ -1,14 +1,21 @@
 import React from 'react';
-import { Button, Form } from 'semantic-ui-react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import classnames from 'classnames';
+import query from 'query-string';
+import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
+
+import {
+	CREATE_ACCOUNT_PATH,
+	CREATE_SUCCESS_PATH,
+	INDEX_PATH,
+} from '../../constants/RouterConstants';
+import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 import { createAccount } from '../../actions/AuthActions';
+import { setFormError } from '../../actions/FormActions';
 
-import BridgeInput from '../../components/BridgeInput';
-
-import { FORM_SIGN_UP } from '../../constants/FormConstants';
+import CreateComponent from './CreateComponent';
+import WelcomeComponent from '../../components/WelcomeComponent';
 
 class CreateAccount extends React.Component {
 
@@ -16,89 +23,89 @@ class CreateAccount extends React.Component {
 		super(props);
 
 		this.state = {
-			accountName: '',
+			name: '',
+			wif: '',
 		};
 	}
 
-	async onCreate() {
-		const { saveWif } = this.props;
+	componentDidMount() {
+		const { pathname, search } = this.props.location;
+		const { wif } = this.state;
 
-		const result = await this.props.createAccount({ accountName: this.state.accountName.trim() });
-
-		saveWif(result);
+		if (`${pathname}${search}` === CREATE_SUCCESS_PATH && !wif) {
+			this.props.history.push(CREATE_ACCOUNT_PATH);
+		}
 	}
 
-	onChange(e) {
-		const field = e.target.name;
+	onChangeName(name) {
+		this.setState({ name });
 
-		let { value } = e.target;
-		value = value.toLowerCase();
+		if (this.props.name.error) {
+			this.props.setFormError(null);
+		}
+	}
 
-		this.setState({
-			[field]: value,
-		});
+	async onCreateAccount() {
+		const wif = await this.props.createAccount(this.state.name);
+
+		if (wif) {
+			this.setState({ wif });
+			this.props.history.push(CREATE_SUCCESS_PATH);
+		}
+	}
+
+	onProceedClick() {
+		this.props.history.push(INDEX_PATH);
 	}
 
 	render() {
-		const { accountName, accountLoading } = this.props;
+		const { name, wif } = this.state;
+		const {
+			loading, name: { error, example }, location,
+		} = this.props;
+
+		const { success } = query.parse(location.search);
+
+		if (wif && success) {
+			return (
+				<WelcomeComponent
+					wif={wif}
+					name={name}
+					proceed={() => this.onProceedClick()}
+				/>
+			);
+		}
 
 		return (
-			<Form>
-				<div className="page-wrap">
-
-					<div className="page">
-						<div className="icon-pageAccount">
-							<span className="path1" />
-							<span className="path2" />
-						</div>
-						<div className="one-input-wrap">
-							<BridgeInput
-								error={!!accountName.error}
-								autoFocus
-								name="accountName"
-								theme="input-light"
-								labelText="Account name"
-								errorText={accountName.error && accountName.error.errorText}
-								hintText={accountName.error && accountName.error.example}
-								descriptionText="Unique name will be used to make transaction"
-								value={this.state.accountName}
-								onChange={(e) => this.onChange(e)}
-								onClick={(e) => this.onClick(e)}
-							/>
-						</div>
-					</div>
-					<div className="page-action-wrap">
-						<div className="one-btn-wrap" >
-							<Button
-								className={classnames('btn-in-light', { loading: accountLoading })}
-								content={<span className="btn-text">Create</span>}
-								type="submit"
-								onClick={(e) => this.onCreate(e)}
-								disabled={accountLoading}
-							/>
-						</div>
-					</div>
-				</div>
-			</Form>
-
+			<CreateComponent
+				loading={loading}
+				name={name}
+				error={error}
+				example={example}
+				changeName={(value) => this.onChangeName(value)}
+				createAccount={() => this.onCreateAccount()}
+			/>
 		);
 	}
 
 }
 
 CreateAccount.propTypes = {
-	accountName: PropTypes.object.isRequired,
-	accountLoading: PropTypes.bool.isRequired,
+	loading: PropTypes.bool.isRequired,
+	name: PropTypes.object.isRequired,
+	location: PropTypes.object.isRequired,
+	history: PropTypes.object.isRequired,
 	createAccount: PropTypes.func.isRequired,
-	saveWif: PropTypes.func.isRequired,
+	setFormError: PropTypes.func.isRequired,
 };
 
-export default connect(
+export default withRouter(connect(
 	(state) => ({
-		accountLoading: state.global.get('accountLoading'),
-		accountName: state.form.getIn([FORM_SIGN_UP, 'accountName']),
+		loading: state.global.get('loading'),
+		name: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 	}),
 	(dispatch) => ({
-		createAccount: (value) => dispatch(createAccount(value)),
+		createAccount: (name) => dispatch(createAccount(name)),
+		setFormError: (error) => dispatch(setFormError(FORM_SIGN_UP, 'accountName', error)),
 	}),
-)(CreateAccount);
+)(CreateAccount));

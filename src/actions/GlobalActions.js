@@ -1,14 +1,10 @@
 import { EchoJSActions } from 'echojs-redux';
 import { Map } from 'immutable';
 
-import history from '../history';
-
 import { getPreviewBalances, initBalances } from './BalanceActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
-import WelcomeReducer from '../reducers/WelcomeReducer';
 
-import { IMPORT_ACCOUNT_PATH, INDEX_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
 import Crypto from '../services/crypto';
@@ -16,7 +12,7 @@ import Crypto from '../services/crypto';
 export const userCrypto = new Crypto();
 
 export const initAccount = (accountName, networkName) => async (dispatch) => {
-	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	try {
 		let accounts = localStorage.getItem(`accounts_${networkName}`);
@@ -45,7 +41,7 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {
-		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
 
@@ -57,15 +53,10 @@ export const addAccount = (accountName, networkName) => (dispatch) => {
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
 	dispatch(initAccount(accountName, networkName));
-
-	if (INDEX_PATH.includes(history.location.pathname)) {
-		dispatch(WelcomeReducer.actions.set({ field: 'isCreate', value: true }));
-	}
-	// history.push(WIF_PATH);
 };
 
 export const connection = () => async (dispatch) => {
-	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	let network = localStorage.getItem('current_network');
 
@@ -79,9 +70,6 @@ export const connection = () => async (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
 
 	try {
-		if (IMPORT_ACCOUNT_PATH !== history.location.pathname) {
-			history.push(IMPORT_ACCOUNT_PATH);
-		}
 		await dispatch(EchoJSActions.connect(network.url));
 		let accounts = localStorage.getItem(`accounts_${network.name}`);
 
@@ -92,7 +80,7 @@ export const connection = () => async (dispatch) => {
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {
-		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
 
@@ -117,7 +105,7 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
 	if (activeAccountName === accountName && accounts[0]) {
-		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 		dispatch(initAccount(accounts[0].name, networkName));
 	} else if (!accounts.length) {

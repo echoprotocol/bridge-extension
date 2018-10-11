@@ -16,6 +16,7 @@ const DEFAULT_FORM_FIELDS = {
 	[FORM_SIGN_UP]: Map({
 		accountName: {
 			error: null,
+			example: '',
 		},
 	}),
 	[FORM_SIGN_IN]: Map({
