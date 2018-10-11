@@ -7,7 +7,6 @@ import { connection } from '../actions/GlobalActions';
 
 import Header from '../components/Header';
 import Navbar from '../components/Navbar';
-import { FORM_SIGN_UP } from '../constants/FormConstants';
 
 class App extends React.Component {
 
@@ -16,21 +15,16 @@ class App extends React.Component {
 	}
 
 	renderChildren() {
-		const { children, loading } = this.props;
+		const { children, accountLoading } = this.props;
 		return (
 			<div className="temp-wrap">
 				<div className="app-wrap">
 					<Header />
 					<Navbar />
 					{children}
-
-					{/* Dimmer */}
 					{
-						(loading) && <Dimmer active inverted />
+						(accountLoading) && <Dimmer active inverted />
 					}
-
-
-					{/* Добавить класс loading на кнопку */}
 				</div>
 			</div>
 		);
@@ -44,18 +38,12 @@ class App extends React.Component {
 
 App.propTypes = {
 	children: PropTypes.element.isRequired,
-	loading: PropTypes.bool,
+	accountLoading: PropTypes.bool.isRequired,
 	connection: PropTypes.func.isRequired,
 };
-
-App.defaultProps = {
-	loading: false,
-};
-
 export default connect(
 	(state) => ({
-		globalLoading: state.global.get('globalLoading'),
-		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
+		accountLoading: state.global.get('accountLoading'),
 	}),
 	(dispatch) => ({
 		connection: () => dispatch(connection()),

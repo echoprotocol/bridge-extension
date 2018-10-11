@@ -1,10 +1,10 @@
 import React from 'react';
-import { Button } from 'semantic-ui-react';
+import { Button, Form } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
 import { createAccount } from '../../actions/AuthActions';
-import { setFormValue } from '../../actions/FormActions';
 
 import BridgeInput from '../../components/BridgeInput';
 
@@ -12,8 +12,20 @@ import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 class CreateAccount extends React.Component {
 
-	onCreate() {
-		this.props.createAccount({ accountName: this.props.accountName.value.trim() });
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			accountName: '',
+		};
+	}
+
+	async onCreate() {
+		const { saveWif } = this.props;
+
+		const result = await this.props.createAccount({ accountName: this.state.accountName.trim() });
+
+		saveWif(result);
 	}
 
 	onChange(e) {
@@ -22,25 +34,16 @@ class CreateAccount extends React.Component {
 		let { value } = e.target;
 		value = value.toLowerCase();
 
-		if (field) {
-			this.props.setFormValue(field, value);
-		}
+		this.setState({
+			[field]: value,
+		});
 	}
 
-	onClick(e) {
-		const { accountName } = this.props;
-
-		const field = e.target.name;
-
-		this.props.setFormValue(field, accountName);
-	}
-
-
-	renderLogin() {
-		const { accountName } = this.props;
+	render() {
+		const { accountName, accountLoading } = this.props;
 
 		return (
-			<React.Fragment>
+			<Form>
 				<div className="page-wrap">
 
 					<div className="page">
@@ -51,13 +54,14 @@ class CreateAccount extends React.Component {
 						<div className="one-input-wrap">
 							<BridgeInput
 								error={!!accountName.error}
+								autoFocus
 								name="accountName"
 								theme="input-light"
 								labelText="Account name"
 								errorText={accountName.error && accountName.error.errorText}
 								hintText={accountName.error && accountName.error.example}
 								descriptionText="Unique name will be used to make transaction"
-								value={accountName.value}
+								value={this.state.accountName}
 								onChange={(e) => this.onChange(e)}
 								onClick={(e) => this.onClick(e)}
 							/>
@@ -66,44 +70,35 @@ class CreateAccount extends React.Component {
 					<div className="page-action-wrap">
 						<div className="one-btn-wrap" >
 							<Button
-								className="btn-in-light"
+								className={classnames('btn-in-light', { loading: accountLoading })}
 								content={<span className="btn-text">Create</span>}
 								type="submit"
 								onClick={(e) => this.onCreate(e)}
-								disabled={this.props.loading}
+								disabled={accountLoading}
 							/>
 						</div>
 					</div>
 				</div>
-
-			</React.Fragment>
+			</Form>
 
 		);
-	}
-
-	render() {
-		return (
-			this.renderLogin()
-		);
-
 	}
 
 }
 
 CreateAccount.propTypes = {
-	loading: PropTypes.bool.isRequired,
 	accountName: PropTypes.object.isRequired,
+	accountLoading: PropTypes.bool.isRequired,
 	createAccount: PropTypes.func.isRequired,
-	setFormValue: PropTypes.func.isRequired,
+	saveWif: PropTypes.func.isRequired,
 };
 
 export default connect(
 	(state) => ({
-		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
+		accountLoading: state.global.get('accountLoading'),
 		accountName: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 	}),
 	(dispatch) => ({
-		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_UP, field, value)),
 		createAccount: (value) => dispatch(createAccount(value)),
 	}),
 )(CreateAccount);

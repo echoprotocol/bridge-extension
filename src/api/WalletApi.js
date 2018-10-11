@@ -77,6 +77,8 @@ export const validateImportAccountExist = async (
 
 export const createWallet = async (registrator, account) => {
 	const password = (`P${key.get_random_key().toWif()}`).substr(0, 45);
+	// TODO change crypto password
+	// const password = userCrypto.generateWIF();
 
 	const owner = generateKeyFromPassword(account, 'owner', password);
 	const active = generateKeyFromPassword(account, 'active', password);
@@ -103,10 +105,11 @@ export const createWallet = async (registrator, account) => {
 		throw response.errors.join();
 	}
 
+	// return password;
 	return active.privateKey.toWif();
 };
 
-export const importWallet = (account, password, roles = ['active', 'owner', 'memo']) => {
+export const importWallet = (account, password) => {
 
 	const privateKey = getKeyFromWif(password);
 	let passKey;
@@ -120,36 +123,13 @@ export const importWallet = (account, password, roles = ['active', 'owner', 'mem
 
 	if (!account) { return null; }
 
-	account = account.toJS();
+	if (!privateKey) {
+		passKey = generateKeyFromPassword(account.get('name'), 'active', password);
+	}
 
-	let passError = null;
+	if (account.getIn(['active', 'key_auths', '0', '0']) !== passKey.publicKey) {
+		return 'Invalid password';
+	}
 
-	roles.forEach((role) => {
-		if (!privateKey) {
-			passKey = generateKeyFromPassword(account.name, role, password);
-		}
-
-		switch (role) {
-			case 'memo':
-				if (account.options.memo_key !== passKey.publicKey) {
-					passError = 'Invalid password';
-				}
-				break;
-			case 'active':
-				if (account.active.key_auths[0][0] !== passKey.publicKey) {
-					passError = 'Invalid password';
-				}
-				break;
-			case 'owner':
-				if (account.owner.key_auths[0][0] !== passKey.publicKey) {
-					passError = 'Invalid password';
-				}
-				break;
-			default: break;
-		}
-
-		return null;
-	});
-
-	return passError;
+	return null;
 };

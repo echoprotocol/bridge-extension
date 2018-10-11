@@ -1,26 +1,13 @@
 import { createModule } from 'redux-modules';
 import { Map } from 'immutable';
-import _ from 'lodash';
 
 const DEFAULT_FIELDS = Map({
-	globalLoading: false,
-	accountLoading: false,
-	error: null,
-	activeUser: new Map({
-		id: '',
-		name: '',
-		icon: '',
-	}),
-	network: new Map({
-		name: '',
-		registrator: '',
-		url: '',
-	}),
-	cryptoError: null,
+	isCreate: false,
+	isWelcomeOpen: false,
 });
 
 export default createModule({
-	name: 'global',
+	name: 'welcome',
 	initialState: DEFAULT_FIELDS,
 	transformations: {
 		set: {
@@ -40,18 +27,11 @@ export default createModule({
 				return state;
 			},
 		},
-		setGlobalLoading: {
-			reducer: (state, { payload }) => {
-				state = state.set('globalLoading', payload.globalLoading);
 
-				return state;
-			},
-		},
-		logout: {
+		reset: {
 			reducer: (state) => {
-				const network = state.get('network');
-
-				return _.cloneDeep(DEFAULT_FIELDS).merge({ network });
+				state = DEFAULT_FIELDS;
+				return state;
 			},
 		},
 	},
