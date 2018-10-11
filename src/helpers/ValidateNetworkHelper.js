@@ -14,7 +14,7 @@ export default class ValidateAccountHelper {
 		}
 
 		if (!name.match(/^[a-zA-Z0-9._ ]+$/)) {
-			return 'Network name should have only latin letters, numbers, dots, underscores and spaces';
+			return 'Network should have only latin letters, numbers, dots, underscores and spaces';
 		}
 
 		return null;
@@ -26,7 +26,7 @@ export default class ValidateAccountHelper {
 		}
 
 		if (!(/ws:\/\/|wss:\/\//i).test(address)) {
-			return 'Network address should be start with \'ws://\' or \'wss://\'';
+			return 'It should be start with \'ws://\' or \'wss://\'';
 		}
 
 		return null;
@@ -38,7 +38,7 @@ export default class ValidateAccountHelper {
 		}
 
 		if (!(/http:\/\/|https:\/\//i).test(registrator)) {
-			return 'Network registrator should be start with \'http://\' or \'https://\'';
+			return 'It should be start with \'http://\' or \'https://\'';
 		}
 
 		return null;

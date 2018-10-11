@@ -29,10 +29,9 @@ export const createAccount = ({ accountName }) => async (dispatch, getState) => 
 	}
 
 	try {
-		const instance = getState().echojs.getIn(['system', 'instance']);
 		const network = getState().global.getIn(['network']).toJS();
 
-		accountNameError = await validateAccountExist(instance, accountName);
+		accountNameError = await validateAccountExist(accountName);
 
 		if (accountNameError.errorText) {
 			dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
@@ -77,10 +76,9 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 	}
 
 	try {
-		const instance = getState().echojs.getIn(['system', 'instance']);
 		const network = getState().global.getIn(['network']).toJS();
 
-		accountNameError = await validateImportAccountExist(instance, accountName, true);
+		accountNameError = await validateImportAccountExist(accountName, true);
 
 		if (!accountNameError) {
 			accountNameError = isAccountAdded(accountName, network.name);

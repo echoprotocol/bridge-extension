@@ -3,14 +3,14 @@ import { List } from 'immutable';
 import history from '../history';
 
 import { getPreviewBalances, initBalances } from './BalanceActions';
-import { setFormError, clearForm } from './FormActions';
+import { setFormError, toggleLoading, clearForm } from './FormActions';
 import { disconnect, connect } from './ChainStoreAction';
 
 import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { WIF_PATH, INDEX_PATH } from '../constants/RouterConstants';
+import { WIF_PATH, INDEX_PATH, SUCCESS_ADD_NETWORK_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
@@ -110,58 +110,66 @@ export const changeNetwork = (network) => async (dispatch, getState) => {
 	dispatch(connect());
 };
 
-export const addNetwork = () => (dispatch, getState) => {
-	const networks = getState().global.get('networks').toJS();
-	const {
-		address, name, registrator,
-	} = getState().form.get(FORM_ADD_NETWORK).toJS();
+export const addNetwork = () => async (dispatch, getState) => {
+	try {
+		dispatch(toggleLoading(FORM_ADD_NETWORK, true));
 
-	const network = {
-		url: address.value.trim(),
-		name: name.value.trim(),
-		registrator: registrator.value.trim(),
-	};
+		const networks = getState().global.get('networks').toJS();
+		const {
+			address, name, registrator,
+		} = getState().form.get(FORM_ADD_NETWORK).toJS();
 
-	let nameError = ValidateNetworkHelper.validateNetworkName(network.name);
+		const network = {
+			url: address.value.trim(),
+			name: name.value.trim(),
+			registrator: registrator.value.trim(),
+		};
 
-	if (NETWORKS.concat(networks).find((i) => i.name === network.name)) {
-		nameError = `Network "${network.name}" already exists`;
+		let nameError = ValidateNetworkHelper.validateNetworkName(network.name);
+
+		if (NETWORKS.concat(networks).find((i) => i.name === network.name)) {
+			nameError = `Network "${network.name}" already exists`;
+		}
+
+		if (nameError) {
+			dispatch(setFormError(FORM_ADD_NETWORK, 'name', nameError));
+		}
+
+		const addressError = ValidateNetworkHelper.validateNetworkAddress(network.url);
+
+		if (addressError) {
+			dispatch(setFormError(FORM_ADD_NETWORK, 'address', addressError));
+		}
+
+		const registratorError = ValidateNetworkHelper.validateNetworkRegistrator(network.registrator);
+
+		if (registratorError) {
+			dispatch(setFormError(FORM_ADD_NETWORK, 'registrator', registratorError));
+		}
+
+		if (nameError || addressError || registratorError) { return; }
+
+		let customNetworks = localStorage.getItem('custom_networks');
+		customNetworks = customNetworks ? JSON.parse(customNetworks) : [];
+		customNetworks.push(network);
+
+		localStorage.setItem('custom_networks', JSON.stringify(customNetworks));
+
+		networks.push(network);
+
+		dispatch(GlobalReducer.actions.set({
+			field: 'networks',
+			value: new List(networks),
+		}));
+
+		dispatch(clearForm(FORM_ADD_NETWORK));
+		await dispatch(changeNetwork(network));
+		history.push(SUCCESS_ADD_NETWORK_PATH);
+	} catch (e) {
+		return;
+	} finally {
+		dispatch(toggleLoading(FORM_ADD_NETWORK, 'loading', false));
 	}
-
-	if (nameError) {
-		dispatch(setFormError(FORM_ADD_NETWORK, 'name', nameError));
-	}
-
-	const addressError = ValidateNetworkHelper.validateNetworkAddress(network.url);
-
-	if (addressError) {
-		dispatch(setFormError(FORM_ADD_NETWORK, 'address', addressError));
-	}
-
-	const registratorError = ValidateNetworkHelper.validateNetworkRegistrator(network.registrator);
-
-	if (registratorError) {
-		dispatch(setFormError(FORM_ADD_NETWORK, 'registrator', registratorError));
-	}
-
-	if (nameError || addressError || registratorError) { return; }
-
-	let customNetworks = localStorage.getItem('custom_networks');
-	customNetworks = customNetworks ? JSON.parse(customNetworks) : [];
-	customNetworks.push(network);
-
-	localStorage.setItem('custom_networks', JSON.stringify(customNetworks));
-
-	networks.push(network);
-
-	dispatch(GlobalReducer.actions.set({
-		field: 'networks',
-		value: new List(networks),
-	}));
-
-	dispatch(clearForm(FORM_ADD_NETWORK));
-
-	// history.push();
 };
 
 export const deleteNetwork = (network) => (dispatch, getState) => {

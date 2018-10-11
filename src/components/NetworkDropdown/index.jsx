@@ -2,11 +2,14 @@ import React from 'react';
 import { connect } from 'react-redux';
 import { Dropdown, Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router';
 import classnames from 'classnames';
+import { Link } from 'react-router-dom';
 
 import { changeNetwork, deleteNetwork } from '../../actions/GlobalActions';
 
 import { NETWORKS } from '../../constants/GlobalConstants';
+import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
 
 import NetworkInfo from './NetworkInfo';
 import UserIcon from '../UserIcon';
@@ -22,33 +25,32 @@ class NetworkDropdown extends React.PureComponent {
 		};
 	}
 
-	// onDropdownChange(e, value) {
-	// 	if ((e.type !== 'click' && e.keyCode !== 13) || e.target.id === 'btn-dlt') {
-	// 		return;
-	// 	}
-	//
-	// 	if (value === 'custom') {
-	// 		// this.props.history.push(NETWORKS_PATH);
-	// 	} else {
-	// 		this.onChangeNetwork(value);
-	// 	}
-	// }
+	onDropdownChange(_, value) {
+		switch (value) {
+			case 'current_net':
+				break;
 
-	onDeleteNetwork(network, e) {
-		e.preventDefault();
+			case 'add-net':
+				this.props.history.push(ADD_NETWORK_PATH);
+				break;
 
+			default:
+				this.onChangeNetwork(value);
+		}
+	}
+
+	onDeleteNetwork(e, name) {
+		e.stopPropagation();
+		const { networks } = this.props;
+
+		const network = NETWORKS.concat(networks).find((i) => i.name === name);
 		this.props.deleteNetwork(network);
 	}
 
 	onChangeNetwork(name) {
-		const { networks, network: oldNetwork } = this.props;
-
-		if (name === oldNetwork.name || name === 'custom') {
-			return;
-		}
+		const { networks } = this.props;
 
 		const network = NETWORKS.concat(networks).find((i) => i.name === name);
-
 		this.props.changeNetwork(network);
 	}
 
@@ -60,27 +62,15 @@ class NetworkDropdown extends React.PureComponent {
 		this.setState({ opened: false });
 	}
 
-	onDropdownChange(e, value) {
-		console.log(e, value);
-
-	}
-
 	onToggleHoverClose() {
 		this.setState({ hover: !this.state.hover });
-	}
-
-	netInfoAir(options) {
-		if (options.length === 6) {
-			return ((options.length - 2) * 37) + 115;
-		}
-		return ((options.length - 2) * 37) + 110;
 	}
 
 	getList() {
 		const { name } = this.props.network;
 
 		const options = NETWORKS.map((n) => ({
-			value: n.name,
+			value: n.name === name ? 'current_net' : n.name,
 			key: n.name,
 			as: 'section',
 			className: classnames('network-item', { active: n.name === name }),
@@ -104,8 +94,8 @@ class NetworkDropdown extends React.PureComponent {
 			),
 		}));
 
-		options.concat(this.props.networks.map((n) => ({
-			value: n.name,
+		options.push(...this.props.networks.map((n) => ({
+			value: n.name === name ? 'current_net' : n.name,
 			key: n.name,
 			className: classnames('network-item', { active: n.name === name }),
 			content: (
@@ -113,7 +103,7 @@ class NetworkDropdown extends React.PureComponent {
 					<div className="network-item-bg" />
 					<div className="network-item-wrap">
 						<div className="network-content">
-							<Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(n.name, e)} />
+							<Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(e, n.name)} />
 							<div className="network-title">
 								{n.name}
 							</div>
@@ -126,14 +116,20 @@ class NetworkDropdown extends React.PureComponent {
 			),
 		})));
 
+		// options.push({
+		// 	value: 'add-net',
+		// 	key: 'add-net',
+		// 	as: 'span',
+		// 	className: 'add-network',
+		// 	content: <Link to={ADD_NETWORK_PATH}>+ Add Network</Link>,
+		// });
 		options.push({
 			value: 'add-net',
 			key: 'add-net',
-			className: 'add-network',
 			as: 'button',
+			className: 'add-network',
 			content: '+ Add Network',
 		});
-
 		options.push({
 			value: 'fake-element',
 			key: 'fake-element',
@@ -146,11 +142,18 @@ class NetworkDropdown extends React.PureComponent {
 				</React.Fragment>
 			),
 		});
+
 		return options;
 	}
 
-	render() {
+	netInfoAir(options) {
+		return ((options.length - 2) * 37) + (options.length === 6 ? 115 : 110);
+	}
 
+	render() {
+		const { network } = this.props;
+		const options = this.getList();
+		const netInfoAir = this.netInfoAir(options);
 		return (
 			<React.Fragment>
 				<Dropdown
@@ -165,18 +168,18 @@ class NetworkDropdown extends React.PureComponent {
 							onMouseLeave={() => this.onToggleHoverClose()}
 						>
 							<div className={classnames('current-network', { connected: true })}>
-								<span className="cut">{this.state.height}Main Network</span>
+								<span className="cut">{this.state.height}{network.name}</span>
 							</div>
 							<i aria-hidden="true" className="dropdown icon" />
 						</div>
 					}
 					onChange={(e, { value }) => this.onDropdownChange(e, value)}
-					options={this.getList()}
+					options={options}
 					selectOnBlur={false}
 					icon={false}
 				/>
 
-				{ !this.state.opened ? <NetworkInfo /> : <NetworkInfo />}
+				{ !this.state.opened ? <NetworkInfo /> : <NetworkInfo netAir={netInfoAir} />}
 
 			</React.Fragment>
 
@@ -186,28 +189,21 @@ class NetworkDropdown extends React.PureComponent {
 }
 
 NetworkDropdown.propTypes = {
-	// loading: PropTypes.bool,
 	network: PropTypes.object.isRequired,
 	networks: PropTypes.array.isRequired,
 	changeNetwork: PropTypes.func.isRequired,
 	deleteNetwork: PropTypes.func.isRequired,
-	// disconnected: PropTypes.bool,
+	history: PropTypes.object.isRequired,
 };
 
-NetworkDropdown.defaultProps = {
-	// disconnected: false,
-	// loading: false,
-};
-
-export default connect(
+export default withRouter(connect(
 	(state) => ({
 		network: state.global.get('network').toJS(),
 		networks: state.global.get('networks').toJS(),
-		// loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
 	}),
 	(dispatch) => ({
 		changeNetwork: (network) => dispatch(changeNetwork(network)),
 		deleteNetwork: (network) => dispatch(deleteNetwork(network)),
 	}),
-)(NetworkDropdown);
+)(NetworkDropdown));
 

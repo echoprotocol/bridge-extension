@@ -1,4 +1,4 @@
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import { ChainStore } from 'echojs-lib';
 
 import history from '../history';
@@ -35,6 +35,10 @@ export const connect = () => async (dispatch) => {
 
 	dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
 
+	let networks = localStorage.getItem('custom_networks');
+	networks = networks ? JSON.parse(networks) : [];
+
+	dispatch(GlobalReducer.actions.set({ field: 'networks', value: new List(networks) }));
 
 	const subscribeCb = () => dispatch(subscribe());
 	try {
@@ -43,9 +47,9 @@ export const connect = () => async (dispatch) => {
 
 		accounts = accounts ? JSON.parse(accounts) : [];
 		const value = await fetchChain('2.1.0');
-		console.log(value.toJS())
+
 		if (!accounts.length) {
-			history.push(IMPORT_ACCOUNT_PATH);
+			// history.push(IMPORT_ACCOUNT_PATH);
 			return;
 		}
 
@@ -53,7 +57,6 @@ export const connect = () => async (dispatch) => {
 
 		await dispatch(initAccount(active.name, network.name));
 	} catch (err) {
-	    // console.log(err);
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {
 		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));

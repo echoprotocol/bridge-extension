@@ -10,14 +10,13 @@ const getTypeByKey = (key) => {
 		} else if (key.search('1.3') === 0) {
 			return 'getAsset';
 		}
-		return 'fetchObject';
+		return 'getObject';
 	} else if (ChainValidation.is_account_name(key)) {
 		return 'getAccount';
-	} else {
-		const keyNumber = Number(key);
-		if (!Number.isSafeInteger(keyNumber) || keyNumber < 1) throw new Error('Key should be id or account name or block number.');
-		return 'getBlock';
 	}
+	const keyNumber = Number(key);
+	if (!Number.isSafeInteger(keyNumber) || keyNumber < 1) throw new Error('Key should be id or account name or block number.');
+	return 'getBlock';
 };
 
 export const connectToAddress = async (address, subscribeCb) => {
@@ -67,4 +66,12 @@ export const fetchChain = async (key) => {
 	} catch (e) {
 		throw e;
 	}
+};
+
+export const lookupAccounts = async (accountName, limit) => {
+	const instance = Apis.instance();
+
+	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);
+
+	return result;
 };
