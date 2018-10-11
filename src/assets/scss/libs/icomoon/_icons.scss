@@ -243,7 +243,9 @@
         color: rgb(0, 0, 0);
     }
 }
-
+.icon-pagePin {
+    text-align: center;
+}
 .icon-pagePin .path1 {
     &:before {
         content: $icon-pagePin-path1;  

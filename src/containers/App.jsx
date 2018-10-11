@@ -1,6 +1,7 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import { Dimmer } from 'semantic-ui-react';
 
 import { connection } from '../actions/GlobalActions';
@@ -19,7 +20,7 @@ class App extends React.Component {
 		const { children, loading } = this.props;
 		return (
 			<div className="temp-wrap">
-				<div className="app-wrap">
+				<div className={classnames('app-wrap', 'dark')} >
 					<Header />
 					<Navbar />
 					{children}

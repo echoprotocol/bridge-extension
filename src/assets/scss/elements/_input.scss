@@ -118,6 +118,7 @@
 
     }
     &-dark {
+
         .input {
 
             &.error {
@@ -179,7 +180,14 @@
             }
  
 
-        } 
+        }
+        .message {
+            &-description {
+                color: rgba(#fff, .2);
+                max-width: 280px;
+            }
+
+        }
     }
 
     .label {
@@ -189,7 +197,6 @@
         top: 0;
         line-height: 47px;
         font-size: 17px;
-        will-change: transform;
         transition: line-height $speed, font-size $speed, color $speed;
         font-family: FNMedium;
     }
@@ -260,7 +267,7 @@
         font-size: 14px;
         color: #9ca1a5;
         margin: 11px auto 0;
-        letter-spacing: 1.32px;
+        letter-spacing: 1px;
         line-height: 21px;
         max-width: 238px;
         padding-left: 3px;

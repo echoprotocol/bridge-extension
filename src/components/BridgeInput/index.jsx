@@ -38,7 +38,6 @@ class BridgeInput extends React.Component {
 				{
 					this.props.hintText.length > 0 ?
 						<div className="message-hint">
-                            You can try
 							<span
 								role="button"
 								tabIndex="0"
