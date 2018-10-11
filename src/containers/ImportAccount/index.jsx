@@ -77,6 +77,7 @@ class ImportAccount extends React.Component {
 								type="password"
 								errorText={password.error}
 								theme="input-light"
+								privacyEye
 								labelText="WIF key / password"
 								value={password.value}
 								onChange={(e) => this.onChange(e)}

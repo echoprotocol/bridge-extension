@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Input } from 'semantic-ui-react';
+import { Input, Button } from 'semantic-ui-react';
 import classnames from 'classnames';
 
 class BridgeInput extends React.Component {
@@ -11,6 +11,7 @@ class BridgeInput extends React.Component {
 		this.state = {
 			up: false,
 			filled: false,
+			showPas: false,
 		};
 	}
 
@@ -25,6 +26,9 @@ class BridgeInput extends React.Component {
 
 	onBlur() {
 		this.setState({ up: false });
+	}
+	onTogglePrivacy() {
+		this.setState({ showPas: !this.state.showPas });
 	}
 
 	renderError() {
@@ -54,6 +58,20 @@ class BridgeInput extends React.Component {
 
 	}
 
+	renderPrivacyEye() {
+		return (
+			<Button
+				className={
+					classnames(
+						'icon-eye',
+						{ 'icon-eyeEnable': this.state.showPas },
+						{ 'icon-eyeDisabled': !this.state.showPas },
+					)
+				}
+				onClick={() => this.onTogglePrivacy()}
+			/>
+		);
+	}
 	render() {
 		return (
 
@@ -64,21 +82,24 @@ class BridgeInput extends React.Component {
 					type={this.props.type}
 					error={this.props.error}
 					onFocus={() => this.onFocus()}
-
+					ref={this.handleRef}
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
 					disabled={this.props.disabled}
 					autoFocus={this.props.autoFocus}
-
+					icon={this.props.privacyEye ? this.renderPrivacyEye() : false}
 					className={classnames(
 						{ up: this.state.up },
 						{ focused: this.state.focus },
 						{ filled: this.state.filled },
+						{ eye: this.props.privacyEye },
 						this.props.position,
 					)}
 				/>
+
 				{ this.props.error ? this.renderError() : null }
 				{ this.props.descriptionText ? <div className="message-description">{ this.props.descriptionText }</div> : null }
+
 			</div>
 
 		);
@@ -100,6 +121,7 @@ BridgeInput.propTypes = {
 	descriptionText: PropTypes.string,
 	onChange: PropTypes.func,
 	onClick: PropTypes.func,
+	privacyEye: PropTypes.bool,
 };
 
 BridgeInput.defaultProps = {
@@ -116,6 +138,7 @@ BridgeInput.defaultProps = {
 	descriptionText: '',
 	onChange: null,
 	onClick: null,
+	privacyEye: false,
 };
 
 export default BridgeInput;
