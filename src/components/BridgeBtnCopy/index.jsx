@@ -28,7 +28,7 @@ class BridgeBtnCopy extends React.Component {
 					content={
 						<React.Fragment>
 							<div className={classnames('btn-copy', { compact: this.props.compact })} >
-								<i className="icon-copy" />
+								<i className="icon-copiedBtn" />
 								<span className="btn-text">{this.state.copied ? 'Copied to clipboard' : 'Copy to clipboard'}</span>
 							</div>
 						</React.Fragment>
