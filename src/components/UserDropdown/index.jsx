@@ -66,20 +66,7 @@ class UserDropdown extends React.PureComponent {
 		const { activeUser } = this.props;
 
 		const optionsEnd = [
-			{
-				value: 'fake-element',
-				key: 'fake-element',
-				disabled: true,
-				content:
-	<React.Fragment>
-		<div className="user-body" />
-		<div className="user-footer-area" />
-		<div className="create-sub">Add account:</div>
-		<div className="import-sub">or</div>
 
-		<div className="user-footer" />
-	</React.Fragment>,
-			},
 			{
 				value: 'create',
 				key: 'create-account',
@@ -100,6 +87,16 @@ class UserDropdown extends React.PureComponent {
 						</Link>
 					</React.Fragment>
 				),
+			},
+			{
+				value: 'fake-element',
+				key: 'fake-element',
+				disabled: true,
+				content:
+	<React.Fragment>
+		<div className="user-body" />
+		<div className="user-footer" />
+	</React.Fragment>,
 			},
 		];
 
