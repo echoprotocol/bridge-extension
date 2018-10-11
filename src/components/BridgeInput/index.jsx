@@ -1,6 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { Input } from 'semantic-ui-react';
+import { Input, Button } from 'semantic-ui-react';
 import classnames from 'classnames';
 
 class BridgeInput extends React.Component {
@@ -11,6 +11,7 @@ class BridgeInput extends React.Component {
 		this.state = {
 			up: false,
 			filled: false,
+			showPas: false,
 		};
 	}
 
@@ -25,6 +26,10 @@ class BridgeInput extends React.Component {
 
 	onBlur() {
 		this.setState({ up: false });
+	}
+
+	onTogglePrivacy() {
+		this.setState({ showPas: !this.state.showPas });
 	}
 
 	renderError() {
@@ -54,31 +59,58 @@ class BridgeInput extends React.Component {
 
 	}
 
+	renderPrivacyEye() {
+		return (
+			<Button
+				className={
+					classnames(
+						'icon-eye',
+						{ 'icon-eyeEnable': this.state.showPas },
+						{ 'icon-eyeDisabled': !this.state.showPas },
+					)
+				}
+				onClick={() => this.onTogglePrivacy()}
+			/>
+		);
+	}
 	render() {
+		const {
+			name, labelText, type, error, disabled, theme, value,
+			autoFocus, privacyEye, position, descriptionText,
+		} = this.props;
+
+		const {
+			up, focus, filled, showPas,
+		} = this.state;
+
 		return (
 
-			<div className={classnames('input-wrap', this.props.theme)} >
+			<div className={classnames('input-wrap', theme)} >
 				<Input
-					name={this.props.name}
-					label={this.props.labelText}
-					type={this.props.type}
-					error={this.props.error}
+					value={value}
+					name={name}
+					label={labelText}
+					type={privacyEye && showPas ? 'text' : type}
+					error={error}
+					disabled={disabled}
+					autoFocus={autoFocus}
+					icon={privacyEye ? this.renderPrivacyEye() : false}
+					className={classnames(
+						{ up },
+						{ focused: focus },
+						{ filled },
+						{ eye: privacyEye },
+						position,
+					)}
+					ref={this.handleRef}
 					onFocus={() => this.onFocus()}
-
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
-					disabled={this.props.disabled}
-					autoFocus={this.props.autoFocus}
-
-					className={classnames(
-						{ up: this.state.up },
-						{ focused: this.state.focus },
-						{ filled: this.state.filled },
-						this.props.position,
-					)}
 				/>
-				{ this.props.error ? this.renderError() : null }
-				{ this.props.descriptionText ? <div className="message-description">{ this.props.descriptionText }</div> : null }
+
+				{ error ? this.renderError() : null }
+				{ descriptionText ? <div className="message-description">{ descriptionText }</div> : null }
+
 			</div>
 
 		);
@@ -87,6 +119,7 @@ class BridgeInput extends React.Component {
 }
 
 BridgeInput.propTypes = {
+	value: PropTypes.string,
 	name: PropTypes.string,
 	theme: PropTypes.string,
 	error: PropTypes.bool,
@@ -100,9 +133,11 @@ BridgeInput.propTypes = {
 	descriptionText: PropTypes.string,
 	onChange: PropTypes.func,
 	onClick: PropTypes.func,
+	privacyEye: PropTypes.bool,
 };
 
 BridgeInput.defaultProps = {
+	value: '',
 	name: '',
 	theme: 'light',
 	error: false,
@@ -116,6 +151,7 @@ BridgeInput.defaultProps = {
 	descriptionText: '',
 	onChange: null,
 	onClick: null,
+	privacyEye: false,
 };
 
 export default BridgeInput;

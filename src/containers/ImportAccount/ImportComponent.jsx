@@ -36,6 +36,7 @@ class ImportComponent extends React.Component {
 								onChange={(e) => this.onChange(e, true)}
 							/>
 							<BridgeInput
+								privacyEye
 								error={!!passwordError}
 								name="password"
 								type="password"
