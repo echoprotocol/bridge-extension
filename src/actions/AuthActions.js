@@ -16,7 +16,10 @@ import {
 } from '../api/WalletApi';
 
 export const createAccount = ({ accountName }) => async (dispatch, getState) => {
+
 	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
+
+	dispatch(toggleLoading(FORM_SIGN_UP, true));
 
 	if (accountNameError) {
 		dispatch(setFormError(FORM_SIGN_UP, 'accountName', { example: '', errorText: accountNameError }));
