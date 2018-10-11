@@ -18,7 +18,7 @@ export default class Routes extends React.Component {
 			<App>
 				<div>
 
-					<Route exact path={INDEX_PATH} component={Wallet} />
+					<Route exact path={INDEX_PATH} component={CreateAccount} />
 					<Route exact path={WIF_PATH} component={WifComponent} />
 					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
 					<Route exact path={WALLET_PATH} component={Wallet} />

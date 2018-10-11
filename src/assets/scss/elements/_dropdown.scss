@@ -414,6 +414,8 @@
                     font-size: 14px;
                     margin: auto 0;
                     transition: color $speed;
+                    max-width: 210px;
+                    @include cutTxt();
                 }
                 &-info {
                     right: 0;
