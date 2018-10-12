@@ -27,7 +27,7 @@ export const validateAccountExist = async (
 	if (requestsCount === 10) {
 		return {
 			example: '',
-			errorText: 'Account with such name already exists.',
+			error: 'Account with such name already exists.',
 		};
 	}
 
@@ -43,13 +43,13 @@ export const validateAccountExist = async (
 			accountName += 1;
 		}
 
-		const { example, errorText } = await validateAccountExist(
+		const { example, error } = await validateAccountExist(
 			instance,
 			accountName,
 			requestsCount += 1,
 		);
 
-		return { example, errorText };
+		return { example, error };
 	}
 
 	if (requestsCount === 0) {
@@ -58,7 +58,7 @@ export const validateAccountExist = async (
 
 	return {
 		example: accountName,
-		errorText: accountName && 'Account with such name already exists.',
+		error: accountName && 'Account with such name already exists.',
 	};
 };
 
@@ -123,13 +123,11 @@ export const importWallet = (account, password) => {
 
 	if (!account) { return null; }
 
-	account = account.toJS();
-
 	if (!privateKey) {
-		passKey = generateKeyFromPassword(account.name, 'active', password);
+		passKey = generateKeyFromPassword(account.get('name'), 'active', password);
 	}
 
-	if (account.active.key_auths[0][0] !== passKey.publicKey) {
+	if (account.getIn(['active', 'key_auths', '0', '0']) !== passKey.publicKey) {
 		return 'Invalid password';
 	}
 

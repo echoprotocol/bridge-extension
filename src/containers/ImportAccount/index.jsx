@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 import { importAccount } from '../../actions/AuthActions';
-import { clearForm, setFormValue, toggleLoading } from '../../actions/FormActions';
+import { clearForm, setFormValue } from '../../actions/FormActions';
 
 import { FORM_SIGN_IN } from '../../constants/FormConstants';
 
@@ -18,8 +18,6 @@ class ImportAccount extends React.Component {
 	}
 
 	onImport() {
-		this.props.toggleLoading(true);
-
 		const { accountName, password } = this.props;
 
 		this.props.importAccount({
@@ -42,11 +40,11 @@ class ImportAccount extends React.Component {
 	}
 
 	isDisabledSubmit() {
-		const { accountName, password, loading } = this.props;
+		const { accountName, password, accountLoading } = this.props;
 
 		if ((!accountName.value || accountName.error)
 			|| (!password.value || password.error)
-			|| loading) {
+			|| accountLoading) {
 			return true;
 		}
 
@@ -54,7 +52,7 @@ class ImportAccount extends React.Component {
 	}
 
 	render() {
-		const { accountName, password, loading } = this.props;
+		const { accountName, password, accountLoading } = this.props;
 
 		return (
 			<Form>
@@ -65,7 +63,7 @@ class ImportAccount extends React.Component {
 						<div className="two-input-wrap">
 							<BridgeInput
 								error={!!accountName.error}
-								disabled={loading}
+								autoFocus
 								name="accountName"
 								theme="input-light"
 								labelText="Account name"
@@ -75,7 +73,6 @@ class ImportAccount extends React.Component {
 							/>
 							<BridgeInput
 								error={!!password.error}
-								disabled={loading}
 								name="password"
 								type="password"
 								errorText={password.error}
@@ -90,7 +87,7 @@ class ImportAccount extends React.Component {
 						<div className="one-btn-wrap" >
 							<Button
 								disabled={this.isDisabledSubmit()}
-								className={classnames('btn-in-dark', { disabled: this.isDisabledSubmit() })}
+								className={classnames('btn-in-dark', { disabled: this.isDisabledSubmit() }, { loading: accountLoading })}
 								content={<span className="btn-text">Import</span>}
 								type="submit"
 								onClick={(e) => this.onImport(e)}
@@ -105,29 +102,23 @@ class ImportAccount extends React.Component {
 }
 
 ImportAccount.propTypes = {
-	loading: PropTypes.bool,
+	accountLoading: PropTypes.bool.isRequired,
 	accountName: PropTypes.object.isRequired,
 	password: PropTypes.object.isRequired,
 	importAccount: PropTypes.func.isRequired,
 	setFormValue: PropTypes.func.isRequired,
-	toggleLoading: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
-};
-
-ImportAccount.defaultProps = {
-	loading: false,
 };
 
 export default connect(
 	(state) => ({
 		accountName: state.form.getIn([FORM_SIGN_IN, 'accountName']),
 		password: state.form.getIn([FORM_SIGN_IN, 'password']),
-		loading: state.form.getIn([FORM_SIGN_IN, 'loading']),
+		accountLoading: state.global.get('loading'),
 	}),
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_IN, field, value)),
 		importAccount: (value) => dispatch(importAccount(value)),
-		toggleLoading: (value) => dispatch(toggleLoading(FORM_SIGN_IN, value)),
 		clearForm: () => dispatch(clearForm(FORM_SIGN_IN)),
 	}),
 )(ImportAccount);

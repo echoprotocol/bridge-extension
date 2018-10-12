@@ -2,7 +2,7 @@ import { EchoJSActions } from 'echojs-redux';
 
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 
-import { setFormError, toggleLoading, setValue } from './FormActions';
+import { setFormError, setValue } from './FormActions';
 import { addAccount, isAccountAdded, userCrypto } from './GlobalActions';
 
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
@@ -16,93 +16,118 @@ import {
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-export const createAccount = ({ accountName }) => async (dispatch, getState) => {
+/**
+ *  @method createAccount
+ *
+ * 	Create account through account name
+ *
+ * 	@param {String} name
+ *
+ * 	@return {String} wif
+ */
+export const createAccount = (name) => async (dispatch, getState) => {
+	let error = null;
+	let example = '';
 
-	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
+	dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
 
-	dispatch(toggleLoading(FORM_SIGN_UP, true));
+	error = ValidateAccountHelper.validateAccountName(name);
 
-	if (accountNameError) {
-		dispatch(setFormError(FORM_SIGN_UP, 'accountName', { example: '', errorText: accountNameError }));
-		dispatch(toggleLoading(FORM_SIGN_UP, false));
-		return;
+	if (error) {
+		dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
+		return null;
 	}
 
 	try {
 		const instance = getState().echojs.getIn(['system', 'instance']);
-		const network = getState().global.getIn(['network']).toJS();
+		const registrator = getState().global.getIn(['network', 'registrator']);
+		const networkName = getState().global.getIn(['network', 'name']);
 
-		accountNameError = await validateAccountExist(instance, accountName);
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
-		if (accountNameError.errorText) {
-			dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
-			return;
+		({ error, example } = await validateAccountExist(instance, name));
+
+		if (error) {
+			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
+			return null;
 		}
 
-		if (userCrypto.isLocked()) {
-			dispatch(GlobalReducer.actions.set({ field: 'cryptoError', value: 'Account locked' }));
-			return;
-		}
+		// if (userCrypto.isLocked()) {
+		// 	dispatch(GlobalReducer.actions.set({ field: 'cryptoError', value: 'Account locked' }));
+		// 	return null;
+		// }
 
-		const wif = await createWallet(network.registrator, accountNameError.example || accountName);
+		const wif = await createWallet(registrator, name);
 
-		userCrypto.importByWIF(wif);
+		// userCrypto.importByWIF(wif);
 
-		dispatch(setValue(FORM_SIGN_UP, 'wif', wif));
+		dispatch(addAccount(name, networkName));
 
-		dispatch(addAccount(accountName, network.name));
+		return wif;
 
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_UP, 'error', err));
+
+		return null;
+
 	} finally {
-		dispatch(toggleLoading(FORM_SIGN_UP, false));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 
 };
 
+/**
+ * Import account from desktop app or sign in
+ * @param {accountName, password}
+ * @returns {Function}
+ */
 export const importAccount = ({ accountName, password }) => async (dispatch, getState) => {
 	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
 	let passwordError = ValidateAccountHelper.validatePassword(password);
 
 	if (accountNameError) {
 		dispatch(setFormError(FORM_SIGN_IN, 'accountName', accountNameError));
-		dispatch(toggleLoading(FORM_SIGN_IN, false));
-		return;
+		return false;
 	}
 
 	if (passwordError) {
 		dispatch(setFormError(FORM_SIGN_IN, 'password', passwordError));
-		dispatch(toggleLoading(FORM_SIGN_IN, false));
-		return;
+		return false;
 	}
 
 	try {
 		const instance = getState().echojs.getIn(['system', 'instance']);
-		const network = getState().global.getIn(['network']).toJS();
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 		accountNameError = await validateImportAccountExist(instance, accountName, true);
 
 		if (!accountNameError) {
-			accountNameError = isAccountAdded(accountName, network.name);
+			accountNameError = isAccountAdded(accountName, networkName);
 		}
 
 		if (accountNameError) {
 			dispatch(setFormError(FORM_SIGN_IN, 'accountName', accountNameError));
-			return;
+			return false;
 		}
 
 		const account = await dispatch(EchoJSActions.fetch(accountName));
 
 		if (userCrypto.isLocked()) {
 			dispatch(GlobalReducer.actions.set({ field: 'cryptoError', value: 'Account locked' }));
-			return;
+			return false;
 		}
 
-		passwordError = importWallet(account, password);
+		if (userCrypto.isWIF(password)) {
+			passwordError = importWallet(password);
+		} else {
+			passwordError = importWallet(account, password);
+		}
 
 		if (passwordError) {
 			dispatch(setFormError(FORM_SIGN_IN, 'password', passwordError));
-			return;
+			return false;
 		}
 
 		if (userCrypto.isWIF(password)) {
@@ -110,12 +135,13 @@ export const importAccount = ({ accountName, password }) => async (dispatch, get
 		}
 		userCrypto.importByPassword(accountName, password);
 
-		dispatch(addAccount(accountName, network.name));
+		dispatch(addAccount(accountName, networkName));
 
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_IN, 'error', err));
 	} finally {
-		dispatch(toggleLoading(FORM_SIGN_IN, false));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 
+	return true;
 };

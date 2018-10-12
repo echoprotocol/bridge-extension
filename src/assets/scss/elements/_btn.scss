@@ -5,6 +5,7 @@
 // SIZE: compact
 // STATE: error, disabled
 
+
 %btn {
     @include noSelection();
     font-family: FNBold;
@@ -22,11 +23,11 @@
     padding: 0;
 
     &.disabled {
-          pointer-events: none;
-          border: 2px solid $colorDisabled;
-          background-color: transparent;
-          color: #b6b9be;
-          transition: none;
+        pointer-events: none;
+        border: 2px solid $colorDisabled;
+        background-color: transparent;
+        color: #b6b9be;
+        transition: none;
     }
 
     &.loading {
