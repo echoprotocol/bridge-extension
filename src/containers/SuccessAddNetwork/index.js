@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 
 import { withRouter } from 'react-router';
 
-import { SUCCESS_ADD_NETWORK_PATH } from '../../constants/RouterConstants';
+import { IMPORT_ACCOUNT_PATH } from '../../constants/RouterConstants';
 
 class SuccessAddNetwork extends React.Component {
 
@@ -24,7 +24,7 @@ class SuccessAddNetwork extends React.Component {
 						compact
 						className="btn-transparent"
 						content={<span className="btn-text">ADD ACCOUNT</span>}
-						onClick={() => this.props.history.push(SUCCESS_ADD_NETWORK_PATH)}
+						onClick={() => this.props.history.push(IMPORT_ACCOUNT_PATH)}
 					/>
 				</div>
 			</div>
