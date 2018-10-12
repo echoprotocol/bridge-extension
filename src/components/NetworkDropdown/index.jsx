@@ -4,7 +4,6 @@ import { Dropdown, Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 import classnames from 'classnames';
-import { Link } from 'react-router-dom';
 
 import { changeNetwork, deleteNetwork } from '../../actions/GlobalActions';
 

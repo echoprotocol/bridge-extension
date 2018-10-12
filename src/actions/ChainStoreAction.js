@@ -12,7 +12,7 @@ import { NETWORKS } from '../constants/GlobalConstants';
 import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
 
 /**
- * connect socket to address
+ * copy object from ChainStore lib to redux every time when triggered
  * @returns {Function}
  */
 export const subscribe = () => (dispatch) => {
@@ -52,10 +52,6 @@ export const connect = () => async (dispatch) => {
 
 		accounts = accounts ? JSON.parse(accounts) : [];
 		await fetchChain('2.1.0');
-		await fetchChain('1.3.0');
-		await fetchChain('1.3.1');
-		await fetchChain('1.2.34');
-		await fetchChain('1.2.35');
 
 		if (!accounts.length) return;
 		const active = accounts.find((i) => i.active) || accounts[0];

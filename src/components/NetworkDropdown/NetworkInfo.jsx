@@ -9,12 +9,12 @@ class NetworkInfo extends React.PureComponent {
 			top: this.props.netAir,
 		};
 
-		const { network, block } = this.props;
+		const { network, headBlock } = this.props;
 		return (
 			<ul className="network-info" style={networkStyle}>
 				<li>
 					<div>Block</div>
-					<div>{block}</div>
+					<div>{headBlock}</div>
 				</li>
 				<li>
 					<div>Faucet</div>
@@ -33,15 +33,16 @@ class NetworkInfo extends React.PureComponent {
 
 NetworkInfo.propTypes = {
 	network: PropTypes.object.isRequired,
-	block: PropTypes.any,
 	netAir: PropTypes.number,
+	headBlock: PropTypes.any,
 };
 NetworkInfo.defaultProps = {
-	block: 100000000,
+	headBlock: 0,
 	netAir: 40,
 };
 
 export default connect((state) => ({
 	network: state.global.get('network').toJS(),
+	headBlock: state.blockchain.getIn(['objectsById', '2.1.0', 'head_block_number']),
 }))(NetworkInfo);
 

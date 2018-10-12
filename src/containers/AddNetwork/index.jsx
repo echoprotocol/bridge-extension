@@ -4,7 +4,6 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withRouter } from 'react-router';
-import { Link } from 'react-router-dom';
 
 import { clearForm, setFormValue } from '../../actions/FormActions';
 import { addNetwork } from '../../actions/GlobalActions';

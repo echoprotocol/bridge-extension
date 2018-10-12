@@ -2,7 +2,10 @@ import React from 'react';
 import { Route } from 'react-router';
 
 import {
-	IMPORT_ACCOUNT_PATH, INDEX_PATH, WIF_PATH, ADD_NETWORK_PATH, SUCCESS_ADD_NETWORK_PATH,
+	IMPORT_ACCOUNT_PATH,
+	INDEX_PATH, WIF_PATH,
+	ADD_NETWORK_PATH,
+	SUCCESS_ADD_NETWORK_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';

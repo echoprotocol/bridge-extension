@@ -116,7 +116,7 @@ export const changeNetwork = (network) => async (dispatch, getState) => {
 };
 
 /**
- * add new network to storage and connect to them
+ * add new network to storage and connect to it
  * @returns {Function}
  */
 export const addNetwork = () => async (dispatch, getState) => {
