@@ -10,6 +10,8 @@ import ImportAccount from './containers/ImportAccount';
 import AddNetwork from './containers/AddNetwork';
 import Pin from './containers/Pin';
 
+// TOOD: Заменить component={Pin} на component={CreareAccount}
+
 export default class Routes extends React.Component {
 
 	render() {
@@ -17,7 +19,7 @@ export default class Routes extends React.Component {
 			<App>
 				<div>
 
-					<Route exact path={INDEX_PATH} component={Pin} />
+					<Route exact path={INDEX_PATH} component={CreateAccount} />
 					<Route exact path={WIF_PATH} component={WifComponent} />
 					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
 					<Route exact path={PIN_PATH} component={Pin} />

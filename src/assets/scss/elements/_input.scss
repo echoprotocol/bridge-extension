@@ -125,6 +125,15 @@
 
         .input {
 
+            input {
+                color: #fff !important;            
+                -webkit-text-fill-color: #fff !important;
+                // #9ba2a5
+                &::placeholder {
+                    color: #fff !important;
+                }
+            }
+
             &.error {
                 &:after {
                     background-color: #96364a;
@@ -140,6 +149,7 @@
             .label {
                 color: #b4b5ba;
             }
+            
 
             &:not(.disabled):not(.error) {
 
@@ -186,6 +196,9 @@
 
         }
         .message {
+            &-hint {
+                color: #ca304e;
+            }
             &-description {
                 color: rgba(#fff, .2);
                 max-width: 280px;
@@ -259,18 +272,18 @@
         letter-spacing: 1px;
         animation: fadeIn $speed;
         span {
-            font-family: FNMedium;
+            font-family: FNBook;
         }
 
         & + .message-description {
-            margin-top: 32px;
+            margin-top: 22px;
         }
     }
     &-description {
         font-family: FNBook;
         font-size: 14px;
         color: #9ca1a5;
-        margin: 11px auto 0;
+        margin: 15px auto 0;
         letter-spacing: 1px;
         line-height: 21px;
         max-width: 238px;

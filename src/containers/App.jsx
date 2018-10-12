@@ -6,8 +6,9 @@ import { Dimmer } from 'semantic-ui-react';
 
 import { connection } from '../actions/GlobalActions';
 
-import Header from '../components/Header';
-import Navbar from '../components/Navbar';
+// import Header from '../components/Header';
+// import Navbar from '../components/Navbar';
+
 import { FORM_SIGN_UP } from '../constants/FormConstants';
 
 class App extends React.Component {
@@ -21,8 +22,11 @@ class App extends React.Component {
 		return (
 			<div className="temp-wrap">
 				<div className={classnames('app-wrap', 'dark')} >
-					<Header />
-					<Navbar />
+					{/* <Header />
+					<Navbar /> */}
+					<div className="header_bridge-image">
+						<span>Bridge</span>
+					</div>
 					{children}
 
 					{/* Dimmer */}

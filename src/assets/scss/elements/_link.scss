@@ -42,6 +42,8 @@
 }
 
 .link {
+    transition: all .2s ease-out;
+
     &-return {
         @extend %link;
         font-family: FNBold;
@@ -70,6 +72,71 @@
             color: #626e70;
         }
     }
+
+    // Ссылка Return с иконкой  
+
+    &.gray {
+        border: 2px solid transparent;
+        border-radius: 6px;
+        padding: 4px;
+        
+        font-family: FNBook;
+        font-size: 13px;
+        color: rgba(255, 255, 255, .2);
+
+        &:focus {
+            border-color: #434e52;
+        }
+        
+        &:hover {
+            color: #7d898e;
+        }
+
+        &:active {
+            opacity: 0.5;
+        }
+    }
+    
+    &-return_icn {
+        font-family: FNBold;
+        display: inline-flex;
+        align-items: center;
+        text-transform: uppercase;  
+        font-size: 10px;
+        letter-spacing: 0.255em;
+
+        .icon-return {
+            font-size: 16px;
+            margin-right: 10px;
+        }
+
+
+        &.green {
+            border: 2px solid transparent;
+            border-radius: 6px;
+            padding: 4px;
+            &:focus {
+                border-color: #434e52;
+            }
+            
+            color: #6db795;
+
+            &:hover {
+                color: #89e7bc;
+            }
+
+            &:active {
+                opacity: 0.5;
+            }
+
+            &.with-icon {
+                &:after {
+                    color: #6db795;
+                }
+            }
+        }
+    }
+
     &-text {
         font-size: 10px;
         letter-spacing: 2.5px;
