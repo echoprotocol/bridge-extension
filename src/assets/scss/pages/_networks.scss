@@ -6,9 +6,12 @@
     padding: 0 20px;
     & + .page-wrap {
         padding-top: 25px;
-        max-height: 443px;
+        height: 443px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
         .page {
-            min-height: 338px;
+            min-height: 332px;
         }
     }
 }

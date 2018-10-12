@@ -19,7 +19,7 @@ class BridgeInput extends React.Component {
 	}
 
 	onChange(e) {
-		this.setState({ filled: !!e.target.value.length });
+		this.setState({ filled: !!e.target.value.trim().length });
 		this.props.onChange(e);
 	}
 
@@ -65,7 +65,7 @@ class BridgeInput extends React.Component {
 					error={this.props.error}
 					onFocus={() => this.onFocus()}
 
-					onBlur={(e) => this.onBlur(e)}
+					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
 					disabled={this.props.disabled}
 
