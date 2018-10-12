@@ -139,7 +139,15 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	netInfoAir(options) {
-		return ((options.length - 2) * 37) + (options.length === 6 ? 115 : 110);
+
+		const fixedElementsCount = 2;
+		const edgeElementsCount = 6;
+		const elementSize = 37;
+		const longOffset = 115;
+		const smallOffset = 110;
+		return (
+			(options.length - fixedElementsCount) * elementSize
+		) + (options.length === edgeElementsCount ? longOffset : smallOffset);
 	}
 
 	render() {

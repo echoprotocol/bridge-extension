@@ -1,27 +1,30 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 import { withRouter } from 'react-router';
 
-import { FORM_SIGN_UP } from '../../constants/FormConstants';
+import { SUCCESS_ADD_NETWORK_PATH } from '../../constants/RouterConstants';
 
 class SuccessAddNetwork extends React.Component {
 
 	renderSuccess() {
+		const { network } = this.props;
+		const networkName = network.get('name');
 		return (
 			<div className="page">
 				<div className="icon-network" />
 				<div className="success-text"> Success </div>
 				<div className="success-desc">
-                    Network <span>Hallelujah</span> was succesfully created
+                    Network <span>{networkName}</span> was succesfully created
 				</div>
 				<div className="one-btn-wrap">
 					<Button
 						compact
 						className="btn-transparent"
 						content={<span className="btn-text">ADD ACCOUNT</span>}
-						onClick={() => this.props.history.push(FORM_SIGN_UP)}
+						onClick={() => this.props.history.push(SUCCESS_ADD_NETWORK_PATH)}
 					/>
 				</div>
 			</div>
@@ -54,7 +57,10 @@ class SuccessAddNetwork extends React.Component {
 
 SuccessAddNetwork.propTypes = {
 	history: PropTypes.object.isRequired,
+	network: PropTypes.object.isRequired,
 };
 
-export default withRouter(SuccessAddNetwork);
+export default withRouter(connect((state) => ({
+	network: state.global.get('network'),
+}))(SuccessAddNetwork));
 

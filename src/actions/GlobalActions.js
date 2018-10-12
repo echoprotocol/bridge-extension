@@ -1,4 +1,5 @@
 import { List } from 'immutable';
+import { batchActions } from 'redux-batched-actions';
 
 import history from '../history';
 
@@ -156,7 +157,7 @@ export const addNetwork = () => async (dispatch, getState) => {
 			dispatch(setFormError(FORM_ADD_NETWORK, 'registrator', registratorError));
 		}
 
-		if (nameError || addressError || registratorError) { return; }
+		if (nameError || addressError || registratorError) { return null; }
 
 		let customNetworks = localStorage.getItem('custom_networks');
 		customNetworks = customNetworks ? JSON.parse(customNetworks) : [];
@@ -171,14 +172,16 @@ export const addNetwork = () => async (dispatch, getState) => {
 			value: new List(networks),
 		}));
 
-		await dispatch(changeNetwork(network));
+		dispatch(batchActions([changeNetwork(network), clearForm(FORM_ADD_NETWORK)]));
+		// await dispatch(changeNetwork(network));
 		history.push(SUCCESS_ADD_NETWORK_PATH);
-		dispatch(clearForm(FORM_ADD_NETWORK));
+		// dispatch(clearForm(FORM_ADD_NETWORK));
 	} catch (e) {
-		return;
+		return null;
 	} finally {
 		dispatch(toggleLoading(FORM_ADD_NETWORK, 'loading', false));
 	}
+	return null;
 };
 
 /**

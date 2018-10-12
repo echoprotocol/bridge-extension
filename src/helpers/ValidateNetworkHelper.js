@@ -1,20 +1,23 @@
 export default class ValidateAccountHelper {
 
 	static validateNetworkName(name) {
+		const minNameSize = 2;
+		const maxNameSize = 2;
+
 		if (!name) {
 			return 'Network name should not be empty';
 		}
 
-		if (name.length < 2) {
+		if (name.length < minNameSize) {
 			return 'Network name must be 2 characters or more';
 		}
 
-		if (name.length > 32) {
+		if (name.length > maxNameSize) {
 			return 'Network name must be 32 characters or less';
 		}
 
 		if (!name.match(/^[a-zA-Z0-9._ ]+$/)) {
-			return 'Network should have only latin letters, numbers, dots, underscores and spaces';
+			return 'Network must have latin letters, numbers, dots, underscores and spaces';
 		}
 
 		return null;

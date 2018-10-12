@@ -1,5 +1,6 @@
 import { Map, List } from 'immutable';
 import { ChainStore } from 'echojs-lib';
+import { batchActions } from 'redux-batched-actions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
@@ -71,7 +72,10 @@ export const connect = () => async (dispatch) => {
  */
 export const disconnect = (address) => async (dispatch) => {
 	await disconnectFromAddress(address);
-	dispatch(BlockchainReducer.actions.disconnect());
-	dispatch(GlobalReducer.actions.disconnect());
+	dispatch(batchActions([
+		BlockchainReducer.actions.disconnect(), GlobalReducer.actions.disconnect()
+	]));
+	// dispatch(BlockchainReducer.actions.disconnect());
+	// dispatch(GlobalReducer.actions.disconnect());
 };
 

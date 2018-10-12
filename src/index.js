@@ -3,6 +3,7 @@ import ReactDOM from 'react-dom';
 import { applyMiddleware, combineReducers, createStore, compose } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
+import { enableBatching } from 'redux-batched-actions';
 
 import { ConnectedRouter, routerMiddleware, routerReducer } from 'react-router-redux';
 
@@ -18,10 +19,10 @@ const middleware = routerMiddleware(history);
 // Add the reducer to your store on the `router` key
 // Also apply our middleware for navigating
 const store = createStore(
-	combineReducers({
+	enableBatching(combineReducers({
 		...reducers,
 		router: routerReducer,
-	}), {},
+	})), {},
 	compose(
 		applyMiddleware(thunk),
 		applyMiddleware(middleware),

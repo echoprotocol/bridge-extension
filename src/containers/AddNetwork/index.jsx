@@ -1,5 +1,5 @@
 import React from 'react';
-import { Button } from 'semantic-ui-react';
+import { Button, Form } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
@@ -35,30 +35,13 @@ class AddNetwork extends React.Component {
 		}
 	}
 
-	isDisabledSubmit() {
-		const {
-			address, name, registrator, loading,
-		} = this.props;
-
-		if ((!address.value || address.error)
-            || (!name.value || name.error)
-            || (!registrator.value || registrator.error)
-            || loading) {
-			return true;
-		}
-
-		return false;
-	}
-
 	renderForm() {
 		const {
 			address, name, registrator, loading,
 		} = this.props;
 
 		return (
-
-			<React.Fragment>
-
+			<Form>
 				<div className="page">
 					<div className="icon-pageNetwork">
 						<span className="path1" />
@@ -102,16 +85,14 @@ class AddNetwork extends React.Component {
 					<div className="one-btn-wrap" >
 						<Button
 							content={<span className="btn-text">ADD</span>}
-							disabled={this.isDisabledSubmit()}
-							className={classnames('btn-in-light', { disabled: this.isDisabledSubmit() })}
+							disabled={loading}
+							className={classnames('btn-in-light', { disabled: loading })}
 							type="submit"
 							onClick={(e) => this.onAdd(e)}
 						/>
-
 					</div>
 				</div>
-
-			</React.Fragment>
+			</Form>
 		);
 	}
 
@@ -131,8 +112,6 @@ class AddNetwork extends React.Component {
 				</div>
 
 			</React.Fragment>
-
-
 		);
 
 	}
