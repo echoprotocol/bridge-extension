@@ -37,3 +37,9 @@ export const NETWORKS = [
 		url: 'wss://echo-devnet-node.pixelplex.io/ws',
 	},
 ];
+
+export const TIMEOUT = 10 * 60 * 1000;
+export const RANDOM_SIZE = 2048;
+export const OWNER_KEY = 'owner';
+export const ACTIVE_KEY = 'active';
+export const MEMO_KEY = 'memo';

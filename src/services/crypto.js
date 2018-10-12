@@ -4,6 +4,8 @@ import EventEmitter from 'events';
 
 import storage from './storage';
 
+import { TIMEOUT, RANDOM_SIZE, ACTIVE_KEY, MEMO_KEY } from '../constants/GlobalConstants';
+
 class AesStorage {
 
 	/**
@@ -13,7 +15,7 @@ class AesStorage {
 	 */
 	constructor() {
 		this.aes = null;
-		this.TIMEOUT = 10 * 60 * 1000;
+		this.TIMEOUT = TIMEOUT;
 		this.emitter = () => {};
 	}
 
@@ -33,7 +35,7 @@ class AesStorage {
 		const publicKey = privateKey.toPublicKey();
 
 		let encrypted = await storage.get('randomKey');
-		let decrypted = Buffer.from(random(2048), 'hex');
+		let decrypted = Buffer.from(random(RANDOM_SIZE), 'hex');
 
 		if (encrypted) {
 			try {
@@ -156,7 +158,7 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @return {WIF} privateKey
 	 */
-	getPrivateKey(username, password, role = 'active') {
+	getPrivateKey(username, password, role = ACTIVE_KEY) {
 		const seed = `${username}${role}${password}`;
 		const privateKey = PrivateKey.fromSeed(seed);
 		return privateKey.toWif();
@@ -173,7 +175,7 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @return {String} publicKey
 	 */
-	getPublicKey(username, password, role = 'active') {
+	getPublicKey(username, password, role = ACTIVE_KEY) {
 		const seed = `${username}${role}${password}`;
 		const privateKey = PrivateKey.fromSeed(seed);
 		return privateKey.toPublicKey().toString();
@@ -207,7 +209,7 @@ class Crypto extends EventEmitter {
 	generateWIF() {
 		privateAES.required();
 
-		const privateKey = PrivateKey.fromSeed(random(2048));
+		const privateKey = PrivateKey.fromSeed(random(RANDOM_SIZE));
 
 		return privateKey.toWif();
 	}
@@ -249,8 +251,8 @@ class Crypto extends EventEmitter {
 		const privateKeyWIF = this.getPrivateKey(username, password);
 		await this.importByWIF(privateKeyWIF);
 
-		if (this.getPublicKey(username, password, 'memo') === memoPublicKey) {
-			await this.importByWIF(this.getPrivateKey(username, password, 'memo'));
+		if (this.getPublicKey(username, password, MEMO_KEY) === memoPublicKey) {
+			await this.importByWIF(this.getPrivateKey(username, password, MEMO_KEY));
 		}
 	}
 

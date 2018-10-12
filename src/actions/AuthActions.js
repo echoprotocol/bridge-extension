@@ -8,6 +8,7 @@ import { addAccount, isAccountAdded } from './GlobalActions';
 import { crypto } from './CryptoActions';
 
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
+import { ACTIVE_KEY, MEMO_KEY } from '../constants/GlobalConstants';
 
 import {
 	validateAccountExist,
@@ -163,8 +164,8 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			success = await dispatch(importByPassword(name, password, networkName));
 
 			keys = [
-				crypto.getPublicKey(name, password, 'active'),
-				crypto.getPublicKey(name, password, 'memo'),
+				crypto.getPublicKey(name, password, ACTIVE_KEY),
+				crypto.getPublicKey(name, password, MEMO_KEY),
 			];
 		}
 
