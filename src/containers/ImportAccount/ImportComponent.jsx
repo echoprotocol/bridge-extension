@@ -18,6 +18,8 @@ class ImportComponent extends React.Component {
 			loading, name, password, nameError, passwordError,
 		} = this.props;
 
+		const bthDisabled = loading || nameError || !name || passwordError || !password;
+
 		return (
 			<Form>
 				<div className="page-wrap">
@@ -34,6 +36,7 @@ class ImportComponent extends React.Component {
 								errorText={nameError}
 								value={name}
 								onChange={(e) => this.onChange(e, true)}
+								disabled={loading}
 							/>
 							<BridgeInput
 								privacyEye
@@ -45,13 +48,14 @@ class ImportComponent extends React.Component {
 								labelText="WIF key / password"
 								value={password}
 								onChange={(e) => this.onChange(e)}
+								disabled={loading}
 							/>
 						</div>
 					</div>
 					<div className="page-action-wrap">
 						<div className="one-btn-wrap" >
 							<Button
-								disabled={loading}
+								disabled={!!bthDisabled}
 								className={classnames('btn-in-dark', { loading })}
 								content={<span className="btn-text">Import</span>}
 								type="submit"
