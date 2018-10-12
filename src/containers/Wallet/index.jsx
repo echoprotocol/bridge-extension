@@ -23,6 +23,31 @@ class Wallet extends React.Component {
 				key: 'EBTC',
 				type: 'asset',
 			},
+			{
+				value: '0.034',
+				key: 'ETH',
+				type: 'asset',
+			},
+			{
+				value: '0.000',
+				key: 'ECHO1',
+				type: 'asset',
+			},
+			{
+				value: '234.09',
+				key: 'ZSHC1',
+				type: 'asset',
+			},
+			{
+				value: '0.000392',
+				key: 'EBTC1',
+				type: 'asset',
+			},
+			{
+				value: '0.034',
+				key: 'ETH1',
+				type: 'asset',
+			},
 
 		];
 		return (

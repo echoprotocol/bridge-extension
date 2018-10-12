@@ -7,7 +7,7 @@ import { getObject, getPreviewBalances, initBalances } from './BalanceActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { IMPORT_ACCOUNT_PATH, WIF_PATH, INDEX_PATH } from '../constants/RouterConstants';
+import { IMPORT_ACCOUNT_PATH, WIF_PATH, INDEX_PATH, WALLET_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
 import Crypto from '../services/crypto';
@@ -33,13 +33,13 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 		localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
-		const { id, name } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
+		const { id, name, balances } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
 
 		// EchoJSActions.setSubscribe({ types: ['objects', 'block', 'accounts'], method: getObject });
 
 		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name, icon } }));
 
-		await dispatch(initBalances(networkName));
+		await dispatch(initBalances(networkName, balances));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {
@@ -78,16 +78,18 @@ export const connection = () => async (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
 
 	try {
-		if (IMPORT_ACCOUNT_PATH !== history.location.pathname) {
-			history.push(IMPORT_ACCOUNT_PATH);
-		}
 		await dispatch(EchoJSActions.connect(network.url));
 		let accounts = localStorage.getItem(`accounts_${network.name}`);
 
 		accounts = accounts ? JSON.parse(accounts) : [];
 
-		const active = accounts.find((i) => i.active) || accounts[0];
-		await dispatch(initAccount(active.name, network.name));
+		if (!accounts.length) {
+			history.push(IMPORT_ACCOUNT_PATH);
+		} else {
+			const active = accounts.find((i) => i.active) || accounts[0];
+			await dispatch(initAccount(active.name, network.name));
+			history.push(WALLET_PATH);
+		}
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {

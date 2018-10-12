@@ -2,8 +2,6 @@ import { EchoJSActions } from 'echojs-redux';
 import { List } from 'immutable';
 
 import BalanceReducer from '../reducers/BalanceReducer';
-import { checkBlockTransaction, checkTransactionResult } from '../helpers/ContractHelper';
-import { getContractResult, getTokenBalance } from '../api/ContractApi';
 
 export const getAssetsBalances = (assets) => async (dispatch) => {
 	let balances = [];
@@ -20,26 +18,6 @@ export const getAssetsBalances = (assets) => async (dispatch) => {
 
 	dispatch(BalanceReducer.actions.set({
 		field: 'assets',
-		value: new List(balances),
-	}));
-};
-
-export const updateTokenBalances = () => async (dispatch, getState) => {
-
-	const tokens = getState().balance.get('tokens');
-	const accountId = getState().global.getIn(['activeUser', 'id']);
-	const instance = getState().echojs.getIn(['system', 'instance']);
-
-	if (!tokens.size || !accountId || !instance) return;
-	let balances = tokens.map(async (value) => {
-		const balance = await getTokenBalance(instance, accountId, value.id);
-		return { ...value, balance };
-	});
-
-	balances = await Promise.all(balances);
-
-	dispatch(BalanceReducer.actions.set({
-		field: 'tokens',
 		value: new List(balances),
 	}));
 };
@@ -95,16 +73,10 @@ export const getPreviewBalances = (networkName) => async (dispatch) => {
 	});
 };
 
-export const initBalances = (networkName) => async (dispatch) => {
+export const initBalances = (networkName, balances) => async (dispatch) => {
 	await dispatch(getPreviewBalances(networkName));
-};
 
-const checkTransactionLogs = async (r, instance, accountId) => {
-	if (typeof r[1] === 'object' || !r[1].startsWith('1.17')) return false;
-
-	const result = await getContractResult(instance, r[1]);
-
-	return checkTransactionResult(accountId, result);
+	await dispatch(getAssetsBalances(balances));
 };
 
 export const getObject = (subscribeObject) => async (dispatch, getState) => {
@@ -113,21 +85,6 @@ export const getObject = (subscribeObject) => async (dispatch, getState) => {
 
 	if (!accountId || !instance) return;
 	switch (subscribeObject.type) {
-		case 'block': {
-			const tokens = getState().balance.get('tokens');
-			const { transactions } = subscribeObject.value;
-			if (!transactions || !tokens.size || !transactions.length) return;
-
-			const isNeedUpdate = transactions.some((tr) =>
-				tr.operations.some((op) => checkBlockTransaction(accountId, op, tokens)) ||
-				tr.operations_results.some(async (r) => {
-					const result = await checkTransactionLogs(r, instance, accountId);
-					return result;
-				}));
-
-			if (isNeedUpdate) await dispatch(updateTokenBalances());
-			break;
-		}
 		case 'objects': {
 			const objectId = subscribeObject.value.get('id');
 			const balances = getState().echojs.getIn(['data', 'accounts', accountId, 'balances']);

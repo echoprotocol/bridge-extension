@@ -1,7 +1,7 @@
 import {
 	INDEX_PATH,
 	IMPORT_ACCOUNT_PATH,
-	WIF_PATH,
+	WIF_PATH, WALLET_PATH,
 } from './RouterConstants';
 
 export const HEADER_TITLE = [
@@ -23,6 +23,10 @@ export const HEADER_TITLE = [
 	},
 	{
 		path: WIF_PATH,
+	},
+	{
+		path: WALLET_PATH,
+		title: 'Wallet',
 	},
 ];
 

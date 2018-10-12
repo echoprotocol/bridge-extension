@@ -3,6 +3,7 @@ import { Map, List } from 'immutable';
 
 const DEFAULT_FIELDS = Map({
 	preview: new List([]),
+	assets: new List([]),
 });
 
 export default createModule({
