@@ -39,6 +39,7 @@ class CreateComponent extends React.Component {
 								descriptionText="Unique name will be used to make transaction"
 								value={name}
 								onChange={(e) => this.onChangeName(e)}
+								disabled={loading}
 							/>
 						</div>
 					</div>
