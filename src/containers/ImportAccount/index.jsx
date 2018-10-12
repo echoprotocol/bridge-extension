@@ -54,7 +54,7 @@ class ImportAccount extends React.Component {
 		const success = await this.props.importAccount(name, password);
 
 		if (success) {
-			this.setState({ success });
+			this.setState({ success: true, name: success });
 			this.props.history.push(IMPORT_SUCCESS_PATH);
 		}
 	}

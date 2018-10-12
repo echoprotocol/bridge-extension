@@ -18,7 +18,7 @@ class ImportComponent extends React.Component {
 			loading, name, password, nameError, passwordError,
 		} = this.props;
 
-		const bthDisabled = loading || nameError || !name || passwordError || !password;
+		const bthDisabled = loading || nameError || passwordError || (!name && !password);
 
 		return (
 			<Form>

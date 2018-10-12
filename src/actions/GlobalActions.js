@@ -42,10 +42,15 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 	}
 };
 
-export const addAccount = (accountName, networkName) => (dispatch) => {
+export const addAccount = (accountName, keys, networkName) => (dispatch) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];
-	accounts.push({ name: accountName, active: false, icon: Math.floor(Math.random() * 15) + 1 });
+	accounts.push({
+		name: accountName,
+		active: false,
+		icon: Math.floor(Math.random() * 15) + 1,
+		keys,
+	});
 
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 

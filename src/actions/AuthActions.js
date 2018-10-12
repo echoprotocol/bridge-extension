@@ -1,4 +1,4 @@
-import { PrivateKey } from 'echojs-lib';
+import { PrivateKey, ChainStore } from 'echojs-lib';
 import { EchoJSActions } from 'echojs-redux';
 
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
@@ -58,7 +58,8 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 		await crypto.importByWIF(wif);
 
-		dispatch(addAccount(name, networkName));
+		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
+		dispatch(addAccount(name, [key, key], networkName));
 
 		return wif;
 
@@ -73,6 +74,44 @@ export const createAccount = (name) => async (dispatch, getState) => {
 };
 
 /**
+ *  @method importByPassword
+ *
+ * 	Import account from desktop app params (name and password)
+ *
+ * 	@param {String} name
+ * 	@param {String} password
+ *
+ * 	@return {Boolean} success
+ */
+const importByPassword = (name, password, networkName) => async (dispatch, getState) => {
+	const instance = getState().echojs.getIn(['system', 'instance']);
+
+	const nameError = ValidateAccountHelper.validateAccountName(name);
+	const addedError = isAccountAdded(name, networkName);
+	const existError = await validateImportAccountExist(instance, name, true);
+
+	if (nameError || addedError || existError) {
+		const error = nameError || addedError || existError;
+
+		dispatch(setValue(FORM_SIGN_IN, 'nameError', error));
+		return false;
+	}
+
+	const account = await dispatch(EchoJSActions.fetch(name));
+
+	const active = crypto.getPublicKey(name, password);
+
+	if (account.getIn(['active', 'key_auths', '0', '0']) !== active) {
+		dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid password'));
+		return false;
+	}
+
+	await crypto.importByPassword(name, password, account.getIn(['options', 'memo_key']));
+
+	return true;
+};
+
+/**
  *  @method importAccount
  *
  * 	Import account from desktop app or sign in
@@ -80,16 +119,12 @@ export const createAccount = (name) => async (dispatch, getState) => {
  * 	@param {String} name
  * 	@param {String} password
  *
- * 	@return {Boolean} success
+ * 	@return {String} name
  */
 export const importAccount = (name, password) => async (dispatch, getState) => {
-	let nameError = ValidateAccountHelper.validateAccountName(name);
-	const passwordError = ValidateAccountHelper.validatePassword(password);
+	const networkName = getState().global.getIn(['network', 'name']);
 
-	if (nameError) {
-		dispatch(setValue(FORM_SIGN_IN, 'nameError', nameError));
-		return false;
-	}
+	const passwordError = ValidateAccountHelper.validatePassword(password);
 
 	if (passwordError) {
 		dispatch(setValue(FORM_SIGN_IN, 'passwordError', passwordError));
@@ -97,47 +132,47 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 	}
 
 	try {
-		const instance = getState().echojs.getIn(['system', 'instance']);
-		const networkName = getState().global.getIn(['network', 'name']);
-
 		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
-		nameError = await validateImportAccountExist(instance, name, true);
-
-		if (!nameError) {
-			nameError = isAccountAdded(name, networkName);
-		}
-
-		if (nameError) {
-			dispatch(setValue(FORM_SIGN_IN, 'nameError', nameError));
-			return false;
-		}
-
-		const account = await dispatch(EchoJSActions.fetch(name));
-
+		let success = true;
+		let keys = [];
 		if (crypto.isWIF(password)) {
 			const active = PrivateKey.fromWif(password).toPublicKey().toString();
 
-			if (account.getIn(['active', 'key_auths', '0', '0']) !== active) {
+			const [accountId] = await ChainStore.FetchChain('getAccountRefsOfKey', active);
+
+			if (!accountId) {
 				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid WIF'));
 				return false;
 			}
 
-			await crypto.importByWIF(password);
-		} else {
-			const active = crypto.getPublicKey(name, password);
+			const account = await dispatch(EchoJSActions.fetch(accountId));
+			const addedError = isAccountAdded(account.get('name'), networkName);
 
-			if (account.getIn(['active', 'key_auths', '0', '0']) !== active) {
-				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid password'));
+			if (addedError) {
+				dispatch(setValue(FORM_SIGN_IN, 'passwordError', addedError));
 				return false;
 			}
 
-			await crypto.importByPassword(name, password, account.getIn(['options', 'memo_key']));
+			await crypto.importByWIF(password);
+
+			name = account.get('name');
+			const memo = account.getIn(['options', 'memo_key']);
+			keys = [active, active === memo ? memo : null];
+		} else {
+			success = await dispatch(importByPassword(name, password, networkName));
+
+			keys = [
+				crypto.getPublicKey(name, password, 'active'),
+				crypto.getPublicKey(name, password, 'memo'),
+			];
 		}
 
-		dispatch(addAccount(name, networkName));
+		if (success) {
+			dispatch(addAccount(name, keys, networkName));
+		}
 
-		return true;
+		return success ? name : null;
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_IN, 'error', err.message));
 
