@@ -50,6 +50,7 @@ class AddNetwork extends React.Component {
 
 					<div className="three-input-wrap">
 						<BridgeInput
+							autoFocus
 							error={!!name.error}
 							disabled={loading}
 							name="name"
