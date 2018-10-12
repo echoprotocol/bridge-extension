@@ -3,11 +3,12 @@
   "description": "PixelPlex React Redux app",
   "version": "0.1.0",
   "scripts": {
-    "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline",
+    "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8081",
     "build": "cross-env NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
     "build-dev": "cross-env NODE_ENV=development webpack --progress --display-error-details --colors --mode production",
     "build-stage": "cross-env NODE_ENV=stage webpack --progress --display-error-details --colors --mode production",
-    "lint": "$(npm bin)/eslint 'src/**/*.jsx' 'src/**/*.js'"
+    "lint": "$(npm bin)/eslint 'src/**/*.jsx' 'src/**/*.js'",
+    "lint-win": "cross-env eslint 'src/**/*.jsx' 'src/**/*.js'"
   },
   "dependencies": {
     "autoprefixer": "^8.1.0",
@@ -23,6 +24,7 @@
     "intl": "^1.2.5",
     "lodash": "^4.17.11",
     "prop-types": "^15.6.1",
+    "query-string": "^6.2.0",
     "react": "^16.5.2",
     "react-copy-to-clipboard": "^5.0.1",
     "react-custom-scroll": "^4.0.0",

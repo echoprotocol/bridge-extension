@@ -1,4 +1,4 @@
-export default class FormatHelper {
+class FormatHelper {
 
 	static toFixed(value, precision) {
 		const power = 10 ** precision;
@@ -33,3 +33,4 @@ export default class FormatHelper {
 
 }
 
+export default FormatHelper;

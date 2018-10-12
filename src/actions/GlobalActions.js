@@ -8,18 +8,14 @@ import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { WIF_PATH, INDEX_PATH, SUCCESS_ADD_NETWORK_PATH } from '../constants/RouterConstants';
+import { SUCCESS_ADD_NETWORK_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
 import { fetchChain } from '../api/ChainApi';
 
-import Crypto from '../services/crypto';
-
-export const userCrypto = new Crypto();
-
 export const initAccount = (accountName, networkName) => async (dispatch) => {
-	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	try {
 		let accounts = localStorage.getItem(`accounts_${networkName}`);
@@ -37,32 +33,34 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 		localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
-		const { id, name } = (await fetchChain(accountName)).toJS();
+		const fetchedAccount = await fetchChain(accountName);
 
-		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name, icon } }));
+		dispatch(GlobalReducer.actions.setIn({
+			field: 'activeUser',
+			params: { id: fetchedAccount.get('id'), name: fetchedAccount.get('name'), icon },
+		}));
 
 		await dispatch(initBalances(networkName));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {
-		setTimeout(() => {
-			dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
-		}, 1000);
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
 
-export const addAccount = (accountName, networkName) => (dispatch) => {
+export const addAccount = (accountName, keys, networkName) => (dispatch) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];
-	accounts.push({ name: accountName, active: false, icon: Math.floor(Math.random() * 15) + 1 });
+	accounts.push({
+		name: accountName,
+		active: false,
+		icon: Math.floor(Math.random() * 15) + 1,
+		keys,
+	});
 
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
 	dispatch(initAccount(accountName, networkName));
-
-	if (INDEX_PATH.includes(history.location.pathname)) {
-		history.push(WIF_PATH);
-	}
 };
 
 export const isAccountAdded = (accountName, networkName) => {
@@ -86,7 +84,7 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
 	if (activeAccountName === accountName && accounts[0]) {
-		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 		dispatch(initAccount(accounts[0].name, networkName));
 	} else if (!accounts.length) {
@@ -103,14 +101,21 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
  * @returns {Function}
  */
 export const changeNetwork = (network) => async (dispatch, getState) => {
-	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
-	const oldNetworkUrl = getState().global.getIn(['network', 'url']);
+	try {
+		const oldNetworkUrl = getState().global.getIn(['network', 'url']);
 
-	await dispatch(disconnect(oldNetworkUrl));
+		await dispatch(disconnect(oldNetworkUrl));
 
-	localStorage.setItem('current_network', JSON.stringify(network));
-	dispatch(connect());
+		localStorage.setItem('current_network', JSON.stringify(network));
+		dispatch(connect());
+	} catch (e) {
+		return;
+	} finally {
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	}
+
 };
 
 /**
@@ -193,6 +198,9 @@ export const deleteNetwork = (network) => (dispatch, getState) => {
 	localStorage.setItem('custom_networks', JSON.stringify(customNetworks));
 
 	const currentNetworkName = getState().global.getIn(['network', 'name']);
+
+	localStorage.removeItem(`accounts_${network.name}`);
+
 	if (currentNetworkName === network.name) {
 		localStorage.removeItem('current_network');
 		dispatch(connect());

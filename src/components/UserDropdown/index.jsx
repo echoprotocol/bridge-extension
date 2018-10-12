@@ -10,18 +10,23 @@ import { initAccount, removeAccount } from '../../actions/GlobalActions';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
-import { IMPORT_ACCOUNT_PATH, INDEX_PATH } from '../../constants/RouterConstants';
+import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
+import { ECHO } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
 
 class UserDropdown extends React.PureComponent {
 
 	onDropdownChange(e, name) {
+		if (!this.props.preview.find((i) => i.name === name)) {
+			return;
+		}
+
 		const handledKey = e.key || e.type;
 		const { activeUser, networkName } = this.props;
 
 		if (['click', 'Enter'].includes(handledKey)) {
-			if (activeUser.name === name) {
+			if (activeUser.get('name') === name) {
 				return;
 			}
 
@@ -47,7 +52,9 @@ class UserDropdown extends React.PureComponent {
 				<div key={name} className="user-item-wrap">
 					<UserIcon color="green" avatar={`ava${icon}`} />
 					<div className="user-name">{name}</div>
-					<div className={classnames('user-balance', { positive: !!amount })}>{FormatHelper.formatAmount(amount, precision, symbol) || '0 ECHO'}</div>
+					<div className={classnames('user-balance', { positive: !!amount })}>
+						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${ECHO}`}
+					</div>
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
 				</div>
 			);
@@ -57,9 +64,9 @@ class UserDropdown extends React.PureComponent {
 				key: name,
 				className: 'user-item',
 				content,
-				selected: activeUser.name === name,
+				selected: activeUser.get('name') === name,
 			});
-		});
+		}).toArray();
 	}
 
 	render() {
@@ -73,7 +80,7 @@ class UserDropdown extends React.PureComponent {
 				className: ' user-create',
 				content: (
 					<React.Fragment>
-						<Link to={INDEX_PATH}>create</Link>
+						<Link to={CREATE_ACCOUNT_PATH}>create</Link>
 					</React.Fragment>
 				),
 			},
@@ -83,8 +90,7 @@ class UserDropdown extends React.PureComponent {
 				className: 'user-import',
 				content: (
 					<React.Fragment>
-						<Link to={IMPORT_ACCOUNT_PATH}>import
-						</Link>
+						<Link to={IMPORT_ACCOUNT_PATH}>import</Link>
 					</React.Fragment>
 				),
 			},
@@ -92,11 +98,12 @@ class UserDropdown extends React.PureComponent {
 				value: 'fake-element',
 				key: 'fake-element',
 				disabled: true,
-				content:
-	<React.Fragment>
-		<div className="user-body" />
-		<div className="user-footer" />
-	</React.Fragment>,
+				content: (
+					<React.Fragment>
+						<div className="user-body" />
+						<div className="user-footer" />
+					</React.Fragment>
+				),
 			},
 		];
 
@@ -105,7 +112,7 @@ class UserDropdown extends React.PureComponent {
 				className="dropdown-user"
 				trigger={
 					<div className="dropdown-trigger">
-						<UserIcon color="green" avatar={`ava${activeUser.icon}`} />
+						<UserIcon color="green" avatar={`ava${activeUser.get('icon')}`} />
 
 						<i aria-hidden="true" className="dropdown icon" />
 					</div>
@@ -123,15 +130,15 @@ class UserDropdown extends React.PureComponent {
 UserDropdown.propTypes = {
 	activeUser: PropTypes.object.isRequired,
 	networkName: PropTypes.string.isRequired,
-	preview: PropTypes.array.isRequired,
+	preview: PropTypes.object.isRequired,
 	initAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
 };
 
 export default withRouter(connect(
 	(state) => ({
-		preview: state.balance.get('preview').toJS(),
-		activeUser: state.global.get('activeUser').toJS(),
+		preview: state.balance.get('preview'),
+		activeUser: state.global.get('activeUser'),
 		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({

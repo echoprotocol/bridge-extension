@@ -22,25 +22,26 @@ export const getPreviewBalances = (networkName) => async (dispatch) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];
 
-	const { symbol, precision } = (await fetchChain('1.3.0')).toJS();
+	const fetchedAsset = await fetchChain('1.3.0');
 
 	const balances = accounts.map(async ({ name, icon }) => {
-		const account = (await fetchChain(name)).toJS();
+		const account = await fetchChain(name);
+		const balance = account.getIn(['balances', '1.3.0']);
 
 		const preview = {
 			balance: {
 				amount: 0,
-				symbol,
-				precision,
+				symbol: fetchedAsset.get('symbol'),
+				precision: fetchedAsset.get('precision'),
 			},
 			name,
 			icon,
 		};
 
-		if (account && account.balances && account.balances['1.3.0']) {
-			const stats = (await fetchChain(account.balances['1.3.0'])).toJS();
-			preview.balance.amount = stats.balance || 0;
-			preview.balance.id = account.balances['1.3.0'];
+		if (account && account.get('balances') && balance) {
+			const balanceAmount = (await fetchChain(balance)).get('balance');
+			preview.balance.amount = balanceAmount || 0;
+			preview.balance.id = balance;
 		}
 
 		return preview;

@@ -46,6 +46,7 @@ export const connectToAddress = async (address, subscribeCb) => {
 		await ChainStore.init();
 		ChainStore.subscribe(CHAIN_SUBSCRIBE);
 	} catch (e) {
+		CHAIN_SUBSCRIBE = null;
 		throw e;
 	}
 };
@@ -60,7 +61,7 @@ export const disconnectFromAddress = async (address) => {
 		throw new Error('invalid address');
 	}
 
-	ChainStore.unsubscribe(CHAIN_SUBSCRIBE);
+	if (CHAIN_SUBSCRIBE) ChainStore.unsubscribe(CHAIN_SUBSCRIBE);
 	ChainStore.resetCache();
 
 	CHAIN_SUBSCRIBE = null;

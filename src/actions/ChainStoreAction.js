@@ -6,6 +6,7 @@ import GlobalReducer from '../reducers/GlobalReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
 
 import { initAccount } from './GlobalActions';
+import { initCrypto } from './CryptoActions';
 
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
 
@@ -28,7 +29,10 @@ export const subscribe = () => (dispatch) => {
  * @returns {Function}
  */
 export const connect = () => async (dispatch) => {
-	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+	dispatch(batchActions([
+		GlobalReducer.actions.set({ field: 'loading', value: true }),
+		GlobalReducer.actions.set({ field: 'connected', value: false }),
+	]));
 
 	let network = localStorage.getItem('current_network');
 
@@ -46,9 +50,13 @@ export const connect = () => async (dispatch) => {
 
 	dispatch(GlobalReducer.actions.set({ field: 'networks', value: new List(networks) }));
 
+	// TODO REMOVE BRG-21
+	dispatch(initCrypto());
+
 	const subscribeCb = () => dispatch(subscribe());
 	try {
 		await connectToAddress(network.url, subscribeCb);
+		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 		let accounts = localStorage.getItem(`accounts_${network.name}`);
 
 		accounts = accounts ? JSON.parse(accounts) : [];
@@ -59,9 +67,12 @@ export const connect = () => async (dispatch) => {
 
 		await dispatch(initAccount(active.name, network.name));
 	} catch (err) {
-		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
+		dispatch(batchActions([
+			GlobalReducer.actions.set({ field: 'error', value: err }),
+			GlobalReducer.actions.set({ field: 'connected', value: false }),
+		]));
 	} finally {
-		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
 
@@ -73,7 +84,9 @@ export const connect = () => async (dispatch) => {
 export const disconnect = (address) => async (dispatch) => {
 	await disconnectFromAddress(address);
 	dispatch(batchActions([
-		BlockchainReducer.actions.disconnect(), GlobalReducer.actions.disconnect(),
+		BlockchainReducer.actions.disconnect(),
+		GlobalReducer.actions.disconnect(),
+		GlobalReducer.actions.set({ field: 'connected', value: false }),
 	]));
 };
 

@@ -153,7 +153,7 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	render() {
-		const { network } = this.props;
+		const { network, connected } = this.props;
 		const name = network.get('name');
 		const options = this.getList();
 		const netInfoAir = this.netInfoAir(options);
@@ -170,7 +170,7 @@ class NetworkDropdown extends React.PureComponent {
 							onMouseEnter={() => this.onToggleHoverClose()}
 							onMouseLeave={() => this.onToggleHoverClose()}
 						>
-							<div className={classnames('current-network', { connected: true })}>
+							<div className={classnames('current-network', { connected })}>
 								<span className="cut">{this.state.height}{name}</span>
 							</div>
 							<i aria-hidden="true" className="dropdown icon" />
@@ -197,12 +197,18 @@ NetworkDropdown.propTypes = {
 	changeNetwork: PropTypes.func.isRequired,
 	deleteNetwork: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
+	connected: PropTypes.bool,
+};
+
+NetworkDropdown.defaultProps = {
+	connected: false,
 };
 
 export default withRouter(connect(
 	(state) => ({
 		network: state.global.get('network'),
 		networks: state.global.get('networks'),
+		connected: state.global.get('connected'),
 	}),
 	(dispatch) => ({
 		changeNetwork: (network) => dispatch(changeNetwork(network)),

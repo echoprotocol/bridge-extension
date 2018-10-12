@@ -5,6 +5,7 @@
 // SIZE: compact
 // STATE: error, disabled
 
+
 %btn {
     @include noSelection();
     font-family: FNBold;
@@ -22,11 +23,11 @@
     padding: 0;
 
     &.disabled {
-          pointer-events: none;
-          border: 2px solid $colorDisabled;
-          background-color: transparent;
-          color: #b6b9be;
-          transition: none;
+        pointer-events: none;
+        border: 2px solid $colorDisabled;
+        background-color: transparent;
+        color: #b6b9be;
+        transition: none;
     }
 
     &.loading {
@@ -80,9 +81,9 @@
     ) {
     display: inline-block;
     position: relative;
-    
+
     @include hardwareAccel();
-    
+
     &:before {
         content: '';
         position: absolute;
@@ -132,7 +133,7 @@
 }
 
 .btn {
-    
+
     &-in-dark {
         @extend %btnIn;
         &:not(.disabled) {
@@ -148,7 +149,7 @@
     &-text {
         margin-right: -3px;
     }
-    
+
     &-in-light {
         @extend %btnIn;
         &:not(.disabled) {
@@ -310,7 +311,7 @@
             color: #506869;
         }
     }
-    
+
     &-logout {
         background-color: transparent;
         border: 0;
@@ -438,12 +439,12 @@
     .btn-inverted {
         min-width: 200px;
         &.compact {
-            min-width: 150px;     
+            min-width: 150px;
         }
     }
 
  }
- 
+
  .two-btn-wrap {
     display: flex;
 
