@@ -50,7 +50,7 @@ class CreateComponent extends React.Component {
 								content={<span className="btn-text">Create</span>}
 								type="submit"
 								onClick={(e) => this.props.createAccount(e)}
-								disabled={loading}
+								disabled={!!(loading || error || !name)}
 							/>
 						</div>
 					</div>

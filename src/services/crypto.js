@@ -147,7 +147,7 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @return {Boolean} isWIF
 	 */
-	static isWIF(passwordOrWIF) {
+	isWIF(passwordOrWIF) {
 		try {
 			PrivateKey.fromWif(passwordOrWIF);
 			return true;

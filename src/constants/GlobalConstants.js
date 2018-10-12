@@ -2,6 +2,7 @@ import {
 	CREATE_ACCOUNT_PATH,
 	CREATE_SUCCESS_PATH,
 	IMPORT_ACCOUNT_PATH,
+	IMPORT_SUCCESS_PATH,
 } from './RouterConstants';
 
 export const HEADER_TITLE = [
@@ -23,6 +24,9 @@ export const HEADER_TITLE = [
 	},
 	{
 		path: CREATE_SUCCESS_PATH,
+	},
+	{
+		path: IMPORT_SUCCESS_PATH,
 	},
 ];
 
