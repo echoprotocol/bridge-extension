@@ -75,7 +75,5 @@ export const disconnect = (address) => async (dispatch) => {
 	dispatch(batchActions([
 		BlockchainReducer.actions.disconnect(), GlobalReducer.actions.disconnect(),
 	]));
-	// dispatch(BlockchainReducer.actions.disconnect());
-	// dispatch(GlobalReducer.actions.disconnect());
 };
 

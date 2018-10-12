@@ -1,10 +1,7 @@
-import { List } from 'immutable';
-import { batchActions } from 'redux-batched-actions';
-
 import history from '../history';
 
 import { getPreviewBalances, initBalances } from './BalanceActions';
-import { setFormError, toggleLoading, clearForm } from './FormActions';
+import { setFormError, toggleLoading } from './FormActions';
 import { disconnect, connect } from './ChainStoreAction';
 
 import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
@@ -124,10 +121,13 @@ export const addNetwork = () => async (dispatch, getState) => {
 	try {
 		dispatch(toggleLoading(FORM_ADD_NETWORK, true));
 
-		const networks = getState().global.get('networks').toJS();
-		const {
-			address, name, registrator,
-		} = getState().form.get(FORM_ADD_NETWORK).toJS();
+		const networks = getState().global.get('networks');
+
+		const form = getState().form.get(FORM_ADD_NETWORK);
+
+		const address = form.get('address');
+		const name = form.get('name');
+		const registrator = form.get('registrator');
 
 		const network = {
 			url: address.value.trim(),
@@ -137,7 +137,7 @@ export const addNetwork = () => async (dispatch, getState) => {
 
 		let nameError = ValidateNetworkHelper.validateNetworkName(network.name);
 
-		if (NETWORKS.concat(networks).find((i) => i.name === network.name)) {
+		if (NETWORKS.concat(networks.toJS()).find((i) => i.name === network.name)) {
 			nameError = `Network "${network.name}" already exists`;
 		}
 
@@ -165,17 +165,13 @@ export const addNetwork = () => async (dispatch, getState) => {
 
 		localStorage.setItem('custom_networks', JSON.stringify(customNetworks));
 
-		networks.push(network);
-
 		dispatch(GlobalReducer.actions.set({
 			field: 'networks',
-			value: new List(networks),
+			value: networks.push(network),
 		}));
 
-		dispatch(batchActions([changeNetwork(network), clearForm(FORM_ADD_NETWORK)]));
-		// await dispatch(changeNetwork(network));
+		await dispatch(changeNetwork(network));
 		history.push(SUCCESS_ADD_NETWORK_PATH);
-		// dispatch(clearForm(FORM_ADD_NETWORK));
 	} catch (e) {
 		return null;
 	} finally {
@@ -202,11 +198,10 @@ export const deleteNetwork = (network) => (dispatch, getState) => {
 		dispatch(connect());
 	}
 
-	let networks = getState().global.get('networks').toJS();
-	networks = networks.filter((i) => i.name !== network.name);
+	const networks = getState().global.get('networks').filter((i) => i.name !== network.name);
 
 	dispatch(GlobalReducer.actions.set({
 		field: 'networks',
-		value: new List(networks),
+		value: networks,
 	}));
 };
