@@ -119,14 +119,13 @@ class AddNetwork extends React.Component {
 		return (
 			<React.Fragment>
 				<div className="return-block">
-					<a href="#" className="link-return" onClick={() => this.props.history.goBack()}>
+					<a href={undefined} className="link-return" onClick={() => this.props.history.goBack()}>
 						<i className="icon-return" />
 						<span className="link-text">Return</span>
 					</a>
 				</div>
 				<div className="page-wrap">
 					{
-						// this.renderSuccess()
 						this.renderForm()
 					}
 				</div>

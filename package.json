@@ -25,6 +25,7 @@
     "prop-types": "^15.6.1",
     "react": "^16.5.2",
     "react-copy-to-clipboard": "^5.0.1",
+    "react-custom-scroll": "^4.0.0",
     "react-dom": "^16.2.0",
     "react-hot-loader": "^4.0.0",
     "react-redux": "^5.0.7",
