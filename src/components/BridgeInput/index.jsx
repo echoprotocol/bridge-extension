@@ -99,7 +99,7 @@ BridgeInput.propTypes = {
 	descriptionText: PropTypes.string,
 	onChange: PropTypes.func,
 	onClick: PropTypes.func,
-    autoFocus: PropTypes.bool,
+	autoFocus: PropTypes.bool,
 };
 
 BridgeInput.defaultProps = {
@@ -115,7 +115,7 @@ BridgeInput.defaultProps = {
 	descriptionText: '',
 	onChange: null,
 	onClick: null,
-    autoFocus: false,
+	autoFocus: false,
 };
 
 export default BridgeInput;

@@ -42,14 +42,14 @@ class NetworkDropdown extends React.PureComponent {
 		e.stopPropagation();
 		const { networks } = this.props;
 
-		const network = NETWORKS.concat(networks.toJS()).find((i) => i.name === name);
+		const network = networks.concat(NETWORKS).find((i) => i.name === name);
 		this.props.deleteNetwork(network);
 	}
 
 	onChangeNetwork(name) {
 		const { networks } = this.props;
 
-		const network = NETWORKS.concat(networks.toJS()).find((i) => i.name === name);
+		const network = networks.concat(NETWORKS).find((i) => i.name === name);
 		this.props.changeNetwork(network);
 	}
 
@@ -66,7 +66,7 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	getList() {
-		const { network } = this.props;
+		const { network, networks } = this.props;
 
 		const name = network.get('name');
 
@@ -95,7 +95,7 @@ class NetworkDropdown extends React.PureComponent {
 			),
 		}));
 
-		options.push(...this.props.networks.toJS().map((n) => ({
+		options.push(...networks.toJS().map((n) => ({
 			value: n.name === name ? 'current_net' : n.name,
 			key: n.name,
 			className: classnames('network-item', { active: n.name === name }),
