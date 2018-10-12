@@ -11,12 +11,17 @@ import { initAccount, removeAccount } from '../../actions/GlobalActions';
 import FormatHelper from '../../helpers/FormatHelper';
 
 import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
+import { ECHO } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
 
 class UserDropdown extends React.PureComponent {
 
 	onDropdownChange(e, name) {
+		if (!this.props.preview.find((i) => i.name === name)) {
+			return;
+		}
+
 		const handledKey = e.key || e.type;
 		const { activeUser, networkName } = this.props;
 
@@ -47,7 +52,9 @@ class UserDropdown extends React.PureComponent {
 				<div key={name} className="user-item-wrap">
 					<UserIcon color="green" avatar={`ava${icon}`} />
 					<div className="user-name">{name}</div>
-					<div className={classnames('user-balance', { positive: !!amount })}>{FormatHelper.formatAmount(amount, precision, symbol) || '0 ECHO'}</div>
+					<div className={classnames('user-balance', { positive: !!amount })}>
+						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${ECHO}`}
+					</div>
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
 				</div>
 			);
@@ -83,8 +90,7 @@ class UserDropdown extends React.PureComponent {
 				className: 'user-import',
 				content: (
 					<React.Fragment>
-						<Link to={IMPORT_ACCOUNT_PATH}>import
-						</Link>
+						<Link to={IMPORT_ACCOUNT_PATH}>import</Link>
 					</React.Fragment>
 				),
 			},
@@ -92,11 +98,12 @@ class UserDropdown extends React.PureComponent {
 				value: 'fake-element',
 				key: 'fake-element',
 				disabled: true,
-				content:
-	<React.Fragment>
-		<div className="user-body" />
-		<div className="user-footer" />
-	</React.Fragment>,
+				content: (
+					<React.Fragment>
+						<div className="user-body" />
+						<div className="user-footer" />
+					</React.Fragment>
+				),
 			},
 		];
 

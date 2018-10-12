@@ -14,7 +14,7 @@ import AddNetwork from './containers/AddNetwork';
 import Wallet from './containers/Wallet';
 
 
-export default class Routes extends React.Component {
+class Routes extends React.Component {
 
 	render() {
 		return (
@@ -33,3 +33,5 @@ export default class Routes extends React.Component {
 	}
 
 }
+
+export default Routes;

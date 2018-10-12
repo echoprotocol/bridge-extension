@@ -19,6 +19,19 @@ import {
 import GlobalReducer from '../reducers/GlobalReducer';
 
 /**
+ *  @method toggleLoading
+ *
+ * 	Toggle global and form loading
+ *
+ * 	@param {String} form
+ * 	@param {Boolean} value
+ */
+const toggleLoading = (form, value) => (dispatch) => {
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value }));
+	dispatch(setValue(form, 'loading', value));
+};
+
+/**
  *  @method createAccount
  *
  * 	Create account through account name
@@ -45,7 +58,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		const registrator = getState().global.getIn(['network', 'registrator']);
 		const networkName = getState().global.getIn(['network', 'name']);
 
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
+		dispatch(toggleLoading(FORM_SIGN_UP, true));
 
 		({ error, example } = await validateAccountExist(instance, name));
 
@@ -69,7 +82,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 		return null;
 	} finally {
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+		dispatch(toggleLoading(FORM_SIGN_UP, false));
 	}
 
 };
@@ -133,7 +146,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 	}
 
 	try {
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
+		dispatch(toggleLoading(FORM_SIGN_IN, true));
 
 		let success = true;
 		let keys = [];
@@ -179,6 +192,6 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 		return false;
 	} finally {
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+		dispatch(toggleLoading(FORM_SIGN_IN, false));
 	}
 };

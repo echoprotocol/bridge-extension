@@ -43,3 +43,4 @@ export const RANDOM_SIZE = 2048;
 export const OWNER_KEY = 'owner';
 export const ACTIVE_KEY = 'active';
 export const MEMO_KEY = 'memo';
+export const ECHO = 'ECHO';

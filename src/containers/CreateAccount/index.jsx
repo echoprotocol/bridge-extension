@@ -105,7 +105,7 @@ CreateAccount.propTypes = {
 
 export default connect(
 	(state) => ({
-		loading: state.global.get('loading'),
+		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
 		name: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 	}),
 	(dispatch) => ({

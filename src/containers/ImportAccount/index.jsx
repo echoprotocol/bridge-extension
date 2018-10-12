@@ -109,7 +109,7 @@ ImportAccount.propTypes = {
 
 export default connect(
 	(state) => ({
-		loading: state.global.get('loading'),
+		loading: state.form.getIn([FORM_SIGN_IN, 'loading']),
 		nameError: state.form.getIn([FORM_SIGN_IN, 'nameError']),
 		passwordError: state.form.getIn([FORM_SIGN_IN, 'passwordError']),
 	}),
