@@ -1,6 +1,5 @@
 import { createModule } from 'redux-modules';
 import { Set, Map } from 'immutable';
-import _ from 'lodash';
 
 const DEFAULT_FIELDS = Map({
 	subbedAccounts: new Set(),
@@ -10,8 +9,8 @@ const DEFAULT_FIELDS = Map({
 	objectsById: new Map(),
 	accountsByName: new Map(),
 	assetsBySymbol: new Map(),
-	accountIdsByKey: Map(),
-	accountIdsByAccount: Map(),
+	accountIdsByKey: new Map(),
+	accountIdsByAccount: new Map(),
 
 	balanceObjectsByAddress: new Map(),
 	getAccountRefsOfKeysCalls: new Set(),
@@ -31,8 +30,7 @@ export default createModule({
 	transformations: {
 		set: {
 			reducer: (state, { payload }) => {
-				state = state.set(payload.field, payload.value);
-
+                state = state.set(payload.field, ...payload.value);
 				return state;
 			},
 		},

@@ -162,9 +162,9 @@ export const addNetwork = () => async (dispatch, getState) => {
 			value: new List(networks),
 		}));
 
-		dispatch(clearForm(FORM_ADD_NETWORK));
 		await dispatch(changeNetwork(network));
 		history.push(SUCCESS_ADD_NETWORK_PATH);
+		dispatch(clearForm(FORM_ADD_NETWORK));
 	} catch (e) {
 		return;
 	} finally {

@@ -1,8 +1,6 @@
 import { Map, List } from 'immutable';
 import { ChainStore } from 'echojs-lib';
 
-import history from '../history';
-
 import GlobalReducer from '../reducers/GlobalReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
 
@@ -12,12 +10,11 @@ import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/Chai
 
 import { NETWORKS } from '../constants/GlobalConstants';
 import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
-import { IMPORT_ACCOUNT_PATH } from '../constants/RouterConstants';
 
 export const subscribe = () => (dispatch) => {
-	ChainStoreCacheNames.forEach(({ origin, custom }) => {
+	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
 		const value = ChainStore[origin];
-		dispatch(BlockchainReducer.actions.set({ custom, value }));
+		dispatch(BlockchainReducer.actions.set({ field, value }));
 	});
 };
 
@@ -46,13 +43,13 @@ export const connect = () => async (dispatch) => {
 		let accounts = localStorage.getItem(`accounts_${network.name}`);
 
 		accounts = accounts ? JSON.parse(accounts) : [];
-		const value = await fetchChain('2.1.0');
+		await fetchChain('2.1.0');
+		await fetchChain('1.3.0');
+		await fetchChain('1.3.1');
+		await fetchChain('1.2.34');
+		await fetchChain('1.2.35');
 
-		if (!accounts.length) {
-			// history.push(IMPORT_ACCOUNT_PATH);
-			return;
-		}
-
+		if (!accounts.length) return;
 		const active = accounts.find((i) => i.active) || accounts[0];
 
 		await dispatch(initAccount(active.name, network.name));
