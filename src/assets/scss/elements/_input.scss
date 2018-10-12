@@ -6,6 +6,7 @@
     z-index: 2;
     font-family: FNMedium;
     font-size: 16px;
+
     transition: color $speed, padding $speed;
     padding: 0;
     letter-spacing: 1.8px;
@@ -19,6 +20,9 @@
     align-items: flex-end;
     letter-spacing: 1px;
     margin-right: -1px;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0) scale(1.0, 1.0);
+    transform: translateZ(0);
     &-wrap {
         text-align: center;
         & + .input-wrap {
