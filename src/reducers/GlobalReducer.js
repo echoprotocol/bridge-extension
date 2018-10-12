@@ -3,7 +3,7 @@ import { Map } from 'immutable';
 import _ from 'lodash';
 
 const DEFAULT_FIELDS = Map({
-	globalLoading: false,
+	loading: false,
 	error: null,
 	activeUser: new Map({
 		id: '',
@@ -42,19 +42,7 @@ export default createModule({
 				return state;
 			},
 		},
-		setGlobalLoading: {
-			reducer: (state, { payload }) => {
-				state = state.set('globalLoading', payload.globalLoading);
 
-				return state;
-			},
-		},
-		setLoading: {
-			reducer: (state, { payload }) => {
-				state = state.set('loading', !!payload);
-				return state;
-			},
-		},
 		logout: {
 			reducer: (state) => {
 				const network = state.get('network');

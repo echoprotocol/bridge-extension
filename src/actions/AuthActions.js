@@ -3,7 +3,7 @@ import { EchoJSActions } from 'echojs-redux';
 
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 
-import { setFormError, toggleLoading, setValue } from './FormActions';
+import { setValue } from './FormActions';
 import { addAccount, isAccountAdded } from './GlobalActions';
 import { crypto } from './CryptoActions';
 
@@ -15,110 +15,134 @@ import {
 	validateImportAccountExist,
 } from '../api/WalletApi';
 
-export const createAccount = ({ accountName }) => async (dispatch, getState) => {
+import GlobalReducer from '../reducers/GlobalReducer';
 
-	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
+/**
+ *  @method createAccount
+ *
+ * 	Create account through account name
+ *
+ * 	@param {String} name
+ *
+ * 	@return {String} wif
+ */
+export const createAccount = (name) => async (dispatch, getState) => {
+	let error = null;
+	let example = '';
 
-	dispatch(toggleLoading(FORM_SIGN_UP, true));
+	dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
 
-	if (accountNameError) {
-		dispatch(setFormError(FORM_SIGN_UP, 'accountName', { example: '', errorText: accountNameError }));
-		dispatch(toggleLoading(FORM_SIGN_UP, false));
-		return;
+	error = ValidateAccountHelper.validateAccountName(name);
+
+	if (error) {
+		dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
+		return null;
 	}
 
 	try {
 		const instance = getState().echojs.getIn(['system', 'instance']);
-		const network = getState().global.getIn(['network']).toJS();
+		const registrator = getState().global.getIn(['network', 'registrator']);
+		const networkName = getState().global.getIn(['network', 'name']);
 
-		accountNameError = await validateAccountExist(instance, accountName);
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
-		if (accountNameError.errorText) {
-			dispatch(setFormError(FORM_SIGN_UP, 'accountName', accountNameError));
-			return;
+		({ error, example } = await validateAccountExist(instance, name));
+
+		if (error) {
+			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
+			return null;
 		}
-
 		const wif = crypto.generateWIF();
 
-		await createWallet(
-			network.registrator,
-			accountNameError.example || accountName,
-			wif,
-		);
+		await createWallet(registrator, name, wif);
 
 		await crypto.importByWIF(wif);
 
-		dispatch(setValue(FORM_SIGN_UP, 'wif', wif));
+		dispatch(addAccount(name, networkName));
 
-		dispatch(addAccount(accountName, network.name));
+		return wif;
 
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_UP, 'error', err.message));
+
+		return null;
 	} finally {
-		dispatch(toggleLoading(FORM_SIGN_UP, false));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 
 };
 
-export const importAccount = ({ accountName, password }) => async (dispatch, getState) => {
-	let accountNameError = ValidateAccountHelper.validateAccountName(accountName);
+/**
+ *  @method importAccount
+ *
+ * 	Import account from desktop app or sign in
+ *
+ * 	@param {String} name
+ * 	@param {String} password
+ *
+ * 	@return {Boolean} success
+ */
+export const importAccount = (name, password) => async (dispatch, getState) => {
+	let nameError = ValidateAccountHelper.validateAccountName(name);
 	const passwordError = ValidateAccountHelper.validatePassword(password);
 
-	if (accountNameError) {
-		dispatch(setFormError(FORM_SIGN_IN, 'accountName', accountNameError));
-		dispatch(toggleLoading(FORM_SIGN_IN, false));
-		return;
+	if (nameError) {
+		dispatch(setValue(FORM_SIGN_IN, 'nameError', nameError));
+		return false;
 	}
 
 	if (passwordError) {
-		dispatch(setFormError(FORM_SIGN_IN, 'password', passwordError));
-		dispatch(toggleLoading(FORM_SIGN_IN, false));
-		return;
+		dispatch(setValue(FORM_SIGN_IN, 'passwordError', passwordError));
+		return false;
 	}
 
 	try {
 		const instance = getState().echojs.getIn(['system', 'instance']);
-		const network = getState().global.getIn(['network']).toJS();
+		const networkName = getState().global.getIn(['network', 'name']);
 
-		accountNameError = await validateImportAccountExist(instance, accountName, true);
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
-		if (!accountNameError) {
-			accountNameError = isAccountAdded(accountName, network.name);
+		nameError = await validateImportAccountExist(instance, name, true);
+
+		if (!nameError) {
+			nameError = isAccountAdded(name, networkName);
 		}
 
-		if (accountNameError) {
-			dispatch(setFormError(FORM_SIGN_IN, 'accountName', accountNameError));
-			return;
+		if (nameError) {
+			dispatch(setValue(FORM_SIGN_IN, 'nameError', nameError));
+			return false;
 		}
 
-		const account = await dispatch(EchoJSActions.fetch(accountName));
+		const account = await dispatch(EchoJSActions.fetch(name));
 
 		if (crypto.isWIF(password)) {
 			const active = PrivateKey.fromWif(password).toPublicKey().toString();
 
 			if (account.getIn(['active', 'key_auths', '0', '0']) !== active) {
-				dispatch(setFormError(FORM_SIGN_IN, 'password', 'Invalid WIF'));
-				return;
+				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid WIF'));
+				return false;
 			}
 
 			await crypto.importByWIF(password);
 		} else {
-			const active = crypto.getPublicKey(accountName, password);
+			const active = crypto.getPublicKey(name, password);
 
 			if (account.getIn(['active', 'key_auths', '0', '0']) !== active) {
-				dispatch(setFormError(FORM_SIGN_IN, 'password', 'Invalid password'));
-				return;
+				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid password'));
+				return false;
 			}
 
-			await crypto.importByPassword(accountName, password, account.getIn(['options', 'memo_key']));
+			await crypto.importByPassword(name, password, account.getIn(['options', 'memo_key']));
 		}
 
-		dispatch(addAccount(accountName, network.name));
+		dispatch(addAccount(name, networkName));
 
+		return true;
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_IN, 'error', err.message));
-	} finally {
-		dispatch(toggleLoading(FORM_SIGN_IN, false));
-	}
 
+		return false;
+	} finally {
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	}
 };

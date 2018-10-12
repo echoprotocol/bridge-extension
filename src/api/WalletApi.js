@@ -10,7 +10,7 @@ export const validateAccountExist = async (
 	if (requestsCount === 10) {
 		return {
 			example: '',
-			errorText: 'Account with such name already exists.',
+			error: 'Account with such name already exists.',
 		};
 	}
 
@@ -26,13 +26,13 @@ export const validateAccountExist = async (
 			accountName += 1;
 		}
 
-		const { example, errorText } = await validateAccountExist(
+		const { example, error } = await validateAccountExist(
 			instance,
 			accountName,
 			requestsCount += 1,
 		);
 
-		return { example, errorText };
+		return { example, error };
 	}
 
 	if (requestsCount === 0) {
@@ -41,7 +41,7 @@ export const validateAccountExist = async (
 
 	return {
 		example: accountName,
-		errorText: accountName && 'Account with such name already exists.',
+		error: accountName && 'Account with such name already exists.',
 	};
 };
 
