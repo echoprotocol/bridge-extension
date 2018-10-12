@@ -11,6 +11,10 @@ import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/Chai
 import { NETWORKS } from '../constants/GlobalConstants';
 import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
 
+/**
+ * connect socket to address
+ * @returns {Function}
+ */
 export const subscribe = () => (dispatch) => {
 	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
 		const value = ChainStore[origin];
@@ -18,6 +22,10 @@ export const subscribe = () => (dispatch) => {
 	});
 };
 
+/**
+ * connect socket current network
+ * @returns {Function}
+ */
 export const connect = () => async (dispatch) => {
 	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
 
@@ -60,8 +68,12 @@ export const connect = () => async (dispatch) => {
 	}
 };
 
+/**
+ * disconnect socket from address
+ * @param {String} address
+ * @returns {Function}
+ */
 export const disconnect = (address) => async (dispatch) => {
-
 	await disconnectFromAddress(address);
 	dispatch(BlockchainReducer.actions.disconnect());
 	dispatch(GlobalReducer.actions.disconnect());

@@ -3,6 +3,11 @@ import { ChainStore, ChainValidation } from 'echojs-lib';
 
 let CHAIN_SUBSCRIBE = null;
 
+/**
+ * return method name by key type
+ * @param {String} key
+ * @returns {String}
+ */
 const getTypeByKey = (key) => {
 	if (ChainValidation.is_object_id(key)) {
 		if (key.search('1.2') === 0) {
@@ -19,6 +24,11 @@ const getTypeByKey = (key) => {
 	return 'getBlock';
 };
 
+/**
+ * connect socket to address
+ * @param {String} address
+ * @param {Function} subscribeCb
+ */
 export const connectToAddress = async (address, subscribeCb) => {
 
 	CHAIN_SUBSCRIBE = subscribeCb;
@@ -40,6 +50,10 @@ export const connectToAddress = async (address, subscribeCb) => {
 	}
 };
 
+/**
+ * disconnect socket from address and clear lib cache
+ * @param {String} address
+ */
 export const disconnectFromAddress = async (address) => {
 	const instance = Apis.instance();
 	if (instance.url !== address) {
@@ -52,10 +66,13 @@ export const disconnectFromAddress = async (address) => {
 	CHAIN_SUBSCRIBE = null;
 
 	await Apis.close();
-
-	return instance;
 };
 
+/**
+ * fetch object from chain
+ * @param {String} key
+ * @returns {Object}
+ */
 export const fetchChain = async (key) => {
 	const method = getTypeByKey(key);
 
@@ -68,6 +85,12 @@ export const fetchChain = async (key) => {
 	}
 };
 
+/**
+ * lookup account
+ * @param {String} accountName
+ * @param {Number} limit
+ * @returns {Object}
+ */
 export const lookupAccounts = async (accountName, limit) => {
 	const instance = Apis.instance();
 

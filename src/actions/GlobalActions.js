@@ -99,6 +99,11 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
 	}
 };
 
+/**
+ * connect to new network and disconnect from old network
+ * @param {Object} network
+ * @returns {Function}
+ */
 export const changeNetwork = (network) => async (dispatch, getState) => {
 	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
 
@@ -110,6 +115,10 @@ export const changeNetwork = (network) => async (dispatch, getState) => {
 	dispatch(connect());
 };
 
+/**
+ * add new network to storage and connect to them
+ * @returns {Function}
+ */
 export const addNetwork = () => async (dispatch, getState) => {
 	try {
 		dispatch(toggleLoading(FORM_ADD_NETWORK, true));
@@ -172,6 +181,11 @@ export const addNetwork = () => async (dispatch, getState) => {
 	}
 };
 
+/**
+ * delete custom network from storage
+ * @param {Object} network
+ * @returns {Function}
+ */
 export const deleteNetwork = (network) => (dispatch, getState) => {
 	let customNetworks = localStorage.getItem('custom_networks');
 	customNetworks = customNetworks ? JSON.parse(customNetworks) : [];
@@ -183,7 +197,6 @@ export const deleteNetwork = (network) => (dispatch, getState) => {
 	if (currentNetwork.name === network.name) {
 		localStorage.removeItem('current_network');
 		dispatch(connect());
-		// return;
 	}
 
 	let networks = getState().global.get('networks').toJS();
