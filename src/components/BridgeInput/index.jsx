@@ -64,6 +64,7 @@ class BridgeInput extends React.Component {
 					type={this.props.type}
 					error={this.props.error}
 					onFocus={() => this.onFocus()}
+					autoFocus={this.props.autoFocus}
 
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
@@ -98,6 +99,7 @@ BridgeInput.propTypes = {
 	descriptionText: PropTypes.string,
 	onChange: PropTypes.func,
 	onClick: PropTypes.func,
+    autoFocus: PropTypes.bool,
 };
 
 BridgeInput.defaultProps = {
@@ -113,6 +115,7 @@ BridgeInput.defaultProps = {
 	descriptionText: '',
 	onChange: null,
 	onClick: null,
+    autoFocus: false,
 };
 
 export default BridgeInput;
