@@ -1,124 +1,115 @@
 import React from 'react';
-import { Button, Form } from 'semantic-ui-react';
-import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import query from 'query-string';
+import { connect } from 'react-redux';
+
+import {
+	CREATE_ACCOUNT_PATH,
+	CREATE_SUCCESS_PATH,
+	INDEX_PATH,
+} from '../../constants/RouterConstants';
+import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 import { createAccount } from '../../actions/AuthActions';
-import { setFormValue, toggleLoading } from '../../actions/FormActions';
+import { setFormError, clearForm } from '../../actions/FormActions';
 
-import BridgeInput from '../../components/BridgeInput';
-
-import { FORM_SIGN_UP } from '../../constants/FormConstants';
+import CreateComponent from './CreateComponent';
+import WelcomeComponent from '../../components/WelcomeComponent';
 
 class CreateAccount extends React.Component {
 
 	constructor(props) {
 		super(props);
+
 		this.state = {
-			disableLoading: false,
+			name: '',
+			wif: '',
 		};
 	}
 
-	onCreate() {
-		this.setState({
-			disableLoading: true,
-		});
-		this.props.toggleLoading(true);
+	componentDidMount() {
+		const { pathname, search } = this.props.location;
+		const { wif } = this.state;
 
-		this.props.createAccount({ accountName: this.props.accountName.value.trim() });
-	}
-
-	onChange(e) {
-		const field = e.target.name;
-
-		let { value } = e.target;
-		value = value.toLowerCase();
-
-		if (field) {
-			this.props.setFormValue(field, value);
+		if (`${pathname}${search}` === CREATE_SUCCESS_PATH && !wif) {
+			this.props.history.push(CREATE_ACCOUNT_PATH);
 		}
 	}
 
-	onClick(e) {
-		const { accountName } = this.props;
-
-		const field = e.target.name;
-
-		this.props.setFormValue(field, accountName);
+	componentWillUnmount() {
+		this.props.clearForm();
 	}
 
+	onChangeName(name) {
+		this.setState({ name });
 
-	renderLogin() {
-		const { accountName, loading } = this.props;
-		const { disableLoading } = this.state;
+		if (this.props.name.error) {
+			this.props.clearError();
+		}
+	}
 
-		return (
-			<Form>
-				<div className="page-wrap">
+	async onCreateAccount() {
+		const wif = await this.props.createAccount(this.state.name);
+		if (wif) {
+			this.setState({ wif });
+			this.props.history.push(CREATE_SUCCESS_PATH);
+		}
+	}
 
-					<div className="page">
-						<div className="icon-pageAccount">
-							<span className="path1" />
-							<span className="path2" />
-						</div>
-						<div className="one-input-wrap">
-							<BridgeInput
-								error={!!accountName.error}
-								disabled={loading}
-								name="accountName"
-								theme="input-light"
-								labelText="Account name"
-								errorText={accountName.error && accountName.error.errorText}
-								hintText={accountName.error && accountName.error.example}
-								descriptionText="Unique name will be used to make transaction"
-								value={accountName.value}
-								onChange={(e) => this.onChange(e)}
-								onClick={(e) => this.onClick(e)}
-							/>
-						</div>
-					</div>
-					<div className="page-action-wrap">
-						<div className="one-btn-wrap" >
-							<Button
-								className="btn-in-light"
-								content={<span className="btn-text">Create</span>}
-								type="submit"
-								onClick={(e) => this.onCreate(e)}
-								disabled={disableLoading}
-							/>
-						</div>
-					</div>
-				</div>
-			</Form>
-
-		);
+	onProceedClick() {
+		this.props.history.push(INDEX_PATH);
 	}
 
 	render() {
-		return (
-			this.renderLogin()
-		);
+		const { name, wif } = this.state;
+		const {
+			loading, name: { error, example }, location,
+		} = this.props;
 
+		const { success } = query.parse(location.search);
+
+		if (wif && success) {
+			return (
+				<WelcomeComponent
+					wif={wif}
+					name={name}
+					proceed={() => this.onProceedClick()}
+				/>
+			);
+		}
+
+		return (
+			<CreateComponent
+				loading={loading}
+				name={name}
+				error={error}
+				example={example}
+				changeName={(value) => this.onChangeName(value)}
+				createAccount={() => this.onCreateAccount()}
+			/>
+		);
 	}
 
 }
 
 CreateAccount.propTypes = {
 	loading: PropTypes.bool.isRequired,
-	accountName: PropTypes.object.isRequired,
+	name: PropTypes.object.isRequired,
+	location: PropTypes.object.isRequired,
+	history: PropTypes.object.isRequired,
 	createAccount: PropTypes.func.isRequired,
-	setFormValue: PropTypes.func.isRequired,
-	toggleLoading: PropTypes.func.isRequired,
+	clearError: PropTypes.func.isRequired,
+	clearForm: PropTypes.func.isRequired,
 };
 
 export default connect(
 	(state) => ({
-		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
-		accountName: state.form.getIn([FORM_SIGN_UP, 'accountName']),
+		loading: state.global.get('loading'),
+		name: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 	}),
 	(dispatch) => ({
-		setFormValue: (field, value) => dispatch(setFormValue(FORM_SIGN_UP, field, value)),
-		createAccount: (value) => dispatch(createAccount(value)),
-		toggleLoading: (value) => dispatch(toggleLoading(FORM_SIGN_UP, value)),
+		createAccount: (name) => dispatch(createAccount(name)),
+		clearError: () => dispatch(setFormError(FORM_SIGN_UP, 'accountName', null)),
+		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
 	}),
 )(CreateAccount);

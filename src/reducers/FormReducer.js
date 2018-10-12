@@ -15,20 +15,13 @@ const DEFAULT_FIELDS = Map({
 const DEFAULT_FORM_FIELDS = {
 	[FORM_SIGN_UP]: Map({
 		accountName: {
-			value: '',
 			error: null,
+			example: '',
 		},
-		wif: '',
 	}),
 	[FORM_SIGN_IN]: Map({
-		accountName: {
-			value: '',
-			error: null,
-		},
-		password: {
-			value: '',
-			error: null,
-		},
+		nameError: null,
+		passwordError: null,
 	}),
 };
 
