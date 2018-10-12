@@ -115,13 +115,6 @@ class NetworkDropdown extends React.PureComponent {
 			),
 		})));
 
-		// options.push({
-		// 	value: 'add-net',
-		// 	key: 'add-net',
-		// 	as: 'span',
-		// 	className: 'add-network',
-		// 	content: <Link to={ADD_NETWORK_PATH}>+ Add Network</Link>,
-		// });
 		options.push({
 			value: 'add-net',
 			key: 'add-net',
