@@ -60,7 +60,7 @@ class AesStorage {
 	}
 
 	/**
-	 *  @method get
+	 *  @method set
 	 *
 	 *  Set aes object.
 	 *
@@ -117,6 +117,13 @@ class AesStorage {
 		}
 	}
 
+	/**
+	 *  @method setTime
+	 *
+	 *  Set expired time in milliseconds
+	 *
+	 *  @param {Number} milliseconds
+	 */
 	setTime(milliseconds) {
 		this.TIMEOUT = milliseconds;
 	}
