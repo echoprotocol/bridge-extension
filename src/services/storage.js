@@ -4,7 +4,7 @@ import extension from '../../extension/extensionizer';
 
 class Storage {
 
-	set(key, value) {
+	static set(key, value) {
 		if (extension.storage && extension.storage.local) {
 			const { local } = extension.storage;
 
@@ -21,14 +21,14 @@ class Storage {
 		}
 
 		if (NODE_ENV === 'local') {
-			localStorage.setItem(key, value);
+			localStorage.setItem(key, JSON.stringify(value));
 			return Promise.resolve();
 		}
 
 		return Promise.resolve();
 	}
 
-	get(key) {
+	static get(key) {
 		if (extension.storage && extension.storage.local) {
 			const { local } = extension.storage;
 
@@ -46,13 +46,14 @@ class Storage {
 		}
 
 		if (NODE_ENV === 'local') {
-			Promise.resolve(localStorage.getItem(key));
+			const value = localStorage.getItem(key);
+			return Promise.resolve(value ? JSON.parse(value) : value);
 		}
 
 		return Promise.resolve();
 	}
 
-	remove(key) {
+	static remove(key) {
 		if (extension.storage && extension.storage.local) {
 			const { local } = extension.storage;
 
@@ -70,7 +71,8 @@ class Storage {
 		}
 
 		if (NODE_ENV === 'local') {
-			Promise.resolve(localStorage.removeItem(key));
+			localStorage.removeItem(key);
+			return Promise.resolve();
 		}
 
 		return Promise.resolve();

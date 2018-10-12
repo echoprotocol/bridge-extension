@@ -2,9 +2,7 @@ import { Aes, PrivateKey } from 'echojs-lib';
 import random from 'crypto-random-string';
 import EventEmitter from 'events';
 
-import Storage from './storage';
-
-const storage = new Storage();
+import storage from './storage';
 
 class AesStorage {
 
@@ -35,7 +33,7 @@ class AesStorage {
 		const publicKey = privateKey.toPublicKey();
 
 		let encrypted = await storage.get('randomKey');
-		let decrypted = Buffer.from(random(1024), 'hex');
+		let decrypted = Buffer.from(random(2048), 'hex');
 
 		if (encrypted) {
 			try {
@@ -202,7 +200,7 @@ class Crypto extends EventEmitter {
 	generateWIF() {
 		privateAES.required();
 
-		const privateKey = PrivateKey.fromSeed(random(32));
+		const privateKey = PrivateKey.fromSeed(random(2048));
 
 		return privateKey.toWif();
 	}

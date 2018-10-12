@@ -9,7 +9,7 @@ const changeCrypto = (params) => (dispatch) => {
 export const crypto = new Crypto();
 
 // TODO remove default pin value in BRG-21
-export const unlockCrypto = (pin = '123456') => async (dispatch) => {
+export const initCrypto = (pin = '123456') => async (dispatch) => {
 	try {
 		await crypto.unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
@@ -17,6 +17,16 @@ export const unlockCrypto = (pin = '123456') => async (dispatch) => {
 		crypto.on('locked', () => {
 			dispatch(changeCrypto({ isLocked: true }));
 		});
+	} catch (err) {
+		dispatch(changeCrypto({ error: err.message }));
+	}
+};
+
+// TODO remove default pin value in BRG-21
+export const unlockCrypto = (pin = '123456') => async (dispatch) => {
+	try {
+		await crypto.unlock(pin);
+		dispatch(changeCrypto({ isLocked: false }));
 	} catch (err) {
 		dispatch(changeCrypto({ error: err.message }));
 	}

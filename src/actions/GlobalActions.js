@@ -2,7 +2,7 @@ import { EchoJSActions } from 'echojs-redux';
 import { Map } from 'immutable';
 
 import { getPreviewBalances, initBalances } from './BalanceActions';
-import { unlockCrypto } from './CryptoActions';
+import { initCrypto } from './CryptoActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -67,7 +67,7 @@ export const connection = () => async (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
 
 	// TODO remove in BRG-21
-	dispatch(unlockCrypto());
+	dispatch(initCrypto());
 
 	try {
 		await dispatch(EchoJSActions.connect(network.url));
