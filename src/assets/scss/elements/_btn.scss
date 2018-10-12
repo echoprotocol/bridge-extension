@@ -1,6 +1,6 @@
 // BTNS:
 // btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy,
-// btn-noborder, btn-nav, btn-logout, btn-round-close
+// btn-noborder, btn-nav, btn-logout, btn-round-close, btn-icon
 
 // SIZE: compact
 // STATE: error, disabled
@@ -217,6 +217,17 @@
                 );
             }
         }
+        &.compact {
+            .btn-text {
+                display: block;
+                font-family: FNMedium;
+                letter-spacing: 2px;
+                font-size: 11px;
+                margin: 2px 0 0 0;
+                letter-spacing: 2.3px;
+                font-size: 11px;
+            }
+        }
     }
 
     &-copy {
@@ -337,11 +348,19 @@
         cursor: pointer;
         &:hover {
             background-color: #363f42;
-
         }
         &:before {
             display: block;
             margin: 3px -1px 0 0;
+        }
+    }
+    &-icon {
+        background-color: transparent;
+        border: 0;
+        color: #aeb4b8;
+        transition: color $speed;
+        &:hover {
+            color: #363f42;
         }
     }
 
