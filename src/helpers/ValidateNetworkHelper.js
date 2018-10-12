@@ -1,18 +1,17 @@
+import { MAX_NETWORK_NAME_LENGTH, MIN_NETWORK_NAME_LENGTH } from '../constants/ValidationConstants';
+
 export default class ValidateAccountHelper {
 
 	static validateNetworkName(name) {
-		const minNameSize = 2;
-		const maxNameSize = 2;
-
 		if (!name) {
 			return 'Network name should not be empty';
 		}
 
-		if (name.length < minNameSize) {
+		if (name.length < MIN_NETWORK_NAME_LENGTH) {
 			return 'Network name must be 2 characters or more';
 		}
 
-		if (name.length > maxNameSize) {
+		if (name.length > MAX_NETWORK_NAME_LENGTH) {
 			return 'Network name must be 32 characters or less';
 		}
 

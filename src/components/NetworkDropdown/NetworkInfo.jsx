@@ -10,6 +10,9 @@ class NetworkInfo extends React.PureComponent {
 		};
 
 		const { network, headBlock } = this.props;
+		const registrator = network.get('registrator');
+		const url = network.get('url');
+
 		return (
 			<ul className="network-info" style={networkStyle}>
 				<li>
@@ -18,11 +21,11 @@ class NetworkInfo extends React.PureComponent {
 				</li>
 				<li>
 					<div>Faucet</div>
-					<div>{network.registrator}</div>
+					<div>{registrator}</div>
 				</li>
 				<li>
 					<div>Address</div>
-					<div>{network.url}</div>
+					<div>{url}</div>
 				</li>
 			</ul>
 
@@ -42,7 +45,7 @@ NetworkInfo.defaultProps = {
 };
 
 export default connect((state) => ({
-	network: state.global.get('network').toJS(),
+	network: state.global.get('network'),
 	headBlock: state.blockchain.getIn(['objectsById', '2.1.0', 'head_block_number']),
 }))(NetworkInfo);
 

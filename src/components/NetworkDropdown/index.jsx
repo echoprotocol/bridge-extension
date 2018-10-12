@@ -42,14 +42,14 @@ class NetworkDropdown extends React.PureComponent {
 		e.stopPropagation();
 		const { networks } = this.props;
 
-		const network = NETWORKS.concat(networks).find((i) => i.name === name);
+		const network = NETWORKS.concat(networks.toJS()).find((i) => i.name === name);
 		this.props.deleteNetwork(network);
 	}
 
 	onChangeNetwork(name) {
 		const { networks } = this.props;
 
-		const network = NETWORKS.concat(networks).find((i) => i.name === name);
+		const network = NETWORKS.concat(networks.toJS()).find((i) => i.name === name);
 		this.props.changeNetwork(network);
 	}
 
@@ -66,7 +66,9 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	getList() {
-		const { name } = this.props.network;
+		const { network } = this.props;
+
+		const name = network.get('name');
 
 		const options = NETWORKS.map((n) => ({
 			value: n.name === name ? 'current_net' : n.name,
@@ -93,7 +95,7 @@ class NetworkDropdown extends React.PureComponent {
 			),
 		}));
 
-		options.push(...this.props.networks.map((n) => ({
+		options.push(...this.props.networks.toJS().map((n) => ({
 			value: n.name === name ? 'current_net' : n.name,
 			key: n.name,
 			className: classnames('network-item', { active: n.name === name }),
@@ -152,6 +154,7 @@ class NetworkDropdown extends React.PureComponent {
 
 	render() {
 		const { network } = this.props;
+		const name = network.get('name');
 		const options = this.getList();
 		const netInfoAir = this.netInfoAir(options);
 		return (
@@ -168,7 +171,7 @@ class NetworkDropdown extends React.PureComponent {
 							onMouseLeave={() => this.onToggleHoverClose()}
 						>
 							<div className={classnames('current-network', { connected: true })}>
-								<span className="cut">{this.state.height}{network.name}</span>
+								<span className="cut">{this.state.height}{name}</span>
 							</div>
 							<i aria-hidden="true" className="dropdown icon" />
 						</div>
@@ -190,7 +193,7 @@ class NetworkDropdown extends React.PureComponent {
 
 NetworkDropdown.propTypes = {
 	network: PropTypes.object.isRequired,
-	networks: PropTypes.array.isRequired,
+	networks: PropTypes.object.isRequired,
 	changeNetwork: PropTypes.func.isRequired,
 	deleteNetwork: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
@@ -198,8 +201,8 @@ NetworkDropdown.propTypes = {
 
 export default withRouter(connect(
 	(state) => ({
-		network: state.global.get('network').toJS(),
-		networks: state.global.get('networks').toJS(),
+		network: state.global.get('network'),
+		networks: state.global.get('networks'),
 	}),
 	(dispatch) => ({
 		changeNetwork: (network) => dispatch(changeNetwork(network)),

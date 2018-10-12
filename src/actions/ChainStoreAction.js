@@ -73,7 +73,7 @@ export const connect = () => async (dispatch) => {
 export const disconnect = (address) => async (dispatch) => {
 	await disconnectFromAddress(address);
 	dispatch(batchActions([
-		BlockchainReducer.actions.disconnect(), GlobalReducer.actions.disconnect()
+		BlockchainReducer.actions.disconnect(), GlobalReducer.actions.disconnect(),
 	]));
 	// dispatch(BlockchainReducer.actions.disconnect());
 	// dispatch(GlobalReducer.actions.disconnect());
