@@ -1,53 +1,56 @@
 import { EchoJSActions } from 'echojs-redux';
 import { Map } from 'immutable';
 
-import history from '../history';
-
 import { getPreviewBalances, initBalances } from './BalanceActions';
+import { initCrypto } from './CryptoActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { INDEX_PATH, WIF_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
 export const initAccount = (accountName, networkName) => async (dispatch) => {
-	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	try {
 		let accounts = localStorage.getItem(`accounts_${networkName}`);
+		let icon = null;
 
 		accounts = accounts ? JSON.parse(accounts) : [];
 		accounts = accounts.map((i) => {
-			i.active = i.name === accountName;
+			i.active = false;
+			if (i.name === accountName) {
+				i.active = true;
+				({ icon } = i);
+			}
 			return i;
 		});
 
 		localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
-		const { id, name } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
+		const fetchedAccount = await dispatch(EchoJSActions.fetch(accountName));
 
-		// EchoJSActions.setSubscribe({ types: ['objects', 'block', 'accounts'], method: getObject });
-
-		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name } }));
-
-		if (INDEX_PATH.includes(history.location.pathname)) {
-			history.push(WIF_PATH);
-		}
+		dispatch(GlobalReducer.actions.setIn({
+			field: 'activeUser',
+			params: { id: fetchedAccount.get('id'), name: fetchedAccount.get('name'), icon },
+		}));
 
 		await dispatch(initBalances(networkName));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {
-		setTimeout(() => {
-			dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
-		}, 1000);
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
 
-export const addAccount = (accountName, networkName) => (dispatch) => {
+export const addAccount = (accountName, keys, networkName) => (dispatch) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];
-	accounts.push({ name: accountName, active: false });
+	accounts.push({
+		name: accountName,
+		active: false,
+		icon: Math.floor(Math.random() * 15) + 1,
+		keys,
+	});
 
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
@@ -55,7 +58,7 @@ export const addAccount = (accountName, networkName) => (dispatch) => {
 };
 
 export const connection = () => async (dispatch) => {
-	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	let network = localStorage.getItem('current_network');
 
@@ -68,6 +71,9 @@ export const connection = () => async (dispatch) => {
 
 	dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
 
+	// TODO remove in BRG-21
+	dispatch(initCrypto());
+
 	try {
 		await dispatch(EchoJSActions.connect(network.url));
 		let accounts = localStorage.getItem(`accounts_${network.name}`);
@@ -77,9 +83,9 @@ export const connection = () => async (dispatch) => {
 		const active = accounts.find((i) => i.active) || accounts[0];
 		await dispatch(initAccount(active.name, network.name));
 	} catch (err) {
-		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
+		dispatch(GlobalReducer.actions.set({ field: 'error', value: err.message }));
 	} finally {
-		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
 
@@ -104,9 +110,12 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
 	if (activeAccountName === accountName && accounts[0]) {
-		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 		dispatch(initAccount(accounts[0].name, networkName));
+	} else if (!accounts.length) {
+		dispatch(GlobalReducer.actions.logout());
+		dispatch(getPreviewBalances(networkName));
 	} else {
 		dispatch(getPreviewBalances(networkName));
 	}

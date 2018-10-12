@@ -1,6 +1,6 @@
 import { ChainValidation } from 'echojs-lib';
 
-export default class ValidateAccountHelper {
+class ValidateAccountHelper {
 
 	static validateAccountName(accountName) {
 		if (!accountName) {
@@ -29,3 +29,5 @@ export default class ValidateAccountHelper {
 	}
 
 }
+
+export default ValidateAccountHelper;

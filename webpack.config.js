@@ -2,6 +2,7 @@ const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 	template: `${__dirname}/src/assets/index.html`,
@@ -98,6 +99,9 @@ module.exports = {
 		new CleanWebpackPlugin(['dist']),
 		HTMLWebpackPluginConfig,
 		extractSass,
+		new webpack.DefinePlugin({
+			NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+		}),
 	],
 	node: {
 		fs: 'empty',

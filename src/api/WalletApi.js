@@ -1,21 +1,4 @@
-import { PrivateKey, key } from 'echojs-lib';
-
-export const generateKeyFromPassword = (accountName, role, password) => {
-	const seed = `${accountName}${role}${password}`;
-	const privateKey = PrivateKey.fromSeed(seed);
-	const publicKey = privateKey.toPublicKey().toString();
-
-	return { privateKey, publicKey };
-};
-
-export const getKeyFromWif = (wif) => {
-	try {
-		const privateKey = PrivateKey.fromWif(wif);
-		return privateKey;
-	} catch (err) {
-		return null;
-	}
-};
+import { PrivateKey } from 'echojs-lib';
 
 export const validateAccountExist = async (
 	instance,
@@ -27,7 +10,7 @@ export const validateAccountExist = async (
 	if (requestsCount === 10) {
 		return {
 			example: '',
-			errorText: 'Account with such name already exists.',
+			error: 'Account with such name already exists.',
 		};
 	}
 
@@ -43,13 +26,13 @@ export const validateAccountExist = async (
 			accountName += 1;
 		}
 
-		const { example, errorText } = await validateAccountExist(
+		const { example, error } = await validateAccountExist(
 			instance,
 			accountName,
 			requestsCount += 1,
 		);
 
-		return { example, errorText };
+		return { example, error };
 	}
 
 	if (requestsCount === 0) {
@@ -58,7 +41,7 @@ export const validateAccountExist = async (
 
 	return {
 		example: accountName,
-		errorText: accountName && 'Account with such name already exists.',
+		error: accountName && 'Account with such name already exists.',
 	};
 };
 
@@ -75,12 +58,8 @@ export const validateImportAccountExist = async (
 	return null;
 };
 
-export const createWallet = async (registrator, account) => {
-	const password = (`P${key.get_random_key().toWif()}`).substr(0, 45);
-
-	const owner = generateKeyFromPassword(account, 'owner', password);
-	const active = generateKeyFromPassword(account, 'active', password);
-	const memo = generateKeyFromPassword(account, 'memo', password);
+export const createWallet = async (registrator, account, wif) => {
+	const publicKey = PrivateKey.fromWif(wif).toPublicKey().toString();
 
 	let response = await fetch(registrator, {
 		method: 'post',
@@ -91,9 +70,9 @@ export const createWallet = async (registrator, account) => {
 		},
 		body: JSON.stringify({
 			name: account,
-			owner_key: owner.publicKey,
-			active_key: active.publicKey,
-			memo_key: memo.publicKey,
+			owner_key: publicKey,
+			active_key: publicKey,
+			memo_key: publicKey,
 		}),
 	});
 
@@ -102,54 +81,4 @@ export const createWallet = async (registrator, account) => {
 	if (!response || (response && response.errors)) {
 		throw response.errors.join();
 	}
-
-	return active.privateKey.toWif();
-};
-
-export const importWallet = (account, password, roles = ['active', 'owner', 'memo']) => {
-
-	const privateKey = getKeyFromWif(password);
-	let passKey;
-
-	if (privateKey) {
-		passKey = {
-			privateKey,
-			publicKey: privateKey.toPublicKey().toString(),
-		};
-	}
-
-	if (!account) { return null; }
-
-	account = account.toJS();
-
-	let passError = null;
-
-	roles.forEach((role) => {
-		if (!privateKey) {
-			passKey = generateKeyFromPassword(account.name, role, password);
-		}
-
-		switch (role) {
-			case 'memo':
-				if (account.options.memo_key !== passKey.publicKey) {
-					passError = 'Invalid password';
-				}
-				break;
-			case 'active':
-				if (account.active.key_auths[0][0] !== passKey.publicKey) {
-					passError = 'Invalid password';
-				}
-				break;
-			case 'owner':
-				if (account.owner.key_auths[0][0] !== passKey.publicKey) {
-					passError = 'Invalid password';
-				}
-				break;
-			default: break;
-		}
-
-		return null;
-	});
-
-	return passError;
 };
