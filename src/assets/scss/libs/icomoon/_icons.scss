@@ -1,3 +1,9 @@
+.icon-arrowDown {
+    &:before {
+      content: $icon-arrowDown;
+    }
+}
+
 .icon-menu {
     &:before {
       content: $icon-menu; 
@@ -115,6 +121,10 @@
 
 .icon-copiedBtn {
     &:before {
+        font-size: 16px;
+        line-height: 20px;
+        margin-top: 1px;
+        display: block;
         content: $icon-copiedBtn; 
     }
 }
@@ -131,7 +141,8 @@
     }
 }
 
-.icon-closeSmall {
+.icon-closeSmall,
+.btn-round-close {
     &:before {
         content: $icon-closeSmall; 
     }

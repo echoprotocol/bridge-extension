@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import UserDropdown from '../UserDropdown';
+import NetworkDropdown from '../NetworkDropdown';
 
 class Header extends React.PureComponent {
 
@@ -12,6 +13,7 @@ class Header extends React.PureComponent {
 		return (
 			<header className="header">
 				{preview.length ? <UserDropdown /> : null}
+				<NetworkDropdown />
 			</header>
 		);
 	}

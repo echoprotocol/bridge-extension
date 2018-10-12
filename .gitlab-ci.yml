@@ -1,0 +1,43 @@
+stages:
+  - lint
+  - build
+  
+cache:
+  paths:
+  - node_modules/
+
+eslint:
+  stage: lint
+  script:
+    - npm i
+    - npm run lint
+  tags:
+    - pp-projects
+
+build_development:
+  stage: build
+  script:
+    - cd /home/devuser/DevProjects/649.bridge/extension
+    - git pull origin development
+    - npm i
+    - npm run build-dev
+  only:
+    - development
+  environment:
+    name: development
+  tags:
+    - pp-projects
+
+build_stage:
+  stage: build
+  script:
+    - cd /home/devuser/Projects/649.bridge/extension
+    - git pull origin stage
+    - npm install
+    - npm run build-stage
+  only:
+    - stage
+  environment:
+    name: stage
+  tags:
+    - pp-projects

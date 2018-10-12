@@ -23,3 +23,22 @@ select:-webkit-autofill:focus {
   transition: background-color 5000s ease-in-out 0s;
 padding-bottom: 8px !important;
 }
+
+::-moz-selection { /* Code for Firefox */
+    color: #324046; 
+    background: #16d6aa;
+}
+
+::selection {
+    color: #324046; 
+    background: #16d6aa;
+}
+
+h1, h2, h3, h4, h5 {
+    font-family: FNMedium;
+}
+
+h4 {
+    font-size: 15px;
+    letter-spacing: 1px;
+}
