@@ -19,7 +19,7 @@ class Navbar extends React.PureComponent {
 			}
 			return false;
 		});
-		return item || '';
+		return item || {};
 	}
 
 	render() {
