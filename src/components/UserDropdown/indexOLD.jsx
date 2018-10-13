@@ -1,8 +1,5 @@
 import React from 'react';
-import { ButtonToolbar, Dropdown, MenuItem } from 'react-bootstrap';
-import CustomScroll from 'react-custom-scroll';
-
-import { Button } from 'semantic-ui-react';
+import { Dropdown, Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
@@ -20,26 +17,6 @@ import UserIcon from '../UserIcon';
 
 class UserDropdown extends React.PureComponent {
 
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			menuHeight: null,
-		};
-	}
-
-
-	componentDidMount() {
-		this.setDDMenuHeight();
-	}
-	// Устанавливает высоту react-custom-scroll
-	setDDMenuHeight() {
-		const elm = document.querySelector('#user-menu');
-		return elm.getBoundingClientRect().height > 350 ?
-			this.setState({ menuHeight: 350 }) :
-			this.setState({ menuHeight: elm.getBoundingClientRect().height });
-
-	}
 	onDropdownChange(e, name) {
 		if (!this.props.preview.find((i) => i.name === name)) {
 			return;
@@ -95,10 +72,6 @@ class UserDropdown extends React.PureComponent {
 	render() {
 		const { activeUser } = this.props;
 
-		const menuHeight = {
-			height: `${this.state.menuHeight}px`,
-		};
-
 		const optionsEnd = [
 
 			{
@@ -137,31 +110,18 @@ class UserDropdown extends React.PureComponent {
 		return (
 			<Dropdown
 				className="dropdown-user"
-				id="dropdown-user"
+				trigger={
+					<div className="dropdown-trigger">
+						<UserIcon color="green" avatar={`ava${activeUser.get('icon')}`} />
+
+						<i aria-hidden="true" className="dropdown icon" />
+					</div>
+				}
 				onChange={(e, { value }) => this.onDropdownChange(e, value)}
 				options={this.renderList().concat(optionsEnd)}
-			>
-				<Dropdown.Toggle noCaret>
-					<UserIcon color="green" avatar={`ava${activeUser.get('icon')}`} />
-					<i aria-hidden="true" className="dropdown icon" />
-				</Dropdown.Toggle>
-				<Dropdown.Menu >
-					<div
-						className="network-scroll"
-						id="user-menu"
-						style={menuHeight}
-					>
-						<CustomScroll
-							flex="1"
-							heightRelativeToParent="calc(100%)"
-						>
-							<div className="dropdown-footer">
-								<MenuItem eventKey="9">+ Add Networks</MenuItem>
-							</div>
-						</CustomScroll>
-					</div>
-				</Dropdown.Menu>
-			</Dropdown>
+				selectOnBlur={false}
+				icon={false}
+			/>
 		);
 	}
 
