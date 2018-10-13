@@ -255,6 +255,7 @@
 .dropdown-network {
     @extend %dropdown;
     @include noSelection();
+    margin-left: auto;
     .dropdown {
         &-toggle {
             position: relative;
