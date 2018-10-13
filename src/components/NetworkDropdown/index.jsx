@@ -24,6 +24,7 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	// Устанавливает высоту react-custom-scroll
+	// Проверить, перерендерится высота, при добавлении или удалении сети
 	setDDMenuHeight() {
 		const elm = document.querySelector('#network-menu');
 		return elm.getBoundingClientRect().height > 350 ?
@@ -112,6 +113,7 @@ class NetworkDropdown extends React.PureComponent {
 								</MenuItem>
 							</ul>
 							<div className="dropdown-footer">
+								{/* Проверить, зароется ли дропдаун при переходе на страницу нетворков */}
 								<MenuItem eventKey="9">+ Add Networks</MenuItem>
 							</div>
 						</CustomScroll>
