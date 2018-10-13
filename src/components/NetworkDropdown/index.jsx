@@ -1,5 +1,5 @@
 import React from 'react';
-import { ButtonToolbar, Dropdown, MenuItem } from 'react-bootstrap';
+import { Dropdown, MenuItem } from 'react-bootstrap';
 import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
 import classnames from 'classnames';
@@ -38,93 +38,89 @@ class NetworkDropdown extends React.PureComponent {
 		};
 
 		return (
-			<React.Fragment>
-				<ButtonToolbar>
-					<Dropdown
-						pullRight
-						className="dropdown-network"
-						id="dropdown-network"
+			<Dropdown
+				pullRight
+				className="dropdown-network"
+				id="dropdown-network"
 
+			>
+				<Dropdown.Toggle noCaret>
+					<div className={classnames('current-network', { connected: true })}>
+						<span className="cut">Main Network</span>
+					</div>
+					<i aria-hidden="true" className="dropdown icon" />
+				</Dropdown.Toggle>
+
+				<Dropdown.Menu >
+					<div
+						className="network-scroll"
+						id="network-menu"
+						style={menuHeight}
 					>
-						<Dropdown.Toggle noCaret>
-							<div className={classnames('current-network', { connected: true })}>
-								<span className="cut">Main Network</span>
-							</div>
-							<i aria-hidden="true" className="dropdown icon" />
-						</Dropdown.Toggle>
+						<CustomScroll
+							flex="1"
+							heightRelativeToParent="calc(100%)"
+						>
+							<ul className="default-networks">
 
-						<Dropdown.Menu >
-							<div
-								className="network-scroll"
-								id="network-menu"
-								style={menuHeight}
-							>
-								<CustomScroll
-									flex="1"
-									heightRelativeToParent="calc(100%)"
-								>
-									<ul className="default-networks">
-
-										<MenuItem eventKey="1">
-											<span className="title">Main Network</span>
-											<ul className="accounts">
-												<li>No accounts</li>
-											</ul>
-										</MenuItem>
-
-										<MenuItem eventKey="2" active>
-											<span className="title">Test Network</span>
-											<ul className="accounts">
-												<li>
-													<UserIcon color="green" avatar="ava7" />
-												</li>
-												<li>
-													<UserIcon color="yellow" avatar="ava3" />
-												</li>
-												<li>
-													<UserIcon color="pink" avatar="ava8" />
-												</li>
-											</ul>
-										</MenuItem>
-										<MenuItem eventKey="3">
-											<span className="title">Dev Network</span>
-											<ul className="accounts">
-												<li>
-													<UserIcon color="pink" avatar="ava8" />
-												</li>
-											</ul>
-										</MenuItem>
+								<MenuItem eventKey="1">
+									<span className="title">Main Network</span>
+									<ul className="accounts">
+										<li>No accounts</li>
 									</ul>
-									<ul className="custom-networks">
-										<MenuItem eventKey="4">
-											<Button className="btn-round-close" />
-											<span className="title">Whitepowernet</span>
-										</MenuItem>
-										<MenuItem eventKey="5">
-											<Button className="btn-round-close" />
-											<span className="title">Hellelujahnet</span>
-										</MenuItem>
-										<MenuItem eventKey="6">
-											<Button className="btn-round-close" />
-											<span className="title">Homersimpsonnet</span>
-										</MenuItem>
-										<MenuItem eventKey="7">
-											<Button className="btn-round-close" />
-											<span className="title">Mytestnet</span>
-										</MenuItem>
+								</MenuItem>
+
+								<MenuItem eventKey="2" active>
+									<span className="title">Test Network</span>
+									<ul className="accounts">
+										<li>
+											<UserIcon color="green" avatar="ava7" />
+										</li>
+										<li>
+											<UserIcon color="yellow" avatar="ava3" />
+										</li>
+										<li>
+											<UserIcon color="pink" avatar="ava8" />
+										</li>
 									</ul>
-									<div className="dropdown-footer">
-										<MenuItem eventKey="9">+ Add Networks</MenuItem>
-									</div>
-								</CustomScroll>
-
+								</MenuItem>
+								<MenuItem eventKey="3">
+									<span className="title">Dev Network</span>
+									<ul className="accounts">
+										<li>
+											<UserIcon color="pink" avatar="ava8" />
+										</li>
+									</ul>
+								</MenuItem>
+							</ul>
+							<ul className="custom-networks">
+								<MenuItem eventKey="4">
+									<Button className="btn-round-close" />
+									<span className="title">Whitepowernet</span>
+								</MenuItem>
+								<MenuItem eventKey="5">
+									<Button className="btn-round-close" />
+									<span className="title">Hellelujahnet</span>
+								</MenuItem>
+								<MenuItem eventKey="6">
+									<Button className="btn-round-close" />
+									<span className="title">Homersimpsonnet</span>
+								</MenuItem>
+								<MenuItem eventKey="7">
+									<Button className="btn-round-close" />
+									<span className="title">Mytestnet</span>
+								</MenuItem>
+							</ul>
+							<div className="dropdown-footer">
+								<MenuItem eventKey="9">+ Add Networks</MenuItem>
 							</div>
+						</CustomScroll>
 
-						</Dropdown.Menu>
+					</div>
 
-					</Dropdown>
-				</ButtonToolbar>
-			</React.Fragment>
+				</Dropdown.Menu>
+
+			</Dropdown>
 
 		);
 	}
