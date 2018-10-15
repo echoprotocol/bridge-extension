@@ -131,7 +131,6 @@ UserDropdown.propTypes = {
 	activeUser: PropTypes.object.isRequired,
 	networkName: PropTypes.string.isRequired,
 	preview: PropTypes.object.isRequired,
-	assets: PropTypes.object.isRequired,
 	initAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
 };
@@ -139,7 +138,6 @@ UserDropdown.propTypes = {
 export default withRouter(connect(
 	(state) => ({
 		preview: state.balance.get('preview'),
-		assets: state.balance.get('assets'),
 		activeUser: state.global.get('activeUser'),
 		networkName: state.global.getIn(['network', 'name']),
 	}),
