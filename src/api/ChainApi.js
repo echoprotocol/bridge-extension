@@ -37,7 +37,7 @@ export const connectToAddress = async (address, subscribeCb) => {
 		const instance = Apis.instance(
 			address,
 			true,
-			2000,
+			4000,
 			{ enableCrypto: false },
 		);
 
