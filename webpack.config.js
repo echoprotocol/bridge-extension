@@ -23,7 +23,7 @@ module.exports = {
 		app: path.resolve('src/index.js'),
 	},
 	output: {
-		publicPath: '/',
+		publicPath: process.env.EXTENTION ? './' : '/',
 		path: path.resolve('dist'),
 		filename: `[name].${version}.js`,
 		pathinfo: process.env.NODE_ENV === 'local',
