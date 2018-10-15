@@ -18,8 +18,6 @@ class ImportComponent extends React.Component {
 			loading, name, password, nameError, passwordError,
 		} = this.props;
 
-		const bthDisabled = loading || nameError || !name || passwordError || !password;
-
 		return (
 			<Form>
 				<div className="page-wrap">
@@ -55,7 +53,7 @@ class ImportComponent extends React.Component {
 					<div className="page-action-wrap">
 						<div className="one-btn-wrap" >
 							<Button
-								disabled={!!bthDisabled}
+								disabled={loading}
 								className={classnames('btn-in-dark', { loading })}
 								content={<span className="btn-text">Import</span>}
 								type="submit"

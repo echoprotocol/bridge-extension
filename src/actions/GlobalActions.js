@@ -4,6 +4,7 @@ import { Map } from 'immutable';
 import history from '../history';
 
 import { getObject, getPreviewBalances, initBalances } from './BalanceActions';
+import { initCrypto } from './CryptoActions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -11,10 +12,6 @@ import { IMPORT_ACCOUNT_PATH, WALLET_PATH } from '../constants/RouterConstants';
 
 
 import { NETWORKS } from '../constants/GlobalConstants';
-
-import Crypto from '../services/crypto';
-
-export const userCrypto = new Crypto();
 
 export const initAccount = (accountName, networkName) => async (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
@@ -52,10 +49,15 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 	}
 };
 
-export const addAccount = (accountName, networkName) => (dispatch) => {
+export const addAccount = (accountName, keys, networkName) => (dispatch) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];
-	accounts.push({ name: accountName, active: false, icon: Math.floor(Math.random() * 15) + 1 });
+	accounts.push({
+		name: accountName,
+		active: false,
+		icon: Math.floor(Math.random() * 15) + 1,
+		keys,
+	});
 
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
@@ -76,6 +78,9 @@ export const connection = () => async (dispatch) => {
 
 	dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
 
+	// TODO remove in BRG-21
+	dispatch(initCrypto());
+
 	try {
 		await dispatch(EchoJSActions.connect(network.url));
 		let accounts = localStorage.getItem(`accounts_${network.name}`);
@@ -90,7 +95,7 @@ export const connection = () => async (dispatch) => {
 			history.push(WALLET_PATH);
 		}
 	} catch (err) {
-		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
+		dispatch(GlobalReducer.actions.set({ field: 'error', value: err.message }));
 	} finally {
 		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}

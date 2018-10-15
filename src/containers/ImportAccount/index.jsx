@@ -54,7 +54,7 @@ class ImportAccount extends React.Component {
 		const success = await this.props.importAccount(name, password);
 
 		if (success) {
-			this.setState({ success });
+			this.setState({ success: true, name: success });
 			this.props.history.push(IMPORT_SUCCESS_PATH);
 		}
 	}
@@ -109,7 +109,7 @@ ImportAccount.propTypes = {
 
 export default connect(
 	(state) => ({
-		loading: state.global.get('loading'),
+		loading: state.form.getIn([FORM_SIGN_IN, 'loading']),
 		nameError: state.form.getIn([FORM_SIGN_IN, 'nameError']),
 		passwordError: state.form.getIn([FORM_SIGN_IN, 'passwordError']),
 	}),

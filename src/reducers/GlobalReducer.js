@@ -15,7 +15,10 @@ const DEFAULT_FIELDS = Map({
 		registrator: '',
 		url: '',
 	}),
-	cryptoError: null,
+	crypto: new Map({
+		isLocked: true,
+		error: null,
+	}),
 });
 
 export default createModule({
