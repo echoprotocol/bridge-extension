@@ -1,5 +1,4 @@
 import { PrivateKey, ChainStore } from 'echojs-lib';
-import { EchoJSActions } from 'echojs-redux';
 
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 
@@ -15,6 +14,8 @@ import {
 	createWallet,
 	validateImportAccountExist,
 } from '../api/WalletApi';
+
+import { fetchChain } from '../api/ChainApi';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -54,13 +55,12 @@ export const createAccount = (name) => async (dispatch, getState) => {
 	}
 
 	try {
-		const instance = getState().echojs.getIn(['system', 'instance']);
 		const registrator = getState().global.getIn(['network', 'registrator']);
 		const networkName = getState().global.getIn(['network', 'name']);
 
 		dispatch(toggleLoading(FORM_SIGN_UP, true));
 
-		({ error, example } = await validateAccountExist(instance, name));
+		({ error, example } = await validateAccountExist(name));
 
 		if (error) {
 			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
@@ -97,12 +97,11 @@ export const createAccount = (name) => async (dispatch, getState) => {
  *
  * 	@return {Boolean} success
  */
-const importByPassword = (name, password, networkName) => async (dispatch, getState) => {
-	const instance = getState().echojs.getIn(['system', 'instance']);
+const importByPassword = (name, password, networkName) => async (dispatch) => {
 
 	const nameError = ValidateAccountHelper.validateAccountName(name);
 	const addedError = isAccountAdded(name, networkName);
-	const existError = await validateImportAccountExist(instance, name, true);
+	const existError = await validateImportAccountExist(name, true);
 
 	if (nameError || addedError || existError) {
 		const error = nameError || addedError || existError;
@@ -111,7 +110,7 @@ const importByPassword = (name, password, networkName) => async (dispatch, getSt
 		return false;
 	}
 
-	const account = await dispatch(EchoJSActions.fetch(name));
+	const account = await fetchChain(name);
 
 	const active = crypto.getPublicKey(name, password);
 
@@ -160,7 +159,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 				return false;
 			}
 
-			const account = await dispatch(EchoJSActions.fetch(accountId));
+			const account = await fetchChain(accountId);
 			const addedError = isAccountAdded(account.get('name'), networkName);
 
 			if (addedError) {

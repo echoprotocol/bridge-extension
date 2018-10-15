@@ -1,5 +1,5 @@
 import { createModule } from 'redux-modules';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import _ from 'lodash';
 
 const DEFAULT_FIELDS = Map({
@@ -15,10 +15,12 @@ const DEFAULT_FIELDS = Map({
 		registrator: '',
 		url: '',
 	}),
+	networks: new List([]),
 	crypto: new Map({
 		isLocked: true,
 		error: null,
 	}),
+	connected: false,
 });
 
 export default createModule({
@@ -41,6 +43,10 @@ export default createModule({
 
 				return state;
 			},
+		},
+
+		disconnect: {
+			reducer: () => DEFAULT_FIELDS,
 		},
 
 		logout: {

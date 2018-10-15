@@ -1,0 +1,2 @@
+export const MIN_NETWORK_NAME_LENGTH = 2;
+export const MAX_NETWORK_NAME_LENGTH = 32;
