@@ -1,5 +1,4 @@
 import { PrivateKey, ChainStore } from 'echojs-lib';
-import { EchoJSActions } from 'echojs-redux';
 
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 
@@ -15,6 +14,8 @@ import {
 	createWallet,
 	validateImportAccountExist,
 } from '../api/WalletApi';
+
+import { fetchChain } from '../api/ChainApi';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -111,7 +112,7 @@ const importByPassword = (name, password, networkName) => async (dispatch, getSt
 		return false;
 	}
 
-	const account = await dispatch(EchoJSActions.fetch(name));
+	const account = await fetchChain(name);
 
 	const active = crypto.getPublicKey(name, password);
 
@@ -160,7 +161,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 				return false;
 			}
 
-			const account = await dispatch(EchoJSActions.fetch(accountId));
+			const account = await fetchChain(accountId);
 			const addedError = isAccountAdded(account.get('name'), networkName);
 
 			if (addedError) {

@@ -1,7 +1,8 @@
 import { PrivateKey } from 'echojs-lib';
 
+import { lookupAccounts } from './ChainApi';
+
 export const validateAccountExist = async (
-	instance,
 	accountName,
 	requestsCount = 0,
 	limit = 50,
@@ -14,7 +15,7 @@ export const validateAccountExist = async (
 		};
 	}
 
-	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);
+	const result = await lookupAccounts(accountName, limit);
 
 	if (result.find((i) => i[0] === accountName)) {
 
@@ -27,7 +28,6 @@ export const validateAccountExist = async (
 		}
 
 		const { example, error } = await validateAccountExist(
-			instance,
 			accountName,
 			requestsCount += 1,
 		);
@@ -46,11 +46,10 @@ export const validateAccountExist = async (
 };
 
 export const validateImportAccountExist = async (
-	instance,
 	accountName,
 	limit = 50,
 ) => {
-	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);
+	const result = await lookupAccounts(accountName, limit);
 
 	if (!result.find((i) => i[0] === accountName)) {
 		return 'Account not found';
