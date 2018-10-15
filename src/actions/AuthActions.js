@@ -55,13 +55,12 @@ export const createAccount = (name) => async (dispatch, getState) => {
 	}
 
 	try {
-		const instance = getState().echojs.getIn(['system', 'instance']);
 		const registrator = getState().global.getIn(['network', 'registrator']);
 		const networkName = getState().global.getIn(['network', 'name']);
 
 		dispatch(toggleLoading(FORM_SIGN_UP, true));
 
-		({ error, example } = await validateAccountExist(instance, name));
+		({ error, example } = await validateAccountExist(name));
 
 		if (error) {
 			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
@@ -98,12 +97,11 @@ export const createAccount = (name) => async (dispatch, getState) => {
  *
  * 	@return {Boolean} success
  */
-const importByPassword = (name, password, networkName) => async (dispatch, getState) => {
-	const instance = getState().echojs.getIn(['system', 'instance']);
+const importByPassword = (name, password, networkName) => async (dispatch) => {
 
 	const nameError = ValidateAccountHelper.validateAccountName(name);
 	const addedError = isAccountAdded(name, networkName);
-	const existError = await validateImportAccountExist(instance, name, true);
+	const existError = await validateImportAccountExist(name, true);
 
 	if (nameError || addedError || existError) {
 		const error = nameError || addedError || existError;
