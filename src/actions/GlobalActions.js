@@ -17,6 +17,14 @@ import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
 import { fetchChain } from '../api/ChainApi';
 
+/**
+ *  @method initAccount
+ *
+ * 	Initialization user's account data, balances
+ *
+ * 	@param {String} accountName
+ * 	@param {String} networkName
+ */
 export const initAccount = (accountName, networkName) => async (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
@@ -51,6 +59,15 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 	}
 };
 
+/**
+ *  @method addAccount
+ *
+ * 	Add account to list of accounts
+ *
+ * 	@param {String} accountName
+ * 	@param {Array} keys
+ * 	@param {String} networkName
+ */
 export const addAccount = (accountName, keys, networkName) => (dispatch) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];
@@ -66,6 +83,16 @@ export const addAccount = (accountName, keys, networkName) => (dispatch) => {
 	dispatch(initAccount(accountName, networkName));
 };
 
+/**
+ *  @method isAccountAdded
+ *
+ * 	Check is account already added
+ *
+ * 	@param {String} accountName
+ * 	@param {String} networkName
+ *
+ * 	@return {String} value
+ */
 export const isAccountAdded = (accountName, networkName) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];
@@ -77,6 +104,14 @@ export const isAccountAdded = (accountName, networkName) => {
 	return null;
 };
 
+/**
+ *  @method removeAccount
+ *
+ * 	Remove account from list of accounts
+ *
+ * 	@param {String} accountName
+ * 	@param {String} networkName
+ */
 export const removeAccount = (accountName, networkName) => async (dispatch, getState) => {
 	const activeAccountName = getState().global.getIn(['activeUser', 'name']);
 

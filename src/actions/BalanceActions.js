@@ -4,12 +4,27 @@ import BalanceReducer from '../reducers/BalanceReducer';
 
 import { fetchChain } from '../api/ChainApi';
 
+/**
+ *  @method setAssetBalance
+ *
+ * 	Set balance amount of asset or user's core cy.
+ *
+ * 	@param {String} balanceId
+ * 	@param {Number} balance
+ */
 export const setAssetBalance = (balanceId, balance) => (dispatch) => {
 	dispatch(BalanceReducer.actions.update({ field: 'assets', param: balanceId, value: { balance } }));
 
 	dispatch(BalanceReducer.actions.update({ field: 'preview', param: balanceId, value: { balance } }));
 };
 
+/**
+ *  @method initAssetsBalances
+ *
+ * 	Initialization user's assets
+ *
+ * 	@param {Object} assets
+ */
 export const initAssetsBalances = (assets) => async (dispatch) => {
 	let balances = [];
 
@@ -34,6 +49,13 @@ export const initAssetsBalances = (assets) => async (dispatch) => {
 	}));
 };
 
+/**
+ *  @method initPreviewBalances
+ *
+ * 	Initialization list of users
+ *
+ * 	@param {String} networkName
+ */
 export const initPreviewBalances = (networkName) => async (dispatch) => {
 	/**
      *  Preview structure
@@ -84,6 +106,14 @@ export const initPreviewBalances = (networkName) => async (dispatch) => {
 	});
 };
 
+/**
+ *  @method initBalances
+ *
+ * 	Initialization list of users and assets
+ *
+ * 	@param {String} networkName
+ * 	@param {Object} balances
+ */
 export const initBalances = (networkName, balances) => async (dispatch) => {
 	await dispatch(initPreviewBalances(networkName));
 
