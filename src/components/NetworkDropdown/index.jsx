@@ -15,6 +15,7 @@ class NetworkDropdown extends React.PureComponent {
 
 		this.state = {
 			menuHeight: null,
+			dropdownIsOpen: false,
 		};
 	}
 
@@ -23,14 +24,34 @@ class NetworkDropdown extends React.PureComponent {
 		this.setDDMenuHeight();
 	}
 
-	// Устанавливает высоту react-custom-scroll
-	// Проверить, перерендерится высота, при добавлении или удалении сети
-	setDDMenuHeight() {
-		const elm = document.querySelector('#network-menu');
-		return elm.getBoundingClientRect().height > 350 ?
-			this.setState({ menuHeight: 350 }) :
-			this.setState({ menuHeight: elm.getBoundingClientRect().height });
+	componentDidUpdate() {
+		this.setDDMenuHeight();
+	}
 
+
+	setDDMenuHeight() {
+
+		const MAX_MENU_HEIGHT = 350;
+		const el = document.getElementById('network-menu-container');
+
+		if (el) {
+			const height = el.clientHeight;
+			if (this.state.menuHeight !== height) {
+				return height > MAX_MENU_HEIGHT ?
+					this.setState({ menuHeight: MAX_MENU_HEIGHT }) :
+					this.setState({ menuHeight: height });
+			}
+		}
+
+		return true;
+	}
+
+	toggleDropdown() {
+		this.setState({ dropdownIsOpen: !this.state.dropdownIsOpen });
+	}
+
+	closeDropDown() {
+		this.setState({ dropdownIsOpen: false });
 	}
 
 	render() {
@@ -43,7 +64,8 @@ class NetworkDropdown extends React.PureComponent {
 				pullRight
 				className="dropdown-network"
 				id="dropdown-network"
-
+				onToggle={() => this.toggleDropdown()}
+				open={this.state.dropdownIsOpen}
 			>
 				<Dropdown.Toggle noCaret>
 					<div className={classnames('current-network', { connected: true })}>
@@ -62,59 +84,61 @@ class NetworkDropdown extends React.PureComponent {
 							flex="1"
 							heightRelativeToParent="calc(100%)"
 						>
-							<ul className="default-networks">
+							<div id="network-menu-container">
+								<ul className="default-networks">
 
-								<MenuItem eventKey="1">
-									<span className="title">Main Network</span>
-									<ul className="accounts">
-										<li>No accounts</li>
-									</ul>
-								</MenuItem>
+									<MenuItem onClick={() => this.closeDropDown()} eventKey="1">
+										<span className="title">Main Network</span>
+										<ul className="accounts">
+											<li>No accounts</li>
+										</ul>
+									</MenuItem>
 
-								<MenuItem eventKey="2" active>
-									<span className="title">Test Network</span>
-									<ul className="accounts">
-										<li>
-											<UserIcon color="green" avatar="ava7" />
-										</li>
-										<li>
-											<UserIcon color="yellow" avatar="ava3" />
-										</li>
-										<li>
-											<UserIcon color="pink" avatar="ava8" />
-										</li>
-									</ul>
-								</MenuItem>
-								<MenuItem eventKey="3">
-									<span className="title">Dev Network</span>
-									<ul className="accounts">
-										<li>
-											<UserIcon color="pink" avatar="ava8" />
-										</li>
-									</ul>
-								</MenuItem>
-							</ul>
-							<ul className="custom-networks">
-								<MenuItem eventKey="4">
-									<Button className="btn-round-close" />
-									<span className="title">Whitepowernet</span>
-								</MenuItem>
-								<MenuItem eventKey="5">
-									<Button className="btn-round-close" />
-									<span className="title">Hellelujahnet</span>
-								</MenuItem>
-								<MenuItem eventKey="6">
-									<Button className="btn-round-close" />
-									<span className="title">Homersimpsonnet</span>
-								</MenuItem>
-								<MenuItem eventKey="7">
-									<Button className="btn-round-close" />
-									<span className="title">Mytestnet</span>
-								</MenuItem>
-							</ul>
-							<div className="dropdown-footer">
-								{/* Проверить, зароется ли дропдаун при переходе на страницу нетворков */}
-								<MenuItem eventKey="9">+ Add Networks</MenuItem>
+									<MenuItem onClick={() => this.closeDropDown()} eventKey="2" active>
+										<span className="title">Test Network</span>
+										<ul className="accounts">
+											<li>
+												<UserIcon color="green" avatar="ava7" />
+											</li>
+											<li>
+												<UserIcon color="yellow" avatar="ava3" />
+											</li>
+											<li>
+												<UserIcon color="pink" avatar="ava8" />
+											</li>
+										</ul>
+									</MenuItem>
+									<MenuItem onClick={() => this.closeDropDown()} eventKey="3">
+										<span className="title">Dev Network</span>
+										<ul className="accounts">
+											<li>
+												<UserIcon color="pink" avatar="ava8" />
+											</li>
+										</ul>
+									</MenuItem>
+								</ul>
+								<ul className="custom-networks">
+									<MenuItem onClick={() => this.closeDropDown()} eventKey="4">
+										<Button className="btn-round-close" />
+										<span className="title">Whitepowernet</span>
+									</MenuItem>
+									<MenuItem onClick={() => this.closeDropDown()} eventKey="5">
+										<Button className="btn-round-close" />
+										<span className="title">Hellelujahnet</span>
+									</MenuItem>
+									<MenuItem onClick={() => this.closeDropDown()} eventKey="6">
+										<Button className="btn-round-close" />
+										<span className="title">Homersimpsonnet</span>
+									</MenuItem>
+									<MenuItem onClick={() => this.closeDropDown()} eventKey="7">
+										<Button className="btn-round-close" />
+										<span className="title">Mytestnet</span>
+									</MenuItem>
+								</ul>
+								<div className="dropdown-footer">
+									{/* Проверить, зароется ли дропдаун при переходе на страницу нетворков */}
+									<MenuItem onClick={() => this.closeDropDown()} eventKey="9">+ Add Networks</MenuItem>
+								</div>
 							</div>
 						</CustomScroll>
 
