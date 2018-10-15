@@ -70,7 +70,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 		await createWallet(registrator, name, wif);
 
-		await crypto.importByWIF(wif);
+		await crypto.importByWIF(networkName, wif);
 
 		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
 		dispatch(addAccount(name, [key, key], networkName));
@@ -92,16 +92,17 @@ export const createAccount = (name) => async (dispatch, getState) => {
  *
  * 	Import account from desktop app params (name and password)
  *
+ *  @param {String} networkName
  * 	@param {String} name
  * 	@param {String} password
  *
  * 	@return {Boolean} success
  */
-const importByPassword = (name, password, networkName) => async (dispatch, getState) => {
+const importByPassword = (networkName, name, password) => async (dispatch, getState) => {
 	const instance = getState().echojs.getIn(['system', 'instance']);
 
 	const nameError = ValidateAccountHelper.validateAccountName(name);
-	const addedError = isAccountAdded(name, networkName);
+	const addedError = dispatch(isAccountAdded(name));
 	const existError = await validateImportAccountExist(instance, name, true);
 
 	if (nameError || addedError || existError) {
@@ -120,7 +121,12 @@ const importByPassword = (name, password, networkName) => async (dispatch, getSt
 		return false;
 	}
 
-	await crypto.importByPassword(name, password, account.getIn(['options', 'memo_key']));
+	await crypto.importByPassword(
+		networkName,
+		name,
+		password,
+		account.getIn(['options', 'memo_key']),
+	);
 
 	return true;
 };
@@ -161,20 +167,20 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			}
 
 			const account = await dispatch(EchoJSActions.fetch(accountId));
-			const addedError = isAccountAdded(account.get('name'), networkName);
+			const addedError = dispatch(isAccountAdded(account.get('name')));
 
 			if (addedError) {
 				dispatch(setValue(FORM_SIGN_IN, 'passwordError', addedError));
 				return false;
 			}
 
-			await crypto.importByWIF(password);
+			await crypto.importByWIF(networkName, password);
 
 			name = account.get('name');
 			const memo = account.getIn(['options', 'memo_key']);
 			keys = [active, active === memo ? memo : null];
 		} else {
-			success = await dispatch(importByPassword(name, password, networkName));
+			success = await dispatch(importByPassword(networkName, name, password));
 
 			keys = [
 				crypto.getPublicKey(name, password, ACTIVE_KEY),

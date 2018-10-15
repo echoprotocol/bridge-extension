@@ -1,11 +1,11 @@
 import { createModule } from 'redux-modules';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import _ from 'lodash';
 
 const DEFAULT_FIELDS = Map({
 	loading: false,
 	error: null,
-	activeUser: new Map({
+	account: new Map({
 		id: '',
 		name: '',
 		icon: '',
@@ -19,6 +19,7 @@ const DEFAULT_FIELDS = Map({
 		isLocked: true,
 		error: null,
 	}),
+	accounts: new List([]),
 });
 
 export default createModule({

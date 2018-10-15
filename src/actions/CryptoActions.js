@@ -31,3 +31,17 @@ export const unlockCrypto = (pin = '123456') => async (dispatch) => {
 		dispatch(changeCrypto({ error: err.message }));
 	}
 };
+
+export const setCryptoInfo = (field, value) => async (dispatch, getState) => {
+	const networkName = getState().global.getIn(['network', 'name']);
+
+	await crypto.setInByNetwork(networkName, field, value);
+};
+
+export const getCryptoInfo = (field) => async (dispatch, getState) => {
+	const networkName = getState().global.getIn(['network', 'name']);
+
+	const value = await crypto.getInByNetwork(networkName, field);
+
+	return value;
+};

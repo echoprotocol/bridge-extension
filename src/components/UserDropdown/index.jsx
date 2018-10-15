@@ -6,7 +6,7 @@ import classnames from 'classnames';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
 
-import { initAccount, removeAccount } from '../../actions/GlobalActions';
+import { switchAccount, removeAccount } from '../../actions/GlobalActions';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
@@ -18,32 +18,27 @@ import UserIcon from '../UserIcon';
 class UserDropdown extends React.PureComponent {
 
 	onDropdownChange(e, name) {
-		if (!this.props.preview.find((i) => i.name === name)) {
-			return;
-		}
+		const account = this.props.preview.find((i) => i.name === name);
+
+		if (!account) { return; }
 
 		const handledKey = e.key || e.type;
-		const { activeUser, networkName } = this.props;
 
 		if (['click', 'Enter'].includes(handledKey)) {
-			if (activeUser.get('name') === name) {
-				return;
-			}
+			if (this.props.account.get('name') === name) { return; }
 
-			this.props.initAccount(name, networkName);
+			this.props.switchAccount(name);
 		}
 	}
 
 	onRemoveAccount(e, name) {
 		e.stopPropagation();
 
-		const { networkName } = this.props;
-
-		this.props.removeAccount(name, networkName);
+		this.props.removeAccount(name);
 	}
 
 	renderList() {
-		const { preview, activeUser } = this.props;
+		const { preview, account } = this.props;
 
 		return preview.map(({
 			name, balance: { amount, precision, symbol }, icon,
@@ -64,13 +59,13 @@ class UserDropdown extends React.PureComponent {
 				key: name,
 				className: 'user-item',
 				content,
-				selected: activeUser.get('name') === name,
+				selected: account.get('name') === name,
 			});
 		}).toArray();
 	}
 
 	render() {
-		const { activeUser } = this.props;
+		const { account } = this.props;
 
 		const optionsEnd = [
 
@@ -112,7 +107,7 @@ class UserDropdown extends React.PureComponent {
 				className="dropdown-user"
 				trigger={
 					<div className="dropdown-trigger">
-						<UserIcon color="green" avatar={`ava${activeUser.get('icon')}`} />
+						<UserIcon color="green" avatar={`ava${account.get('icon')}`} />
 
 						<i aria-hidden="true" className="dropdown icon" />
 					</div>
@@ -128,21 +123,19 @@ class UserDropdown extends React.PureComponent {
 }
 
 UserDropdown.propTypes = {
-	activeUser: PropTypes.object.isRequired,
-	networkName: PropTypes.string.isRequired,
+	account: PropTypes.object.isRequired,
 	preview: PropTypes.object.isRequired,
-	initAccount: PropTypes.func.isRequired,
+	switchAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
 };
 
 export default withRouter(connect(
 	(state) => ({
 		preview: state.balance.get('preview'),
-		activeUser: state.global.get('activeUser'),
-		networkName: state.global.getIn(['network', 'name']),
+		account: state.global.get('account'),
 	}),
 	(dispatch) => ({
-		initAccount: (name, network) => dispatch(initAccount(name, network)),
-		removeAccount: (name, network) => dispatch(removeAccount(name, network)),
+		switchAccount: (name) => dispatch(switchAccount(name)),
+		removeAccount: (name) => dispatch(removeAccount(name)),
 	}),
 )(UserDropdown));
