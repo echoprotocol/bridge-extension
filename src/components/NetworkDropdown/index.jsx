@@ -47,10 +47,16 @@ class NetworkDropdown extends React.PureComponent {
 
 	onChangeNetwork(name) {
 		this.props.setGlobalLoad();
-		const { networks } = this.props;
+		const { network, networks } = this.props;
 
-		const network = networks.concat(NETWORKS).find((i) => i.name === name);
-		setTimeout(() => this.props.changeNetwork(network), 0);
+		const currentNetworkName = network.get('name');
+
+		if (currentNetworkName === name) {
+			return;
+		}
+
+		const newNetwork = networks.concat(NETWORKS).find((i) => i.name === name);
+		setTimeout(() => this.props.changeNetwork(newNetwork), 0);
 		this.closeDropDown();
 	}
 
