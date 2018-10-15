@@ -10,6 +10,8 @@ import { changeNetwork, deleteNetwork } from '../../actions/GlobalActions';
 import { NETWORKS } from '../../constants/GlobalConstants';
 import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
 
+import GlobalReducer from '../../reducers/GlobalReducer';
+
 import NetworkInfo from './NetworkInfo';
 import UserIcon from '../UserIcon';
 
@@ -34,7 +36,8 @@ class NetworkDropdown extends React.PureComponent {
 				break;
 
 			default:
-				this.onChangeNetwork(value);
+				this.props.setGlobalLoad();
+				setTimeout(() => this.onChangeNetwork(value), 0);
 		}
 	}
 
@@ -196,6 +199,7 @@ NetworkDropdown.propTypes = {
 	networks: PropTypes.object.isRequired,
 	changeNetwork: PropTypes.func.isRequired,
 	deleteNetwork: PropTypes.func.isRequired,
+	setGlobalLoad: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	connected: PropTypes.bool,
 };
@@ -213,6 +217,7 @@ export default withRouter(connect(
 	(dispatch) => ({
 		changeNetwork: (network) => dispatch(changeNetwork(network)),
 		deleteNetwork: (network) => dispatch(deleteNetwork(network)),
+		setGlobalLoad: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
 	}),
 )(NetworkDropdown));
 
