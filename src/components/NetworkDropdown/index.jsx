@@ -46,7 +46,6 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	onChangeNetwork(name) {
-		this.props.setGlobalLoad();
 		const { network, networks } = this.props;
 
 		const currentNetworkName = network.get('name');
@@ -54,6 +53,8 @@ class NetworkDropdown extends React.PureComponent {
 		if (currentNetworkName === name) {
 			return;
 		}
+
+		this.props.setGlobalLoad();
 
 		const newNetwork = networks.concat(NETWORKS).find((i) => i.name === name);
 		setTimeout(() => this.props.changeNetwork(newNetwork), 0);
