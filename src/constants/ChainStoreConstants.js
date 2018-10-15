@@ -1,5 +1,4 @@
-/* eslint-disable import/prefer-default-export */
-export const ChainStoreCacheNames = [
+const ChainStoreCacheNames = [
 	{
 		origin: 'objects_by_id',
 		custom: 'objectsById',
@@ -34,3 +33,4 @@ export const ChainStoreCacheNames = [
 	},
 ];
 
+export default ChainStoreCacheNames;

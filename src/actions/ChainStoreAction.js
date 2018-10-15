@@ -10,20 +10,43 @@ import BalanceReducer from '../reducers/BalanceReducer';
 
 import { initAccount } from './GlobalActions';
 import { initCrypto } from './CryptoActions';
+import { setAssetBalance } from './BalanceActions';
 
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
 
 import { NETWORKS } from '../constants/GlobalConstants';
 import { CREATE_ACCOUNT_PATH, INDEX_PATH } from '../constants/RouterConstants';
-import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
+import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 
 /**
  * copy object from ChainStore lib to redux every time when triggered
  * @returns {Function}
  */
-export const subscribe = () => (dispatch) => {
+export const subscribe = () => (dispatch, getState) => {
 	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
 		const value = ChainStore[origin];
+
+		if (value && (field === 'accountsByName')) {
+			const accounts = getState().balance.get('preview');
+
+			accounts.forEach(async (account) => {
+				const chainAssets = (await fetchChain(account.accountName)).get('balances');
+				const assets = getState().balance.get('assets');
+
+				chainAssets.forEach(async (chainAssetId) => {
+					const chainBalance = (await fetchChain(chainAssetId)).get('balance');
+
+					if (assets.find((asset) => asset.id === chainAssetId)) {
+						if (assets.find((asset) => asset.balance !== chainBalance)) {
+							dispatch(setAssetBalance(chainAssetId, chainBalance));
+						}
+					} else {
+						dispatch(setAssetBalance(chainAssetId, chainBalance));
+					}
+				});
+			});
+		}
+
 		dispatch(BlockchainReducer.actions.set({ field, value }));
 	});
 };
@@ -75,7 +98,6 @@ export const connect = () => async (dispatch) => {
 			await dispatch(initAccount(active.name, network.name));
 			history.push(INDEX_PATH);
 		}
-
 	} catch (err) {
 		dispatch(batchActions([
 			GlobalReducer.actions.set({ field: 'error', value: err }),

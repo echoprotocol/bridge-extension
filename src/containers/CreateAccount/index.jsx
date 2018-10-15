@@ -50,7 +50,6 @@ class CreateAccount extends React.Component {
 
 	async onCreateAccount() {
 		const wif = await this.props.createAccount(this.state.name);
-
 		if (wif) {
 			this.setState({ wif });
 			this.props.history.push(CREATE_SUCCESS_PATH);

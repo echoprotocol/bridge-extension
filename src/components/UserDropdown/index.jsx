@@ -18,7 +18,7 @@ import UserIcon from '../UserIcon';
 class UserDropdown extends React.PureComponent {
 
 	onDropdownChange(e, name) {
-		if (!this.props.preview.find((i) => i.name === name)) {
+		if (!this.props.preview.find((i) => i.accountName === name)) {
 			return;
 		}
 
@@ -46,25 +46,25 @@ class UserDropdown extends React.PureComponent {
 		const { preview, activeUser } = this.props;
 
 		return preview.map(({
-			name, balance: { amount, precision, symbol }, icon,
+			accountName, balance, precision, symbol, icon,
 		}) => {
 			const content = (
-				<div key={name} className="user-item-wrap">
+				<div key={accountName} className="user-item-wrap">
 					<UserIcon color="green" avatar={`ava${icon}`} />
-					<div className="user-name">{name}</div>
-					<div className={classnames('user-balance', { positive: !!amount })}>
-						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${ECHO}`}
+					<div className="user-name">{accountName}</div>
+					<div className={classnames('user-balance', { positive: !!balance })}>
+						{FormatHelper.formatAmount(balance, precision, symbol) || `0 ${ECHO}`}
 					</div>
-					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
+					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, accountName)} />
 				</div>
 			);
 
 			return ({
-				value: name,
-				key: name,
+				value: accountName,
+				key: accountName,
 				className: 'user-item',
 				content,
-				selected: activeUser.get('name') === name,
+				selected: activeUser.get('name') === accountName,
 			});
 		}).toArray();
 	}
@@ -131,6 +131,7 @@ UserDropdown.propTypes = {
 	activeUser: PropTypes.object.isRequired,
 	networkName: PropTypes.string.isRequired,
 	preview: PropTypes.object.isRequired,
+	assets: PropTypes.object.isRequired,
 	initAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
 };
@@ -138,6 +139,7 @@ UserDropdown.propTypes = {
 export default withRouter(connect(
 	(state) => ({
 		preview: state.balance.get('preview'),
+		assets: state.balance.get('assets'),
 		activeUser: state.global.get('activeUser'),
 		networkName: state.global.getIn(['network', 'name']),
 	}),

@@ -4,7 +4,37 @@ import BalanceReducer from '../reducers/BalanceReducer';
 
 import { fetchChain } from '../api/ChainApi';
 
-export const getPreviewBalances = (networkName) => async (dispatch) => {
+export const setAssetBalance = (balanceId, balance) => (dispatch) => {
+	dispatch(BalanceReducer.actions.update({ field: 'assets', param: balanceId, value: { balance } }));
+
+	dispatch(BalanceReducer.actions.update({ field: 'preview', param: balanceId, value: { balance } }));
+};
+
+export const initAssetsBalances = (assets) => async (dispatch) => {
+	let balances = [];
+
+	if (assets && Object.keys(assets).length) {
+		balances = Object.entries(assets).map(async (asset) => {
+			const balance = await fetchChain(asset[1]);
+			asset = (await fetchChain(asset[0]));
+			return {
+				id: balance.get('id'),
+				balance: balance.get('balance'),
+				precision: asset.get('precision'),
+				symbol: asset.get('symbol'),
+			};
+		});
+
+		balances = await Promise.all(balances);
+	}
+
+	dispatch(BalanceReducer.actions.set({
+		field: 'assets',
+		value: new List(balances),
+	}));
+};
+
+export const initPreviewBalances = (networkName) => async (dispatch) => {
 	/**
      *  Preview structure
      *  preview: [{
@@ -29,19 +59,17 @@ export const getPreviewBalances = (networkName) => async (dispatch) => {
 		const balance = account.getIn(['balances', '1.3.0']);
 
 		const preview = {
-			balance: {
-				amount: 0,
-				symbol: fetchedAsset.get('symbol'),
-				precision: fetchedAsset.get('precision'),
-			},
-			name,
+			balance: 0,
+			symbol: fetchedAsset.get('symbol'),
+			precision: fetchedAsset.get('precision'),
+			accountName: name,
 			icon,
 		};
 
 		if (account && account.get('balances') && balance) {
 			const balanceAmount = (await fetchChain(balance)).get('balance');
-			preview.balance.amount = balanceAmount || 0;
-			preview.balance.id = balance;
+			preview.balance = balanceAmount || 0;
+			preview.id = balance;
 		}
 
 		return preview;
@@ -56,6 +84,8 @@ export const getPreviewBalances = (networkName) => async (dispatch) => {
 	});
 };
 
-export const initBalances = (networkName) => async (dispatch) => {
-	await dispatch(getPreviewBalances(networkName));
+export const initBalances = (networkName, balances) => async (dispatch) => {
+	await dispatch(initPreviewBalances(networkName));
+
+	await dispatch(initAssetsBalances(balances));
 };

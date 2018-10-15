@@ -2,6 +2,7 @@ import {
 	CREATE_ACCOUNT_PATH,
 	CREATE_SUCCESS_PATH,
 	IMPORT_ACCOUNT_PATH,
+	WALLET_PATH,
 	IMPORT_SUCCESS_PATH,
 } from './RouterConstants';
 
@@ -27,6 +28,10 @@ export const HEADER_TITLE = [
 	},
 	{
 		path: IMPORT_SUCCESS_PATH,
+	},
+	{
+		path: WALLET_PATH,
+		title: 'Wallet',
 	},
 ];
 

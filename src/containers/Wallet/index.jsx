@@ -2,29 +2,25 @@ import React from 'react';
 import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
 import classnames from 'classnames';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+
+import FormatHelper from '../../helpers/FormatHelper';
 
 
 class Wallet extends React.Component {
 
 	render() {
-		const balances = [
-			{
-				value: '0.000',
-				key: 'ECHO',
-				type: 'asset',
-			},
-			{
-				value: '234.09',
-				key: 'ZSHC',
-				type: 'asset',
-			},
-			{
-				value: '0.000392',
-				key: 'EBTC',
-				type: 'asset',
-			},
+		// const balances = [
+		// 	{
+		// 		value: '0.000',
+		// 		key: 'ECHO',
+		// 		type: 'asset',
+		// 	},
+		// ];
+		let { assets } = this.props;
+		assets = assets.toArray();
 
-		];
 		return (
 			<React.Fragment>
 				<div className="wallet-block">
@@ -42,7 +38,7 @@ class Wallet extends React.Component {
 					<div className="page">
 						<div className={classnames(
 							'scroll-wrap',
-							{ two: balances.length === 2 },
+							{ two: assets.length === 2 },
 						)}
 						>
 							<CustomScroll
@@ -51,33 +47,33 @@ class Wallet extends React.Component {
 							>
 								<ul className={classnames(
 									'wallet-list',
-									{ one: balances.length === 1 },
-									{ two: balances.length === 2 },
-									{ three: balances.length === 3 },
+									{ one: assets.length === 1 },
+									{ two: assets.length === 2 },
+									{ three: assets.length === 3 },
 								)}
 								>
 									{
 
-										balances.map((balance, i) => {
+										assets.map((asset, i) => {
 											const id = i;
 											return (
 
 												<li key={id}>
 													<div className="balance-info">
-														<span>{balance.value}</span>
-														<span>{balance.key}</span>
+														<span>{FormatHelper.formatAmount(asset.balance, asset.precision)}</span>
+														<span>{asset.symbol}</span>
 													</div>
-													{
-														balance.type === 'token' ?
-															<React.Fragment>
-																<Button className="btn-icon icon-closeBig" />
-																<div className="token-info">
-																	<span>ERC20</span>
-																	<span>TOKEN</span>
-																</div>
-															</React.Fragment> :
-															null
-													}
+													{/* { */}
+													{/* asset.type === 'token' ? */}
+													{/* <React.Fragment> */}
+													{/* <Button className="btn-icon icon-closeBig" /> */}
+													{/* <div className="token-info"> */}
+													{/* <span>ERC20</span> */}
+													{/* <span>TOKEN</span> */}
+													{/* </div> */}
+													{/* </React.Fragment> : */}
+													{/* null */}
+													{/* } */}
 												</li>
 
 											);
@@ -112,4 +108,13 @@ class Wallet extends React.Component {
 
 }
 
-export default Wallet;
+Wallet.propTypes = {
+	assets: PropTypes.object.isRequired,
+};
+
+export default connect(
+	(state) => ({
+		assets: state.balance.get('assets'),
+	}),
+	() => ({}),
+)(Wallet);

@@ -1,6 +1,10 @@
 import history from '../history';
 
-import { getPreviewBalances, initBalances } from './BalanceActions';
+import { initPreviewBalances, initBalances } from './BalanceActions';
+
+import { SUCCESS_ADD_NETWORK_PATH } from '../constants/RouterConstants';
+
+
 import { setFormError, toggleLoading } from './FormActions';
 import { disconnect, connect } from './ChainStoreAction';
 
@@ -8,7 +12,6 @@ import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { SUCCESS_ADD_NETWORK_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
@@ -40,7 +43,7 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 			params: { id: fetchedAccount.get('id'), name: fetchedAccount.get('name'), icon },
 		}));
 
-		await dispatch(initBalances(networkName));
+		await dispatch(initBalances(networkName, fetchedAccount.get('balances').toObject()));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {
@@ -89,9 +92,9 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
 		dispatch(initAccount(accounts[0].name, networkName));
 	} else if (!accounts.length) {
 		dispatch(GlobalReducer.actions.logout());
-		dispatch(getPreviewBalances(networkName));
+		dispatch(initPreviewBalances(networkName));
 	} else {
-		dispatch(getPreviewBalances(networkName));
+		dispatch(initPreviewBalances(networkName));
 	}
 };
 
