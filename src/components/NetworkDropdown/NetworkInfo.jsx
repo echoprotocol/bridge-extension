@@ -1,5 +1,5 @@
-
 import React from 'react';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 class NetworkInfo extends React.PureComponent {
@@ -8,19 +8,24 @@ class NetworkInfo extends React.PureComponent {
 		const networkStyle = {
 			top: this.props.netAir,
 		};
+
+		const { network, headBlock } = this.props;
+		const registrator = network.get('registrator');
+		const url = network.get('url');
+
 		return (
 			<ul className="network-info" style={networkStyle}>
 				<li>
 					<div>Block</div>
-					<div>5282942</div>
+					<div>{headBlock}</div>
 				</li>
 				<li>
 					<div>Faucet</div>
-					<div>1.234.234.34</div>
+					<div>{registrator}</div>
 				</li>
 				<li>
-					<div>Addres</div>
-					<div>192.168.1.02</div>
+					<div>Address</div>
+					<div>{url}</div>
 				</li>
 			</ul>
 
@@ -28,12 +33,19 @@ class NetworkInfo extends React.PureComponent {
 	}
 
 }
+
 NetworkInfo.propTypes = {
+	network: PropTypes.object.isRequired,
 	netAir: PropTypes.number,
+	headBlock: PropTypes.any,
 };
 NetworkInfo.defaultProps = {
+	headBlock: 0,
 	netAir: 40,
 };
 
-export default NetworkInfo;
+export default connect((state) => ({
+	network: state.global.get('network'),
+	headBlock: state.blockchain.getIn(['objectsById', '2.1.0', 'head_block_number']),
+}))(NetworkInfo);
 

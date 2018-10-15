@@ -1,9 +1,9 @@
 import { createModule } from 'redux-modules';
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 import _ from 'lodash';
 
 const DEFAULT_FIELDS = Map({
-	globalLoading: false,
+	loading: false,
 	error: null,
 	activeUser: new Map({
 		id: '',
@@ -15,7 +15,12 @@ const DEFAULT_FIELDS = Map({
 		registrator: '',
 		url: '',
 	}),
-	cryptoError: null,
+	networks: new List([]),
+	crypto: new Map({
+		isLocked: true,
+		error: null,
+	}),
+	connected: false,
 });
 
 export default createModule({
@@ -39,19 +44,11 @@ export default createModule({
 				return state;
 			},
 		},
-		setGlobalLoading: {
-			reducer: (state, { payload }) => {
-				state = state.set('globalLoading', payload.globalLoading);
 
-				return state;
-			},
+		disconnect: {
+			reducer: () => DEFAULT_FIELDS,
 		},
-		setLoading: {
-			reducer: (state, { payload }) => {
-				state = state.set('loading', !!payload);
-				return state;
-			},
-		},
+
 		logout: {
 			reducer: (state) => {
 				const network = state.get('network');

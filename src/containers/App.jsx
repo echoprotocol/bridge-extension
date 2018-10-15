@@ -3,11 +3,10 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Dimmer } from 'semantic-ui-react';
 
-import { connection } from '../actions/GlobalActions';
+import { connect as connectTo } from '../actions/ChainStoreAction';
 
 import Header from '../components/Header';
 import Navbar from '../components/Navbar';
-import { FORM_SIGN_UP } from '../constants/FormConstants';
 
 class App extends React.Component {
 
@@ -23,14 +22,9 @@ class App extends React.Component {
 					<Header />
 					<Navbar />
 					{children}
-
-					{/* Dimmer */}
 					{
 						(loading) && <Dimmer active inverted />
 					}
-
-
-					{/* Добавить класс loading на кнопку */}
 				</div>
 			</div>
 		);
@@ -44,20 +38,14 @@ class App extends React.Component {
 
 App.propTypes = {
 	children: PropTypes.element.isRequired,
-	loading: PropTypes.bool,
+	loading: PropTypes.bool.isRequired,
 	connection: PropTypes.func.isRequired,
 };
-
-App.defaultProps = {
-	loading: false,
-};
-
 export default connect(
 	(state) => ({
-		globalLoading: state.global.get('globalLoading'),
-		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
+		loading: state.global.get('loading'),
 	}),
 	(dispatch) => ({
-		connection: () => dispatch(connection()),
+		connection: () => dispatch(connectTo()),
 	}),
 )(App);

@@ -48,6 +48,7 @@
         color: #39494C;
         min-width: 89px;
         text-transform: uppercase;
+        cursor: pointer;
         &:not(.disabled) {
             @include onLinkFocus(
                  $angularMin,

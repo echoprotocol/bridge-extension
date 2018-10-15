@@ -1,21 +1,21 @@
-import { EchoJSActions } from 'echojs-redux';
-import { Map } from 'immutable';
-
 import history from '../history';
 
 import { getPreviewBalances, initBalances } from './BalanceActions';
+import { setFormError, toggleLoading } from './FormActions';
+import { disconnect, connect } from './ChainStoreAction';
+
+import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { IMPORT_ACCOUNT_PATH, WIF_PATH, INDEX_PATH } from '../constants/RouterConstants';
+import { SUCCESS_ADD_NETWORK_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
+import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
-import Crypto from '../services/crypto';
-
-export const userCrypto = new Crypto();
+import { fetchChain } from '../api/ChainApi';
 
 export const initAccount = (accountName, networkName) => async (dispatch) => {
-	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	try {
 		let accounts = localStorage.getItem(`accounts_${networkName}`);
@@ -33,64 +33,34 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 
 		localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
-		const { id, name } = (await dispatch(EchoJSActions.fetch(accountName))).toJS();
+		const fetchedAccount = await fetchChain(accountName);
 
-		dispatch(GlobalReducer.actions.setIn({ field: 'activeUser', params: { id, name, icon } }));
+		dispatch(GlobalReducer.actions.setIn({
+			field: 'activeUser',
+			params: { id: fetchedAccount.get('id'), name: fetchedAccount.get('name'), icon },
+		}));
 
 		await dispatch(initBalances(networkName));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {
-		setTimeout(() => {
-			dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
-		}, 1000);
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
 
-export const addAccount = (accountName, networkName) => (dispatch) => {
+export const addAccount = (accountName, keys, networkName) => (dispatch) => {
 	let accounts = localStorage.getItem(`accounts_${networkName}`);
 	accounts = accounts ? JSON.parse(accounts) : [];
-	accounts.push({ name: accountName, active: false, icon: Math.floor(Math.random() * 15) + 1 });
+	accounts.push({
+		name: accountName,
+		active: false,
+		icon: Math.floor(Math.random() * 15) + 1,
+		keys,
+	});
 
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
 	dispatch(initAccount(accountName, networkName));
-
-	if (INDEX_PATH.includes(history.location.pathname)) {
-		history.push(WIF_PATH);
-	}
-};
-
-export const connection = () => async (dispatch) => {
-	dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
-
-	let network = localStorage.getItem('current_network');
-
-	if (!network) {
-		[network] = NETWORKS;
-		localStorage.setItem('current_network', JSON.stringify(network));
-	} else {
-		network = JSON.parse(network);
-	}
-
-	dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
-
-	try {
-		if (IMPORT_ACCOUNT_PATH !== history.location.pathname) {
-			history.push(IMPORT_ACCOUNT_PATH);
-		}
-		await dispatch(EchoJSActions.connect(network.url));
-		let accounts = localStorage.getItem(`accounts_${network.name}`);
-
-		accounts = accounts ? JSON.parse(accounts) : [];
-
-		const active = accounts.find((i) => i.active) || accounts[0];
-		await dispatch(initAccount(active.name, network.name));
-	} catch (err) {
-		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
-	} finally {
-		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: false }));
-	}
 };
 
 export const isAccountAdded = (accountName, networkName) => {
@@ -114,7 +84,7 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
 	localStorage.setItem(`accounts_${networkName}`, JSON.stringify(accounts));
 
 	if (activeAccountName === accountName && accounts[0]) {
-		dispatch(GlobalReducer.actions.setGlobalLoading({ globalLoading: true }));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 		dispatch(initAccount(accounts[0].name, networkName));
 	} else if (!accounts.length) {
@@ -123,4 +93,118 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
 	} else {
 		dispatch(getPreviewBalances(networkName));
 	}
+};
+
+/**
+ * connect to new network and disconnect from old network
+ * @param {Object} network
+ * @returns {Function}
+ */
+export const changeNetwork = (network) => async (dispatch, getState) => {
+	try {
+		const oldNetworkUrl = getState().global.getIn(['network', 'url']);
+
+		await dispatch(disconnect(oldNetworkUrl));
+
+		localStorage.setItem('current_network', JSON.stringify(network));
+		await dispatch(connect());
+	} catch (err) {
+		GlobalReducer.actions.set({ field: 'error', value: err });
+	}
+};
+
+/**
+ * add new network to storage and connect to it
+ * @returns {Function}
+ */
+export const addNetwork = () => async (dispatch, getState) => {
+	try {
+		dispatch(toggleLoading(FORM_ADD_NETWORK, true));
+
+		const networks = getState().global.get('networks');
+
+		const form = getState().form.get(FORM_ADD_NETWORK);
+
+		const address = form.get('address');
+		const name = form.get('name');
+		const registrator = form.get('registrator');
+
+		const network = {
+			url: address.value.trim(),
+			name: name.value.trim(),
+			registrator: registrator.value.trim(),
+		};
+
+		let nameError = ValidateNetworkHelper.validateNetworkName(network.name);
+
+		if (NETWORKS.concat(networks.toJS()).find((i) => i.name === network.name)) {
+			nameError = `Network "${network.name}" already exists`;
+		}
+
+		if (nameError) {
+			dispatch(setFormError(FORM_ADD_NETWORK, 'name', nameError));
+		}
+
+		const addressError = ValidateNetworkHelper.validateNetworkAddress(network.url);
+
+		if (addressError) {
+			dispatch(setFormError(FORM_ADD_NETWORK, 'address', addressError));
+		}
+
+		const registratorError = ValidateNetworkHelper.validateNetworkRegistrator(network.registrator);
+
+		if (registratorError) {
+			dispatch(setFormError(FORM_ADD_NETWORK, 'registrator', registratorError));
+		}
+
+		if (nameError || addressError || registratorError) { return null; }
+
+		let customNetworks = localStorage.getItem('custom_networks');
+		customNetworks = customNetworks ? JSON.parse(customNetworks) : [];
+		customNetworks.push(network);
+
+		localStorage.setItem('custom_networks', JSON.stringify(customNetworks));
+
+		dispatch(GlobalReducer.actions.set({
+			field: 'networks',
+			value: networks.push(network),
+		}));
+
+		await dispatch(changeNetwork(network));
+		history.push(SUCCESS_ADD_NETWORK_PATH);
+	} catch (e) {
+		return null;
+	} finally {
+		dispatch(toggleLoading(FORM_ADD_NETWORK, 'loading', false));
+	}
+	return null;
+};
+
+/**
+ * delete custom network from storage
+ * @param {Object} network
+ * @returns {Function}
+ */
+export const deleteNetwork = (network) => (dispatch, getState) => {
+	let customNetworks = localStorage.getItem('custom_networks');
+	customNetworks = customNetworks ? JSON.parse(customNetworks) : [];
+	customNetworks = customNetworks.filter((i) => i.name !== network.name);
+
+	localStorage.setItem('custom_networks', JSON.stringify(customNetworks));
+
+	const currentNetworkName = getState().global.getIn(['network', 'name']);
+
+	localStorage.removeItem(`accounts_${network.name}`);
+
+	if (currentNetworkName === network.name) {
+		localStorage.removeItem('current_network');
+		dispatch(connect());
+	}
+
+	const networks = getState().global.get('networks').filter((i) => i.name !== network.name);
+
+	dispatch(GlobalReducer.actions.set({
+		field: 'networks',
+		value: networks,
+	}));
 };
