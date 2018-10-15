@@ -32,7 +32,8 @@
   position: absolute;
   top: 100%;
   left: 0;
-  z-index: -$zindex-dropdown;
+//   z-index: -$zindex-dropdown;
+  display: none;
   float: left;
   min-width: 160px;
   margin: 2px 0 0; // override default ul
@@ -115,6 +116,7 @@
   // Show the menu
   > .dropdown-menu {
     z-index: $zindex-dropdown;
+    display: block;
   }
 
   // Remove the outline when :focus is triggered

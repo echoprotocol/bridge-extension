@@ -59,7 +59,7 @@ class UserDropdown extends React.PureComponent {
 
 	setDDMenuHeight() {
 
-		const MAX_MENU_HEIGHT = 350;
+		const MAX_MENU_HEIGHT = 300;
 		const el = document.getElementById('user-menu-container');
 
 		if (el) {
@@ -90,8 +90,10 @@ class UserDropdown extends React.PureComponent {
 			const content = (
 				<MenuItem
 					active={activeUser.get('name') === name}
+					tabIndex="-1"
 					key={name}
 					eventKey={i}
+					onClick={() => this.closeDropDown()}
 					onSelect={() => this.onSelect(name)}
 				>
 					<UserIcon color="green" avatar={`ava${icon}`} />
@@ -109,7 +111,6 @@ class UserDropdown extends React.PureComponent {
 
 	render() {
 		const { preview, activeUser } = this.props;
-		console.log(this.state.menuHeight);
 		const menuHeight = {
 			height: `${this.state.menuHeight}px`,
 		};
@@ -128,7 +129,6 @@ class UserDropdown extends React.PureComponent {
 				<Dropdown.Menu >
 					<div
 						className="user-scroll"
-						id="user-menu"
 						style={menuHeight}
 					>
 						<CustomScroll
@@ -139,27 +139,28 @@ class UserDropdown extends React.PureComponent {
 								<ul className="user-list">
 									{this.renderList(preview, activeUser)}
 								</ul>
-								<div className="dropdown-footer">
-									<span>Add account: </span>
-									<MenuItem
-										onClick={() => this.closeDropDown()}
-										href={`#${CREATE_ACCOUNT_PATH}`}
-										eventKey={preview.size + 1}
-									>
-										create
-									</MenuItem>
-									<span>or </span>
-									<MenuItem
-										onClick={() => this.closeDropDown()}
-										href={`#${IMPORT_ACCOUNT_PATH}`}
-										eventKey={preview.size + 2}
-									>
-										import
-									</MenuItem>
-								</div>
+
 							</div>
 
 						</CustomScroll>
+					</div>
+					<div className="dropdown-footer">
+						<span>Add account: </span>
+						<MenuItem
+							onClick={() => this.closeDropDown()}
+							href={`#${CREATE_ACCOUNT_PATH}`}
+							eventKey={preview.size + 1}
+						>
+										create
+						</MenuItem>
+						<span>or </span>
+						<MenuItem
+							onClick={() => this.closeDropDown()}
+							href={`#${IMPORT_ACCOUNT_PATH}`}
+							eventKey={preview.size + 2}
+						>
+										import
+						</MenuItem>
 					</div>
 				</Dropdown.Menu>
 			</Dropdown>
