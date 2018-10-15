@@ -217,7 +217,7 @@ export default withRouter(connect(
 	(dispatch) => ({
 		changeNetwork: (network) => dispatch(changeNetwork(network)),
 		deleteNetwork: (network) => dispatch(deleteNetwork(network)),
-		setLoad: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
+		setGlobalLoad: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
 	}),
 )(NetworkDropdown));
 
