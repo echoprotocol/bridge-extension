@@ -7,5 +7,6 @@ export const WALLET_PATH = '/wallet';
 export const ADD_NETWORK_PATH = '/networks/create';
 export const SUCCESS_ADD_NETWORK_PATH = '/networks/success';
 
+export const RECIEVE_PATH = '/recieve';
 
 export const INDEX_PATH = WALLET_PATH;
