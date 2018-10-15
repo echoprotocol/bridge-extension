@@ -90,7 +90,7 @@ class UserDropdown extends React.PureComponent {
 
 	render() {
 		const { preview, activeUser } = this.props;
-
+		console.log(this.state.menuHeight);
 		const menuHeight = {
 			height: `${this.state.menuHeight}px`,
 		};
