@@ -101,21 +101,16 @@ export const removeAccount = (accountName, networkName) => async (dispatch, getS
  * @returns {Function}
  */
 export const changeNetwork = (network) => async (dispatch, getState) => {
-	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
-
 	try {
 		const oldNetworkUrl = getState().global.getIn(['network', 'url']);
 
 		await dispatch(disconnect(oldNetworkUrl));
 
 		localStorage.setItem('current_network', JSON.stringify(network));
-		dispatch(connect());
-	} catch (e) {
-		return;
-	} finally {
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+		await dispatch(connect());
+	} catch (err) {
+		GlobalReducer.actions.set({ field: 'error', value: err });
 	}
-
 };
 
 /**

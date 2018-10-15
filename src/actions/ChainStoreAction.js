@@ -56,6 +56,9 @@ export const connect = () => async (dispatch) => {
 	const subscribeCb = () => dispatch(subscribe());
 	try {
 		await connectToAddress(network.url, subscribeCb);
+		// await new Promise((res) => {
+		// 	setTimeout(() => res(), 2000)
+		// })
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 		let accounts = localStorage.getItem(`accounts_${network.name}`);
 

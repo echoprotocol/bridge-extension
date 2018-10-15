@@ -34,7 +34,7 @@ class NetworkDropdown extends React.PureComponent {
 				break;
 
 			default:
-				this.onChangeNetwork(value);
+				setTimeout(() => this.onChangeNetwork(value), 0);
 		}
 	}
 
