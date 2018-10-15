@@ -2,8 +2,11 @@ import { Map, List } from 'immutable';
 import { ChainStore } from 'echojs-lib';
 import { batchActions } from 'redux-batched-actions';
 
+import history from '../history';
+
 import GlobalReducer from '../reducers/GlobalReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
+import BalanceReducer from '../reducers/BalanceReducer';
 
 import { initAccount } from './GlobalActions';
 import { initCrypto } from './CryptoActions';
@@ -11,6 +14,7 @@ import { initCrypto } from './CryptoActions';
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
 
 import { NETWORKS } from '../constants/GlobalConstants';
+import { CREATE_ACCOUNT_PATH } from '../constants/RouterConstants';
 import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
 
 /**
@@ -58,15 +62,19 @@ export const connect = () => async (dispatch) => {
 		await connectToAddress(network.url, subscribeCb);
 
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
-		let accounts = localStorage.getItem(`accounts_${network.name}`);
 
-		accounts = accounts ? JSON.parse(accounts) : [];
 		await fetchChain('2.1.0');
 
-		if (!accounts.length) return;
-		const active = accounts.find((i) => i.active) || accounts[0];
+		let accounts = localStorage.getItem(`accounts_${network.name}`);
+		accounts = accounts ? JSON.parse(accounts) : [];
 
-		await dispatch(initAccount(active.name, network.name));
+		if (!accounts.length) {
+			history.push(CREATE_ACCOUNT_PATH);
+		} else {
+			const active = accounts.find((i) => i.active) || accounts[0];
+			await dispatch(initAccount(active.name, network.name));
+		}
+
 	} catch (err) {
 		dispatch(batchActions([
 			GlobalReducer.actions.set({ field: 'error', value: err }),
@@ -87,6 +95,7 @@ export const disconnect = (address) => async (dispatch) => {
 	dispatch(batchActions([
 		BlockchainReducer.actions.disconnect(),
 		GlobalReducer.actions.disconnect(),
+		BalanceReducer.actions.reset(),
 		GlobalReducer.actions.set({ field: 'connected', value: false }),
 	]));
 };
