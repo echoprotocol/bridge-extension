@@ -41,6 +41,8 @@ export const connectToAddress = async (address, subscribeCb) => {
 			{ enableCrypto: false },
 		);
 
+		Apis.setAutoReconnect(false);
+
 		await instance.init_promise;
 
 		await ChainStore.init();
