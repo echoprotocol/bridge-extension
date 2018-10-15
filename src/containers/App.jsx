@@ -24,7 +24,7 @@ class App extends React.Component {
 				<div className={classnames('app-wrap', 'dark')} >
 					{/* <Header />
 					<Navbar /> */}
-					<div className="header_bridge-image">
+					<div className="header-bridge-image">
 						<span>Bridge</span>
 					</div>
 					{children}
