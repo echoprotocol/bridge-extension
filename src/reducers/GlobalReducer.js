@@ -15,11 +15,13 @@ const DEFAULT_FIELDS = Map({
 		registrator: '',
 		url: '',
 	}),
+	networks: new List([]),
 	crypto: new Map({
 		isLocked: true,
 		error: null,
 	}),
 	accounts: new List([]),
+	connected: false,
 });
 
 export default createModule({
@@ -42,6 +44,10 @@ export default createModule({
 
 				return state;
 			},
+		},
+
+		disconnect: {
+			reducer: () => DEFAULT_FIELDS,
 		},
 
 		logout: {

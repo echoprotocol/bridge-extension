@@ -1,10 +1,12 @@
 import React from 'react';
-import { Dropdown, Button } from 'semantic-ui-react';
+import { Dropdown, MenuItem } from 'react-bootstrap';
+import CustomScroll from 'react-custom-scroll';
+
+import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { withRouter } from 'react-router';
-import { Link } from 'react-router-dom';
 
 import { switchAccount, removeAccount } from '../../actions/GlobalActions';
 
@@ -17,18 +19,34 @@ import UserIcon from '../UserIcon';
 
 class UserDropdown extends React.PureComponent {
 
-	onDropdownChange(e, name) {
-		const account = this.props.preview.find((i) => i.name === name);
+	constructor(props) {
+		super(props);
 
-		if (!account) { return; }
+		this.state = {
+			menuHeight: null,
+			opened: false,
+		};
+	}
 
-		const handledKey = e.key || e.type;
+	componentDidMount() {
+		this.setDDMenuHeight();
+	}
 
-		if (['click', 'Enter'].includes(handledKey)) {
-			if (this.props.account.get('name') === name) { return; }
+	componentDidUpdate() {
+		this.setDDMenuHeight();
+	}
 
-			this.props.switchAccount(name);
+	onSelect(name) {
+		if (!this.props.preview.find((i) => i.name === name)) {
+			return;
 		}
+		const { account } = this.props;
+
+		if (account.get('name') === name) {
+			return;
+		}
+
+		this.props.switchAccount(name);
 	}
 
 	onRemoveAccount(e, name) {
@@ -37,86 +55,113 @@ class UserDropdown extends React.PureComponent {
 		this.props.removeAccount(name);
 	}
 
-	renderList() {
-		const { preview, account } = this.props;
+	setDDMenuHeight() {
+
+		const MAX_MENU_HEIGHT = 300;
+		const el = document.getElementById('user-menu-container');
+
+		if (el) {
+			const height = el.clientHeight;
+			if (this.state.menuHeight !== height) {
+				return height > MAX_MENU_HEIGHT ?
+					this.setState({ menuHeight: MAX_MENU_HEIGHT }) :
+					this.setState({ menuHeight: height });
+			}
+		}
+
+		return true;
+	}
+
+	toggleDropdown() {
+		this.setState({ opened: !this.state.opened });
+	}
+
+	closeDropDown() {
+		this.setState({ opened: false });
+	}
+
+	renderList(preview, account) {
 
 		return preview.map(({
 			name, balance: { amount, precision, symbol }, icon,
-		}) => {
+		}, i) => {
 			const content = (
-				<div key={name} className="user-item-wrap">
+				<MenuItem
+					active={account.get('name') === name}
+					tabIndex="-1"
+					key={name}
+					eventKey={i}
+					onClick={() => this.closeDropDown()}
+					onSelect={() => this.onSelect(name)}
+				>
 					<UserIcon color="green" avatar={`ava${icon}`} />
 					<div className="user-name">{name}</div>
 					<div className={classnames('user-balance', { positive: !!amount })}>
 						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${ECHO}`}
 					</div>
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
-				</div>
+				</MenuItem>
 			);
 
-			return ({
-				value: name,
-				key: name,
-				className: 'user-item',
-				content,
-				selected: account.get('name') === name,
-			});
-		}).toArray();
+			return content;
+		});
 	}
 
 	render() {
-		const { account } = this.props;
-
-		const optionsEnd = [
-
-			{
-				value: 'create',
-				key: 'create-account',
-				className: ' user-create',
-				content: (
-					<React.Fragment>
-						<Link to={CREATE_ACCOUNT_PATH}>create</Link>
-					</React.Fragment>
-				),
-			},
-			{
-				value: 'import',
-				key: 'import-account',
-				className: 'user-import',
-				content: (
-					<React.Fragment>
-						<Link to={IMPORT_ACCOUNT_PATH}>import</Link>
-					</React.Fragment>
-				),
-			},
-			{
-				value: 'fake-element',
-				key: 'fake-element',
-				disabled: true,
-				content: (
-					<React.Fragment>
-						<div className="user-body" />
-						<div className="user-footer" />
-					</React.Fragment>
-				),
-			},
-		];
+		const { preview, account } = this.props;
+		const menuHeight = {
+			height: `${this.state.menuHeight}px`,
+		};
 
 		return (
 			<Dropdown
 				className="dropdown-user"
-				trigger={
-					<div className="dropdown-trigger">
-						<UserIcon color="green" avatar={`ava${account.get('icon')}`} />
+				id="dropdown-user"
+				onToggle={() => this.toggleDropdown()}
+				open={this.state.opened}
+			>
+				<Dropdown.Toggle noCaret>
+					<UserIcon color="green" avatar={`ava${account.get('icon')}`} />
+					<i aria-hidden="true" className="dropdown icon" />
+				</Dropdown.Toggle>
+				<Dropdown.Menu >
+					<div
+						className="user-scroll"
+						style={menuHeight}
+					>
+						<CustomScroll
+							flex="1"
+							heightRelativeToParent="calc(100%)"
+						>
+							<div id="user-menu-container">
+								<ul className="user-list">
+									{this.renderList(preview, account)}
+								</ul>
 
-						<i aria-hidden="true" className="dropdown icon" />
+							</div>
+
+						</CustomScroll>
 					</div>
-				}
-				onChange={(e, { value }) => this.onDropdownChange(e, value)}
-				options={this.renderList().concat(optionsEnd)}
-				selectOnBlur={false}
-				icon={false}
-			/>
+					<div className="dropdown-footer">
+						<span>Add account: </span>
+						<MenuItem
+							onClick={() => this.closeDropDown()}
+							href={`#${CREATE_ACCOUNT_PATH}`}
+							eventKey={preview.size + 1}
+						>
+										create
+						</MenuItem>
+						<span>or </span>
+						<MenuItem
+							onClick={() => this.closeDropDown()}
+							href={`#${IMPORT_ACCOUNT_PATH}`}
+							eventKey={preview.size + 2}
+						>
+										import
+						</MenuItem>
+					</div>
+				</Dropdown.Menu>
+			</Dropdown>
 		);
 	}
 

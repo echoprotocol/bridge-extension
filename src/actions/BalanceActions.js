@@ -1,7 +1,8 @@
-import { EchoJSActions } from 'echojs-redux';
 import { List } from 'immutable';
 
 import BalanceReducer from '../reducers/BalanceReducer';
+
+import { fetchChain } from '../api/ChainApi';
 
 export const getPreviewBalances = () => async (dispatch, getState) => {
 	/**
@@ -22,10 +23,10 @@ export const getPreviewBalances = () => async (dispatch, getState) => {
 
 	if (!accounts) { return; }
 
-	const fetchedAsset = await dispatch(EchoJSActions.fetch('1.3.0'));
+	const fetchedAsset = await fetchChain('1.3.0');
 
 	const balances = accounts.map(async ({ name, icon }) => {
-		const account = await dispatch(EchoJSActions.fetch(name));
+		const account = await fetchChain(name);
 		const balance = account.getIn(['balances', '1.3.0']);
 
 		const preview = {
@@ -39,7 +40,7 @@ export const getPreviewBalances = () => async (dispatch, getState) => {
 		};
 
 		if (account && account.get('balances') && balance) {
-			const balanceAmount = (await dispatch(EchoJSActions.fetch(balance))).get('balance');
+			const balanceAmount = (await fetchChain(balance)).get('balance');
 			preview.balance.amount = balanceAmount || 0;
 			preview.balance.id = balance;
 		}

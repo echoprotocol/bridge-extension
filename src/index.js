@@ -3,9 +3,9 @@ import ReactDOM from 'react-dom';
 import { applyMiddleware, combineReducers, createStore, compose } from 'redux';
 import { Provider } from 'react-redux';
 import thunk from 'redux-thunk';
+import { batchDispatchMiddleware } from 'redux-batched-actions';
 
 import { ConnectedRouter, routerMiddleware, routerReducer } from 'react-router-redux';
-import { EchoJSReducer } from 'echojs-redux';
 
 import reducers from './reducers';
 import Routes from './routes'; // Or wherever you keep your reducers
@@ -22,10 +22,10 @@ const store = createStore(
 	combineReducers({
 		...reducers,
 		router: routerReducer,
-		echojs: EchoJSReducer.reducer,
 	}), {},
 	compose(
 		applyMiddleware(thunk),
+		applyMiddleware(batchDispatchMiddleware),
 		applyMiddleware(middleware),
 		window.devToolsExtension ? window.devToolsExtension() : (f) => f,
 	),
