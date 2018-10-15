@@ -24,9 +24,13 @@ class UserDropdown extends React.PureComponent {
 
 		this.state = {
 			menuHeight: null,
+			dropdownIsOpen: false,
 		};
 	}
 
+	componentDidMount() {
+		this.setDDMenuHeight();
+	}
 
 	componentDidUpdate() {
 		this.setDDMenuHeight();
@@ -53,13 +57,29 @@ class UserDropdown extends React.PureComponent {
 		this.props.removeAccount(name, networkName);
 	}
 
-	// Устанавливает высоту react-custom-scroll
-	// Не апдейдится высота, при удалении и добавлении юзера
 	setDDMenuHeight() {
-		const elm = document.querySelector('#user-menu');
-		return elm.getBoundingClientRect().height > 350 ?
-			this.setState({ menuHeight: 350 }) :
-			this.setState({ menuHeight: elm.getBoundingClientRect().height });
+
+		const MAX_MENU_HEIGHT = 350;
+		const el = document.getElementById('user-menu-container');
+
+		if (el) {
+			const height = el.clientHeight;
+			if (this.state.menuHeight !== height) {
+				return height > MAX_MENU_HEIGHT ?
+					this.setState({ menuHeight: MAX_MENU_HEIGHT }) :
+					this.setState({ menuHeight: height });
+			}
+		}
+
+		return true;
+	}
+
+	toggleDropdown() {
+		this.setState({ dropdownIsOpen: !this.state.dropdownIsOpen });
+	}
+
+	closeDropDown() {
+		this.setState({ dropdownIsOpen: false });
 	}
 
 	renderList(preview, activeUser) {
@@ -73,7 +93,6 @@ class UserDropdown extends React.PureComponent {
 					key={name}
 					eventKey={i}
 					onSelect={() => this.onSelect(name)}
-
 				>
 					<UserIcon color="green" avatar={`ava${icon}`} />
 					<div className="user-name">{name}</div>
@@ -99,6 +118,8 @@ class UserDropdown extends React.PureComponent {
 			<Dropdown
 				className="dropdown-user"
 				id="dropdown-user"
+				onToggle={() => this.toggleDropdown()}
+				open={this.state.dropdownIsOpen}
 			>
 				<Dropdown.Toggle noCaret>
 					<UserIcon color="green" avatar={`ava${activeUser.get('icon')}`} />
@@ -114,27 +135,30 @@ class UserDropdown extends React.PureComponent {
 							flex="1"
 							heightRelativeToParent="calc(100%)"
 						>
-							<ul className="user-list">
-								{this.renderList(preview, activeUser)}
-							</ul>
-							<div className="dropdown-footer">
-								<span>Add account: </span>
-								{/* Не закрывается дропдаун, при переходе по ссылке */}
-								<MenuItem
-									href={`#${CREATE_ACCOUNT_PATH}`}
-									eventKey={preview.size + 1}
-								>
-									create
-								</MenuItem>
-								<span>or </span>
-								{/* Не закрывается дропдаун, при переходе по ссылке */}
-								<MenuItem
-									href={`#${IMPORT_ACCOUNT_PATH}`}
-									eventKey={preview.size + 2}
-								>
-									import
-								</MenuItem>
+							<div id="user-menu-container">
+								<ul className="user-list">
+									{this.renderList(preview, activeUser)}
+								</ul>
+								<div className="dropdown-footer">
+									<span>Add account: </span>
+									<MenuItem
+										onClick={() => this.closeDropDown()}
+										href={`#${CREATE_ACCOUNT_PATH}`}
+										eventKey={preview.size + 1}
+									>
+										create
+									</MenuItem>
+									<span>or </span>
+									<MenuItem
+										onClick={() => this.closeDropDown()}
+										href={`#${IMPORT_ACCOUNT_PATH}`}
+										eventKey={preview.size + 2}
+									>
+										import
+									</MenuItem>
+								</div>
 							</div>
+
 						</CustomScroll>
 					</div>
 				</Dropdown.Menu>
