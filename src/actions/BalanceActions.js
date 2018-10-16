@@ -106,50 +106,24 @@ export const initPreviewBalances = (networkName) => async (dispatch) => {
 
 		return preview;
 	});
+	const result = await Promise.all(balances);
+	dispatch(BalanceReducer.actions.set({ field: 'preview', value: new List(result) }));
 
-	balances.reduce(
-		(resolved, balance) =>
-			resolved.then((array) => balance.then((result) => [...array, result]).catch(() => array)),
-		Promise.resolve([]),
-	).then((result) => {
-		dispatch(BalanceReducer.actions.set({ field: 'preview', value: new List(result) }));
-	});
+	// balances.reduce(
+	// 	(resolved, balance) =>
+	// 		resolved.then((array) => balance.then((result) => [...array, result]).catch(() => array)),
+	// 	Promise.resolve([]),
+	// ).then((result) => {
+	// 	dispatch(BalanceReducer.actions.set({ field: 'preview', value: new List(result) }));
+	// });
 };
 
-export const updatePreviewBalances = (networkName) => async (dispatch) => {
+export const updatePreviewBalances = () => async (dispatch, getState) => {
 
-	let accounts = localStorage.getItem(`accounts_${networkName}`);
-	accounts = accounts ? JSON.parse(accounts) : [];
+	const previewAccounts = getState().balance.get('preview');
 
-	const fetchedAsset = await fetchChain('1.3.0');
-
-	const balances = accounts.map(async ({ name, icon }) => {
-		const account = await fetchChain(name);
-		const balance = account.getIn(['balances', '1.3.0']);
-
-		const preview = {
-			balance: 0,
-			symbol: fetchedAsset.get('symbol'),
-			precision: fetchedAsset.get('precision'),
-			accountName: name,
-			icon,
-		};
-
-		if (account && account.get('balances') && balance) {
-			const balanceAmount = (await fetchChain(balance)).get('balance');
-			preview.balance = balanceAmount || 0;
-			preview.id = balance;
-		}
-
-		return preview;
-	});
-
-	balances.reduce(
-		(resolved, balance) =>
-			resolved.then((array) => balance.then((result) => [...array, result]).catch(() => array)),
-		Promise.resolve([]),
-	).then((result) => {
-		dispatch(BalanceReducer.actions.set({ field: 'preview', value: new List(result) }));
+	previewAccounts.forEach(async (account) => {
+		await fetchChain(account.balanceId);
 	});
 
 };

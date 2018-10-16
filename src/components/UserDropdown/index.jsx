@@ -87,7 +87,6 @@ class UserDropdown extends React.PureComponent {
 	renderList(preview, activeUser) {
 
 		return preview.map((account, i) => {
-			console.log(account.balanceId);
 			const content = (
 				<MenuItem
 					active={activeUser.get('name') === account.accountName}
