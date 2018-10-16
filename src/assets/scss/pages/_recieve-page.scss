@@ -1,0 +1,32 @@
+.page {
+    &.recieve-page {
+        p {
+            color: #596066;
+            text-align: center;
+            font-size: 15px;
+            letter-spacing: 0.6px;
+            line-height: 19px;
+            font-family: FNBook;
+            margin: 19px auto 0;
+        }
+
+        .wif-wrap {
+            margin: 44px -12px 0;
+            height: 135px;
+            .wif {
+                font-size: 18px;
+                letter-spacing: 0.8px;
+                margin-top: 29px;
+
+                & + .btn-copy-wrap {
+                    margin: 24px auto 0;
+
+                    .btn-copy.compact .btn-text {
+                        letter-spacing: 2.7px;
+                        font-size: 10px;
+                    }
+                }
+            }
+        }
+    }
+}
