@@ -64,8 +64,8 @@ export default createModule({
 
 		resetAssets: {
 			reducer: (state) => {
-				state.balances = DEFAULT_FIELDS.balances;
-				state.assets = DEFAULT_FIELDS.assets;
+				state = state.set('balances', DEFAULT_FIELDS.get('balances')).set('assets', DEFAULT_FIELDS.get('assets'));
+
 				return state;
 			},
 		},

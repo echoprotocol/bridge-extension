@@ -9,6 +9,7 @@ import classnames from 'classnames';
 import { withRouter } from 'react-router';
 
 import { initAccount, removeAccount } from '../../actions/GlobalActions';
+import { resetAssets } from '../../actions/BalanceActions';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
@@ -46,6 +47,7 @@ class UserDropdown extends React.PureComponent {
 			return;
 		}
 
+		this.props.resetAssets();
 		this.props.initAccount(name, networkName);
 	}
 
@@ -84,24 +86,23 @@ class UserDropdown extends React.PureComponent {
 
 	renderList(preview, activeUser) {
 
-		return preview.map(({
-			accountName, balance, precision, symbol, icon,
-		}, i) => {
+		return preview.map((account, i) => {
+			console.log(account.balanceId);
 			const content = (
 				<MenuItem
-					active={activeUser.get('name') === accountName}
+					active={activeUser.get('name') === account.accountName}
 					tabIndex="-1"
-					key={accountName}
+					key={account.accountName}
 					eventKey={i}
 					onClick={() => this.closeDropDown()}
-					onSelect={() => this.onSelect(accountName)}
+					onSelect={() => this.onSelect(account.accountName)}
 				>
-					<UserIcon color="green" avatar={`ava${icon}`} />
-					<div className="user-name">{accountName}</div>
-					<div className={classnames('user-balance', { positive: !!balance })}>
-						{FormatHelper.formatAmount(balance, precision, symbol) || `0 ${ECHO}`}
+					<UserIcon color="green" avatar={`ava${account.icon}`} />
+					<div className="user-name">{account.accountName}</div>
+					<div className={classnames('user-balance', { positive: !!account.balance })}>
+						{FormatHelper.formatAmount(account.balance, account.precision, account.symbol) || `0 ${ECHO}`}
 					</div>
-					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, accountName)} />
+					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.accountName)} />
 				</MenuItem>
 			);
 
@@ -175,6 +176,7 @@ UserDropdown.propTypes = {
 	preview: PropTypes.object.isRequired,
 	initAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
+	resetAssets: PropTypes.func.isRequired,
 };
 
 export default withRouter(connect(
@@ -186,5 +188,6 @@ export default withRouter(connect(
 	(dispatch) => ({
 		initAccount: (name, network) => dispatch(initAccount(name, network)),
 		removeAccount: (name, network) => dispatch(removeAccount(name, network)),
+		resetAssets: () => dispatch(resetAssets()),
 	}),
 )(UserDropdown));
