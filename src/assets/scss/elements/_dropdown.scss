@@ -19,7 +19,6 @@
     &:before {
         content: '';
         position: absolute;
-        transition: border $speed;
         border-radius: 6px;
         border: 2px solid transparent;
         top: 0;
@@ -29,7 +28,10 @@
     }
     &:not(:active) {
         &:focus {
+            border-radius: 6px;
+
             &:before {
+                transition: border $speed;
                 border: 2px solid $color;
             }
         }
@@ -147,7 +149,7 @@
                     @include cutTxt();
                 }
                 &:before {
-                    width: 4px;
+                    min-width: 4px;
                     height: 4px;
                     border-radius: 50%;
                     content: "";

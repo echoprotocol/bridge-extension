@@ -6,6 +6,10 @@
     align-items: center;
     justify-content: center;
 
+    &.big {
+        min-width: 86px;
+        height: 86px;
+    }
     &.green {
         background-color:#16d6aa;
     }
@@ -38,4 +42,5 @@
         color: #3f4c4e;
         font-size: 19px;
     }
+
 }

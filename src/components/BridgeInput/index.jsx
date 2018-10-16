@@ -19,10 +19,6 @@ class BridgeInput extends React.Component {
 		this.setState({ up: true });
 	}
 
-	onChange(e) {
-		this.setState({ filled: !!e.target.value.trim().length });
-		this.props.onChange(e);
-	}
 
 	onBlur() {
 		this.setState({ up: false });
@@ -30,6 +26,10 @@ class BridgeInput extends React.Component {
 
 	onTogglePrivacy() {
 		this.setState({ showPas: !this.state.showPas });
+	}
+	isEmpty() {
+		this.setState({ filled: !!this.bridgeInput.inputRef.value.trim().length });
+		this.props.onChange(this.bridgeInput.inputRef);
 	}
 
 	renderError() {
@@ -43,13 +43,19 @@ class BridgeInput extends React.Component {
 				{
 					this.props.hintText.length > 0 ?
 						<div className="message-hint">
-                            You can try
 							<span
 								role="button"
 								tabIndex="0"
 								onClick={this.props.onClick}
 								onKeyPress={this.props.onClick}
-							> { this.props.hintText }
+							>
+								{
+									this.props.errorText === 'Account with such name already exists.' ?
+										<React.Fragment>
+                                            You can try <button className="btn-try">{this.props.hintText}</button>
+										</React.Fragment> :
+										this.props.hintText
+								}
 							</span>
 						</div> : null
 				}
@@ -74,6 +80,7 @@ class BridgeInput extends React.Component {
 		);
 	}
 	render() {
+
 		const {
 			name, labelText, type, error, disabled, theme, value,
 			autoFocus, privacyEye, position, descriptionText,
@@ -87,7 +94,7 @@ class BridgeInput extends React.Component {
 
 			<div className={classnames('input-wrap', theme)} >
 				<Input
-					value={value}
+					defaultValue={value}
 					name={name}
 					label={labelText}
 					type={privacyEye && showPas ? 'text' : type}
@@ -95,6 +102,7 @@ class BridgeInput extends React.Component {
 					disabled={disabled}
 					autoFocus={autoFocus}
 					icon={privacyEye ? this.renderPrivacyEye() : false}
+					ref={(bridgeInput) => { this.bridgeInput = bridgeInput; }}
 					className={classnames(
 						{ up },
 						{ focused: focus },
@@ -102,10 +110,9 @@ class BridgeInput extends React.Component {
 						{ eye: privacyEye },
 						position,
 					)}
-					ref={this.handleRef}
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
-					onChange={(e) => this.onChange(e)}
+					onChange={() => this.isEmpty()}
 				/>
 
 				{ error ? this.renderError() : null }

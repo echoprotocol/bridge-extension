@@ -7,10 +7,9 @@ import BridgeInput from '../../components/BridgeInput';
 
 class CreateComponent extends React.Component {
 
-	onChangeName(e) {
-		const { value } = e.target;
+	onChangeName(elm) {
 
-		this.props.changeName(value.trim().toLowerCase());
+		this.props.changeName(elm.value.trim().toLowerCase());
 	}
 
 	render() {

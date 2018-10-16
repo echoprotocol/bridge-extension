@@ -7,8 +7,8 @@ import BridgeInput from '../../components/BridgeInput';
 
 class ImportComponent extends React.Component {
 
-	onChange(e, lowercase) {
-		const { name, value } = e.target;
+	onChange(val, lowercase) {
+		const { name, value } = val;
 
 		this.props.change(name, lowercase ? value.trim().toLowerCase() : value.trim());
 	}
