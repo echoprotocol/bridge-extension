@@ -43,20 +43,18 @@ class BridgeInput extends React.Component {
 				{
 					this.props.hintText.length > 0 ?
 						<div className="message-hint">
-							<span
-								role="button"
-								tabIndex="0"
-								onClick={this.props.onClick}
-								onKeyPress={this.props.onClick}
-							>
-								{
-									this.props.errorText === 'Account with such name already exists.' ?
-										<React.Fragment>
-                                            You can try <button className="btn-try">{this.props.hintText}</button>
-										</React.Fragment> :
-										this.props.hintText
-								}
-							</span>
+							{
+								this.props.errorText === 'Account with such name already exists.' ?
+									<React.Fragment>
+                                            You can try
+										<button
+											onClick={() => this.props.onClick}
+											className="btn-try"
+										> {this.props.hintText}
+										</button>
+									</React.Fragment> :
+									this.props.hintText
+							}
 						</div> : null
 				}
 

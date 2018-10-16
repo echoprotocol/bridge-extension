@@ -9,6 +9,9 @@
     &.big {
         min-width: 86px;
         height: 86px;
+        [class*="icon-ava"] {
+            font-size: 32px;
+        }
     }
     &.green {
         background-color:#16d6aa;
