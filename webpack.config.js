@@ -1,7 +1,10 @@
+require('babel-polyfill');
+
 const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const webpack = require('webpack');
 
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 	template: `${__dirname}/src/assets/index.html`,
@@ -20,7 +23,7 @@ module.exports = {
 		app: path.resolve('src/index.js'),
 	},
 	output: {
-		publicPath: '/',
+		publicPath: process.env.EXTENSION ? './' : '/',
 		path: path.resolve('dist'),
 		filename: `[name].${version}.js`,
 		pathinfo: process.env.NODE_ENV === 'local',
@@ -98,6 +101,10 @@ module.exports = {
 		new CleanWebpackPlugin(['dist']),
 		HTMLWebpackPluginConfig,
 		extractSass,
+		new webpack.DefinePlugin({
+			NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+			EXTENSION: !!process.env.EXTENSION,
+		}),
 	],
 	node: {
 		fs: 'empty',

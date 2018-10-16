@@ -5,6 +5,7 @@ import _ from 'lodash';
 import {
 	FORM_SIGN_UP,
 	FORM_SIGN_IN,
+	FORM_ADD_NETWORK,
 } from '../constants/FormConstants';
 
 const DEFAULT_FIELDS = Map({
@@ -15,17 +16,24 @@ const DEFAULT_FIELDS = Map({
 const DEFAULT_FORM_FIELDS = {
 	[FORM_SIGN_UP]: Map({
 		accountName: {
-			value: '',
 			error: null,
+			example: '',
 		},
-		wif: '',
 	}),
 	[FORM_SIGN_IN]: Map({
-		accountName: {
+		nameError: null,
+		passwordError: null,
+	}),
+	[FORM_ADD_NETWORK]: Map({
+		address: {
 			value: '',
 			error: null,
 		},
-		password: {
+		name: {
+			value: '',
+			error: null,
+		},
+		registrator: {
 			value: '',
 			error: null,
 		},
@@ -37,6 +45,7 @@ export default createModule({
 	initialState: Map({
 		[FORM_SIGN_UP]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_SIGN_UP]),
 		[FORM_SIGN_IN]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_SIGN_IN]),
+		[FORM_ADD_NETWORK]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_ADD_NETWORK]),
 	}),
 	transformations: {
 		set: {

@@ -2,34 +2,22 @@ import React from 'react';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
-import history from '../../history';
+import { Link } from 'react-router-dom';
 
 import { HEADER_TITLE } from '../../constants/GlobalConstants';
 
 class Navbar extends React.PureComponent {
 
-	onClick(e, link) {
-		e.preventDefault();
-		history.push(link);
-	}
-
 	renderTitle() {
-		const { location } = this.props;
+		const { pathname, search } = this.props.location;
 
-		const item = HEADER_TITLE.find((title) => {
-			if (title.path === location.pathname) {
-				return true;
-			} else if (title.path.split('/')[1] === location.pathname.split('/')[1]) {
-				return true;
-			}
-			return false;
-		});
-		return item || '';
+		const item = HEADER_TITLE.find(({ path }) => (path === `${pathname}${search}`));
+
+		return item || {};
 	}
 
 	render() {
 		const { title, link } = this.renderTitle();
-		// console.log(link.value);
 
 		return (
 			<div className="navbar">
@@ -37,16 +25,12 @@ class Navbar extends React.PureComponent {
 					<li className="btn-nav-wrap" >
 						<Button className="icon-menu btn-nav" />
 					</li>
+					{ title ? <li className="page-title">{title}</li> : null }
 					{
-						title &&
-						<li className="page-title">{title}</li>}
-					{
-						link &&
-						<li className="link-nav">
-							<a onClick={(e) => this.onClick(e, link.value)} href="#">
-								{link.name}
-							</a>
-						</li>
+						link ?
+							<li className="link-nav">
+								<Link to={link.value}>{link.name}</Link>
+							</li> : null
 					}
 				</ul>
 			</div>

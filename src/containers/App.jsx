@@ -1,15 +1,16 @@
+/* global EXTENSION */
+
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { Dimmer } from 'semantic-ui-react';
 
-import { connection } from '../actions/GlobalActions';
+import { connect as connectTo } from '../actions/ChainStoreAction';
 
-// import Header from '../components/Header';
-// import Navbar from '../components/Navbar';
 
-import { FORM_SIGN_UP } from '../constants/FormConstants';
+import Header from '../components/Header';
+import Navbar from '../components/Navbar';
 
 class App extends React.Component {
 
@@ -17,28 +18,46 @@ class App extends React.Component {
 		this.props.connection();
 	}
 
-	renderChildren() {
+	renderExtension() {
 		const { children, loading } = this.props;
+
 		return (
-			<div className="temp-wrap">
-				<div className={classnames('app-wrap', 'dark')} >
-					{/* <Header />
-					<Navbar /> */}
-					<div className="header-bridge-image">
+
+			<React.Fragment>
+                <div className={classnames('app-wrap', 'dark')} >
+					<Header />
+					<Navbar />
+                    <div className="header-bridge-image">
 						<span>Bridge</span>
 					</div>
 					{children}
-
-					{/* Dimmer */}
 					{
 						(loading) && <Dimmer active inverted />
 					}
+				</div>
+			</React.Fragment>
+		);
+	}
 
+	renderApp() {
+		const { children, loading } = this.props;
 
-					{/* Добавить класс loading на кнопку */}
+		return (
+			<div className="temp-wrap">
+				<div className="app-wrap">
+					<Header />
+					<Navbar />
+					{children}
+					{
+						(loading) && <Dimmer active inverted />
+					}
 				</div>
 			</div>
 		);
+	}
+
+	renderChildren() {
+		return EXTENSION ? this.renderExtension() : this.renderApp();
 	}
 
 	render() {
@@ -49,20 +68,14 @@ class App extends React.Component {
 
 App.propTypes = {
 	children: PropTypes.element.isRequired,
-	loading: PropTypes.bool,
+	loading: PropTypes.bool.isRequired,
 	connection: PropTypes.func.isRequired,
 };
-
-App.defaultProps = {
-	loading: false,
-};
-
 export default connect(
 	(state) => ({
-		globalLoading: state.global.get('globalLoading'),
-		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
+		loading: state.global.get('loading'),
 	}),
 	(dispatch) => ({
-		connection: () => dispatch(connection()),
+		connection: () => dispatch(connectTo()),
 	}),
 )(App);

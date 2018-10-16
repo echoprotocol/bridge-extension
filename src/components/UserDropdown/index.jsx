@@ -1,26 +1,52 @@
 import React from 'react';
-import { Dropdown, Button } from 'semantic-ui-react';
+import { Dropdown, MenuItem } from 'react-bootstrap';
+import CustomScroll from 'react-custom-scroll';
+
+import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
+import { withRouter } from 'react-router';
 
-import { formatAmount } from '../../helpers/FormatHelper';
 import { initAccount, removeAccount } from '../../actions/GlobalActions';
+
+import FormatHelper from '../../helpers/FormatHelper';
+
+import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
+import { ECHO } from '../../constants/GlobalConstants';
+
 import UserIcon from '../UserIcon';
 
 class UserDropdown extends React.PureComponent {
 
-	onDropdownChange(e, name) {
-		const handledKey = e.key || e.type;
-		const { accountName, networkName } = this.props;
+	constructor(props) {
+		super(props);
 
-		if (['click', 'Enter'].includes(handledKey)) {
-			if (accountName === name) {
-				return;
-			}
+		this.state = {
+			menuHeight: null,
+			opened: false,
+		};
+	}
 
-			this.props.initAccount(name, networkName);
+	componentDidMount() {
+		this.setDDMenuHeight();
+	}
+
+	componentDidUpdate() {
+		this.setDDMenuHeight();
+	}
+
+	onSelect(name) {
+		if (!this.props.preview.find((i) => i.name === name)) {
+			return;
 		}
+		const { activeUser, networkName } = this.props;
+
+		if (activeUser.get('name') === name) {
+			return;
+		}
+
+		this.props.initAccount(name, networkName);
 	}
 
 	onRemoveAccount(e, name) {
@@ -31,103 +57,134 @@ class UserDropdown extends React.PureComponent {
 		this.props.removeAccount(name, networkName);
 	}
 
-	renderList() {
-		const { preview, accountName } = this.props;
+	setDDMenuHeight() {
+
+		const MAX_MENU_HEIGHT = 300;
+		const el = document.getElementById('user-menu-container');
+
+		if (el) {
+			const height = el.clientHeight;
+			if (this.state.menuHeight !== height) {
+				return height > MAX_MENU_HEIGHT ?
+					this.setState({ menuHeight: MAX_MENU_HEIGHT }) :
+					this.setState({ menuHeight: height });
+			}
+		}
+
+		return true;
+	}
+
+	toggleDropdown() {
+		this.setState({ opened: !this.state.opened });
+	}
+
+	closeDropDown() {
+		this.setState({ opened: false });
+	}
+
+	renderList(preview, activeUser) {
 
 		return preview.map(({
-			name, balance: { amount, precision, symbol },
-		}) => {
+			name, balance: { amount, precision, symbol }, icon,
+		}, i) => {
 			const content = (
-				<div key={name} className="user-item-wrap">
-					<UserIcon color="green" avatar="ava7" />
+				<MenuItem
+					active={activeUser.get('name') === name}
+					tabIndex="-1"
+					key={name}
+					eventKey={i}
+					onClick={() => this.closeDropDown()}
+					onSelect={() => this.onSelect(name)}
+				>
+					<UserIcon color="green" avatar={`ava${icon}`} />
 					<div className="user-name">{name}</div>
-					<div className={classnames('user-balance', { positive: !!amount })}>{formatAmount(amount, precision, symbol) || '0 ECHO'}</div>
+					<div className={classnames('user-balance', { positive: !!amount })}>
+						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${ECHO}`}
+					</div>
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
-				</div>
+				</MenuItem>
 			);
 
-			return ({
-				value: name,
-				key: name,
-				className: 'user-item',
-				content,
-				selected: accountName === name,
-			});
+			return content;
 		});
 	}
 
 	render() {
-		const optionsEnd = [
-
-			{
-				value: 'create',
-				key: 'create-account',
-				className: ' user-create',
-				content: (
-					<React.Fragment>
-						<a href="">create</a>
-					</React.Fragment>
-				),
-			},
-			{
-				value: 'import',
-				key: 'import-account',
-				className: 'user-import',
-				content: (
-					<React.Fragment>
-						<a href="">import</a>
-					</React.Fragment>
-				),
-			},
-			{
-				value: 'fake-element',
-				key: 'fake-element',
-				disabled: true,
-				content:
-	<React.Fragment>
-		<div className="user-body" />
-		<div className="user-footer" />
-	</React.Fragment>,
-			},
-		];
+		const { preview, activeUser } = this.props;
+		const menuHeight = {
+			height: `${this.state.menuHeight}px`,
+		};
 
 		return (
 			<Dropdown
 				className="dropdown-user"
-				trigger={
-					<div className="dropdown-trigger">
-						<UserIcon color="green" avatar="ava7" />
+				id="dropdown-user"
+				onToggle={() => this.toggleDropdown()}
+				open={this.state.opened}
+			>
+				<Dropdown.Toggle noCaret>
+					<UserIcon color="green" avatar={`ava${activeUser.get('icon')}`} />
+					<i aria-hidden="true" className="dropdown icon" />
+				</Dropdown.Toggle>
+				<Dropdown.Menu >
+					<div
+						className="user-scroll"
+						style={menuHeight}
+					>
+						<CustomScroll
+							flex="1"
+							heightRelativeToParent="calc(100%)"
+						>
+							<div id="user-menu-container">
+								<ul className="user-list">
+									{this.renderList(preview, activeUser)}
+								</ul>
 
-						<i aria-hidden="true" className="dropdown icon" />
+							</div>
+
+						</CustomScroll>
 					</div>
-				}
-				onChange={(e, { value }) => this.onDropdownChange(e, value)}
-				options={this.renderList().concat(optionsEnd)}
-				selectOnBlur={false}
-				icon={false}
-			/>
+					<div className="dropdown-footer">
+						<span>Add account: </span>
+						<MenuItem
+							onClick={() => this.closeDropDown()}
+							href={`#${CREATE_ACCOUNT_PATH}`}
+							eventKey={preview.size + 1}
+						>
+										create
+						</MenuItem>
+						<span>or </span>
+						<MenuItem
+							onClick={() => this.closeDropDown()}
+							href={`#${IMPORT_ACCOUNT_PATH}`}
+							eventKey={preview.size + 2}
+						>
+										import
+						</MenuItem>
+					</div>
+				</Dropdown.Menu>
+			</Dropdown>
 		);
 	}
 
 }
 
 UserDropdown.propTypes = {
-	accountName: PropTypes.string.isRequired,
+	activeUser: PropTypes.object.isRequired,
 	networkName: PropTypes.string.isRequired,
-	preview: PropTypes.array.isRequired,
+	preview: PropTypes.object.isRequired,
 	initAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
 };
 
-export default connect(
+export default withRouter(connect(
 	(state) => ({
-		preview: state.balance.get('preview').toJS(),
-		accountName: state.global.getIn(['activeUser', 'name']),
+		preview: state.balance.get('preview'),
+		activeUser: state.global.get('activeUser'),
 		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
 		initAccount: (name, network) => dispatch(initAccount(name, network)),
 		removeAccount: (name, network) => dispatch(removeAccount(name, network)),
 	}),
-)(UserDropdown);
-
+)(UserDropdown));
