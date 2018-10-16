@@ -10,7 +10,7 @@ import BalanceReducer from '../reducers/BalanceReducer';
 
 import { initAccount } from './GlobalActions';
 import { initCrypto } from './CryptoActions';
-import { setAssetBalance } from './BalanceActions';
+import { initAssetsBalances } from './BalanceActions';
 
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
 
@@ -23,28 +23,12 @@ import ChainStoreCacheNames from '../constants/ChainStoreConstants';
  * @returns {Function}
  */
 export const subscribe = () => (dispatch, getState) => {
-	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
+	ChainStoreCacheNames.forEach(async ({ origin, custom: field }) => {
 		const value = ChainStore[origin];
+		const activeUserName = getState().global.getIn(['activeUser', 'name']);
 
-		if (value && (field === 'accountsByName')) {
-			const accounts = getState().balance.get('preview');
-
-			accounts.forEach(async (account) => {
-				const chainAssets = (await fetchChain(account.accountName)).get('balances');
-				const assets = getState().balance.get('assets');
-
-				chainAssets.forEach(async (chainAssetId) => {
-					const chainBalance = (await fetchChain(chainAssetId)).get('balance');
-
-					if (assets.find((asset) => asset.id === chainAssetId)) {
-						if (assets.find((asset) => asset.balance !== chainBalance)) {
-							dispatch(setAssetBalance(chainAssetId, chainBalance));
-						}
-					} else {
-						dispatch(setAssetBalance(chainAssetId, chainBalance));
-					}
-				});
-			});
+		if (activeUserName) {
+			dispatch(initAssetsBalances((await fetchChain(activeUserName)).get('balances')));
 		}
 
 		dispatch(BlockchainReducer.actions.set({ field, value }));

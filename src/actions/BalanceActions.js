@@ -1,52 +1,41 @@
-import { List } from 'immutable';
+import { Map, List } from 'immutable';
 
 import BalanceReducer from '../reducers/BalanceReducer';
 
 import { fetchChain } from '../api/ChainApi';
 
 /**
- *  @method setAssetBalance
- *
- * 	Set balance amount of asset or user's core cy.
- *
- * 	@param {String} balanceId
- * 	@param {Number} balance
- */
-export const setAssetBalance = (balanceId, balance) => (dispatch) => {
-	dispatch(BalanceReducer.actions.update({ field: 'assets', param: balanceId, value: { balance } }));
-
-	dispatch(BalanceReducer.actions.update({ field: 'preview', param: balanceId, value: { balance } }));
-};
-
-/**
  *  @method initAssetsBalances
  *
  * 	Initialization user's assets
  *
- * 	@param {Object} assets
+ * 	@param {Object} userBalances
  */
-export const initAssetsBalances = (assets) => async (dispatch) => {
-	let balances = [];
+export const initAssetsBalances = (userBalances) => async (dispatch, getState) => {
+	const arr = [];
+	const arrAssets = [];
+	const stateAssets = getState().balance.get('assets');
+	const stateBalances = getState().balance.get('balances');
 
-	if (assets && Object.keys(assets).length) {
-		balances = Object.entries(assets).map(async (asset) => {
-			const balance = await fetchChain(asset[1]);
-			asset = (await fetchChain(asset[0]));
-			return {
-				id: balance.get('id'),
-				balance: balance.get('balance'),
-				precision: asset.get('precision'),
-				symbol: asset.get('symbol'),
-			};
-		});
+	userBalances.forEach((value) => arr.push(fetchChain(value)));
+	userBalances.mapKeys((value) => arrAssets.push(fetchChain(value)));
 
-		balances = await Promise.all(balances);
+	let balances = new Map();
+	let assets = new Map();
+
+	(await Promise.all(arr)).forEach((bal, key) => {
+		balances = balances.set(key.toString(), bal);
+	});
+	(await Promise.all(arrAssets)).forEach((asset, key) => {
+		assets = assets.set(key.toString(), asset);
+	});
+
+	if (!stateAssets.equals(assets) && !stateBalances.equals(balances)) {
+		dispatch(BalanceReducer.actions.setAssets({
+			balances,
+			assets,
+		}));
 	}
-
-	dispatch(BalanceReducer.actions.set({
-		field: 'assets',
-		value: new List(balances),
-	}));
 };
 
 /**

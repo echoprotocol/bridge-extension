@@ -18,8 +18,7 @@ class Wallet extends React.Component {
 		// 		type: 'asset',
 		// 	},
 		// ];
-		let { assets } = this.props;
-		assets = assets.toArray();
+		const { assets, balances } = this.props;
 
 		return (
 			<React.Fragment>
@@ -38,7 +37,7 @@ class Wallet extends React.Component {
 					<div className="page">
 						<div className={classnames(
 							'scroll-wrap',
-							{ two: assets.length === 2 },
+							{ two: balances.size === 2 },
 						)}
 						>
 							<CustomScroll
@@ -47,36 +46,40 @@ class Wallet extends React.Component {
 							>
 								<ul className={classnames(
 									'wallet-list',
-									{ one: assets.length === 1 },
-									{ two: assets.length === 2 },
-									{ three: assets.length === 3 },
+									{ one: balances.size === 1 },
+									{ two: balances.size === 2 },
+									{ three: balances.size === 3 },
 								)}
 								>
 									{
 
-										assets.map((asset, i) => {
+										balances.toArray().map((asset, i) => {
 											const id = i;
-											return (
+											const asset12 = assets.find((asset1) => asset1.get('id') === asset.get('asset_type'));
+											if (asset12) {
+												return (
 
-												<li key={id}>
-													<div className="balance-info">
-														<span>{FormatHelper.formatAmount(asset.balance, asset.precision)}</span>
-														<span>{asset.symbol}</span>
-													</div>
-													{/* { */}
-													{/* asset.type === 'token' ? */}
-													{/* <React.Fragment> */}
-													{/* <Button className="btn-icon icon-closeBig" /> */}
-													{/* <div className="token-info"> */}
-													{/* <span>ERC20</span> */}
-													{/* <span>TOKEN</span> */}
-													{/* </div> */}
-													{/* </React.Fragment> : */}
-													{/* null */}
-													{/* } */}
-												</li>
+													<li key={id}>
+														<div className="balance-info">
+															<span>{FormatHelper.formatAmount(asset.get('balance'), asset12.get('precision'))}</span>
+															<span>{asset12.get('symbol')}</span>
+														</div>
+														{/* { */}
+														{/* asset.type === 'token' ? */}
+														{/* <React.Fragment> */}
+														{/* <Button className="btn-icon icon-closeBig" /> */}
+														{/* <div className="token-info"> */}
+														{/* <span>ERC20</span> */}
+														{/* <span>TOKEN</span> */}
+														{/* </div> */}
+														{/* </React.Fragment> : */}
+														{/* null */}
+														{/* } */}
+													</li>
 
-											);
+												);
+											}
+											return null;
 
 										})
 									}
@@ -110,11 +113,13 @@ class Wallet extends React.Component {
 
 Wallet.propTypes = {
 	assets: PropTypes.object.isRequired,
+	balances: PropTypes.object.isRequired,
 };
 
 export default connect(
 	(state) => ({
 		assets: state.balance.get('assets'),
+		balances: state.balance.get('balances'),
 	}),
 	() => ({}),
 )(Wallet);

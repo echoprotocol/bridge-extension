@@ -51,7 +51,7 @@ export const initAccount = (accountName, networkName) => async (dispatch) => {
 			params: { id: fetchedAccount.get('id'), name: fetchedAccount.get('name'), icon },
 		}));
 
-		await dispatch(initBalances(networkName, fetchedAccount.get('balances').toObject()));
+		await dispatch(initBalances(networkName, fetchedAccount.get('balances')));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'error', value: err }));
 	} finally {
