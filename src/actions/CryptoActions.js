@@ -1,10 +1,13 @@
 import history from '../history';
 import Crypto from '../services/crypto';
 
+import storage from '../services/storage';
+
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import { FORM_UNLOCK } from '../constants/FormConstants';
-import { CREATE_PIN_PATH, ENTER_PIN_PATH } from '../constants/RouterConstants';
+import { CREATE_PIN_PATH, UNLOCK_PATH } from '../constants/RouterConstants';
+import { NETWORKS } from '../constants/GlobalConstants';
 
 import { setValue } from './FormActions';
 import { loadInfo } from './GlobalActions';
@@ -15,7 +18,7 @@ const changeCrypto = (params) => (dispatch) => {
 
 const lockCrypto = () => (dispatch) => {
 	dispatch(GlobalReducer.actions.lock());
-	history.push(ENTER_PIN_PATH);
+	history.push(UNLOCK_PATH);
 };
 
 export const crypto = new Crypto();
@@ -24,7 +27,7 @@ export const initCrypto = () => async (dispatch) => {
 	try {
 		const isFirstTime = await crypto.isFirstTime();
 
-		history.push(isFirstTime ? CREATE_PIN_PATH : ENTER_PIN_PATH);
+		history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
 
 		crypto.on('locked', () => dispatch(lockCrypto()));
 	} catch (err) {
@@ -67,4 +70,16 @@ export const getCryptoInfo = (field) => async (dispatch, getState) => {
 		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
 		return null;
 	}
+};
+
+export const wipeCrypto = () => async (dispatch, getState) => {
+	const networks = getState().global.get('networks');
+
+	networks.concat(NETWORKS).forEach(async ({ name }) => {
+		await storage.remove(name);
+	});
+
+	await storage.remove('randomKey');
+
+	history.push(CREATE_PIN_PATH);
 };

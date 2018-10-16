@@ -2,10 +2,12 @@ import React from 'react';
 import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
 
 import BridgeInput from '../../components/BridgeInput';
 
 import { FORM_UNLOCK } from '../../constants/FormConstants';
+import { WIPE_PIN_PATH } from '../../constants/RouterConstants';
 
 import { unlockCrypto } from '../../actions/CryptoActions';
 import { setValue, clearForm } from '../../actions/FormActions';
@@ -76,7 +78,7 @@ class Unlock extends React.Component {
 							type="submit"
 							onClick={(e) => this.onSubmit(e)}
 						/>
-						<a href="" className="link gray forgot-password">Forgot PIN?</a>
+						<Link className="link gray forgot-password" to={WIPE_PIN_PATH}>Forgot PIN?</Link>
 					</div>
 				</div>
 			</div>

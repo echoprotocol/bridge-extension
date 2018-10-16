@@ -10,8 +10,8 @@ import {
 	SUCCESS_ADD_NETWORK_PATH,
 	RECIEVE_PATH,
 	CREATE_PIN_PATH,
-	ENTER_PIN_PATH,
-	REMOVE_PIN_PATH,
+	WIPE_PIN_PATH,
+	UNLOCK_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -34,8 +34,8 @@ export default class Routes extends React.Component {
 					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
 
 					<Route exact path={CREATE_PIN_PATH} component={Pin.Create} />
-					<Route exact path={REMOVE_PIN_PATH} component={Pin.Remove} />
-					<Route exact path={ENTER_PIN_PATH} component={Pin.Unlock} />
+					<Route exact path={WIPE_PIN_PATH} component={Pin.Wipe} />
+					<Route exact path={UNLOCK_PATH} component={Pin.Unlock} />
 
 					<Route exact path={ADD_NETWORK_PATH} component={AddNetwork} />
 					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={SuccessAddNetwork} />

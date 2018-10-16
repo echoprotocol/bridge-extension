@@ -1,5 +1,5 @@
 import Create from './Create';
-import Remove from './Remove';
+import Wipe from './Wipe';
 import Unlock from './Unlock';
 
-export default { Create, Remove, Unlock };
+export default { Create, Wipe, Unlock };

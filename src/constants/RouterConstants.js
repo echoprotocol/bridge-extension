@@ -5,8 +5,8 @@ export const CREATE_SUCCESS_PATH = '/accounts/create?success=1';
 export const IMPORT_SUCCESS_PATH = '/accounts/import?success=1';
 export const WALLET_PATH = '/wallet';
 export const CREATE_PIN_PATH = '/pin/create';
-export const ENTER_PIN_PATH = '/pin/unlock';
-export const REMOVE_PIN_PATH = '/pin/remove';
+export const WIPE_PIN_PATH = '/pin/wipe';
+export const UNLOCK_PATH = '/pin/unlock';
 
 export const ADD_NETWORK_PATH = '/networks/create';
 export const SUCCESS_ADD_NETWORK_PATH = '/networks/success';
@@ -15,4 +15,4 @@ export const RECIEVE_PATH = '/recieve';
 
 export const INDEX_PATH = WALLET_PATH;
 
-export const PIN_PATHS = [CREATE_PIN_PATH, ENTER_PIN_PATH, REMOVE_PIN_PATH];
+export const PIN_PATHS = [CREATE_PIN_PATH, UNLOCK_PATH, WIPE_PIN_PATH];
