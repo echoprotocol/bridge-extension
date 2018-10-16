@@ -5,10 +5,13 @@
   "scripts": {
     "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8081",
     "build": "cross-env NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
+    "build-ext": "cross-env EXTENSION=TRUE NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
+    "postbuild-ext": "npm run copy-manifest",
     "build-dev": "cross-env NODE_ENV=development webpack --progress --display-error-details --colors --mode production",
     "build-stage": "cross-env NODE_ENV=stage webpack --progress --display-error-details --colors --mode production",
     "lint": "$(npm bin)/eslint 'src/**/*.jsx' 'src/**/*.js'",
-    "lint-win": "cross-env eslint 'src/**/*.jsx' 'src/**/*.js'"
+    "lint-win": "cross-env eslint 'src/**/*.jsx' 'src/**/*.js'",
+    "copy-manifest": "copyfiles -f src/assets/extention_config/manifest.json dist/"
   },
   "dependencies": {
     "autoprefixer": "^8.1.0",
@@ -26,6 +29,7 @@
     "prop-types": "^15.6.1",
     "query-string": "^6.2.0",
     "react": "^16.5.2",
+    "react-bootstrap": "^0.32.4",
     "react-copy-to-clipboard": "^5.0.1",
     "react-custom-scroll": "^4.0.0",
     "react-dom": "^16.2.0",
@@ -56,6 +60,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "clean-webpack-plugin": "^0.1.18",
+    "copyfiles": "^2.1.0",
     "cross-env": "^5.1.4",
     "css-loader": "^0.28.10",
     "eslint": "^4.18.2",
