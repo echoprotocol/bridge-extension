@@ -1,10 +1,10 @@
 {
   "short_name": "BRG",
-  "name": "Bridge",
+  "name": "Echo Bridge",
   "manifest_version": 2,
   "browser_action": {
     "default_popup": "./index.html",
-    "default_title": "React Ext"
+    "default_title": "Echo Bridge"
   },
   "version": "1.0"
 }
