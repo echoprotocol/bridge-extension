@@ -24,10 +24,10 @@ class App extends React.Component {
 		return (
 
 			<React.Fragment>
-                <div className={classnames('app-wrap', 'dark')} >
+				<div className={classnames('app-wrap', 'dark')} >
 					<Header />
 					<Navbar />
-                    <div className="header-bridge-image">
+					<div className="header-bridge-image">
 						<span>Bridge</span>
 					</div>
 					{children}

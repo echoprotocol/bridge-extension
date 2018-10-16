@@ -8,8 +8,8 @@ import {
 	WALLET_PATH,
 	ADD_NETWORK_PATH,
 	SUCCESS_ADD_NETWORK_PATH,
-    RECIEVE_PATH,
-    PIN_PATH
+	RECIEVE_PATH,
+	PIN_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -20,7 +20,6 @@ import Pin from './containers/Pin';
 import SuccessAddNetwork from './containers/SuccessAddNetwork';
 import Wallet from './containers/Wallet';
 import Recieve from './containers/Recieve';
-
 
 
 export default class Routes extends React.Component {
