@@ -15,6 +15,7 @@ import { setFormError, clearForm } from '../../actions/FormActions';
 
 import CreateComponent from './CreateComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
+import SuccessTransaction from '../../components/SuccessTransaction';
 
 class CreateAccount extends React.Component {
 
@@ -80,14 +81,15 @@ class CreateAccount extends React.Component {
 		}
 
 		return (
-			<CreateComponent
-				loading={loading}
-				name={name}
-				error={error}
-				example={example}
-				changeName={(value) => this.onChangeName(value)}
-				createAccount={() => this.onCreateAccount()}
-			/>
+			// <CreateComponent
+			// 	loading={loading}
+			// 	name={name}
+			// 	error={error}
+			// 	example={example}
+			// 	changeName={(value) => this.onChangeName(value)}
+			// 	createAccount={() => this.onCreateAccount()}
+		// />
+			<SuccessTransaction />
 		);
 	}
 

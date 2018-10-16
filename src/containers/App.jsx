@@ -40,7 +40,7 @@ class App extends React.Component {
 			<div className="temp-wrap">
 				<div className="app-wrap">
 					<Header />
-					<Navbar />
+					{/* <Navbar /> */}
 					{children}
 					{
 						(loading) && <Dimmer active inverted />
