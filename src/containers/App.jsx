@@ -11,7 +11,7 @@ import { connect as connectTo } from '../actions/ChainStoreAction';
 import Header from '../components/Header';
 import Navbar from '../components/Navbar';
 
-import { PIN_CODE_PATH } from '../constants/RouterConstants';
+import { PIN_PATHS } from '../constants/RouterConstants';
 
 class App extends React.Component {
 
@@ -20,7 +20,7 @@ class App extends React.Component {
 	}
 
 	renderHeader(pathname) {
-		if (pathname === PIN_CODE_PATH) {
+		if (PIN_PATHS.includes(pathname)) {
 			return (
 				<div className="header-bridge-image">
 					<span>Bridge</span>
@@ -40,7 +40,7 @@ class App extends React.Component {
 		const { children, loading, pathname } = this.props;
 
 		return (
-			<div className={classnames('app-wrap', { dark: pathname === PIN_CODE_PATH })}>
+			<div className={classnames('app-wrap', { dark: PIN_PATHS.includes(pathname) })}>
 				{ this.renderHeader(pathname) }
 				{children}
 				{ loading ? <Dimmer active inverted /> : null }

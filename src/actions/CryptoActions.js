@@ -1,34 +1,48 @@
+import history from '../history';
 import Crypto from '../services/crypto';
 
 import GlobalReducer from '../reducers/GlobalReducer';
+
+import { FORM_UNLOCK } from '../constants/FormConstants';
+import { CREATE_PIN_PATH, ENTER_PIN_PATH } from '../constants/RouterConstants';
+
+import { setValue } from './FormActions';
+import { loadInfo } from './GlobalActions';
 
 const changeCrypto = (params) => (dispatch) => {
 	dispatch(GlobalReducer.actions.setIn({ field: 'crypto', params }));
 };
 
+const lockCrypto = () => (dispatch) => {
+	dispatch(GlobalReducer.actions.lock());
+	history.push(ENTER_PIN_PATH);
+};
+
 export const crypto = new Crypto();
 
-// TODO remove default pin value in BRG-21
-export const initCrypto = (pin = '123456') => async (dispatch) => {
+export const initCrypto = () => async (dispatch) => {
 	try {
-		await crypto.unlock(pin);
-		dispatch(changeCrypto({ isLocked: false }));
+		const isFirstTime = await crypto.isFirstTime();
 
-		crypto.on('locked', () => {
-			dispatch(changeCrypto({ isLocked: true }));
-		});
+		history.push(isFirstTime ? CREATE_PIN_PATH : ENTER_PIN_PATH);
+
+		crypto.on('locked', () => dispatch(lockCrypto()));
 	} catch (err) {
 		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
 	}
 };
 
-// TODO remove default pin value in BRG-21
-export const unlockCrypto = (pin = '123456') => async (dispatch) => {
+export const unlockCrypto = (pin) => async (dispatch) => {
+	dispatch(setValue(FORM_UNLOCK, 'loading', true));
+
 	try {
 		await crypto.unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
+		await dispatch(loadInfo());
 	} catch (err) {
-		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+		dispatch(setValue(FORM_UNLOCK, 'error', err instanceof Error ? err.message : err));
+	} finally {
+		dispatch(setValue(FORM_UNLOCK, 'loading', false));
 	}
 };
 

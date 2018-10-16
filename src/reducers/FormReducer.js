@@ -6,6 +6,7 @@ import {
 	FORM_SIGN_UP,
 	FORM_SIGN_IN,
 	FORM_ADD_NETWORK,
+	FORM_UNLOCK,
 } from '../constants/FormConstants';
 
 const DEFAULT_FIELDS = Map({
@@ -46,6 +47,7 @@ export default createModule({
 		[FORM_SIGN_UP]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_SIGN_UP]),
 		[FORM_SIGN_IN]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_SIGN_IN]),
 		[FORM_ADD_NETWORK]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_ADD_NETWORK]),
+		[FORM_UNLOCK]: _.cloneDeep(DEFAULT_FIELDS),
 	}),
 	transformations: {
 		set: {
