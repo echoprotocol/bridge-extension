@@ -1,3 +1,5 @@
+/* global EXTENSION */
+
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
@@ -14,8 +16,26 @@ class App extends React.Component {
 		this.props.connection();
 	}
 
-	renderChildren() {
+	renderExtension() {
 		const { children, loading } = this.props;
+
+		return (
+			<React.Fragment>
+				<div className="app-wrap">
+					<Header />
+					<Navbar />
+					{children}
+					{
+						(loading) && <Dimmer active inverted />
+					}
+				</div>
+			</React.Fragment>
+		);
+	}
+
+	renderApp() {
+		const { children, loading } = this.props;
+
 		return (
 			<div className="temp-wrap">
 				<div className="app-wrap">
@@ -28,6 +48,10 @@ class App extends React.Component {
 				</div>
 			</div>
 		);
+	}
+
+	renderChildren() {
+		return EXTENSION ? this.renderExtension() : this.renderApp();
 	}
 
 	render() {
