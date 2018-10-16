@@ -5,7 +5,7 @@ import _ from 'lodash';
 const DEFAULT_FIELDS = Map({
 	loading: false,
 	error: null,
-	activeUser: new Map({
+	account: new Map({
 		id: '',
 		name: '',
 		icon: '',
@@ -20,6 +20,7 @@ const DEFAULT_FIELDS = Map({
 		isLocked: true,
 		error: null,
 	}),
+	accounts: new List([]),
 	connected: false,
 });
 
