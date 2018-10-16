@@ -11,7 +11,8 @@ import { fetchChain } from '../api/ChainApi';
  *
  * 	@param {Object} userBalances
  */
-export const initAssetsBalances = (userBalances) => async (dispatch, getState) => {
+export const initAssetsBalances = (activeUserName) => async (dispatch, getState) => {
+	const userBalances = (await fetchChain(activeUserName)).get('balances');
 
 	const balancesPromises = [];
 	const assetsPromises = [];
