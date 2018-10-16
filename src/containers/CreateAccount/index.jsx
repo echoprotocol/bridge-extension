@@ -74,6 +74,7 @@ class CreateAccount extends React.Component {
 				<WelcomeComponent
 					wif={wif}
 					name={name}
+					unmount={() => this.setState({ name: '', wif: '' })}
 					proceed={() => this.onProceedClick()}
 				/>
 			);

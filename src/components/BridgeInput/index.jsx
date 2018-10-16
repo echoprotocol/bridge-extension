@@ -15,6 +15,7 @@ class BridgeInput extends React.Component {
 		};
 	}
 
+
 	onFocus() {
 		this.setState({ up: true });
 	}
@@ -27,9 +28,10 @@ class BridgeInput extends React.Component {
 	onTogglePrivacy() {
 		this.setState({ showPas: !this.state.showPas });
 	}
-	isEmpty() {
+
+	onChange(e) {
 		this.setState({ filled: !!this.bridgeInput.inputRef.value.trim().length });
-		this.props.onChange(this.bridgeInput.inputRef);
+		this.props.onChange(e);
 	}
 
 	renderError() {
@@ -78,7 +80,6 @@ class BridgeInput extends React.Component {
 		);
 	}
 	render() {
-
 		const {
 			name, labelText, type, error, disabled, theme, value,
 			autoFocus, privacyEye, position, descriptionText,
@@ -92,7 +93,7 @@ class BridgeInput extends React.Component {
 
 			<div className={classnames('input-wrap', theme)} >
 				<Input
-					defaultValue={value}
+					value={value}
 					name={name}
 					label={labelText}
 					type={privacyEye && showPas ? 'text' : type}
@@ -110,7 +111,7 @@ class BridgeInput extends React.Component {
 					)}
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
-					onChange={() => this.isEmpty()}
+					onChange={(e) => this.onChange(e)}
 				/>
 
 				{ error ? this.renderError() : null }

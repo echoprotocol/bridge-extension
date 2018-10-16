@@ -9,6 +9,10 @@ import UserIcon from '../UserIcon';
 
 class WelcomeComponent extends React.Component {
 
+	componentWillUnmount() {
+		this.props.unmount();
+	}
+
 	render() {
 		const { name, wif, activeUser } = this.props;
 
@@ -67,6 +71,7 @@ WelcomeComponent.propTypes = {
 	activeUser: PropTypes.object.isRequired,
 	wif: PropTypes.string,
 	name: PropTypes.string.isRequired,
+	unmount: PropTypes.func.isRequired,
 	proceed: PropTypes.func.isRequired,
 };
 
