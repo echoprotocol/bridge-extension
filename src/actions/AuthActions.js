@@ -78,7 +78,11 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		return wif;
 
 	} catch (err) {
-		dispatch(setValue(FORM_SIGN_UP, 'error', err.message));
+		dispatch(setValue(
+			FORM_SIGN_UP,
+			'error',
+			err instanceof Error ? err.message : err,
+		));
 
 		return null;
 	} finally {
@@ -193,7 +197,11 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 		return success ? name : null;
 	} catch (err) {
-		dispatch(setValue(FORM_SIGN_IN, 'error', err.message));
+		dispatch(setValue(
+			FORM_SIGN_IN,
+			'error',
+			err instanceof Error ? err.message : err,
+		));
 
 		return false;
 	} finally {
