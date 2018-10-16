@@ -11,13 +11,6 @@ import FormatHelper from '../../helpers/FormatHelper';
 class Wallet extends React.Component {
 
 	render() {
-		// const balances = [
-		// 	{
-		// 		value: '0.000',
-		// 		key: 'ECHO',
-		// 		type: 'asset',
-		// 	},
-		// ];
 		const { assets, balances } = this.props;
 
 		return (
@@ -53,33 +46,34 @@ class Wallet extends React.Component {
 								>
 									{
 
-										balances.toArray().map((asset, i) => {
-											const id = i;
-											const asset12 = assets.find((asset1) => asset1.get('id') === asset.get('asset_type'));
-											if (asset12) {
-												return (
+										balances.toArray().map((balance) => {
+											const asset = assets.get(balance.get('asset_type'));
 
-													<li key={id}>
-														<div className="balance-info">
-															<span>{FormatHelper.formatAmount(asset.get('balance'), asset12.get('precision'))}</span>
-															<span>{asset12.get('symbol')}</span>
-														</div>
-														{/* { */}
-														{/* asset.type === 'token' ? */}
-														{/* <React.Fragment> */}
-														{/* <Button className="btn-icon icon-closeBig" /> */}
-														{/* <div className="token-info"> */}
-														{/* <span>ERC20</span> */}
-														{/* <span>TOKEN</span> */}
-														{/* </div> */}
-														{/* </React.Fragment> : */}
-														{/* null */}
-														{/* } */}
-													</li>
-
-												);
+											if (!asset) {
+												return null;
 											}
-											return null;
+
+											return (
+
+												<li key={balance.get('id')}>
+													<div className="balance-info">
+														<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
+														<span>{asset.get('symbol')}</span>
+													</div>
+													{/* { */}
+													{/* asset.type === 'token' ? */}
+													{/* <React.Fragment> */}
+													{/* <Button className="btn-icon icon-closeBig" /> */}
+													{/* <div className="token-info"> */}
+													{/* <span>ERC20</span> */}
+													{/* <span>TOKEN</span> */}
+													{/* </div> */}
+													{/* </React.Fragment> : */}
+													{/* null */}
+													{/* } */}
+												</li>
+
+											);
 
 										})
 									}

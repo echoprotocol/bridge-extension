@@ -1,4 +1,4 @@
-import { Map, List } from 'immutable';
+import { List } from 'immutable';
 
 import BalanceReducer from '../reducers/BalanceReducer';
 
@@ -12,36 +12,50 @@ import { fetchChain } from '../api/ChainApi';
  * 	@param {Object} userBalances
  */
 export const initAssetsBalances = (userBalances) => async (dispatch, getState) => {
+
 	const balancesPromises = [];
 	const assetsPromises = [];
-	const stateAssets = getState().balance.get('assets');
-	const stateBalances = getState().balance.get('balances');
+	const balancesState = getState().balance;
+	const stateAssets = balancesState.get('assets');
+	const stateBalances = balancesState.get('balances');
 
 	userBalances.forEach((value) => balancesPromises.push(fetchChain(value)));
 
 	userBalances.mapKeys((value) => assetsPromises.push(fetchChain(value)));
 
-	let balances = new Map();
-	let assets = new Map();
+	let balances = stateBalances;
+	let assets = stateAssets;
+
 
 	const balancesPromise = Promise.all(balancesPromises);
 	const assetsPromise = Promise.all(assetsPromises);
 
 	const [balancesResult, assetsResult] = await Promise.all([balancesPromise, assetsPromise]);
 
-	balancesResult.forEach((value, key) => {
-		balances = balances.set(key, value);
+	balancesResult.forEach((value) => {
+		balances = balances.set(value.get('id'), value);
 	});
-	assetsResult.forEach((value, key) => {
-		assets = assets.set(key, value);
+	assetsResult.forEach((value) => {
+		assets = assets.set(value.get('id'), value);
 	});
 
-	if (!stateAssets.equals(assets) && !stateBalances.equals(balances)) {
+	if ((stateAssets !== assets) || (stateBalances !== balances)) {
 		dispatch(BalanceReducer.actions.setAssets({
 			balances,
 			assets,
 		}));
 	}
+
+};
+
+/**
+ *  @method initPreviewBalances
+ *
+ * 	Reset active user's assets
+ *
+ */
+export const resetAssets = () => (dispatch) => {
+	dispatch(BalanceReducer.actions.resetAssets());
 };
 
 /**

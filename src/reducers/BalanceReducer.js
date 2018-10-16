@@ -62,6 +62,14 @@ export default createModule({
 			},
 		},
 
+		resetAssets: {
+			reducer: (state) => {
+				state.balances = DEFAULT_FIELDS.balances;
+				state.assets = DEFAULT_FIELDS.assets;
+				return state;
+			},
+		},
+
 		update: {
 			reducer: (state, { payload }) => {
 				const index = state.get(payload.field).findIndex((t) => (t.id === payload.param));
