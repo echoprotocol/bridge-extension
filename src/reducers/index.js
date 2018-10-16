@@ -1,7 +1,11 @@
-import modalReducer from './ModalReducer';
 import globalReducer from './GlobalReducer';
+import formReducer from './FormReducer';
+import balanceReducer from './BalanceReducer';
+import blockchainReducer from './BlockchainReducer';
 
 export default {
-	modal: modalReducer.reducer,
 	global: globalReducer.reducer,
+	form: formReducer.reducer,
+	balance: balanceReducer.reducer,
+	blockchain: blockchainReducer.reducer,
 };

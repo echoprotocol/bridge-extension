@@ -1,0 +1,47 @@
+.temp-wrap {
+    height: 100vh;
+    width: 100vw;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.app-wrap {
+    background-color: $colorBgLight;
+    width: 362px;
+    height: 591px;
+    border-radius: $angularMin;
+    position: relative;
+    overflow: hidden;
+    &.light {
+        background-color: $colorBgLight;
+    }
+    &.dark {
+        background-color: $colorBgDark;
+    }
+
+}
+
+.page-wrap {
+    padding-top: 70px;
+    max-height: 488px;
+    overflow: auto;
+    .page {
+        padding: 0 28px 35px;
+        position: relative;
+        min-height: 348px;
+    }
+    .one-input-wrap {
+        margin-top: 80px;
+    }
+    .two-input-wrap,
+    .three-input-wrap {
+        margin-top: 45px;
+    }
+}
+.page-action-wrap {
+    height: 70px;
+    display: flex;
+    align-items: flex-start;
+    justify-content: center;
+}

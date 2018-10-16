@@ -1,0 +1,66 @@
+.icon-pageAccount {
+    border-radius: 50%;
+    width: 28px;
+    height: 28px;
+    margin: 0 auto auto;
+    font-size: 32px;
+    text-align: center;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    &-in {
+        height: 86px;
+        width: 86px;
+        border-radius: 50%;
+        background-color: #b2d57a;
+        margin: -43px auto 0;
+        position: absolute;
+        right: 0;
+        left: 0;
+    }
+}
+
+.hi-text {
+    text-align: center;
+    font-family: FNBook;
+    font-size: 23px;
+    color: #3E4850;
+    line-height: 21px;
+    letter-spacing: 1px;
+    div {
+        margin-bottom: 10px;
+        font-family: FNMedium;
+    }
+}
+.instruction-text {
+    color: #596066;
+    font-family: FNBook;
+    text-align: center;
+    margin: 21px 0 0 4px;
+    font-size: 15px;
+    letter-spacing: 0.6px;
+    line-height: 19px;
+}
+
+.wif {
+    font-family: FNMedium;
+    color: #3E4851;
+    line-height: 25px;
+    margin-top: 25px;
+    text-align: center;
+    font-size: 15px;
+    letter-spacing: 0.6px;
+    word-break: break-all;
+    & + .btn-copy-wrap {
+        margin: 21px 0 0 7px;
+    }
+    &-wrap {
+        margin: 39px -12px 0;
+        background-color: #fafbfc;
+        height: 152px;
+        padding: 0 36px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+    }
+}
