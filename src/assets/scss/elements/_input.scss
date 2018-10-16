@@ -6,6 +6,7 @@
     z-index: 2;
     font-family: FNMedium;
     font-size: 16px;
+
     transition: color $speed, padding $speed;
     padding: 0;
     letter-spacing: 1.8px;
@@ -19,6 +20,9 @@
     align-items: flex-end;
     letter-spacing: 1px;
     margin-right: -1px;
+    -webkit-backface-visibility: hidden;
+    -webkit-transform: translateZ(0) scale(1.0, 1.0);
+    transform: translateZ(0);
     &-wrap {
         text-align: center;
         & + .input-wrap {
@@ -142,7 +146,17 @@
 
     }
     &-dark {
+
         .input {
+
+            input {
+                color: #fff !important;            
+                -webkit-text-fill-color: #fff !important;
+                // #9ba2a5
+                &::placeholder {
+                    color: #fff !important;
+                }
+            }
 
             &.error {
                 &:after {
@@ -159,6 +173,7 @@
             .label {
                 color: #b4b5ba;
             }
+            
 
             &:not(.disabled):not(.error) {
 
@@ -203,7 +218,17 @@
             }
  
 
-        } 
+        }
+        .message {
+            &-hint {
+                color: #ca304e;
+            }
+            &-description {
+                color: rgba(#fff, .2);
+                max-width: 280px;
+            }
+
+        }
     }
 
     .label {
@@ -213,7 +238,6 @@
         top: 0;
         line-height: 47px;
         font-size: 17px;
-        will-change: transform;
         transition: line-height $speed, font-size $speed, color $speed;
         font-family: FNMedium;
     }
@@ -272,19 +296,19 @@
         letter-spacing: 1px;
         animation: fadeIn $speed;
         span {
-            font-family: FNMedium;
+            font-family: FNBook;
         }
 
         & + .message-description {
-            margin-top: 32px;
+            margin-top: 22px;
         }
     }
     &-description {
         font-family: FNBook;
         font-size: 14px;
         color: #9ca1a5;
-        margin: 11px auto 0;
-        letter-spacing: 1.32px;
+        margin: 15px auto 0;
+        letter-spacing: 1px;
         line-height: 21px;
         max-width: 238px;
         padding-left: 3px;

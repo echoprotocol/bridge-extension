@@ -3,4 +3,29 @@
     background-image: url(../images/headerBg.jpg);
     display: flex;
     justify-content: space-between;
+
+    &-bridge-image {
+        user-select: none;
+        height: 103px;
+        width: 100%;
+        background-image: url(../images/bridge-header-img.png);
+        background-size: cover;
+        background-repeat: no-repeat;
+        background-position: center;
+        display: flex;  
+        align-items: center;
+        justify-content: center;
+
+        span {
+            font-family: 'FNBook';
+            font-weight: 400;
+            letter-spacing: 0.6em;
+            font-size: 15px;
+            color: #3e434f;
+            text-transform: uppercase;
+            max-width: 96px;
+            width: 100%;
+            white-space: nowrap;
+        }
+    }
 }
