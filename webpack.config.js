@@ -23,7 +23,7 @@ module.exports = {
 		app: path.resolve('src/index.js'),
 	},
 	output: {
-		publicPath: '/',
+		publicPath: process.env.EXTENSION ? './' : '/',
 		path: path.resolve('dist'),
 		filename: `[name].${version}.js`,
 		pathinfo: process.env.NODE_ENV === 'local',
@@ -103,6 +103,7 @@ module.exports = {
 		extractSass,
 		new webpack.DefinePlugin({
 			NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+			EXTENSION: !!process.env.EXTENSION,
 		}),
 	],
 	node: {
