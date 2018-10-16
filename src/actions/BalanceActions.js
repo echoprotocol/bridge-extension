@@ -12,22 +12,28 @@ import { fetchChain } from '../api/ChainApi';
  * 	@param {Object} userBalances
  */
 export const initAssetsBalances = (userBalances) => async (dispatch, getState) => {
-	const arr = [];
-	const arrAssets = [];
+	const balancesPromises = [];
+	const assetsPromises = [];
 	const stateAssets = getState().balance.get('assets');
 	const stateBalances = getState().balance.get('balances');
 
-	userBalances.forEach((value) => arr.push(fetchChain(value)));
-	userBalances.mapKeys((value) => arrAssets.push(fetchChain(value)));
+	userBalances.forEach((value) => balancesPromises.push(fetchChain(value)));
+
+	userBalances.mapKeys((value) => assetsPromises.push(fetchChain(value)));
 
 	let balances = new Map();
 	let assets = new Map();
 
-	(await Promise.all(arr)).forEach((bal, key) => {
-		balances = balances.set(key.toString(), bal);
+	const balancesPromise = Promise.all(balancesPromises);
+	const assetsPromise = Promise.all(assetsPromises);
+
+	const [balancesResult, assetsResult] = await Promise.all([balancesPromise, assetsPromise]);
+
+	balancesResult.forEach((value, key) => {
+		balances = balances.set(key, value);
 	});
-	(await Promise.all(arrAssets)).forEach((asset, key) => {
-		assets = assets.set(key.toString(), asset);
+	assetsResult.forEach((value, key) => {
+		assets = assets.set(key, value);
 	});
 
 	if (!stateAssets.equals(assets) && !stateBalances.equals(balances)) {

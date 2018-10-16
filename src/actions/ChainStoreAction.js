@@ -22,17 +22,18 @@ import ChainStoreCacheNames from '../constants/ChainStoreConstants';
  * copy object from ChainStore lib to redux every time when triggered
  * @returns {Function}
  */
-export const subscribe = () => (dispatch, getState) => {
-	ChainStoreCacheNames.forEach(async ({ origin, custom: field }) => {
+export const subscribe = () => async (dispatch, getState) => {
+	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
 		const value = ChainStore[origin];
-		const activeUserName = getState().global.getIn(['activeUser', 'name']);
-
-		if (activeUserName) {
-			dispatch(initAssetsBalances((await fetchChain(activeUserName)).get('balances')));
-		}
 
 		dispatch(BlockchainReducer.actions.set({ field, value }));
 	});
+
+	const activeUserName = getState().global.getIn(['activeUser', 'name']);
+
+	if (activeUserName) {
+		dispatch(initAssetsBalances((await fetchChain(activeUserName)).get('balances')));
+	}
 };
 
 /**
