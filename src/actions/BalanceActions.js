@@ -9,7 +9,7 @@ import { fetchChain } from '../api/ChainApi';
  *
  * 	Initialization user's assets
  *
- * 	@param {Object} userBalances
+ * 	@param {String} activeUserName
  */
 export const initAssetsBalances = (activeUserName) => async (dispatch, getState) => {
 	const userBalances = (await fetchChain(activeUserName)).get('balances');
