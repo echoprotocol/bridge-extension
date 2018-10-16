@@ -7,6 +7,7 @@ import {
 	FORM_SIGN_IN,
 	FORM_ADD_NETWORK,
 	FORM_UNLOCK,
+	FORM_WIPE,
 } from '../constants/FormConstants';
 
 const DEFAULT_FIELDS = Map({
@@ -38,6 +39,9 @@ const DEFAULT_FORM_FIELDS = {
 			value: '',
 			error: null,
 		},
+	}),
+	[FORM_WIPE]: Map({
+		checked: false,
 	}),
 };
 
