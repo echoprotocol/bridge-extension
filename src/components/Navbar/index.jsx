@@ -10,7 +10,6 @@ class Navbar extends React.PureComponent {
 
 	renderTitle() {
 		const { pathname, search } = this.props.location;
-		console.log(pathname, search);
 
 		const item = HEADER_TITLE.find(({ path }) => (path === `${pathname}${search}`));
 
