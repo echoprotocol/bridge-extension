@@ -15,14 +15,11 @@ class BridgeInput extends React.Component {
 		};
 	}
 
+
 	onFocus() {
 		this.setState({ up: true });
 	}
 
-	onChange(e) {
-		this.setState({ filled: !!e.target.value.trim().length });
-		this.props.onChange(e);
-	}
 
 	onBlur() {
 		this.setState({ up: false });
@@ -32,30 +29,28 @@ class BridgeInput extends React.Component {
 		this.setState({ showPas: !this.state.showPas });
 	}
 
+	onChange(e) {
+		this.setState({ filled: !!this.bridgeInput.inputRef.value });
+		this.props.onChange(e);
+	}
+
 	renderError() {
+		return (<div className="message-error"> {this.props.errorText}</div>);
+	}
+
+	renderHint() {
+		const { hintText, hintClickable } = this.props;
+
 		return (
-			<React.Fragment>
-
-				<div className="message-error">
-					{ this.props.errorText}
-				</div>
-
+			<div className="message-hint">
 				{
-					this.props.hintText.length > 0 ?
-						<div className="message-hint">
-							<span
-								role="button"
-								tabIndex="0"
-								onClick={this.props.onClick}
-								onKeyPress={this.props.onClick}
-							> { this.props.hintText }
-							</span>
-						</div> : null
+					hintClickable ?
+						<button onClick={(e) => this.props.onHintClick(e)} className="btn-try">
+							{hintText}
+						</button> : { hintText }
 				}
-
-			</React.Fragment>
+			</div>
 		);
-
 	}
 
 	renderPrivacyEye() {
@@ -75,7 +70,7 @@ class BridgeInput extends React.Component {
 	render() {
 		const {
 			name, labelText, type, error, disabled, theme, value,
-			autoFocus, privacyEye, position, descriptionText,
+			autoFocus, privacyEye, position, descriptionText, hintText,
 		} = this.props;
 
 		const {
@@ -94,6 +89,7 @@ class BridgeInput extends React.Component {
 					disabled={disabled}
 					autoFocus={autoFocus}
 					icon={privacyEye ? this.renderPrivacyEye() : false}
+					ref={(bridgeInput) => { this.bridgeInput = bridgeInput; }}
 					className={classnames(
 						{ up },
 						{ focused: focus },
@@ -101,13 +97,13 @@ class BridgeInput extends React.Component {
 						{ eye: privacyEye },
 						position,
 					)}
-					ref={this.handleRef}
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
 				/>
 
 				{ error ? this.renderError() : null }
+				{ hintText ? this.renderHint() : null }
 				{ descriptionText ? <div className="message-description">{ descriptionText }</div> : null }
 
 			</div>
@@ -129,10 +125,11 @@ BridgeInput.propTypes = {
 	labelText: PropTypes.string,
 	errorText: PropTypes.string,
 	hintText: PropTypes.string,
+	hintClickable: PropTypes.bool,
 	descriptionText: PropTypes.string,
-	onChange: PropTypes.func,
-	onClick: PropTypes.func,
 	privacyEye: PropTypes.bool,
+	onChange: PropTypes.func,
+	onHintClick: PropTypes.func,
 };
 
 BridgeInput.defaultProps = {
@@ -147,10 +144,11 @@ BridgeInput.defaultProps = {
 	labelText: '',
 	errorText: '',
 	hintText: '',
+	hintClickable: false,
 	descriptionText: '',
-	onChange: null,
-	onClick: null,
 	privacyEye: false,
+	onChange: null,
+	onHintClick: null,
 };
 
 export default BridgeInput;

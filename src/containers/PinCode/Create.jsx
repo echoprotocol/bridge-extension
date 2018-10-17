@@ -23,7 +23,7 @@ class CreatePin extends React.Component {
 							labelText="Create PIN"
 							type="password"
 						/>
-						<BridgeInput
+						{/* <BridgeInput
 							error
 							theme="input-dark"
 							labelText="Repeat PIN"
@@ -31,7 +31,7 @@ class CreatePin extends React.Component {
 							type="password"
 							hintText="Repeat PIN correctly"
 							descriptionText="At least 6 symbols. PIN will be used only to unlock extension"
-						/>
+						/> */}
 					</div>
 				</div>
 				<div className="page-action-wrap pin-screen">

@@ -11,7 +11,7 @@ import {
 import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 import { createAccount } from '../../actions/AuthActions';
-import { setFormError, clearForm } from '../../actions/FormActions';
+import { setValue, clearForm } from '../../actions/FormActions';
 
 import CreateComponent from './CreateComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
@@ -43,7 +43,7 @@ class CreateAccount extends React.Component {
 	onChangeName(name) {
 		this.setState({ name });
 
-		if (this.props.name.error) {
+		if (this.props.name.error || this.props.name.example) {
 			this.props.clearError();
 		}
 	}
@@ -75,6 +75,7 @@ class CreateAccount extends React.Component {
 					wif={wif}
 					name={name}
 					proceed={() => this.onProceedClick()}
+					unmount={() => this.setState({ name: '', wif: '' })}
 				/>
 			);
 		}
@@ -110,7 +111,11 @@ export default connect(
 	}),
 	(dispatch) => ({
 		createAccount: (name) => dispatch(createAccount(name)),
-		clearError: () => dispatch(setFormError(FORM_SIGN_UP, 'accountName', null)),
 		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
+		clearError: () => dispatch(setValue(
+			FORM_SIGN_UP,
+			'accountName',
+			{ error: null, example: '' },
+		)),
 	}),
 )(CreateAccount);

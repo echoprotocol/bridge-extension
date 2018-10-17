@@ -8,16 +8,6 @@
     display: flex;
     align-items: center;
     justify-content: center;
-    &-in {
-        height: 86px;
-        width: 86px;
-        border-radius: 50%;
-        background-color: #b2d57a;
-        margin: -43px auto 0;
-        position: absolute;
-        right: 0;
-        left: 0;
-    }
 }
 
 .hi-text {

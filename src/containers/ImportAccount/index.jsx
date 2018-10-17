@@ -72,6 +72,7 @@ class ImportAccount extends React.Component {
 				<WelcomeComponent
 					name={name}
 					proceed={() => this.onProceedClick()}
+					unmount={() => this.setState({ name: '', password: '', success: false })}
 				/>
 			);
 		}
