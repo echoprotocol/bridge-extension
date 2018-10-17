@@ -1,8 +1,7 @@
 import { createModule } from 'redux-modules';
-import { Map, List } from 'immutable';
+import { Map } from 'immutable';
 
 const DEFAULT_FIELDS = Map({
-	preview: new List([]),
 	balances: new Map({}),
 	assets: new Map({}),
 });

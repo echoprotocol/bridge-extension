@@ -11,7 +11,7 @@ import FormatHelper from '../../helpers/FormatHelper';
 class Wallet extends React.Component {
 
 	render() {
-		const { assets, balances } = this.props;
+		const { assets, balances, account } = this.props;
 
 		return (
 			<React.Fragment>
@@ -49,7 +49,7 @@ class Wallet extends React.Component {
 										balances.toArray().map((balance) => {
 											const asset = assets.get(balance.get('asset_type'));
 
-											if (!asset) {
+											if (!asset || account.get('id') !== balance.get('owner')) {
 												return null;
 											}
 
@@ -108,12 +108,14 @@ class Wallet extends React.Component {
 Wallet.propTypes = {
 	assets: PropTypes.object.isRequired,
 	balances: PropTypes.object.isRequired,
+	account: PropTypes.object.isRequired,
 };
 
 export default connect(
 	(state) => ({
 		assets: state.balance.get('assets'),
 		balances: state.balance.get('balances'),
+		account: state.global.get('account'),
 	}),
 	() => ({}),
 )(Wallet);

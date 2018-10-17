@@ -18,7 +18,7 @@ export const initCrypto = (pin = '123456') => async (dispatch) => {
 			dispatch(changeCrypto({ isLocked: true }));
 		});
 	} catch (err) {
-		dispatch(changeCrypto({ error: err.message }));
+		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
 	}
 };
 
@@ -28,6 +28,29 @@ export const unlockCrypto = (pin = '123456') => async (dispatch) => {
 		await crypto.unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
 	} catch (err) {
-		dispatch(changeCrypto({ error: err.message }));
+		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+	}
+};
+
+export const setCryptoInfo = (field, value) => async (dispatch, getState) => {
+	try {
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		await crypto.setInByNetwork(networkName, field, value);
+	} catch (err) {
+		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+	}
+};
+
+export const getCryptoInfo = (field) => async (dispatch, getState) => {
+	try {
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		const value = await crypto.getInByNetwork(networkName, field);
+
+		return value;
+	} catch (err) {
+		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+		return null;
 	}
 };

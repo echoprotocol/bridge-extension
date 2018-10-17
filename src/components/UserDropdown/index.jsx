@@ -8,12 +8,11 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { withRouter } from 'react-router';
 
-import { initAccount, removeAccount } from '../../actions/GlobalActions';
-import { resetAssets } from '../../actions/BalanceActions';
+import { switchAccount, removeAccount } from '../../actions/GlobalActions';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
-import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
+import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH, WALLET_PATH } from '../../constants/RouterConstants';
 import { ECHO } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
@@ -38,25 +37,23 @@ class UserDropdown extends React.PureComponent {
 	}
 
 	onSelect(name) {
-		if (!this.props.preview.find((i) => i.accountName === name)) {
+		if (!this.props.accounts.find((i) => i.name === name)) {
 			return;
 		}
-		const { activeUser, networkName } = this.props;
+		const { account } = this.props;
 
-		if (activeUser.get('name') === name) {
+		if (account.get('name') === name) {
 			return;
 		}
 
-		this.props.resetAssets();
-		this.props.initAccount(name, networkName);
+		this.props.switchAccount(name);
 	}
 
 	onRemoveAccount(e, name) {
 		e.stopPropagation();
 
-		const { networkName } = this.props;
-
-		this.props.removeAccount(name, networkName);
+		this.props.removeAccount(name);
+		this.props.history.push(WALLET_PATH);
 	}
 
 	setDDMenuHeight() {
@@ -84,33 +81,50 @@ class UserDropdown extends React.PureComponent {
 		this.setState({ opened: false });
 	}
 
-	renderList(preview, activeUser) {
+	renderList() {
 
-		return preview.map((account, i) => {
+		const {
+			balances, assets, accounts, account: activeAccount,
+		} = this.props;
+		const asset = assets.get('1.3.0');
+
+		if (!asset) {
+			return null;
+		}
+
+		return accounts.map((account, i) => {
+
+			const userBalance = balances.find((value) => ((value.get('owner') === account.id) && (value.get('asset_type') === '1.3.0')));
+
+			if (!userBalance) {
+				return null;
+			}
+
 			const content = (
 				<MenuItem
-					active={activeUser.get('name') === account.accountName}
+					active={activeAccount.get('name') === account.name}
 					tabIndex="-1"
-					key={account.accountName}
+					key={account.name}
 					eventKey={i}
 					onClick={() => this.closeDropDown()}
-					onSelect={() => this.onSelect(account.accountName)}
+					onSelect={() => this.onSelect(account.name)}
 				>
 					<UserIcon color="green" avatar={`ava${account.icon}`} />
-					<div className="user-name">{account.accountName}</div>
-					<div className={classnames('user-balance', { positive: !!account.balance })}>
-						{FormatHelper.formatAmount(account.balance, account.precision, account.symbol) || `0 ${ECHO}`}
+					<div className="user-name">{account.name}</div>
+					<div className={classnames('user-balance', { positive: !!userBalance.get('balance') })}>
+						{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${ECHO}`}
 					</div>
-					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.accountName)} />
+					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.name)} />
 				</MenuItem>
 			);
 
 			return content;
+
 		});
 	}
 
 	render() {
-		const { preview, activeUser } = this.props;
+		const { account, accounts } = this.props;
 		const menuHeight = {
 			height: `${this.state.menuHeight}px`,
 		};
@@ -123,7 +137,7 @@ class UserDropdown extends React.PureComponent {
 				open={this.state.opened}
 			>
 				<Dropdown.Toggle noCaret>
-					<UserIcon color="green" avatar={`ava${activeUser.get('icon')}`} />
+					<UserIcon color="green" avatar={`ava${account.get('icon')}`} />
 					<i aria-hidden="true" className="dropdown icon" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu >
@@ -137,7 +151,7 @@ class UserDropdown extends React.PureComponent {
 						>
 							<div id="user-menu-container">
 								<ul className="user-list">
-									{this.renderList(preview, activeUser)}
+									{this.renderList()}
 								</ul>
 
 							</div>
@@ -149,7 +163,7 @@ class UserDropdown extends React.PureComponent {
 						<MenuItem
 							onClick={() => this.closeDropDown()}
 							href={`#${CREATE_ACCOUNT_PATH}`}
-							eventKey={preview.size + 1}
+							eventKey={accounts.size + 1}
 						>
 										create
 						</MenuItem>
@@ -157,7 +171,7 @@ class UserDropdown extends React.PureComponent {
 						<MenuItem
 							onClick={() => this.closeDropDown()}
 							href={`#${IMPORT_ACCOUNT_PATH}`}
-							eventKey={preview.size + 2}
+							eventKey={accounts.size + 2}
 						>
 										import
 						</MenuItem>
@@ -170,23 +184,24 @@ class UserDropdown extends React.PureComponent {
 }
 
 UserDropdown.propTypes = {
-	activeUser: PropTypes.object.isRequired,
-	networkName: PropTypes.string.isRequired,
-	preview: PropTypes.object.isRequired,
-	initAccount: PropTypes.func.isRequired,
+	account: PropTypes.object.isRequired,
+	accounts: PropTypes.object.isRequired,
+	balances: PropTypes.object.isRequired,
+	assets: PropTypes.object.isRequired,
+	history: PropTypes.object.isRequired,
+	switchAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
-	resetAssets: PropTypes.func.isRequired,
 };
 
 export default withRouter(connect(
 	(state) => ({
-		preview: state.balance.get('preview'),
-		activeUser: state.global.get('activeUser'),
-		networkName: state.global.getIn(['network', 'name']),
+		balances: state.balance.get('balances'),
+		assets: state.balance.get('assets'),
+		account: state.global.get('account'),
+		accounts: state.global.get('accounts'),
 	}),
 	(dispatch) => ({
-		initAccount: (name, network) => dispatch(initAccount(name, network)),
-		removeAccount: (name, network) => dispatch(removeAccount(name, network)),
-		resetAssets: () => dispatch(resetAssets()),
+		switchAccount: (name) => dispatch(switchAccount(name)),
+		removeAccount: (name) => dispatch(removeAccount(name)),
 	}),
 )(UserDropdown));

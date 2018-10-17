@@ -8,11 +8,11 @@ import NetworkDropdown from '../NetworkDropdown';
 class Header extends React.PureComponent {
 
 	render() {
-		const { preview } = this.props;
+		const { accounts } = this.props;
 
 		return (
 			<header className="header">
-				{preview.size ? <UserDropdown /> : null}
+				{accounts.size ? <UserDropdown /> : null}
 				<NetworkDropdown />
 			</header>
 		);
@@ -21,12 +21,12 @@ class Header extends React.PureComponent {
 }
 
 Header.propTypes = {
-	preview: PropTypes.object.isRequired,
+	accounts: PropTypes.object.isRequired,
 };
 
 export default connect(
 	(state) => ({
-		preview: state.balance.get('preview'),
+		accounts: state.global.get('accounts'),
 	}),
 	() => ({}),
 )(Header);
