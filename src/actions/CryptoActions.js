@@ -5,7 +5,6 @@ import storage from '../services/storage';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { FORM_UNLOCK } from '../constants/FormConstants';
 import { CREATE_PIN_PATH, UNLOCK_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
@@ -13,6 +12,7 @@ import { setValue } from './FormActions';
 import { loadInfo } from './GlobalActions';
 
 import FormatHelper from '../helpers/FormatHelper';
+import ValidatePinHelper from '../helpers/ValidatePinHelper';
 
 const changeCrypto = (params) => (dispatch) => {
 	dispatch(GlobalReducer.actions.setIn({ field: 'crypto', params }));
@@ -37,17 +37,24 @@ export const initCrypto = () => async (dispatch) => {
 	}
 };
 
-export const unlockCrypto = (pin) => async (dispatch) => {
-	dispatch(setValue(FORM_UNLOCK, 'loading', true));
+export const unlockCrypto = (form, pin) => async (dispatch) => {
+	const error = ValidatePinHelper.validatePin(pin);
+
+	if (error) {
+		dispatch(setValue(form, 'error', error));
+		return;
+	}
 
 	try {
+		dispatch(setValue(form, 'loading', true));
+		
 		await crypto.unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
 		await dispatch(loadInfo());
 	} catch (err) {
-		dispatch(setValue(FORM_UNLOCK, 'error', FormatHelper.formatError(err)));
+		dispatch(setValue(form, 'error', FormatHelper.formatError(err)));
 	} finally {
-		dispatch(setValue(FORM_UNLOCK, 'loading', false));
+		dispatch(setValue(form, 'loading', false));
 	}
 };
 

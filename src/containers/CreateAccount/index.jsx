@@ -44,7 +44,7 @@ class CreateAccount extends React.Component {
 		this.setState({ name });
 
 		if (this.props.name.error || this.props.name.example) {
-			this.props.clearError();
+			this.props.setValue({ error: null, example: '' });
 		}
 	}
 
@@ -100,7 +100,7 @@ CreateAccount.propTypes = {
 	location: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
 	createAccount: PropTypes.func.isRequired,
-	clearError: PropTypes.func.isRequired,
+	setValue: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
 };
 
@@ -112,10 +112,6 @@ export default connect(
 	(dispatch) => ({
 		createAccount: (name) => dispatch(createAccount(name)),
 		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
-		clearError: () => dispatch(setValue(
-			FORM_SIGN_UP,
-			'accountName',
-			{ error: null, example: '' },
-		)),
+		setValue: (value) => dispatch(setValue(FORM_SIGN_UP, 'accountName', value)),
 	}),
 )(CreateAccount);

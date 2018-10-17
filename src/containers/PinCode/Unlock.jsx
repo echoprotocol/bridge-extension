@@ -106,7 +106,7 @@ export default connect(
 		error: state.form.getIn([FORM_UNLOCK, 'error']),
 	}),
 	(dispatch) => ({
-		unlock: (value) => dispatch(unlockCrypto(value)),
+		unlock: (value) => dispatch(unlockCrypto(FORM_UNLOCK, value)),
 		clearError: () => dispatch(setValue(FORM_UNLOCK, 'error', null)),
 		clearForm: () => dispatch(clearForm(FORM_UNLOCK)),
 	}),
