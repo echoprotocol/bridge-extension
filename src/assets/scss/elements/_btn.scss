@@ -1,6 +1,6 @@
 // BTNS:
 // btn-in-dark, btn-in-light, btn-transparent, btn-inverted, btn-copy,
-// btn-noborder, btn-nav, btn-logout, btn-round-close, btn-icon
+// btn-noborder, btn-nav, btn-logout, btn-round-close, btn-icon, btn-try
 
 // SIZE: compact
 // STATE: error, disabled
@@ -361,6 +361,22 @@
         transition: color $speed;
         &:hover {
             color: #363f42;
+        }
+    }
+    &-try {
+        background-color: transparent;
+        border: 0;
+        font-family: FNMedium;
+        font-size: 15px;
+        color: #3b454a;
+        letter-spacing: 1px;
+        cursor: pointer;
+        padding: 0;
+        margin: -1px 0 0 5px;
+        border-bottom: 1px solid transparent;
+        transition: border $speed;
+        &:focus {
+            border-bottom: 1px solid;
         }
     }
 

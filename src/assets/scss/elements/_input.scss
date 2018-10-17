@@ -31,7 +31,7 @@
     }
     &.left {
         text-align: left;
-        
+
         input,
         .input-wrap {
             text-align: left;
@@ -86,7 +86,7 @@
         }
         input[type="password" i] {
             color: $colorError !important;
-        }   
+        }
     }
 
     &-light {
@@ -103,21 +103,21 @@
                     }
                 }
             }
-            
+
             &:after {
                 background-color: #c8cfd2;
             }
-            
+
             .label {
                 color: #92999e;
             }
- 
+
             &:not(.disabled):not(.error) {
 
                 input {
                     color: #3d4b52;
                 }
-    
+
                 &:hover {
                     &:after {
                         background-color: #848e95;
@@ -141,7 +141,7 @@
                     color: #80888c;
                 }
             }
- 
+
         }
 
     }
@@ -150,7 +150,7 @@
         .input {
 
             input {
-                color: #fff !important;            
+                color: #fff !important;
                 -webkit-text-fill-color: #fff !important;
                 // #9ba2a5
                 &::placeholder {
@@ -173,7 +173,7 @@
             .label {
                 color: #b4b5ba;
             }
-            
+
 
             &:not(.disabled):not(.error) {
 
@@ -184,7 +184,7 @@
                 input {
                     color: #b4b5ba;
                 }
-    
+
                 &:hover {
                     input {
                         color: #ffffff;
@@ -216,7 +216,7 @@
                     color: #c8c9ce;
                 }
             }
- 
+
 
         }
         .message {
@@ -295,9 +295,6 @@
         color: #3b454a;
         letter-spacing: 1px;
         animation: fadeIn $speed;
-        span {
-            font-family: FNBook;
-        }
 
         & + .message-description {
             margin-top: 22px;
