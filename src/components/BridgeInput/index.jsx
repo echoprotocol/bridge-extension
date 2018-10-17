@@ -30,7 +30,7 @@ class BridgeInput extends React.Component {
 	}
 
 	onChange(e) {
-		this.setState({ filled: !!this.bridgeInput.inputRef.value.trim().length });
+		this.setState({ filled: !!this.bridgeInput.inputRef.value });
 		this.props.onChange(e);
 	}
 
@@ -42,24 +42,20 @@ class BridgeInput extends React.Component {
 					{ this.props.errorText}
 				</div>
 
-				{
-					this.props.hintText.length > 0 ?
-						<div className="message-hint">
-							{
-								this.props.errorText === 'Account with such name already exists.' ?
-									<React.Fragment>
+				<div className="message-hint">
+					{
+						this.props.exampleName ?
+							<React.Fragment>
                                             You can try
-										<button
-											onClick={() => this.props.onClick}
-											className="btn-try"
-										> {this.props.hintText}
-										</button>
-									</React.Fragment> :
-									this.props.hintText
-							}
-						</div> : null
-				}
-
+								<button
+									onClick={() => this.props.onClick}
+									className="btn-try"
+								> {this.props.exampleName}
+								</button>
+							</React.Fragment> :
+							this.props.exampleName
+					}
+				</div>
 			</React.Fragment>
 		);
 
@@ -135,7 +131,7 @@ BridgeInput.propTypes = {
 	position: PropTypes.string,
 	labelText: PropTypes.string,
 	errorText: PropTypes.string,
-	hintText: PropTypes.string,
+	exampleName: PropTypes.string,
 	descriptionText: PropTypes.string,
 	onChange: PropTypes.func,
 	onClick: PropTypes.func,
@@ -153,7 +149,7 @@ BridgeInput.defaultProps = {
 	position: '',
 	labelText: '',
 	errorText: '',
-	hintText: '',
+	exampleName: '',
 	descriptionText: '',
 	onChange: null,
 	onClick: null,

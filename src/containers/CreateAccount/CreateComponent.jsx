@@ -34,7 +34,7 @@ class CreateComponent extends React.Component {
 								theme="input-light"
 								labelText="Account name"
 								errorText={error}
-								hintText={example}
+								exampleName={example}
 								descriptionText="Unique name will be used to make transaction"
 								value={name}
 								onChange={(e) => this.onChangeName(e)}
