@@ -15,7 +15,7 @@ import GlobalReducer from '../reducers/GlobalReducer';
 
 import { NETWORKS } from '../constants/GlobalConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
-import {SUCCESS_ADD_NETWORK_PATH, CREATE_ACCOUNT_PATH, WALLET_PATH} from '../constants/RouterConstants';
+import { SUCCESS_ADD_NETWORK_PATH, CREATE_ACCOUNT_PATH } from '../constants/RouterConstants';
 
 import { fetchChain } from '../api/ChainApi';
 

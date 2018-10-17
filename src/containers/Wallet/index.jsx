@@ -12,6 +12,7 @@ class Wallet extends React.Component {
 
 	render() {
 		const { assets, balances, account } = this.props;
+		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size;
 
 		return (
 			<React.Fragment>
@@ -30,7 +31,7 @@ class Wallet extends React.Component {
 					<div className="page">
 						<div className={classnames(
 							'scroll-wrap',
-							{ two: balances.size === 2 },
+							{ two: balancesCount === 2 },
 						)}
 						>
 							<CustomScroll
@@ -39,13 +40,12 @@ class Wallet extends React.Component {
 							>
 								<ul className={classnames(
 									'wallet-list',
-									{ one: balances.size === 1 },
-									{ two: balances.size === 2 },
-									{ three: balances.size === 3 },
+									{ one: balancesCount === 1 },
+									{ two: balancesCount === 2 },
+									{ three: balancesCount === 3 },
 								)}
 								>
 									{
-
 										balances.toArray().map((balance) => {
 											const asset = assets.get(balance.get('asset_type'));
 

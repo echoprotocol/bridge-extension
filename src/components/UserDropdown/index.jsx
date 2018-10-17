@@ -185,7 +185,6 @@ UserDropdown.propTypes = {
 	accounts: PropTypes.object.isRequired,
 	balances: PropTypes.object.isRequired,
 	assets: PropTypes.object.isRequired,
-	history: PropTypes.object.isRequired,
 	switchAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
 };
