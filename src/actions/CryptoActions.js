@@ -47,7 +47,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 
 	try {
 		dispatch(setValue(form, 'loading', true));
-		
+
 		await crypto.unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
 		await dispatch(loadInfo());
