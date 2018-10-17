@@ -6,19 +6,6 @@ import classnames from 'classnames';
 
 class Wallet extends React.Component {
 
-	onChange(e, lowerCase) {
-		const field = e.target.name;
-		let { value } = e.target;
-
-		if (lowerCase) {
-			value = value.toLowerCase();
-		}
-
-		// if (field) {
-		// this.props.setFormValue(field, value);
-		// }
-	}
-
 	renderWallet() {
 		const balances = [
 			{
