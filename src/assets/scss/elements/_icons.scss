@@ -13,6 +13,14 @@
             font-size: 32px;
         }
     }
+    &.medium {
+        min-width: 41px;
+        height: 41px;
+        [class*="icon-ava"] {
+            font-size: 32px;
+        }
+    }
+
     &.green {
         background-color:#16d6aa;
     }

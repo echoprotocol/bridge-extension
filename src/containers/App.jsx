@@ -18,12 +18,13 @@ class App extends React.Component {
 		super(props);
 
 		this.state = {
-			visible: false,
+			visible: true,
 		};
 	}
 
 	componentDidMount() {
 		this.props.connection();
+
 	}
 
 	onSidebarToggle() {
@@ -54,14 +55,16 @@ class App extends React.Component {
 			<div className="temp-wrap">
 				<div className="app-wrap">
 					<Header />
-					<Sidebar.Pushable >
+					<Sidebar.Pushable>
+
 						<Navigator
 							visible={visible}
 							onSidebarToggle={() => this.onSidebarToggle()}
 						/>
 						<Sidebar.Pusher
-							key="sidebar-pusher"
 							dimmed={visible}
+							onClick={() => (visible ? this.onSidebarToggle() : null)}
+
 						>
 							<Navbar onSidebarToggle={() => this.onSidebarToggle()} />
 

@@ -8,6 +8,11 @@ import { HEADER_TITLE } from '../../constants/GlobalConstants';
 
 class Navbar extends React.PureComponent {
 
+	onClick(e) {
+		e.target.blur();
+		this.props.onSidebarToggle();
+	}
+
 	renderTitle() {
 		const { pathname, search } = this.props.location;
 
@@ -23,7 +28,7 @@ class Navbar extends React.PureComponent {
 			<div className="navbar">
 				<ul>
 					<li className="btn-nav-wrap" >
-						<Button onClick={() => this.props.onSidebarToggle()} className="icon-menu btn-nav" />
+						<Button onClick={(e) => this.onClick(e)} className="icon-menu btn-nav" />
 					</li>
 					{ title ? <li className="page-title">{title}</li> : null }
 					{

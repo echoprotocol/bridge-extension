@@ -1,0 +1,92 @@
+.sidebar {
+    &-header {
+        height: 150px;
+        background-color: rgba(#324046,1);
+        position: relative;
+        z-index: 1;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        
+        &:before {
+            position: absolute;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            top: 0;
+            content: "";
+            opacity: .07;
+            background-position: center;
+            background-image: url(../images/walletBG.jpg);
+            z-index: -1;
+        }
+        .btn-icon {
+            padding: 12px 4px;
+            font-size: 18px;
+            &:hover {
+                color: #d4dede;
+            }
+        }
+    }
+    &-body {
+        background-color: rgba(#324046,1);
+        height: calc(100% - 150px);
+        padding: 53px 30px 20px;
+        .panel {
+            margin-bottom: 17px;
+        }
+        .panel-title {
+            a {
+                display: flex;
+                align-items: center;
+                height: 30px;
+            }
+            a:not(.collapsed) {
+                color: #61D3AD;
+            }
+        }
+        .panel-body {
+            padding: 17px 0 0 70px;
+
+        }
+    }
+    &-user {
+        display: flex;
+        align-items: center;
+        color: #97ACAD;
+        font-family: FNBook;
+        margin: auto 0px 13px 6px;
+        .name {
+            margin: -3px 0px 0 17px;
+            font-size: 20px;
+            letter-spacing: 0.7px;
+
+        }
+    }
+}
+
+.nav-list {
+    li {
+        &:not(:last-child) {
+            margin-bottom: 17px;
+        }
+        a {
+            color: #6d7f80;
+            font-size: 18px;
+            letter-spacing: .5px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            transition: color $speed;
+            &:hover,
+            &:focus {
+                color: #d4dede;
+            }
+        }
+    }
+}
+
+.icon-navWallet {
+    font-size: 29px;
+}
+
