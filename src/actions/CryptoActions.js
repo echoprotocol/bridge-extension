@@ -2,6 +2,8 @@ import Crypto from '../services/crypto';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
+import FormatHelper from '../helpers/FormatHelper';
+
 const changeCrypto = (params) => (dispatch) => {
 	dispatch(GlobalReducer.actions.setIn({ field: 'crypto', params }));
 };
@@ -18,7 +20,7 @@ export const initCrypto = (pin = '123456') => async (dispatch) => {
 			dispatch(changeCrypto({ isLocked: true }));
 		});
 	} catch (err) {
-		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };
 
@@ -28,7 +30,7 @@ export const unlockCrypto = (pin = '123456') => async (dispatch) => {
 		await crypto.unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
 	} catch (err) {
-		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };
 
@@ -38,7 +40,7 @@ export const setCryptoInfo = (field, value) => async (dispatch, getState) => {
 
 		await crypto.setInByNetwork(networkName, field, value);
 	} catch (err) {
-		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };
 
@@ -50,7 +52,17 @@ export const getCryptoInfo = (field) => async (dispatch, getState) => {
 
 		return value;
 	} catch (err) {
-		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 		return null;
+	}
+};
+
+export const removeCryptoInfo = (field) => async (dispatch, getState) => {
+	try {
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		await crypto.removeInByNetwork(networkName, field);
+	} catch (err) {
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };

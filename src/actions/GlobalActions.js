@@ -1,7 +1,7 @@
 import { Map } from 'immutable';
 
 import { initBalances } from './BalanceActions';
-import { setCryptoInfo } from './CryptoActions';
+import { setCryptoInfo, removeCryptoInfo } from './CryptoActions';
 
 import history from '../history';
 
@@ -9,10 +9,11 @@ import { setFormError, toggleLoading } from './FormActions';
 import { disconnect, connect } from './ChainStoreAction';
 
 import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
+import FormatHelper from '../helpers/FormatHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { SUCCESS_ADD_NETWORK_PATH } from '../constants/RouterConstants';
+import { CREATE_ACCOUNT_PATH, SUCCESS_ADD_NETWORK_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
@@ -50,7 +51,7 @@ export const initAccount = ({ name, icon }) => async (dispatch) => {
 
 		await dispatch(initBalances());
 	} catch (err) {
-		dispatch(set('error', err instanceof Error ? err.message : err));
+		dispatch(set('error', FormatHelper.formatError(err)));
 	} finally {
 		dispatch(set('loading', false));
 	}
@@ -64,13 +65,9 @@ export const initAccount = ({ name, icon }) => async (dispatch) => {
  * 	@param {String} name
  */
 export const isAccountAdded = (name) => (dispatch, getState) => {
-	const accounts = getState().global.getIn(['info', 'accounts']);
+	const accounts = getState().global.get('accounts');
 
-	if (accounts && accounts.find((i) => i.name === name)) {
-		return 'Account already added';
-	}
-
-	return null;
+	return !!(accounts && accounts.find((i) => i.name === name));
 };
 
 /**
@@ -82,20 +79,22 @@ export const isAccountAdded = (name) => (dispatch, getState) => {
  * 	@param {Array} keys
  */
 export const addAccount = (name, keys) => async (dispatch, getState) => {
-	let accounts = getState().global.get('accounts');
-	accounts = accounts.map((i) => ({ ...i, active: false }));
-	const icon = Math.floor(Math.random() * 15) + 1;
-	accounts = accounts.push({
-		active: true, icon, name, keys,
-	});
-
 	try {
+		const account = await fetchChain(name);
+
+		let accounts = getState().global.get('accounts');
+		accounts = accounts.map((i) => ({ ...i, active: false }));
+		const icon = Math.floor(Math.random() * 15) + 1;
+		accounts = accounts.push({
+			id: account.get('id'), active: true, icon, name, keys,
+		});
+
 		await dispatch(setCryptoInfo('accounts', accounts));
 		dispatch(set('accounts', accounts));
 
 		dispatch(initAccount({ name, icon }));
 	} catch (err) {
-		dispatch(set('error', err instanceof Error ? err.message : err));
+		dispatch(set('error', FormatHelper.formatError(err)));
 	}
 };
 
@@ -110,26 +109,31 @@ export const removeAccount = (name) => async (dispatch, getState) => {
 	const accountName = getState().global.getIn(['account', 'name']);
 
 	try {
-
 		let accounts = getState().global.get('accounts');
+
+		const { keys } = accounts.find((i) => i.name === name);
+		await Promise.all(keys.map((key) => dispatch(removeCryptoInfo(key))));
+
 		accounts = accounts.filter((i) => i.name !== name);
 		await dispatch(setCryptoInfo('accounts', accounts));
 		dispatch(set('accounts', accounts));
 
 		if (accountName !== name) { return; }
 
-		if (!accounts.length) {
+		if (!accounts.size) {
 			dispatch(GlobalReducer.actions.logout());
+			history.push(CREATE_ACCOUNT_PATH);
 			return;
 		}
 
 		accounts = accounts.set(0, { ...accounts.get(0), active: true });
+
 		await dispatch(setCryptoInfo('accounts', accounts));
 		dispatch(set('accounts', accounts));
 
 		dispatch(initAccount(accounts.get(0)));
 	} catch (err) {
-		dispatch(set('error', err instanceof Error ? err.message : err));
+		dispatch(set('error', FormatHelper.formatError(err)));
 	}
 };
 
@@ -150,7 +154,7 @@ export const switchAccount = (name) => async (dispatch, getState) => {
 
 		dispatch(initAccount(accounts.find((i) => i.active)));
 	} catch (err) {
-		dispatch(set('error', err instanceof Error ? err.message : err));
+		dispatch(set('error', FormatHelper.formatError(err)));
 	}
 };
 
@@ -170,7 +174,7 @@ export const changeNetwork = (network) => async (dispatch, getState) => {
 		await storage.set('current_network', network);
 		await dispatch(connect());
 	} catch (err) {
-		dispatch(set('error', err instanceof Error ? err.message : err));
+		dispatch(set('error', FormatHelper.formatError(err)));
 	}
 };
 
@@ -228,7 +232,7 @@ export const addNetwork = () => async (dispatch, getState) => {
 		await dispatch(changeNetwork(network));
 		history.push(SUCCESS_ADD_NETWORK_PATH);
 	} catch (err) {
-		dispatch(set('error', err instanceof Error ? err.message : err));
+		dispatch(set('error', FormatHelper.formatError(err)));
 		return null;
 	} finally {
 		dispatch(toggleLoading(FORM_ADD_NETWORK, 'loading', false));
@@ -261,6 +265,6 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 
 		dispatch(set('networks', networks));
 	} catch (err) {
-		dispatch(set('error', err instanceof Error ? err.message : err));
+		dispatch(set('error', FormatHelper.formatError(err)));
 	}
 };

@@ -4,6 +4,8 @@ import BalanceReducer from '../reducers/BalanceReducer';
 
 import { fetchChain } from '../api/ChainApi';
 
+import { CORE_ID } from '../constants/GlobalConstants';
+
 export const getPreviewBalances = () => async (dispatch, getState) => {
 	/**
      *  Preview structure
@@ -23,11 +25,11 @@ export const getPreviewBalances = () => async (dispatch, getState) => {
 
 	if (!accounts) { return; }
 
-	const fetchedAsset = await fetchChain('1.3.0');
+	const fetchedAsset = await fetchChain(CORE_ID);
 
 	const balances = accounts.map(async ({ name, icon }) => {
 		const account = await fetchChain(name);
-		const balance = account.getIn(['balances', '1.3.0']);
+		const balance = account.getIn(['balances', CORE_ID]);
 
 		const preview = {
 			balance: {
