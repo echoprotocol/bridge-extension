@@ -1,6 +1,7 @@
 import { PrivateKey, ChainStore } from 'echojs-lib';
 
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
+import FormatHelper from '../helpers/FormatHelper';
 
 import { setValue } from './FormActions';
 import { addAccount, isAccountAdded } from './GlobalActions';
@@ -14,7 +15,6 @@ import {
 	createWallet,
 	validateImportAccountExist,
 } from '../api/WalletApi';
-
 import { fetchChain } from '../api/ChainApi';
 
 import GlobalReducer from '../reducers/GlobalReducer';
@@ -78,11 +78,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		return wif;
 
 	} catch (err) {
-		dispatch(setValue(
-			FORM_SIGN_UP,
-			'error',
-			err instanceof Error ? err.message : err,
-		));
+		dispatch(setValue(FORM_SIGN_UP, 'error', FormatHelper.formatError(err)));
 
 		return null;
 	} finally {
@@ -105,7 +101,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	const nameError = ValidateAccountHelper.validateAccountName(name);
-	const addedError = dispatch(isAccountAdded(name));
+	const addedError = dispatch(isAccountAdded(name)) ? 'Account already added' : null;
 	const existError = await validateImportAccountExist(name, true);
 
 	if (nameError || addedError || existError) {
@@ -170,10 +166,9 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			}
 
 			const account = await fetchChain(accountId);
-			const addedError = dispatch(isAccountAdded(account.get('name')));
 
-			if (addedError) {
-				dispatch(setValue(FORM_SIGN_IN, 'passwordError', addedError));
+			if (dispatch(isAccountAdded(account.get('name')))) {
+				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Account already added'));
 				return false;
 			}
 
@@ -197,11 +192,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 		return success ? name : null;
 	} catch (err) {
-		dispatch(setValue(
-			FORM_SIGN_IN,
-			'error',
-			err instanceof Error ? err.message : err,
-		));
+		dispatch(setValue(FORM_SIGN_IN,	'error', FormatHelper.formatError(err)));
 
 		return false;
 	} finally {

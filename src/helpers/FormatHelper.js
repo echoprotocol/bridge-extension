@@ -31,6 +31,10 @@ class FormatHelper {
 		return symbol ? `${resultNumber} ${symbol}` : resultNumber;
 	}
 
+	static formatError(err) {
+		return err instanceof Error ? err.message : err;
+	}
+
 }
 
 export default FormatHelper;

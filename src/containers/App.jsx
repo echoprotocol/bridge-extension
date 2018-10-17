@@ -3,9 +3,11 @@
 import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 import { Dimmer } from 'semantic-ui-react';
 
 import { connect as connectTo } from '../actions/ChainStoreAction';
+
 
 import Header from '../components/Header';
 import Navbar from '../components/Navbar';
@@ -20,10 +22,14 @@ class App extends React.Component {
 		const { children, loading } = this.props;
 
 		return (
+
 			<React.Fragment>
-				<div className="app-wrap">
+				<div className={classnames('app-wrap', 'dark')} >
 					<Header />
 					<Navbar />
+					<div className="header-bridge-image">
+						<span>Bridge</span>
+					</div>
 					{children}
 					{
 						(loading) && <Dimmer active inverted />

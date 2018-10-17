@@ -12,8 +12,8 @@ import { switchAccount, removeAccount } from '../../actions/GlobalActions';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
-import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH, WALLET_PATH } from '../../constants/RouterConstants';
-import { ECHO } from '../../constants/GlobalConstants';
+import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
+import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
 
@@ -51,9 +51,8 @@ class UserDropdown extends React.PureComponent {
 
 	onRemoveAccount(e, name) {
 		e.stopPropagation();
-
+		e.preventDefault();
 		this.props.removeAccount(name);
-		this.props.history.push(WALLET_PATH);
 	}
 
 	setDDMenuHeight() {
@@ -94,13 +93,13 @@ class UserDropdown extends React.PureComponent {
 
 		return accounts.map((account, i) => {
 
-			const userBalance = balances.find((value) => ((value.get('owner') === account.id) && (value.get('asset_type') === '1.3.0')));
+			const userBalance = balances.find((value) => ((value.get('owner') === account.id) && (value.get('asset_type') === CORE_ID)));
 
 			if (!userBalance) {
 				return null;
 			}
 
-			const content = (
+			return (
 				<MenuItem
 					active={activeAccount.get('name') === account.name}
 					tabIndex="-1"
@@ -112,13 +111,11 @@ class UserDropdown extends React.PureComponent {
 					<UserIcon color="green" avatar={`ava${account.icon}`} />
 					<div className="user-name">{account.name}</div>
 					<div className={classnames('user-balance', { positive: !!userBalance.get('balance') })}>
-						{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${ECHO}`}
+						{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${CORE_SYMBOL}`}
 					</div>
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.name)} />
 				</MenuItem>
 			);
-
-			return content;
 
 		});
 	}

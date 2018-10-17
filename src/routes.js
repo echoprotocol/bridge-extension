@@ -1,6 +1,7 @@
 import React from 'react';
 import { Route } from 'react-router';
 
+
 import {
 	IMPORT_ACCOUNT_PATH,
 	CREATE_ACCOUNT_PATH,
@@ -18,7 +19,8 @@ import SuccessAddNetwork from './containers/SuccessAddNetwork';
 import Wallet from './containers/Wallet';
 import Recieve from './containers/Recieve';
 
-class Routes extends React.Component {
+
+export default class Routes extends React.Component {
 
 	render() {
 		return (
@@ -30,11 +32,10 @@ class Routes extends React.Component {
 					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={SuccessAddNetwork} />
 					<Route exact path={WALLET_PATH} component={Wallet} />
 					<Route exact path={RECIEVE_PATH} component={Recieve} />
+
 				</div>
 			</App>
 		);
 	}
 
 }
-
-export default Routes;

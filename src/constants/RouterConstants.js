@@ -1,3 +1,4 @@
+
 export const IMPORT_ACCOUNT_PATH = '/accounts/import';
 export const CREATE_ACCOUNT_PATH = '/accounts/create';
 export const CREATE_SUCCESS_PATH = '/accounts/create?success=1';
@@ -9,4 +10,4 @@ export const SUCCESS_ADD_NETWORK_PATH = '/networks/success';
 
 export const RECIEVE_PATH = '/recieve';
 
-export const INDEX_PATH = IMPORT_ACCOUNT_PATH;
+export const INDEX_PATH = WALLET_PATH;

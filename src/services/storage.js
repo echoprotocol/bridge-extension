@@ -8,7 +8,6 @@ class Storage {
 	 *  @method set
 	 *
 	 *  Set value by key in storage
-	 *  VALUE IS NOT ENCRYPTED!!!
 	 *
 	 *  @param {String} key
 	 *  @param {Any} value
@@ -41,7 +40,6 @@ class Storage {
 	 *  @method get
 	 *
 	 *  Get value by key from storage
-	 *  VALUE IS NOT DECRYPTED!!!
 	 *
 	 *  @param {String} key
 	 */

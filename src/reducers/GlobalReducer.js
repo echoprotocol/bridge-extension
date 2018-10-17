@@ -1,6 +1,5 @@
 import { createModule } from 'redux-modules';
 import { Map, List } from 'immutable';
-import _ from 'lodash';
 
 const DEFAULT_FIELDS = Map({
 	loading: false,
@@ -51,11 +50,7 @@ export default createModule({
 		},
 
 		logout: {
-			reducer: (state) => {
-				const network = state.get('network');
-
-				return _.cloneDeep(DEFAULT_FIELDS).merge({ network });
-			},
+			reducer: (state) => (state.set('account', new Map({ id: '', name: '', icon: '' }))),
 		},
 	},
 });
