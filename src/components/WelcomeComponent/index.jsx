@@ -1,8 +1,6 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
-import { withRouter } from 'react-router';
 
 import BridgeBtnCopy from '../BridgeBtnCopy';
 import UserIcon from '../UserIcon';
@@ -14,11 +12,11 @@ class WelcomeComponent extends React.Component {
 	}
 
 	render() {
-		const { name, wif, activeUser } = this.props;
+		const { name, wif } = this.props;
 
 		return (
 			<div className="welcome-wrap">
-				<UserIcon color="green" big avatar={`ava${activeUser.get('icon')}`} />
+				<UserIcon color="green" big avatar="ava1" />
 				<div className="page-wrap" >
 					<div className="page">
 						<div className="hi-text">
@@ -68,13 +66,10 @@ WelcomeComponent.defaultProps = {
 };
 
 WelcomeComponent.propTypes = {
-	activeUser: PropTypes.object.isRequired,
 	wif: PropTypes.string,
 	name: PropTypes.string.isRequired,
 	unmount: PropTypes.func.isRequired,
 	proceed: PropTypes.func.isRequired,
 };
 
-export default withRouter(connect((state) => ({
-	activeUser: state.global.get('activeUser'),
-}))(WelcomeComponent));
+export default WelcomeComponent;
