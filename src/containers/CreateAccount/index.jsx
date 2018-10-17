@@ -64,16 +64,19 @@ class CreateAccount extends React.Component {
 	render() {
 		const { name, wif } = this.state;
 		const {
-			loading, name: { error, example }, location,
+			loading, name: { error, example }, location, accounts,
 		} = this.props;
 
 		const { success } = query.parse(location.search);
 
 		if (wif && success) {
+			const { icon } = accounts.find((i) => i.name === name);
+
 			return (
 				<WelcomeComponent
 					wif={wif}
 					name={name}
+					icon={icon}
 					proceed={() => this.onProceedClick()}
 					unmount={() => this.setState({ name: '', wif: '' })}
 				/>
@@ -99,6 +102,7 @@ CreateAccount.propTypes = {
 	name: PropTypes.object.isRequired,
 	location: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
+	accounts: PropTypes.object.isRequired,
 	createAccount: PropTypes.func.isRequired,
 	setValue: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
@@ -108,6 +112,7 @@ export default connect(
 	(state) => ({
 		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
 		name: state.form.getIn([FORM_SIGN_UP, 'accountName']),
+		accounts: state.global.get('accounts'),
 	}),
 	(dispatch) => ({
 		createAccount: (name) => dispatch(createAccount(name)),
