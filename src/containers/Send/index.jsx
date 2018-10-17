@@ -50,7 +50,6 @@ class Send extends React.Component {
 								labelText="To"
 								defaultUp
 								placeholder="Reciever's name"
-								// value="Jellyjeda345"
 								leftLabel
 							/>
 							<BridgeInput
@@ -68,6 +67,7 @@ class Send extends React.Component {
 								name="Fee"
 								theme="input-light"
 								placeholder="0.000"
+								// value=""
 								defaultUp
 								labelText="Fee"
 								leftLabel
