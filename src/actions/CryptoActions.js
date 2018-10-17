@@ -12,6 +12,8 @@ import { NETWORKS } from '../constants/GlobalConstants';
 import { setValue } from './FormActions';
 import { loadInfo } from './GlobalActions';
 
+import FormatHelper from '../helpers/FormatHelper';
+
 const changeCrypto = (params) => (dispatch) => {
 	dispatch(GlobalReducer.actions.setIn({ field: 'crypto', params }));
 };
@@ -31,7 +33,7 @@ export const initCrypto = () => async (dispatch) => {
 
 		crypto.on('locked', () => dispatch(lockCrypto()));
 	} catch (err) {
-		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };
 
@@ -43,7 +45,7 @@ export const unlockCrypto = (pin) => async (dispatch) => {
 		dispatch(changeCrypto({ isLocked: false }));
 		await dispatch(loadInfo());
 	} catch (err) {
-		dispatch(setValue(FORM_UNLOCK, 'error', err instanceof Error ? err.message : err));
+		dispatch(setValue(FORM_UNLOCK, 'error', FormatHelper.formatError(err)));
 	} finally {
 		dispatch(setValue(FORM_UNLOCK, 'loading', false));
 	}
@@ -55,7 +57,7 @@ export const setCryptoInfo = (field, value) => async (dispatch, getState) => {
 
 		await crypto.setInByNetwork(networkName, field, value);
 	} catch (err) {
-		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };
 
@@ -67,8 +69,18 @@ export const getCryptoInfo = (field) => async (dispatch, getState) => {
 
 		return value;
 	} catch (err) {
-		dispatch(changeCrypto({ error: err instanceof Error ? err.message : err }));
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 		return null;
+	}
+};
+
+export const removeCryptoInfo = (field) => async (dispatch, getState) => {
+	try {
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		await crypto.removeInByNetwork(networkName, field);
+	} catch (err) {
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };
 

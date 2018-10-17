@@ -43,4 +43,6 @@ export const RANDOM_SIZE = 2048;
 export const OWNER_KEY = 'owner';
 export const ACTIVE_KEY = 'active';
 export const MEMO_KEY = 'memo';
-export const ECHO = 'ECHO';
+export const CORE_SYMBOL = 'ECHO';
+export const CORE_ID = '1.3.0';
+export const GLOBAL_ID = '2.1.0';

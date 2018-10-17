@@ -55,11 +55,7 @@ export default createModule({
 		},
 
 		logout: {
-			reducer: (state) => {
-				const network = state.get('network');
-
-				return _.cloneDeep(DEFAULT_FIELDS).merge({ network });
-			},
+			reducer: (state) => (state.set('account', new Map({ id: '', name: '', icon: '' }))),
 		},
 
 		lock: {

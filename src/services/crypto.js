@@ -342,7 +342,7 @@ class Crypto extends EventEmitter {
 	 *  @param {String} publicKey
 	 */
 	async removePrivateKey(networkName, publicKey) {
-		await this.removeNetworkInfo(networkName, publicKey);
+		await this.removeInByNetwork(networkName, publicKey);
 	}
 
 	/**
@@ -389,7 +389,6 @@ class Crypto extends EventEmitter {
 		} else {
 			networkData = {};
 		}
-
 		return networkData[field];
 	}
 

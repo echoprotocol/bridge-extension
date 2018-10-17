@@ -8,12 +8,14 @@ import BalanceReducer from '../reducers/BalanceReducer';
 
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
 
-import { NETWORKS } from '../constants/GlobalConstants';
+import { NETWORKS, GLOBAL_ID } from '../constants/GlobalConstants';
 import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
 
 import { initCrypto } from './CryptoActions';
 
 import storage from '../services/storage';
+
+import FormatHelper from '../helpers/FormatHelper';
 
 /**
  * copy object from ChainStore lib to redux every time when triggered
@@ -60,13 +62,13 @@ export const connect = () => async (dispatch) => {
 
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 
-		await fetchChain('2.1.0');
+		await fetchChain(GLOBAL_ID);
 
 	} catch (err) {
 		dispatch(batchActions([
 			GlobalReducer.actions.set({
 				field: 'error',
-				value: err instanceof Error ? err.message : err,
+				value: FormatHelper.formatError(err),
 			}),
 			GlobalReducer.actions.set({ field: 'connected', value: false }),
 		]));
@@ -92,7 +94,7 @@ export const disconnect = (address) => async (dispatch) => {
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({
 			field: 'error',
-			value: err instanceof Error ? err.message : err,
+			value: FormatHelper.formatError(err),
 		}));
 	}
 };

@@ -13,7 +13,7 @@ import { switchAccount, removeAccount } from '../../actions/GlobalActions';
 import FormatHelper from '../../helpers/FormatHelper';
 
 import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
-import { ECHO } from '../../constants/GlobalConstants';
+import { CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
 
@@ -97,7 +97,7 @@ class UserDropdown extends React.PureComponent {
 					<UserIcon color="green" avatar={`ava${icon}`} />
 					<div className="user-name">{name}</div>
 					<div className={classnames('user-balance', { positive: !!amount })}>
-						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${ECHO}`}
+						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${CORE_SYMBOL}`}
 					</div>
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
 				</MenuItem>
