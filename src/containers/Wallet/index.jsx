@@ -2,11 +2,24 @@ import React from 'react';
 import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
 import classnames from 'classnames';
-
+// import { Dropdown, MenuItem } from 'react-bootstrap';
 
 class Wallet extends React.Component {
 
-	render() {
+	onChange(e, lowerCase) {
+		const field = e.target.name;
+		let { value } = e.target;
+
+		if (lowerCase) {
+			value = value.toLowerCase();
+		}
+
+		// if (field) {
+		// this.props.setFormValue(field, value);
+		// }
+	}
+
+	renderWallet() {
 		const balances = [
 			{
 				value: '0.000',
@@ -21,10 +34,11 @@ class Wallet extends React.Component {
 			{
 				value: '0.000392',
 				key: 'EBTC',
-				type: 'asset',
+				type: 'token',
 			},
 
 		];
+
 		return (
 			<React.Fragment>
 				<div className="wallet-block">
@@ -102,12 +116,14 @@ class Wallet extends React.Component {
 						</div>
 					</div>
 				</div>
-
 			</React.Fragment>
-
-
 		);
+	}
 
+	render() {
+		return (
+			this.renderWallet()
+		);
 	}
 
 }

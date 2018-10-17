@@ -11,4 +11,6 @@ export const RECIEVE_PATH = '/recieve';
 
 export const TRANSACTIONS_PATH = '/transactions';
 
+export const SEND_PATH = '/send';
+
 export const INDEX_PATH = WALLET_PATH;

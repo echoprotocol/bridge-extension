@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Input, Button } from 'semantic-ui-react';
 import classnames from 'classnames';
+import UserIcon from '../UserIcon';
+import CurrencySelect from '../../components/CurrencySelect';
 
 class BridgeInput extends React.Component {
 
@@ -59,6 +61,14 @@ class BridgeInput extends React.Component {
 
 	}
 
+	renderImage(color, id) {
+		return (
+			<div className="input-image">
+				<UserIcon color={color} avatar={`ava${id}`} />
+			</div>
+		);
+	}
+
 	renderPrivacyEye() {
 		return (
 			<Button
@@ -73,10 +83,12 @@ class BridgeInput extends React.Component {
 			/>
 		);
 	}
+
 	render() {
 		const {
 			name, labelText, type, error, disabled, theme, value,
-			autoFocus, privacyEye, position, descriptionText,
+			autoFocus, privacyEye, position, descriptionText, leftLabel, placeholder,
+			defaultUp, readOnly, userIcon, innerDropdown,
 		} = this.props;
 
 		const {
@@ -85,7 +97,12 @@ class BridgeInput extends React.Component {
 
 		return (
 
-			<div className={classnames('input-wrap', theme)} >
+			<div className={classnames(
+				'input-wrap',
+				theme,
+				{ 'inner-dropdown': innerDropdown },
+			)}
+			>
 				<Input
 					value={value}
 					name={name}
@@ -100,17 +117,22 @@ class BridgeInput extends React.Component {
 						{ focused: focus },
 						{ filled },
 						{ eye: privacyEye },
+						{ 'left-label': leftLabel },
+						{ filled: defaultUp },
+						{ readOnly },
+						{ 'with-image': userIcon },
 						position,
 					)}
+					placeholder={placeholder}
 					ref={this.handleRef}
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
+					action={(innerDropdown) && (<CurrencySelect data={innerDropdown} />)}
 				/>
-
+				{ userIcon ? this.renderImage('green', 3) : null}
 				{ error ? this.renderError() : null }
 				{ descriptionText ? <div className="message-description">{ descriptionText }</div> : null }
-
 			</div>
 
 		);
@@ -125,7 +147,11 @@ BridgeInput.propTypes = {
 	error: PropTypes.bool,
 	disabled: PropTypes.bool,
 	autoFocus: PropTypes.bool,
+	leftLabel: PropTypes.bool,
+	defaultUp: PropTypes.bool,
+	readOnly: PropTypes.bool,
 	type: PropTypes.string,
+	placeholder: PropTypes.string,
 	position: PropTypes.string,
 	labelText: PropTypes.string,
 	errorText: PropTypes.string,
@@ -134,6 +160,9 @@ BridgeInput.propTypes = {
 	onChange: PropTypes.func,
 	onClick: PropTypes.func,
 	privacyEye: PropTypes.bool,
+
+	innerDropdown: PropTypes.array,
+	userIcon: PropTypes.string,
 };
 
 BridgeInput.defaultProps = {
@@ -143,7 +172,11 @@ BridgeInput.defaultProps = {
 	error: false,
 	disabled: false,
 	autoFocus: false,
+	leftLabel: false,
+	defaultUp: false,
+	readOnly: false,
 	type: 'text',
+	placeholder: '',
 	position: '',
 	labelText: '',
 	errorText: '',
@@ -152,6 +185,9 @@ BridgeInput.defaultProps = {
 	onChange: null,
 	onClick: null,
 	privacyEye: false,
+
+	innerDropdown: null,
+	userIcon: null,
 };
 
 export default BridgeInput;
