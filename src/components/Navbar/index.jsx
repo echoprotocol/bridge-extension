@@ -23,7 +23,7 @@ class Navbar extends React.PureComponent {
 			<div className="navbar">
 				<ul>
 					<li className="btn-nav-wrap" >
-						<Button className="icon-menu btn-nav" />
+						<Button onClick={() => this.props.onSidebarToggle()} className="icon-menu btn-nav" />
 					</li>
 					{ title ? <li className="page-title">{title}</li> : null }
 					{
@@ -41,6 +41,7 @@ class Navbar extends React.PureComponent {
 
 Navbar.propTypes = {
 	location: PropTypes.object.isRequired,
+	onSidebarToggle: PropTypes.func.isRequired,
 };
 
 export default withRouter(Navbar);
