@@ -9,7 +9,7 @@ import BlockchainReducer from '../reducers/BlockchainReducer';
 import BalanceReducer from '../reducers/BalanceReducer';
 
 import { initAccount } from './GlobalActions';
-import initAssetsBalances from './BalanceActions';
+import { initAssetsBalances } from './BalanceActions';
 import { initCrypto, getCryptoInfo } from './CryptoActions';
 
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';

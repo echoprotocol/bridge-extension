@@ -6,7 +6,7 @@ import history from '../history';
 
 import { setFormError, toggleLoading } from './FormActions';
 import { disconnect, connect } from './ChainStoreAction';
-import initAssetsBalances from './BalanceActions';
+import { initAssetsBalances, removeBalances } from './BalanceActions';
 
 import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
 import FormatHelper from '../helpers/FormatHelper';
@@ -111,7 +111,10 @@ export const removeAccount = (name) => async (dispatch, getState) => {
 	try {
 		let accounts = getState().global.get('accounts');
 
-		const { keys } = accounts.find((i) => i.name === name);
+		const { keys, id } = accounts.find((i) => i.name === name);
+
+		dispatch(removeBalances(id));
+
 		await Promise.all(keys.map((key) => dispatch(removeCryptoInfo(key))));
 
 		accounts = accounts.filter((i) => i.name !== name);

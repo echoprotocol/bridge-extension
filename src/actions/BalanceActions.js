@@ -8,7 +8,7 @@ import { fetchChain } from '../api/ChainApi';
  * 	Initialization user's assets
  *
  */
-const initAssetsBalances = () => async (dispatch, getState) => {
+export const initAssetsBalances = () => async (dispatch, getState) => {
 
 	const balancesPromises = [];
 	const assetsPromises = [];
@@ -57,4 +57,29 @@ const initAssetsBalances = () => async (dispatch, getState) => {
 
 };
 
-export default initAssetsBalances;
+/**
+ *  @method removeBalances
+ *
+ * 	Remove balances and assets by deleted user's id
+ *
+ * 	@param {String} accountId
+ */
+export const removeBalances = (accountId) => (dispatch, getState) => {
+	let balances = getState().balance.get('balances');
+	let assets = getState().balance.get('assets');
+
+	balances.forEach((balance) => {
+		if (balance.get('owner') === accountId) {
+			balances = balances.delete(balance.get('id'));
+
+			if (!balances.find((val) => val.get('asset_type') === balance.get('asset_type'))) {
+				assets = assets.delete(balance.get('asset_type'));
+			}
+		}
+	});
+
+	dispatch(BalanceReducer.actions.setAssets({
+		balances,
+		assets,
+	}));
+};
