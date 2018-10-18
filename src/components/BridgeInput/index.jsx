@@ -108,6 +108,7 @@ class BridgeInput extends React.Component {
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
+					onKeyPress={(e) => this.props.onKeyPress(e)}
 				/>
 
 				{ error ? this.renderError() : null }
@@ -135,6 +136,7 @@ BridgeInput.propTypes = {
 	descriptionText: PropTypes.string,
 	onChange: PropTypes.func,
 	onClick: PropTypes.func,
+	onKeyPress: PropTypes.func,
 	privacyEye: PropTypes.bool,
 };
 
@@ -153,6 +155,7 @@ BridgeInput.defaultProps = {
 	descriptionText: '',
 	onChange: null,
 	onClick: null,
+	onKeyPress: null,
 	privacyEye: false,
 };
 

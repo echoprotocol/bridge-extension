@@ -13,6 +13,13 @@ class ImportComponent extends React.Component {
 		this.props.change(name, lowercase ? value.trim().toLowerCase() : value.trim());
 	}
 
+	onPressEnter(e) {
+		if (e.key === 'Enter') {
+			e.preventDefault();
+			this.props.importAccount(e);
+		}
+	}
+
 	render() {
 		const {
 			loading, name, password, nameError, passwordError,
@@ -34,6 +41,7 @@ class ImportComponent extends React.Component {
 								errorText={nameError}
 								value={name}
 								onChange={(e) => this.onChange(e, true)}
+								onKeyPress={(e) => this.onPressEnter(e)}
 								disabled={loading}
 							/>
 							<BridgeInput
@@ -46,6 +54,7 @@ class ImportComponent extends React.Component {
 								labelText="WIF key / password"
 								value={password}
 								onChange={(e) => this.onChange(e)}
+								onKeyPress={(e) => this.onPressEnter(e)}
 								disabled={loading}
 							/>
 						</div>
@@ -53,7 +62,7 @@ class ImportComponent extends React.Component {
 					<div className="page-action-wrap">
 						<div className="one-btn-wrap" >
 							<Button
-								disabled={loading}
+								disabled={!password}
 								className={classnames('btn-in-dark', { loading })}
 								content={<span className="btn-text">Import</span>}
 								type="submit"
