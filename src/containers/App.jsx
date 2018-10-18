@@ -4,7 +4,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Dimmer, Sidebar } from 'semantic-ui-react';
-
 import { connect as connectTo } from '../actions/ChainStoreAction';
 
 import Header from '../components/Header';
@@ -18,7 +17,7 @@ class App extends React.Component {
 		super(props);
 
 		this.state = {
-			visible: true,
+			visible: false,
 		};
 	}
 
@@ -54,23 +53,14 @@ class App extends React.Component {
 		return (
 			<div className="temp-wrap">
 				<div className="app-wrap">
-					<Header />
-					<Sidebar.Pushable>
 
+
+					<Sidebar.Pushable>
 						<Navigator
 							visible={visible}
 							onSidebarToggle={() => this.onSidebarToggle()}
 						/>
-						<Sidebar.Pusher
-							dimmed={visible}
-							onClick={() => (visible ? this.onSidebarToggle() : null)}
-
-						>
-							<Navbar onSidebarToggle={() => this.onSidebarToggle()} />
-
-							{children}
-
-						</Sidebar.Pusher>
+						{children}
 					</Sidebar.Pushable>
 					{
 						(loading) && <Dimmer active inverted />

@@ -22,6 +22,11 @@ class AddNetwork extends React.Component {
 		this.props.addNetwork();
 	}
 
+	onClick(e) {
+		e.preventDefault();
+		this.props.history.goBack();
+	}
+
 	onChange(e, lowerCase) {
 		const field = e.target.name;
 		let { value } = e.target;
@@ -101,7 +106,7 @@ class AddNetwork extends React.Component {
 		return (
 			<React.Fragment>
 				<div className="return-block">
-					<a href={undefined} className="link-return" onClick={() => this.props.history.goBack()}>
+					<a href="/" className="link-return" onClick={(e) => this.onClick(e)}>
 						<i className="icon-return" />
 						<span className="link-text">Return</span>
 					</a>
