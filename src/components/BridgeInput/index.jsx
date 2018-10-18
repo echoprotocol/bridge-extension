@@ -78,7 +78,7 @@ class BridgeInput extends React.Component {
 	render() {
 		const {
 			name, labelText, type, error, disabled, theme, value,
-			autoFocus, privacyEye, position, descriptionText,
+			autoFocus, privacyEye, position, descriptionText, onKeyPress,
 		} = this.props;
 
 		const {
@@ -108,7 +108,7 @@ class BridgeInput extends React.Component {
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
-					onKeyPress={(e) => this.props.onKeyPress(e)}
+					onKeyPress={(e) => onKeyPress && onKeyPress(e)}
 				/>
 
 				{ error ? this.renderError() : null }
