@@ -1,16 +1,33 @@
+
 .transaction-status {
     &-wrap {
         height: 551px;
         position: relative;
-        background-repeat: no-repeat;
-        background-position: center bottom;
+        z-index: 1;
+        &:before {
+            right: 0;
+            left: 0;
+            bottom: 0;
+            top: 0;
+            content: "";
+            opacity: .7;
+            position: absolute;
+            background-repeat: no-repeat;
+            z-index: -1;
+        }
         &.success {
-            background-color: #7ad5ab;
-        // background-image: url(../images/successBg.png);
+            background-color: #7ad5aa;
+            &:before {
+                background-image: url(../images/send/successBg.svg);
+                background-position: center 32px;
+            }
         }
         &.error {
             background-color: #d56468;
-        // background-image: url(../images/successBg.png);
+            &:before {
+                background-image: url(../images/send/errorBg.svg);
+                background-position: center 72px;
+            }
         }
         .page-action-wrap {
             position: absolute;
