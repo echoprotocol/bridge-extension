@@ -13,4 +13,6 @@ export const TRANSACTIONS_PATH = '/transactions';
 
 export const SEND_PATH = '/send';
 
+export const BACKUP_PATH = '/backup';
+
 export const INDEX_PATH = WALLET_PATH;
