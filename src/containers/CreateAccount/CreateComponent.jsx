@@ -39,6 +39,8 @@ class CreateComponent extends React.Component {
 								value={name}
 								onChange={(e) => this.onChangeName(e)}
 								disabled={loading}
+								focusTo={() => this.focusTo()}
+								setFocus={!!error}
 							/>
 						</div>
 					</div>

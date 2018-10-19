@@ -35,6 +35,7 @@ class ImportComponent extends React.Component {
 								value={name}
 								onChange={(e) => this.onChange(e, true)}
 								disabled={loading}
+								setFocus={!!nameError}
 							/>
 							<BridgeInput
 								privacyEye
@@ -47,6 +48,7 @@ class ImportComponent extends React.Component {
 								value={password}
 								onChange={(e) => this.onChange(e)}
 								disabled={loading}
+								setFocus={!nameError && !!passwordError}
 							/>
 						</div>
 					</div>

@@ -15,6 +15,19 @@ class BridgeInput extends React.Component {
 		};
 	}
 
+    componentWillUpdate(nextProps, nextState) {
+
+    }
+
+    componentDidMount() {
+		const { setFocus, errorText, name } = this.props;
+
+		console.log(setFocus, errorText, name);
+		if (setFocus) {
+			this.bridgeInput.focus();
+		}
+	}
+
 
 	onFocus() {
 		this.setState({ up: true });
@@ -133,6 +146,7 @@ BridgeInput.propTypes = {
 	errorText: PropTypes.string,
 	exampleName: PropTypes.string,
 	descriptionText: PropTypes.string,
+	setFocus: PropTypes.bool,
 	onChange: PropTypes.func,
 	onClick: PropTypes.func,
 	privacyEye: PropTypes.bool,
@@ -151,6 +165,7 @@ BridgeInput.defaultProps = {
 	errorText: '',
 	exampleName: '',
 	descriptionText: '',
+	setFocus: false,
 	onChange: null,
 	onClick: null,
 	privacyEye: false,
