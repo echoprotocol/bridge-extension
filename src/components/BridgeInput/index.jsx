@@ -64,6 +64,7 @@ class BridgeInput extends React.Component {
 	renderPrivacyEye() {
 		return (
 			<Button
+				tabIndex="-1"
 				className={
 					classnames(
 						'icon-eye',
