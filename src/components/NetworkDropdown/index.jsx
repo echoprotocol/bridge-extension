@@ -64,7 +64,6 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	onSwitchAccount(e, name) {
-		e.stopPropagation();
 		e.preventDefault();
 
 		if (!this.props.accounts.find((i) => i.name === name)) {
@@ -103,13 +102,21 @@ class NetworkDropdown extends React.PureComponent {
 			.toArray()
 			.slice(Math.max(accounts.size - 4, 0))
 			.map((account) =>
-				(
-					<li key={account.id} onClick={(e) => this.onSwitchAccount(e, account.name)}>
-						<UserIcon
-							avatar={`ava${account.icon}`}
-							color={account.iconColor}
-						/>
-					</li>
+				( // TODO fix div styles
+					<div
+						key={account.id}
+						role="button"
+						tabIndex="0"
+						onClick={(e) => this.onSwitchAccount(e, account.name)}
+						onKeyPress={(e) => this.onSwitchAccount(e, account.name)}
+					>
+						<li>
+							<UserIcon
+								avatar={`ava${account.icon}`}
+								color={account.iconColor}
+							/>
+						</li>
+					</div>
 				));
 	}
 

@@ -48,7 +48,9 @@ export const initAccount = ({ name, icon, iconColor }) => async (dispatch) => {
 	try {
 		const account = await fetchChain(name);
 
-		dispatch(set('account', new Map({ id: account.get('id'), name, icon, iconColor })));
+		dispatch(set('account', new Map({
+			id: account.get('id'), name, icon, iconColor,
+		})));
 
 		await dispatch(initAssetsBalances());
 	} catch (err) {

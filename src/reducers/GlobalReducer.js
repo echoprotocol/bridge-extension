@@ -1,5 +1,6 @@
 import { createModule } from 'redux-modules';
 import { Map, List } from 'immutable';
+import _ from 'lodash';
 
 const DEFAULT_FIELDS = Map({
 	loading: false,
