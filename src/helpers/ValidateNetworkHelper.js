@@ -27,7 +27,7 @@ export default class ValidateAccountHelper {
 			return 'Network address should not be empty';
 		}
 
-		if (!(/ws:\/\/|wss:\/\//i).test(address)) {
+		if (!(/^ws:\/\/|^wss:\/\//i).test(address)) {
 			return 'It should be start with \'ws://\' or \'wss://\'';
 		}
 
@@ -39,7 +39,7 @@ export default class ValidateAccountHelper {
 			return 'Network registrator should not be empty';
 		}
 
-		if (!(/http:\/\/|https:\/\//i).test(registrator)) {
+		if (!(/^http:\/\/|^https:\/\//i).test(registrator)) {
 			return 'It should be start with \'http://\' or \'https://\'';
 		}
 

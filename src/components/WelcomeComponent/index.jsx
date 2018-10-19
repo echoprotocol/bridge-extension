@@ -3,16 +3,20 @@ import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 import BridgeBtnCopy from '../BridgeBtnCopy';
+import UserIcon from '../UserIcon';
 
 class WelcomeComponent extends React.Component {
+
+	componentWillUnmount() {
+		this.props.unmount();
+	}
 
 	render() {
 		const { name, wif } = this.props;
 
 		return (
-			<React.Fragment>
-				<div className="icon-pageAccount-in" />
-
+			<div className="welcome-wrap">
+				<UserIcon color="green" big avatar="ava1" />
 				<div className="page-wrap" >
 					<div className="page">
 						<div className="hi-text">
@@ -49,13 +53,13 @@ class WelcomeComponent extends React.Component {
 						</div>
 					</div>
 				</div>
-
-			</React.Fragment>
+			</div>
 		);
 
 	}
 
 }
+
 
 WelcomeComponent.defaultProps = {
 	wif: '',
@@ -64,8 +68,8 @@ WelcomeComponent.defaultProps = {
 WelcomeComponent.propTypes = {
 	wif: PropTypes.string,
 	name: PropTypes.string.isRequired,
+	unmount: PropTypes.func.isRequired,
 	proceed: PropTypes.func.isRequired,
 };
-
 
 export default WelcomeComponent;

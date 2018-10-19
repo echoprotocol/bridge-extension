@@ -46,8 +46,11 @@
     justify-content: center;
 }
 
-.success-wrap {
-    background-color: #7ad5ab;
-    height: 551px;
-    position: relative;
+.welcome-wrap {
+    .user-icon-wrap {
+        margin: -43px auto 0;
+        position: absolute;
+        right: 0;
+        left: 0;
+    }
 }

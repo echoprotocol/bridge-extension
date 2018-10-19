@@ -1,0 +1,44 @@
+.transaction-status {
+    &-wrap {
+        height: 551px;
+        position: relative;
+        background-repeat: no-repeat;
+        background-position: center bottom;
+        &.success {
+            background-color: #7ad5ab;
+        // background-image: url(../images/successBg.png);
+        }
+        &.error {
+            background-color: #d56468;
+        // background-image: url(../images/successBg.png);
+        }
+        .page-action-wrap {
+            position: absolute;
+            bottom: 0;
+            right: 0;
+            left: 0;
+        }
+    }
+
+    &-body {
+
+        font-family: FNMedium;
+        color: #364047;
+        height: 100%;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        text-align: center;
+        .title {
+            font-size: 26px;
+            margin-bottom: 23px;
+        }
+        .description {
+            font-size: 18px;
+            margin-bottom: 20px;
+            letter-spacing: .65px;
+        }
+    }
+
+}
