@@ -50,10 +50,6 @@ export default createModule({
 			},
 		},
 
-		disconnect: {
-			reducer: () => DEFAULT_FIELDS,
-		},
-
 		logout: {
 			reducer: (state) => (state.set('account', new Map({ id: '', name: '', icon: '' }))),
 		},

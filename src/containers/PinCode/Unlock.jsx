@@ -3,6 +3,7 @@ import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
+import classnames from 'classnames';
 
 import BridgeInput from '../../components/BridgeInput';
 
@@ -27,7 +28,7 @@ class Unlock extends React.Component {
 	}
 
 	onChange(e) {
-		this.setState({ pin: e.target.value.trim() });
+		this.setState({ pin: e.target.value });
 
 		if (this.props.error) {
 			this.props.clearError();
@@ -36,6 +37,15 @@ class Unlock extends React.Component {
 
 	onSubmit() {
 		this.props.unlock(this.state.pin);
+	}
+
+	onKeyDown(e) {
+		const { keyCode } = e;
+
+		if ([13, 62].includes(keyCode)) {
+			e.preventDefault();
+			this.props.unlock(this.state.pin);
+		}
 	}
 
 	render() {
@@ -66,13 +76,14 @@ class Unlock extends React.Component {
 							labelText="Enter PIN"
 							type="password"
 							descriptionText="Enter PIN to unlock the Bridge"
+							onKeyDown={(e) => this.onKeyDown(e)}
 						/>
 					</div>
 				</div>
 				<div className="page-action-wrap pin-screen enter-pin">
 					<div className="one-btn-wrap" >
 						<Button
-							className="btn-in-light"
+							className={classnames('btn-in-light', { loading })}
 							disabled={Boolean(loading || !pin || error)}
 							content={<span className="btn-text">Unlock</span>}
 							type="submit"

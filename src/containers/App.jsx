@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { Dimmer } from 'semantic-ui-react';
 
-import { connect as connectTo } from '../actions/ChainStoreAction';
+import { globalInit } from '../actions/GlobalActions';
 
 import Header from '../components/Header';
 import Navbar from '../components/Navbar';
@@ -16,7 +16,7 @@ import { PIN_PATHS } from '../constants/RouterConstants';
 class App extends React.Component {
 
 	componentDidMount() {
-		this.props.connection();
+		this.props.initApp();
 	}
 
 	renderHeader(pathname) {
@@ -62,7 +62,7 @@ App.propTypes = {
 	children: PropTypes.element.isRequired,
 	loading: PropTypes.bool.isRequired,
 	pathname: PropTypes.string.isRequired,
-	connection: PropTypes.func.isRequired,
+	initApp: PropTypes.func.isRequired,
 };
 export default connect(
 	(state) => ({
@@ -70,6 +70,6 @@ export default connect(
 		pathname: state.router.location.pathname,
 	}),
 	(dispatch) => ({
-		connection: () => dispatch(connectTo()),
+		initApp: () => dispatch(globalInit()),
 	}),
 )(App);

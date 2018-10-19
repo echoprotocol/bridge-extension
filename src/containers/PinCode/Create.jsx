@@ -2,10 +2,12 @@ import React from 'react';
 import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
 import BridgeInput from '../../components/BridgeInput';
 
 import { FORM_CREATE_PIN } from '../../constants/FormConstants';
+import { MIN_PIN_LENGTH } from '../../constants/ValidationConstants';
 
 import { unlockCrypto } from '../../actions/CryptoActions';
 import { setValue, clearForm } from '../../actions/FormActions';
@@ -29,7 +31,7 @@ class CreatePin extends React.Component {
 	onChange(e) {
 		const { name, value } = e.target;
 
-		this.setState({ [name]: value.trim(), repeatError: null });
+		this.setState({ [name]: value, repeatError: null });
 
 		if (this.props.error) {
 			this.props.clearError();
@@ -84,7 +86,7 @@ class CreatePin extends React.Component {
 							theme="input-dark"
 							labelText="Repeat PIN"
 							type="password"
-							descriptionText="At least 6 symbols. PIN will be used only to unlock extension"
+							descriptionText={`At least ${MIN_PIN_LENGTH} symbols. PIN will be used only to unlock extension`}
 							value={repeat}
 							name="repeat"
 							onChange={(e) => this.onChange(e)}
@@ -95,7 +97,7 @@ class CreatePin extends React.Component {
 				<div className="page-action-wrap pin-screen">
 					<div className="one-btn-wrap" >
 						<Button
-							className="btn-in-light"
+							className={classnames('btn-in-light', { loading })}
 							content={<span className="btn-text">Create</span>}
 							type="submit"
 							onClick={(e) => this.onSubmit(e)}
