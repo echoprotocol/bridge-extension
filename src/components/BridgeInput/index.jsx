@@ -15,16 +15,12 @@ class BridgeInput extends React.Component {
 		};
 	}
 
-    componentWillUpdate(nextProps, nextState) {
 
-    }
+	componentDidUpdate() {
+		const { name, setFocus } = this.props;
 
-    componentDidMount() {
-		const { setFocus, errorText, name } = this.props;
-
-		console.log(setFocus, errorText, name);
 		if (setFocus) {
-			this.bridgeInput.focus();
+			this[name].focus();
 		}
 	}
 
@@ -43,7 +39,8 @@ class BridgeInput extends React.Component {
 	}
 
 	onChange(e) {
-		this.setState({ filled: !!this.bridgeInput.inputRef.value });
+		const { name } = this.props;
+		this.setState({ filled: !!this[name].inputRef.value });
 		this.props.onChange(e);
 	}
 
@@ -110,7 +107,7 @@ class BridgeInput extends React.Component {
 					disabled={disabled}
 					autoFocus={autoFocus}
 					icon={privacyEye ? this.renderPrivacyEye() : false}
-					ref={(bridgeInput) => { this.bridgeInput = bridgeInput; }}
+					ref={(bridgeInput) => { this[name] = bridgeInput; }}
 					className={classnames(
 						{ up },
 						{ focused: focus },
