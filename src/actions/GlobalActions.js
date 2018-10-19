@@ -13,7 +13,7 @@ import FormatHelper from '../helpers/FormatHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { NETWORKS } from '../constants/GlobalConstants';
+import { ACCOUNT_COLORS, NETWORKS } from '../constants/GlobalConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 import { SUCCESS_ADD_NETWORK_PATH, CREATE_ACCOUNT_PATH } from '../constants/RouterConstants';
 
@@ -40,14 +40,15 @@ const set = (field, value) => (dispatch) => {
  *
  * 	@param {String} name
  * 	@param {String} icon
+ * 	@param {String} iconColor
  */
-export const initAccount = ({ name, icon }) => async (dispatch) => {
+export const initAccount = ({ name, icon, iconColor }) => async (dispatch) => {
 	dispatch(set('loading', true));
 
 	try {
 		const account = await fetchChain(name);
 
-		dispatch(set('account', new Map({ id: account.get('id'), name, icon })));
+		dispatch(set('account', new Map({ id: account.get('id'), name, icon, iconColor })));
 
 		await dispatch(initAssetsBalances());
 	} catch (err) {
@@ -85,14 +86,15 @@ export const addAccount = (name, keys) => async (dispatch, getState) => {
 		let accounts = getState().global.get('accounts');
 		accounts = accounts.map((i) => ({ ...i, active: false }));
 		const icon = Math.floor(Math.random() * 15) + 1;
+		const iconColor = ACCOUNT_COLORS[Math.floor(Math.random() * 7) + 1];
 		accounts = accounts.push({
-			id: account.get('id'), active: true, icon, name, keys,
+			id: account.get('id'), active: true, icon, iconColor, name, keys,
 		});
 
 		await dispatch(setCryptoInfo('accounts', accounts));
 		dispatch(set('accounts', accounts));
 
-		dispatch(initAccount({ name, icon }));
+		dispatch(initAccount({ name, icon, iconColor }));
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}

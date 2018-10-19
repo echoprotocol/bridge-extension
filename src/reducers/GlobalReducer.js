@@ -8,6 +8,7 @@ const DEFAULT_FIELDS = Map({
 		id: '',
 		name: '',
 		icon: '',
+		iconColor: '',
 	}),
 	network: new Map({
 		name: '',
@@ -50,7 +51,12 @@ export default createModule({
 		},
 
 		logout: {
-			reducer: (state) => (state.set('account', new Map({ id: '', name: '', icon: '' }))),
+			reducer: (state) => {
+				const network = state.get('network');
+				const connected = state.get('connected');
+
+				return _.cloneDeep(DEFAULT_FIELDS).merge({ network, connected });
+			},
 		},
 	},
 });
