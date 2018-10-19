@@ -8,6 +8,7 @@ import BridgeInput from '../../components/BridgeInput';
 
 import { FORM_CREATE_PIN } from '../../constants/FormConstants';
 import { MIN_PIN_LENGTH } from '../../constants/ValidationConstants';
+import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants';
 
 import { unlockCrypto } from '../../actions/CryptoActions';
 import { setValue, clearForm } from '../../actions/FormActions';
@@ -22,6 +23,9 @@ class CreatePin extends React.Component {
 			repeat: '',
 			repeatError: null,
 		};
+
+		this.passwordRef = null;
+		this.repeatRef = null;
 	}
 
 	componentWillUnmount() {
@@ -38,7 +42,7 @@ class CreatePin extends React.Component {
 		}
 	}
 
-	onSubmit() {
+	async onSubmit() {
 		const { pin, repeat, repeatError } = this.state;
 
 		if (repeatError || this.props.error) {
@@ -47,10 +51,36 @@ class CreatePin extends React.Component {
 
 		if (pin !== repeat) {
 			this.setState({ repeatError: 'Repeat PIN correctly' });
+			if (this.repeatRef) { this.repeatRef.focus(); }
 			return;
 		}
 
-		this.props.createPin(pin);
+		const created = await this.props.createPin(pin);
+
+		if (!created && this.passwordRef) {
+			this.passwordRef.focus();
+		}
+	}
+
+	onKeyDown(e) {
+		const { pin, repeat, repeatError } = this.state;
+		const { loading, error } = this.props;
+
+		if (loading || !pin || !repeat || error || repeatError) { return; }
+
+		const { keyCode } = e;
+
+		if ([KEY_CODE_ENTER, KEY_CODE_SPACE].includes(keyCode)) {
+			e.preventDefault();
+			this.onSubmit(pin);
+		}
+
+	}
+
+	handleRef(ref, type) {
+		if (ref) {
+			this[`${type}Ref`] = ref.bridgeInput;
+		}
 	}
 
 	render() {
@@ -79,6 +109,8 @@ class CreatePin extends React.Component {
 							name="pin"
 							onChange={(e) => this.onChange(e)}
 							disabled={loading}
+							onKeyDown={(e) => this.onKeyDown(e)}
+							ref={(r) => this.handleRef(r, 'password')}
 						/>
 						<BridgeInput
 							error={!!repeatError}
@@ -91,6 +123,8 @@ class CreatePin extends React.Component {
 							name="repeat"
 							onChange={(e) => this.onChange(e)}
 							disabled={loading}
+							onKeyDown={(e) => this.onKeyDown(e)}
+							ref={(r) => this.handleRef(r, 'repeat')}
 						/>
 					</div>
 				</div>

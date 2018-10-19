@@ -8,11 +8,11 @@ class ValidatePinHelper {
 		}
 
 		if (pin.length < MIN_PIN_LENGTH) {
-			return 'At least 6 symbols';
+			return `At least ${MIN_PIN_LENGTH} symbols`;
 		}
 
 		if (pin.length > MAX_PIN_LENGTH) {
-			return 'Maximum 32 symbols';
+			return `Maximum ${MAX_PIN_LENGTH} symbols`;
 		}
 
 		return null;

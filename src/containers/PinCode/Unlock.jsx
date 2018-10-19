@@ -9,6 +9,7 @@ import BridgeInput from '../../components/BridgeInput';
 
 import { FORM_UNLOCK } from '../../constants/FormConstants';
 import { WIPE_PIN_PATH } from '../../constants/RouterConstants';
+import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants';
 
 import { unlockCrypto } from '../../actions/CryptoActions';
 import { setValue, clearForm } from '../../actions/FormActions';
@@ -21,6 +22,8 @@ class Unlock extends React.Component {
 		this.state = {
 			pin: '',
 		};
+
+		this.inputRef = null;
 	}
 
 	componentWillUnmount() {
@@ -35,16 +38,31 @@ class Unlock extends React.Component {
 		}
 	}
 
-	onSubmit() {
-		this.props.unlock(this.state.pin);
+	async onSubmit() {
+		const unlocked = await this.props.unlock(this.state.pin);
+
+		if (!unlocked && this.inputRef) {
+			this.inputRef.focus();
+		}
 	}
 
 	onKeyDown(e) {
+		const { loading, error } = this.props;
+		const { pin } = this.state;
+
+		if (loading || !pin || error) { return; }
+
 		const { keyCode } = e;
 
-		if ([13, 62].includes(keyCode)) {
+		if ([KEY_CODE_ENTER, KEY_CODE_SPACE].includes(keyCode)) {
 			e.preventDefault();
-			this.props.unlock(this.state.pin);
+			this.onSubmit(pin);
+		}
+	}
+
+	handleRef(ref) {
+		if (ref) {
+			this.inputRef = ref.bridgeInput;
 		}
 	}
 
@@ -77,11 +95,12 @@ class Unlock extends React.Component {
 							type="password"
 							descriptionText="Enter PIN to unlock the Bridge"
 							onKeyDown={(e) => this.onKeyDown(e)}
+							ref={(r) => this.handleRef(r)}
 						/>
 					</div>
 				</div>
 				<div className="page-action-wrap pin-screen enter-pin">
-					<div className="one-btn-wrap" >
+					<div className="one-btn-wrap">
 						<Button
 							className={classnames('btn-in-light', { loading })}
 							disabled={Boolean(loading || !pin || error)}

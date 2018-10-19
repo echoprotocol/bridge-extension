@@ -152,17 +152,14 @@ export const removeCryptoInfo = (field) => async (dispatch, getState) => {
  *  @method wipeCrypto
  *
  *  Remove all info
- *
- * 	@param {String} field
  */
 export const wipeCrypto = () => async (dispatch, getState) => {
 	const networks = getState().global.get('networks');
 
-	networks.concat(NETWORKS).forEach(async ({ name }) => {
-		await storage.remove(name);
-	});
+	const promises = networks.concat(NETWORKS).map(({ name }) => storage.remove(name));
+	promises.push(storage.remove('randomKey'));
 
-	await storage.remove('randomKey');
+	await Promise.all(promises);
 
 	history.push(CREATE_PIN_PATH);
 };
