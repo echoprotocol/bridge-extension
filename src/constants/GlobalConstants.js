@@ -46,3 +46,5 @@ export const MEMO_KEY = 'memo';
 export const CORE_SYMBOL = 'ECHO';
 export const CORE_ID = '1.3.0';
 export const GLOBAL_ID = '2.1.0';
+export const KEY_CODE_ENTER = 13;
+export const KEY_CODE_SPACE = 62;

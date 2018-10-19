@@ -11,8 +11,6 @@ import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/Chai
 import { NETWORKS, GLOBAL_ID } from '../constants/GlobalConstants';
 import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
 
-import { initCrypto } from './CryptoActions';
-
 import storage from '../services/storage';
 
 import FormatHelper from '../helpers/FormatHelper';
@@ -39,8 +37,6 @@ export const connect = () => async (dispatch) => {
 	]));
 
 	try {
-		await dispatch(initCrypto());
-
 		let network = await storage.get('current_network');
 
 		if (!network) {
@@ -87,7 +83,6 @@ export const disconnect = (address) => async (dispatch) => {
 		await disconnectFromAddress(address);
 		dispatch(batchActions([
 			BlockchainReducer.actions.disconnect(),
-			GlobalReducer.actions.disconnect(),
 			BalanceReducer.actions.reset(),
 			GlobalReducer.actions.set({ field: 'connected', value: false }),
 		]));

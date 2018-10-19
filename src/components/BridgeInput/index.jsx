@@ -70,7 +70,7 @@ class BridgeInput extends React.Component {
 	render() {
 		const {
 			name, labelText, type, error, disabled, theme, value,
-			autoFocus, privacyEye, position, descriptionText, hintText,
+			autoFocus, privacyEye, position, descriptionText, hintText, onKeyDown,
 		} = this.props;
 
 		const {
@@ -100,6 +100,7 @@ class BridgeInput extends React.Component {
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
+					onKeyDown={(e) => (onKeyDown ? onKeyDown(e) : null)}
 				/>
 
 				{ error ? this.renderError() : null }
@@ -130,6 +131,7 @@ BridgeInput.propTypes = {
 	privacyEye: PropTypes.bool,
 	onChange: PropTypes.func,
 	onHintClick: PropTypes.func,
+	onKeyDown: PropTypes.func,
 };
 
 BridgeInput.defaultProps = {
@@ -149,6 +151,7 @@ BridgeInput.defaultProps = {
 	privacyEye: false,
 	onChange: null,
 	onHintClick: null,
+	onKeyDown: null,
 };
 
 export default BridgeInput;

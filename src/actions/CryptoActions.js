@@ -14,17 +14,41 @@ import { loadInfo } from './GlobalActions';
 import FormatHelper from '../helpers/FormatHelper';
 import ValidatePinHelper from '../helpers/ValidatePinHelper';
 
+/**
+ *  @method changeCrypto
+ *
+ * 	Change crypto object in GlobalReducer
+ *
+ * 	@param {Object} params
+ */
 const changeCrypto = (params) => (dispatch) => {
 	dispatch(GlobalReducer.actions.setIn({ field: 'crypto', params }));
 };
 
+/**
+ *  @method lockCrypto
+ *
+ * 	Lock crypto in GlobalReducer and redirect to unlock
+ */
 const lockCrypto = () => (dispatch) => {
 	dispatch(GlobalReducer.actions.lock());
 	history.push(UNLOCK_PATH);
 };
 
+/**
+ *  @const crypto
+ *
+ * 	Instance of Сrypto class
+ */
 export const crypto = new Crypto();
 
+/**
+ *  @method initCrypto
+ *
+ * 	Check is pin setted
+ * 	If it doesn't exist, redirect to create pin. Otherwise - to unlock
+ * 	Set subscribe on lock event
+ */
 export const initCrypto = () => async (dispatch) => {
 	try {
 		const isFirstTime = await crypto.isFirstTime();
@@ -37,12 +61,21 @@ export const initCrypto = () => async (dispatch) => {
 	}
 };
 
+/**
+ *  @method unlockCrypto
+ *
+ * 	Validate PIN and try to unlock
+ * 	Load encrypted info
+ *
+ * 	@param {String} form
+ * 	@param {String} pin
+ */
 export const unlockCrypto = (form, pin) => async (dispatch) => {
 	const error = ValidatePinHelper.validatePin(pin);
 
 	if (error) {
 		dispatch(setValue(form, 'error', error));
-		return;
+		return false;
 	}
 
 	try {
@@ -51,13 +84,23 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 		await crypto.unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
 		await dispatch(loadInfo());
+		return true;
 	} catch (err) {
 		dispatch(setValue(form, 'error', FormatHelper.formatError(err)));
+		return false;
 	} finally {
 		dispatch(setValue(form, 'loading', false));
 	}
 };
 
+/**
+ *  @method setCryptoInfo
+ *
+ *  Set value by field in network storage
+ *
+ * 	@param {String} field
+ * 	@param {Any} value
+ */
 export const setCryptoInfo = (field, value) => async (dispatch, getState) => {
 	try {
 		const networkName = getState().global.getIn(['network', 'name']);
@@ -68,6 +111,13 @@ export const setCryptoInfo = (field, value) => async (dispatch, getState) => {
 	}
 };
 
+/**
+ *  @method getCryptoInfo
+ *
+ *  Get value by field in network storage
+ *
+ * 	@param {String} field
+ */
 export const getCryptoInfo = (field) => async (dispatch, getState) => {
 	try {
 		const networkName = getState().global.getIn(['network', 'name']);
@@ -81,6 +131,13 @@ export const getCryptoInfo = (field) => async (dispatch, getState) => {
 	}
 };
 
+/**
+ *  @method removeCryptoInfo
+ *
+ *  Remove value by field in network storage
+ *
+ * 	@param {String} field
+ */
 export const removeCryptoInfo = (field) => async (dispatch, getState) => {
 	try {
 		const networkName = getState().global.getIn(['network', 'name']);
@@ -91,14 +148,18 @@ export const removeCryptoInfo = (field) => async (dispatch, getState) => {
 	}
 };
 
+/**
+ *  @method wipeCrypto
+ *
+ *  Remove all info
+ */
 export const wipeCrypto = () => async (dispatch, getState) => {
 	const networks = getState().global.get('networks');
 
-	networks.concat(NETWORKS).forEach(async ({ name }) => {
-		await storage.remove(name);
-	});
+	const promises = networks.concat(NETWORKS).map(({ name }) => storage.remove(name));
+	promises.push(storage.remove('randomKey'));
 
-	await storage.remove('randomKey');
+	await Promise.all(promises);
 
 	history.push(CREATE_PIN_PATH);
 };

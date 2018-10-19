@@ -1,7 +1,7 @@
 import { Map, List } from 'immutable';
 
 import { initBalances } from './BalanceActions';
-import { setCryptoInfo, getCryptoInfo, removeCryptoInfo } from './CryptoActions';
+import { initCrypto, setCryptoInfo, getCryptoInfo, removeCryptoInfo } from './CryptoActions';
 
 import history from '../history';
 
@@ -163,6 +163,29 @@ export const switchAccount = (name) => async (dispatch, getState) => {
 };
 
 /**
+ *  @method loadInfo
+ *
+ * 	Load info from storage after unlock crypto
+ */
+export const loadInfo = () => async (dispatch, getState) => {
+	const accounts = await dispatch(getCryptoInfo('accounts'));
+
+	if (accounts && accounts.length) {
+		dispatch(set('accounts', new List(accounts)));
+
+		await dispatch(initAccount(accounts.find((account) => account.active)));
+
+		if (getState().global.getIn(['crypto', 'goBack'])) {
+			history.goBack();
+		} else {
+			history.push(INDEX_PATH);
+		}
+	} else {
+		history.push(CREATE_ACCOUNT_PATH);
+	}
+};
+
+/**
  *  @method changeNetwork
  *
  * 	Connect to new network and disconnect from old network
@@ -177,6 +200,7 @@ export const changeNetwork = (network) => async (dispatch, getState) => {
 
 		await storage.set('current_network', network);
 		await dispatch(connect());
+		await dispatch(loadInfo());
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
@@ -274,24 +298,11 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 };
 
 /**
- *  @method loadInfo
+ *  @method globalInit
  *
- * 	Load info from storage after unlock crypto
+ *  Initialize crypto and connect to blockchain
  */
-export const loadInfo = () => async (dispatch, getState) => {
-	const accounts = await dispatch(getCryptoInfo('accounts'));
-
-	if (accounts && accounts.length) {
-		dispatch(set('accounts', new List(accounts)));
-
-		await dispatch(initAccount(accounts.find((i) => i.active)));
-
-		if (getState().global.getIn(['crypto', 'goBack'])) {
-			history.goBack();
-		} else {
-			history.push(INDEX_PATH);
-		}
-	} else {
-		history.push(CREATE_ACCOUNT_PATH);
-	}
+export const globalInit = () => async (dispatch) => {
+	await dispatch(initCrypto());
+	await dispatch(connect());
 };

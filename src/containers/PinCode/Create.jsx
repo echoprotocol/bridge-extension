@@ -2,10 +2,13 @@ import React from 'react';
 import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
 import BridgeInput from '../../components/BridgeInput';
 
 import { FORM_CREATE_PIN } from '../../constants/FormConstants';
+import { MIN_PIN_LENGTH } from '../../constants/ValidationConstants';
+import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants';
 
 import { unlockCrypto } from '../../actions/CryptoActions';
 import { setValue, clearForm } from '../../actions/FormActions';
@@ -20,6 +23,9 @@ class CreatePin extends React.Component {
 			repeat: '',
 			repeatError: null,
 		};
+
+		this.passwordRef = null;
+		this.repeatRef = null;
 	}
 
 	componentWillUnmount() {
@@ -29,14 +35,14 @@ class CreatePin extends React.Component {
 	onChange(e) {
 		const { name, value } = e.target;
 
-		this.setState({ [name]: value.trim(), repeatError: null });
+		this.setState({ [name]: value, repeatError: null });
 
 		if (this.props.error) {
 			this.props.clearError();
 		}
 	}
 
-	onSubmit() {
+	async onSubmit() {
 		const { pin, repeat, repeatError } = this.state;
 
 		if (repeatError || this.props.error) {
@@ -45,10 +51,36 @@ class CreatePin extends React.Component {
 
 		if (pin !== repeat) {
 			this.setState({ repeatError: 'Repeat PIN correctly' });
+			if (this.repeatRef) { this.repeatRef.focus(); }
 			return;
 		}
 
-		this.props.createPin(pin);
+		const created = await this.props.createPin(pin);
+
+		if (!created && this.passwordRef) {
+			this.passwordRef.focus();
+		}
+	}
+
+	onKeyDown(e) {
+		const { pin, repeat, repeatError } = this.state;
+		const { loading, error } = this.props;
+
+		if (loading || !pin || !repeat || error || repeatError) { return; }
+
+		const { keyCode } = e;
+
+		if ([KEY_CODE_ENTER, KEY_CODE_SPACE].includes(keyCode)) {
+			e.preventDefault();
+			this.onSubmit(pin);
+		}
+
+	}
+
+	handleRef(ref, type) {
+		if (ref) {
+			this[`${type}Ref`] = ref.bridgeInput;
+		}
 	}
 
 	render() {
@@ -77,6 +109,8 @@ class CreatePin extends React.Component {
 							name="pin"
 							onChange={(e) => this.onChange(e)}
 							disabled={loading}
+							onKeyDown={(e) => this.onKeyDown(e)}
+							ref={(r) => this.handleRef(r, 'password')}
 						/>
 						<BridgeInput
 							error={!!repeatError}
@@ -84,18 +118,20 @@ class CreatePin extends React.Component {
 							theme="input-dark"
 							labelText="Repeat PIN"
 							type="password"
-							descriptionText="At least 6 symbols. PIN will be used only to unlock extension"
+							descriptionText={`At least ${MIN_PIN_LENGTH} symbols. PIN will be used only to unlock extension`}
 							value={repeat}
 							name="repeat"
 							onChange={(e) => this.onChange(e)}
 							disabled={loading}
+							onKeyDown={(e) => this.onKeyDown(e)}
+							ref={(r) => this.handleRef(r, 'repeat')}
 						/>
 					</div>
 				</div>
 				<div className="page-action-wrap pin-screen">
 					<div className="one-btn-wrap" >
 						<Button
-							className="btn-in-light"
+							className={classnames('btn-in-light', { loading })}
 							content={<span className="btn-text">Create</span>}
 							type="submit"
 							onClick={(e) => this.onSubmit(e)}

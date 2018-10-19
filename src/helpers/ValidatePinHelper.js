@@ -4,15 +4,15 @@ class ValidatePinHelper {
 
 	static validatePin(pin) {
 		if (/ /.test(pin)) {
-			return 'PIN should not contain spaces';
+			return 'PIN shouldn’t contain spaces';
 		}
 
 		if (pin.length < MIN_PIN_LENGTH) {
-			return `PIN must be ${MIN_PIN_LENGTH} characters or more`;
+			return `At least ${MIN_PIN_LENGTH} symbols`;
 		}
 
 		if (pin.length > MAX_PIN_LENGTH) {
-			return `PIN must be ${MAX_PIN_LENGTH} characters or less`;
+			return `Maximum ${MAX_PIN_LENGTH} symbols`;
 		}
 
 		return null;
