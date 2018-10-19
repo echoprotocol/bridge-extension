@@ -44,15 +44,14 @@ class Wipe extends React.Component {
 				</div>
 				<div className="confirm-container">
 					<section>
-						<CheckBox id="1" checked={checked} onChange={(e) => this.onCheckBox(e)} />
-						<div className="text">I understand that Bridge does not store backups of my account keys, and i will lose access to them by clearing my account data.</div>
+						<CheckBox id="1" checked={checked} label="I understand that Bridge does not store backups of my account keys, and I will lose access to them by clearing my account data." onChange={(e) => this.onCheckBox(e)} />
 					</section>
 					<div className="one-btn-wrap" >
 						<Button
 							type="submit"
 							className="btn-in-light"
 							disabled={loading || !checked}
-							content={<span className="btn-text">Cleare Bridge data</span>}
+							content={<span className="btn-text">Clear Bridge data</span>}
 							onClick={(e) => this.onSubmit(e)}
 						/>
 					</div>

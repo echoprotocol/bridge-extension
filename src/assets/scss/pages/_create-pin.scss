@@ -1,9 +1,9 @@
 .no-restored-pin-container {
-    padding-top: 20px;
+    padding-top: 14px;
 
     .top-section {
-        padding-left: 28px;
-        padding-right: 28px;
+        padding-left: 30px;
+        padding-right: 30px;
 
         .link {
             margin-left: -8px;
@@ -19,6 +19,8 @@
         line-height: 24px;
         margin-bottom: 25px;
         letter-spacing: 0.015em;
+
+        letter-spacing: 0.6px;
     }
 
     .description {
@@ -44,8 +46,10 @@
         justify-content: flex-start;
 
         padding-top: 25px;
-        padding-left: 28px;
-        padding-right: 28px;
+
+        padding-left: 32px;
+        padding-right: 29px;
+
         background-color: #31393d;
 
         section {
@@ -60,10 +64,11 @@
         .text {
             padding-left: 13px;
             font-family: FNBook;
-            letter-spacing: 0.015em;
             line-height: 18px;
             font-size: 14px;
             color: #616669;
+
+            padding-right: 23px;
         }
 
         .one-btn-wrap {
