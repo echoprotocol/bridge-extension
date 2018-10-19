@@ -51,7 +51,7 @@ export default createModule({
 		},
 
 		logout: {
-			reducer: (state) => (state.set('account', new Map({ id: '', name: '', icon: '' }))),
+			reducer: (state) => (_.cloneDeep(state).merge(DEFAULT_LOCKED_FIELDS)),
 		},
 
 		lock: {

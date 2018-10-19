@@ -56,6 +56,7 @@ class BridgeInput extends React.Component {
 	renderPrivacyEye() {
 		return (
 			<Button
+				tabIndex="-1"
 				className={
 					classnames(
 						'icon-eye',
@@ -70,7 +71,8 @@ class BridgeInput extends React.Component {
 	render() {
 		const {
 			name, labelText, type, error, disabled, theme, value,
-			autoFocus, privacyEye, position, descriptionText, hintText, onKeyDown,
+			autoFocus, privacyEye, position, descriptionText, hintText,
+			onKeyPress, onKeyDown,
 		} = this.props;
 
 		const {
@@ -101,6 +103,7 @@ class BridgeInput extends React.Component {
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
 					onKeyDown={(e) => (onKeyDown ? onKeyDown(e) : null)}
+					onKeyPress={(e) => onKeyPress && onKeyPress(e)}
 				/>
 
 				{ error ? this.renderError() : null }
@@ -132,6 +135,7 @@ BridgeInput.propTypes = {
 	onChange: PropTypes.func,
 	onHintClick: PropTypes.func,
 	onKeyDown: PropTypes.func,
+	onKeyPress: PropTypes.func,
 };
 
 BridgeInput.defaultProps = {
@@ -152,6 +156,7 @@ BridgeInput.defaultProps = {
 	onChange: null,
 	onHintClick: null,
 	onKeyDown: null,
+	onKeyPress: null,
 };
 
 export default BridgeInput;
