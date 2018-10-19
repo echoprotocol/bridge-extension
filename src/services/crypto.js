@@ -137,6 +137,19 @@ const privateAES = new AesStorage();
 class Crypto extends EventEmitter {
 
 	/**
+	 *  @method isFirstTime
+	 *
+	 *  Check is key exist
+	 *
+	 *  @return {Boolean} isFirstTime
+	 */
+	async isFirstTime() {
+		const key = await storage.get('randomKey');
+
+		return Boolean(!key);
+	}
+
+	/**
 	 *  @method setExpiredTime
 	 *
 	 *  Set expired time in milliseconds

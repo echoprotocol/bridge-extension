@@ -1,7 +1,7 @@
-import { Map } from 'immutable';
+import { Map, List } from 'immutable';
 
 import { initBalances } from './BalanceActions';
-import { setCryptoInfo, removeCryptoInfo } from './CryptoActions';
+import { setCryptoInfo, getCryptoInfo, removeCryptoInfo } from './CryptoActions';
 
 import history from '../history';
 
@@ -13,7 +13,11 @@ import FormatHelper from '../helpers/FormatHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { CREATE_ACCOUNT_PATH, SUCCESS_ADD_NETWORK_PATH } from '../constants/RouterConstants';
+import {
+	CREATE_ACCOUNT_PATH,
+	SUCCESS_ADD_NETWORK_PATH,
+	INDEX_PATH,
+} from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
@@ -266,5 +270,28 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 		dispatch(set('networks', networks));
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
+	}
+};
+
+/**
+ *  @method loadInfo
+ *
+ * 	Load info from storage after unlock crypto
+ */
+export const loadInfo = () => async (dispatch, getState) => {
+	const accounts = await dispatch(getCryptoInfo('accounts'));
+
+	if (accounts && accounts.length) {
+		dispatch(set('accounts', new List(accounts)));
+
+		await dispatch(initAccount(accounts.find((i) => i.active)));
+
+		if (getState().global.getIn(['crypto', 'goBack'])) {
+			history.goBack();
+		} else {
+			history.push(INDEX_PATH);
+		}
+	} else {
+		history.push(CREATE_ACCOUNT_PATH);
 	}
 };

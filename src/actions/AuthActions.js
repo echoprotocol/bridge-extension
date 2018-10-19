@@ -73,7 +73,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		await crypto.importByWIF(networkName, wif);
 
 		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
-		dispatch(addAccount(name, [key, key], networkName));
+		await dispatch(addAccount(name, [key, key], networkName));
 
 		return wif;
 
@@ -187,7 +187,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		}
 
 		if (success) {
-			dispatch(addAccount(name, keys, networkName));
+			await dispatch(addAccount(name, keys, networkName));
 		}
 
 		return success ? name : null;

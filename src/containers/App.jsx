@@ -8,9 +8,10 @@ import { Dimmer } from 'semantic-ui-react';
 
 import { connect as connectTo } from '../actions/ChainStoreAction';
 
-
 import Header from '../components/Header';
 import Navbar from '../components/Navbar';
+
+import { PIN_PATHS } from '../constants/RouterConstants';
 
 class App extends React.Component {
 
@@ -18,50 +19,41 @@ class App extends React.Component {
 		this.props.connection();
 	}
 
-	renderExtension() {
-		const { children, loading } = this.props;
+	renderHeader(pathname) {
+		if (PIN_PATHS.includes(pathname)) {
+			return (
+				<div className="header-bridge-image">
+					<span>Bridge</span>
+				</div>
+			);
+		}
 
 		return (
-
 			<React.Fragment>
-				<div className={classnames('app-wrap', 'dark')} >
-					<Header />
-					<Navbar />
-					<div className="header-bridge-image">
-						<span>Bridge</span>
-					</div>
-					{children}
-					{
-						(loading) && <Dimmer active inverted />
-					}
-				</div>
+				<Header />
+				<Navbar />
 			</React.Fragment>
 		);
 	}
 
 	renderApp() {
-		const { children, loading } = this.props;
+		const { children, loading, pathname } = this.props;
 
 		return (
-			<div className="temp-wrap">
-				<div className="app-wrap">
-					<Header />
-					<Navbar />
-					{children}
-					{
-						(loading) && <Dimmer active inverted />
-					}
-				</div>
+			<div className={classnames('app-wrap', { dark: PIN_PATHS.includes(pathname) })}>
+				{ this.renderHeader(pathname) }
+				{children}
+				{ loading ? <Dimmer active inverted /> : null }
 			</div>
 		);
 	}
 
-	renderChildren() {
-		return EXTENSION ? this.renderExtension() : this.renderApp();
-	}
-
 	render() {
-		return this.renderChildren();
+		return EXTENSION ? this.renderApp() : (
+			<div className="temp-wrap">
+				{ this.renderApp() }
+			</div>
+		);
 	}
 
 }
@@ -69,11 +61,13 @@ class App extends React.Component {
 App.propTypes = {
 	children: PropTypes.element.isRequired,
 	loading: PropTypes.bool.isRequired,
+	pathname: PropTypes.string.isRequired,
 	connection: PropTypes.func.isRequired,
 };
 export default connect(
 	(state) => ({
 		loading: state.global.get('loading'),
+		pathname: state.router.location.pathname,
 	}),
 	(dispatch) => ({
 		connection: () => dispatch(connectTo()),

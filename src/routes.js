@@ -9,18 +9,20 @@ import {
 	ADD_NETWORK_PATH,
 	SUCCESS_ADD_NETWORK_PATH,
 	RECIEVE_PATH,
-	PIN_PATH,
+	CREATE_PIN_PATH,
+	WIPE_PIN_PATH,
+	UNLOCK_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
 import CreateAccount from './containers/CreateAccount';
 import ImportAccount from './containers/ImportAccount';
 import AddNetwork from './containers/AddNetwork';
-import Pin from './containers/Pin';
+import Pin from './containers/PinCode';
+
 import SuccessAddNetwork from './containers/SuccessAddNetwork';
 import Wallet from './containers/Wallet';
 import Recieve from './containers/Recieve';
-
 
 export default class Routes extends React.Component {
 
@@ -31,7 +33,9 @@ export default class Routes extends React.Component {
 					<Route exact path={CREATE_ACCOUNT_PATH} component={CreateAccount} />
 					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
 
-					<Route exact path={PIN_PATH} component={Pin} />
+					<Route exact path={CREATE_PIN_PATH} component={Pin.Create} />
+					<Route exact path={WIPE_PIN_PATH} component={Pin.Wipe} />
+					<Route exact path={UNLOCK_PATH} component={Pin.Unlock} />
 
 					<Route exact path={ADD_NETWORK_PATH} component={AddNetwork} />
 					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={SuccessAddNetwork} />
