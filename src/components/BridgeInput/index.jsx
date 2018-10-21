@@ -16,11 +16,14 @@ class BridgeInput extends React.Component {
 	}
 
 
-	componentDidUpdate() {
-		const { name, setFocus } = this.props;
+	componentDidUpdate(prevProps) {
+		const {
+			name, setFocus, errorText,
+		} = this.props;
+		const { errorText: prevError } = prevProps;
 
-		if (setFocus) {
-			this[name].focus();
+		if (errorText !== prevError && setFocus) {
+			setTimeout(this[name].focus, 0);
 		}
 	}
 

@@ -59,6 +59,7 @@ class AddNetwork extends React.Component {
 							errorText={name.error}
 							value={name.value}
 							onChange={(e) => this.onChange(e)}
+							setFocus={!!name.error}
 						/>
 						<BridgeInput
 							error={!!address.error}
@@ -69,6 +70,7 @@ class AddNetwork extends React.Component {
 							errorText={address.error}
 							value={address.value}
 							onChange={(e) => this.onChange(e)}
+							setFocus={!name.error && !!address.error}
 						/>
 						<BridgeInput
 							error={!!registrator.error}
@@ -79,6 +81,7 @@ class AddNetwork extends React.Component {
 							errorText={registrator.error}
 							value={registrator.value}
 							onChange={(e) => this.onChange(e)}
+							setFocus={(!name.error && !address.error) && !!registrator.error}
 						/>
 					</div>
 				</div>
