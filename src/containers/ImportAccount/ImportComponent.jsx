@@ -27,6 +27,7 @@ class ImportComponent extends React.Component {
 						<div className="two-input-wrap">
 							<BridgeInput
 								error={!!nameError}
+								autoFocus
 								name="name"
 								theme="input-light"
 								labelText="Account name"
