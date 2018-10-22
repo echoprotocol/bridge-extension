@@ -10,4 +10,6 @@ export const SUCCESS_ADD_NETWORK_PATH = '/networks/success';
 
 export const RECIEVE_PATH = '/recieve';
 
+export const TRANSACTIONS_PATH = '/transactions';
+
 export const INDEX_PATH = WALLET_PATH;
