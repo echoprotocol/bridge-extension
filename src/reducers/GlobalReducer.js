@@ -8,11 +8,6 @@ const DEFAULT_LOCKED_FIELDS = Map({
 		name: '',
 		icon: '',
 	}),
-	crypto: new Map({
-		isLocked: true,
-		error: null,
-		goBack: false,
-	}),
 	accounts: new List([]),
 });
 
@@ -26,6 +21,11 @@ const DEFAULT_FIELDS = Map({
 	}),
 	networks: new List([]),
 	connected: false,
+	crypto: new Map({
+		isLocked: true,
+		error: null,
+		goBack: false,
+	}),
 });
 
 export default createModule({
@@ -57,7 +57,8 @@ export default createModule({
 		lock: {
 			reducer: (state) => {
 				state = _.cloneDeep(state).merge(DEFAULT_LOCKED_FIELDS);
-				return state.setIn(['crypto', 'goBack'], true);
+				state = state.setIn(['crypto', 'goBack'], true);
+				return state.setIn(['crypto', 'isLocked'], true);
 			},
 		},
 	},
