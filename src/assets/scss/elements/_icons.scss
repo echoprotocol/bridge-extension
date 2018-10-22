@@ -5,6 +5,7 @@
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
 
     &.big {
         min-width: 86px;
@@ -13,6 +14,7 @@
             font-size: 32px;
         }
     }
+
     &.green {
         background-color:#16d6aa;
     }
@@ -46,4 +48,110 @@
         font-size: 19px;
     }
 
+
+    &.change-animation {
+        opacity: 1;
+        &.big {
+            [class*="icon-ava"] {
+                font-size: 51px;
+                display: block;
+                margin-top: -6px;
+            }
+            .icon-ava1,
+            .icon-ava3,
+            .icon-ava7,
+            .icon-ava8,
+            .icon-ava9,
+            .icon-ava10,
+            .icon-ava11 {
+                margin: -6px 0 0 3px;
+            }
+
+            .icon-ava6,
+            .icon-ava2 {
+                margin: -6px 0 0 2px;
+            }
+
+        }
+        & > *:not([class^="animation-"]) {
+            transition: opacity .3s;
+        }
+        &:hover {
+            .blob {
+                border-radius: 0;
+                height: 2px;
+                width: 16px;
+                background-color: #405051;
+                &:first-child {
+                    transform: translate(0, 0);
+                }
+                &:last-child {
+                    transform: translate(0, 0);
+                }
+            }
+            .animation-text {
+                display: flex;
+            }
+            & > *:not([class^="animation-"]) {
+                opacity: .2;
+            }
+        }
+    }
+}
+
+.animation-blobs {
+	position: absolute;
+	right: 0;
+	left: 0;
+	bottom: 14px;
+	height: 4px;
+	width: 16px;
+	margin: auto;
+	border-radius: 50%;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+}
+
+.blob {
+	position: absolute;
+	margin: auto;
+	top: 0;
+	bottom: 0;
+	width: 4px;
+	height: 4px;
+	border-radius: 50%;
+	background-color: rgba(#405051, .4);
+	transition:
+		transform .2s,
+		border .2s,
+		width .2s,
+		background-color .2s;
+	
+	&:first-child {
+		left:0;
+		transform: translate(14px, 0);
+	}
+	&:last-child {
+		right: 0;
+		transform: translate(-14px, 0);
+	}
+}
+
+.animation-text {
+	animation: fadeInUp .4s;
+	position: absolute;
+	right: 0;
+    left: 4px;
+    top: -1px;
+	bottom: 0;
+	display: none;
+	align-items: center;
+	justify-content: center;
+	text-align: center;
+    color: #3E4851;
+    font-family: FNBook;
+    font-size: 14px;
+    letter-spacing: .3px;
+    user-select: none;
 }
