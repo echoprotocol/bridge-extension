@@ -41,7 +41,7 @@ class AesStorage {
 			try {
 				decrypted = Aes.decryptWithChecksum(privateKey, publicKey, '', Buffer.from(encrypted, 'hex'));
 			} catch (err) {
-				throw new Error('Invalid pin');
+				throw new Error('Enter valid PIN');
 			}
 		} else {
 			encrypted = Aes.encryptWithChecksum(privateKey, publicKey, '', decrypted);
@@ -137,6 +137,19 @@ const privateAES = new AesStorage();
 class Crypto extends EventEmitter {
 
 	/**
+	 *  @method isFirstTime
+	 *
+	 *  Check is key exist
+	 *
+	 *  @return {Boolean} isFirstTime
+	 */
+	async isFirstTime() {
+		const key = await storage.get('randomKey');
+
+		return Boolean(!key);
+	}
+
+	/**
 	 *  @method setExpiredTime
 	 *
 	 *  Set expired time in milliseconds
@@ -221,9 +234,10 @@ class Crypto extends EventEmitter {
 	 *  Encrypt private key.
 	 * 	Save encrypted private key.
 	 *
+	 *  @param {String} networkName
 	 *  @param {String} wif
 	 */
-	async importByWIF(wif) {
+	async importByWIF(networkName, wif) {
 		privateAES.required();
 
 		const privateKey = PrivateKey.fromWif(wif);
@@ -231,7 +245,7 @@ class Crypto extends EventEmitter {
 		const encryptedPrivateKey = aes.encryptToHex(privateKey.toBuffer());
 		const publicKey = privateKey.toPublicKey();
 
-		await storage.set(publicKey.toString(), encryptedPrivateKey);
+		await this.setInByNetwork(networkName, publicKey.toString(), encryptedPrivateKey);
 	}
 
 	/**
@@ -241,18 +255,22 @@ class Crypto extends EventEmitter {
 	 *  Encrypt private key.
 	 *  Save encrypted private key.
 	 *
+	 *  @param {String} networkName
 	 *  @param {String} username
 	 *  @param {String} password
 	 *  @param {String} memoPublicKey
 	 */
-	async importByPassword(username, password, memoPublicKey) {
+	async importByPassword(networkName, username, password, memoPublicKey) {
 		privateAES.required();
 
 		const privateKeyWIF = this.getPrivateKey(username, password);
-		await this.importByWIF(privateKeyWIF);
+		await this.importByWIF(networkName, privateKeyWIF);
 
 		if (this.getPublicKey(username, password, MEMO_KEY) === memoPublicKey) {
-			await this.importByWIF(this.getPrivateKey(username, password, MEMO_KEY));
+			await this.importByWIF(
+				networkName,
+				this.getPrivateKey(username, password, MEMO_KEY),
+			);
 		}
 	}
 
@@ -292,15 +310,16 @@ class Crypto extends EventEmitter {
 	 *
 	 *  Add sign in transaction by public key.
 	 *
+	 *  @param {String} networkName
 	 *  @param {Transaction} transaction
 	 *  @param {String} publicKeyString
 	 *
 	 *  @return {Transaction} signedTransaction
 	 */
-	async sign(transaction, publicKeyString) {
+	async sign(networkName, transaction, publicKeyString) {
 		privateAES.required();
 
-		const encryptedPrivateKey = await storage.get(publicKeyString);
+		const encryptedPrivateKey = await this.getInByNetwork(networkName, publicKeyString);
 
 		if (!encryptedPrivateKey) {
 			throw new Error('Key not found.');
@@ -319,10 +338,83 @@ class Crypto extends EventEmitter {
 	 *
 	 *  Remove encrypted private key by public key.
 	 *
+	 *  @param {String} networkName
 	 *  @param {String} publicKey
 	 */
-	async removePrivateKey(publicKey) {
-		await storage.remove(publicKey);
+	async removePrivateKey(networkName, publicKey) {
+		await this.removeInByNetwork(networkName, publicKey);
+	}
+
+	/**
+	 *  @method setInByNetwork
+	 *
+	 *  Set encrypted field data by network name key.
+	 *
+	 *  @param {String} networkName
+	 *  @param {String} field
+	 *  @param {Any} fieldData
+	 */
+	async setInByNetwork(networkName, field, fieldData) {
+		privateAES.required();
+
+		let networkData = await storage.get(networkName);
+		if (networkData) {
+			networkData = privateAES.get().decryptHexToBuffer(networkData);
+			networkData = JSON.parse(networkData.toString());
+		} else {
+			networkData = {};
+		}
+
+		networkData[field] = fieldData;
+		networkData = JSON.stringify(networkData);
+		networkData = privateAES.get().encryptToHex(Buffer.from(networkData));
+		await storage.set(networkName, networkData);
+	}
+
+	/**
+	 *  @method getInByNetwork
+	 *
+	 *  Get decrypted field data by network name key.
+	 *
+	 *  @param {String} networkName
+	 *  @param {String} field
+	 */
+	async getInByNetwork(networkName, field) {
+		privateAES.required();
+
+		let networkData = await storage.get(networkName);
+		if (networkData) {
+			networkData = privateAES.get().decryptHexToBuffer(networkData);
+			networkData = JSON.parse(networkData.toString());
+		} else {
+			networkData = {};
+		}
+		return networkData[field];
+	}
+
+	/**
+	 *  @method removeInByNetwork
+	 *
+	 *  Remove field data by network name key.
+	 *
+	 *  @param {String} networkName
+	 *  @param {String} field
+	 */
+	async removeInByNetwork(networkName, field) {
+		privateAES.required();
+
+		let networkData = await storage.get(networkName);
+		if (networkData) {
+			networkData = privateAES.get().decryptHexToBuffer(networkData);
+			networkData = JSON.parse(networkData.toString());
+		} else {
+			networkData = {};
+		}
+
+		delete networkData[field];
+		networkData = JSON.stringify(networkData);
+		networkData = privateAES.get().encryptToHex(Buffer.from(networkData));
+		await storage.set(networkName, networkData);
 	}
 
 }

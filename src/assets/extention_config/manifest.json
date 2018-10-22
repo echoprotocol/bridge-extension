@@ -27,8 +27,14 @@
       "all_frames": true
     }
   ],
+  "permissions": [
+    "storage",
+    "clipboardWrite",
+    "notifications"
+  ],
   "web_accessible_resources": [
     "inpage.js",
-    "background.js"
+    "background.js",
+    "unlimitedStorage.js"
   ]
 }

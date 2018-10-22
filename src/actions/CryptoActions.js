@@ -1,33 +1,165 @@
-import Crypto from '../services/crypto';
+import history from '../history';
+
+import storage from '../services/storage';
+import echoService from '../services/echo';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
+import { CREATE_PIN_PATH, UNLOCK_PATH } from '../constants/RouterConstants';
+import { NETWORKS } from '../constants/GlobalConstants';
+
+import { setValue } from './FormActions';
+import { loadInfo } from './GlobalActions';
+
+import FormatHelper from '../helpers/FormatHelper';
+import ValidatePinHelper from '../helpers/ValidatePinHelper';
+
+/**
+ *  @method changeCrypto
+ *
+ * 	Change crypto object in GlobalReducer
+ *
+ * 	@param {Object} params
+ */
 const changeCrypto = (params) => (dispatch) => {
 	dispatch(GlobalReducer.actions.setIn({ field: 'crypto', params }));
 };
 
-export const crypto = new Crypto();
+/**
+ *  @method lockCrypto
+ *
+ * 	Lock crypto in GlobalReducer and redirect to unlock
+ */
+const lockCrypto = () => (dispatch) => {
+	dispatch(GlobalReducer.actions.lock());
+	history.push(UNLOCK_PATH);
+};
 
-// TODO remove default pin value in BRG-21
-export const initCrypto = (pin = '123456') => async (dispatch) => {
+/**
+ *  @const crypto
+ *
+ * 	Instance of Сrypto class
+ */
+export const crypto = echoService.getCrypto();
+
+/**
+ *  @method initCrypto
+ *
+ * 	Check is pin setted
+ * 	If it doesn't exist, redirect to create pin. Otherwise - to unlock
+ * 	Set subscribe on lock event
+ */
+export const initCrypto = () => async (dispatch) => {
 	try {
-		await crypto.unlock(pin);
-		dispatch(changeCrypto({ isLocked: false }));
+		const isFirstTime = await crypto.isFirstTime();
 
-		crypto.on('locked', () => {
-			dispatch(changeCrypto({ isLocked: true }));
-		});
+		history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
+
+		crypto.on('locked', () => dispatch(lockCrypto()));
 	} catch (err) {
-		dispatch(changeCrypto({ error: err.message }));
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };
 
-// TODO remove default pin value in BRG-21
-export const unlockCrypto = (pin = '123456') => async (dispatch) => {
+/**
+ *  @method unlockCrypto
+ *
+ * 	Validate PIN and try to unlock
+ * 	Load encrypted info
+ *
+ * 	@param {String} form
+ * 	@param {String} pin
+ */
+export const unlockCrypto = (form, pin) => async (dispatch) => {
+	const error = ValidatePinHelper.validatePin(pin);
+
+	if (error) {
+		dispatch(setValue(form, 'error', error));
+		return false;
+	}
+
 	try {
+		dispatch(setValue(form, 'loading', true));
+
 		await crypto.unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
+		await dispatch(loadInfo());
+		return true;
 	} catch (err) {
-		dispatch(changeCrypto({ error: err.message }));
+		dispatch(setValue(form, 'error', FormatHelper.formatError(err)));
+		return false;
+	} finally {
+		dispatch(setValue(form, 'loading', false));
 	}
+};
+
+/**
+ *  @method setCryptoInfo
+ *
+ *  Set value by field in network storage
+ *
+ * 	@param {String} field
+ * 	@param {Any} value
+ */
+export const setCryptoInfo = (field, value) => async (dispatch, getState) => {
+	try {
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		await crypto.setInByNetwork(networkName, field, value);
+	} catch (err) {
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
+	}
+};
+
+/**
+ *  @method getCryptoInfo
+ *
+ *  Get value by field in network storage
+ *
+ * 	@param {String} field
+ */
+export const getCryptoInfo = (field) => async (dispatch, getState) => {
+	try {
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		const value = await crypto.getInByNetwork(networkName, field);
+
+		return value;
+	} catch (err) {
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
+		return null;
+	}
+};
+
+/**
+ *  @method removeCryptoInfo
+ *
+ *  Remove value by field in network storage
+ *
+ * 	@param {String} field
+ */
+export const removeCryptoInfo = (field) => async (dispatch, getState) => {
+	try {
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		await crypto.removeInByNetwork(networkName, field);
+	} catch (err) {
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
+	}
+};
+
+/**
+ *  @method wipeCrypto
+ *
+ *  Remove all info
+ */
+export const wipeCrypto = () => async (dispatch, getState) => {
+	const networks = getState().global.get('networks');
+
+	const promises = networks.concat(NETWORKS).map(({ name }) => storage.remove(name));
+	promises.push(storage.remove('randomKey'));
+
+	await Promise.all(promises);
+
+	history.push(CREATE_PIN_PATH);
 };

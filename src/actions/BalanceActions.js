@@ -4,7 +4,9 @@ import BalanceReducer from '../reducers/BalanceReducer';
 
 import { fetchChain } from '../api/ChainApi';
 
-export const getPreviewBalances = (networkName) => async (dispatch) => {
+import { CORE_ID } from '../constants/GlobalConstants';
+
+export const getPreviewBalances = () => async (dispatch, getState) => {
 	/**
      *  Preview structure
      *  preview: [{
@@ -19,14 +21,15 @@ export const getPreviewBalances = (networkName) => async (dispatch) => {
      *  }]
      */
 
-	let accounts = localStorage.getItem(`accounts_${networkName}`);
-	accounts = accounts ? JSON.parse(accounts) : [];
+	const accounts = getState().global.get('accounts');
 
-	const fetchedAsset = await fetchChain('1.3.0');
+	if (!accounts) { return; }
+
+	const fetchedAsset = await fetchChain(CORE_ID);
 
 	const balances = accounts.map(async ({ name, icon }) => {
 		const account = await fetchChain(name);
-		const balance = account.getIn(['balances', '1.3.0']);
+		const balance = account.getIn(['balances', CORE_ID]);
 
 		const preview = {
 			balance: {
@@ -56,6 +59,6 @@ export const getPreviewBalances = (networkName) => async (dispatch) => {
 	});
 };
 
-export const initBalances = (networkName) => async (dispatch) => {
-	await dispatch(getPreviewBalances(networkName));
+export const initBalances = () => async (dispatch) => {
+	await dispatch(getPreviewBalances());
 };

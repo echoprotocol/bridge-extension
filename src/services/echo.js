@@ -3,7 +3,10 @@
 import echojs from 'echojs-ws';
 import chainlib from 'echojs-lib';
 
+import Crypto from '../services/crypto';
 import extension from '../../extension/extensionizer';
+
+const crypto = new Crypto();
 
 class Echo {
 
@@ -13,6 +16,10 @@ class Echo {
 
 	static getChainLib() {
 		return EXTENSION ? extension.extension.getBackgroundPage().getChainLib() : chainlib;
+	}
+
+	static getCrypto() {
+		return EXTENSION ? extension.extension.getBackgroundPage().getCrypto() : crypto;
 	}
 
 }
