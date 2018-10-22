@@ -40,6 +40,15 @@ class AddNetwork extends React.Component {
 		}
 	}
 
+	isButtonDisabled() {
+		const {
+			address, name, registrator,
+		} = this.props;
+
+		return !!(!address.value || !name.value || !registrator.value
+			|| address.error || name.error || registrator.error);
+	}
+
 	renderForm() {
 		const {
 			address, name, registrator, loading,
@@ -91,7 +100,7 @@ class AddNetwork extends React.Component {
 					<div className="one-btn-wrap" >
 						<Button
 							content={<span className="btn-text">ADD</span>}
-							disabled={loading}
+							disabled={this.isButtonDisabled()}
 							className={classnames('btn-in-light', { disabled: loading })}
 							type="submit"
 							onClick={(e) => this.onAdd(e)}

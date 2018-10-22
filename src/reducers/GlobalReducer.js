@@ -52,8 +52,9 @@ export default createModule({
 		logout: {
 			reducer: (state) => {
 				const network = state.get('network');
+				const connected = state.get('connected');
 
-				return _.cloneDeep(DEFAULT_FIELDS).merge({ network });
+				return _.cloneDeep(DEFAULT_FIELDS).merge({ network, connected });
 			},
 		},
 	},
