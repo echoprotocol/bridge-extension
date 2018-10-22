@@ -1,7 +1,5 @@
 import { Map, List } from 'immutable';
-import { ChainStore } from 'echojs-lib';
 import { batchActions } from 'redux-batched-actions';
-import { Apis } from 'echojs-ws';
 
 import history from '../history';
 import ext from '../../extension/extensionizer';
