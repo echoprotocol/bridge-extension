@@ -47,7 +47,7 @@
 }
 .welcome-wrap,
 .settings-wrap {
-    .user-icon-wrap {
+    & > .user-icon-wrap {
         margin: -43px auto 0;
         position: absolute;
         right: 0;

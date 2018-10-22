@@ -6,7 +6,9 @@
     align-items: center;
     justify-content: center;
     position: relative;
-
+    background-color: transparent;
+    padding: 0;
+    border: 0;
     &.big {
         min-width: 86px;
         height: 86px;
@@ -23,8 +25,68 @@
         }
     }
 
+    &.select {
+        min-width: 61px;
+        height: 61px;
+        cursor: pointer;
+        transition:
+            background-color $speed,
+            box-shadow $speed,
+            border $speed;
+        border: 1px solid transparent;
+        [class*="icon-ava"] {
+            font-size: 50px;
+            opacity: .3;
+            transition: opacity $speed;
+        }
+        &.active {
+            box-shadow:
+                0 -3px 6px rgba(#3f4c4e,0.06),
+                0 3px 6px rgba(#3f4c4e,0.06);
+            background-color: #fff;
+            [class*="icon-ava"] {
+                opacity: 1;
+            }
+            &:hover {
+                border: 1px solid transparent;
+                [class*="icon-ava"] {
+                    opacity: 1;
+                }
+            }
+        }
+        &:hover,
+        &:focus {
+            &:not(.active) {
+                border: 1px solid #b7bdbf;
+                [class*="icon-ava"] {
+                    opacity: .6;
+                }
+            }
+        }
+    }
+
+    &.transparent {
+        background-color: transparent;
+    }
+
     &.green {
         background-color:#16d6aa;
+    }
+
+    &.sky {
+        background-color: #76c5d3;
+    }
+
+    &.blue {
+        background-color: #7683d3;
+    }
+
+    &.pink {
+        background-color: #b989cf;
+    }
+
+    &.red {
+        background-color: #d36496;
     }
 
     &.yellow {
@@ -35,21 +97,11 @@
         background-color: #cbd376;
     }
 
-    &.blue {
-        background-color: #7683d3;
-    }
 
-    &.sky {
-        background-color: #76c5d3;
-    }
 
-    &.pink {
-        background-color: #b989cf;
-    }
 
-    &.red {
-        background-color: #d36496;
-    }
+
+
 
     [class*="icon-ava"] {
         color: #3f4c4e;
@@ -65,25 +117,25 @@
                 display: block;
                 margin-top: -6px;
             }
-            .icon-ava1,
-            .icon-ava3,
-            .icon-ava7,
-            .icon-ava8,
-            .icon-ava9,
-            .icon-ava10,
-            .icon-ava11,
-            .icon-ava15 {
-                margin: -6px 0 0 3px;
-            }
+            // .icon-ava1,
+            // .icon-ava3,
+            // .icon-ava7,
+            // .icon-ava8,
+            // .icon-ava9,
+            // .icon-ava10,
+            // .icon-ava11,
+            // .icon-ava15 {
+            //     margin: -6px 0 0 3px;
+            // }
 
-            .icon-ava6,
-            .icon-ava12 {
-                margin: -6px 0 0 2px;
-            }
+            // .icon-ava6,
+            // .icon-ava12 {
+            //     margin: -6px 0 0 2px;
+            // }
 
-            .icon-ava14 {
-                margin: -6px 0 0 5px;
-            }
+            // .icon-ava14 {
+            //     margin: -6px 0 0 5px;
+            // }
 
         }
         & > *:not([class^="animation-"]) {
