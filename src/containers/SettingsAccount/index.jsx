@@ -12,7 +12,13 @@ class SettingsAccount extends React.Component {
 			<React.Fragment>
 
 				<div className="settings-wrap">
-					<UserIcon color="green" big remove avatar="ava1" />
+					<UserIcon
+						color="green"
+						big
+						animationChange
+						// animationBack
+						avatar="ava1"
+					/>
 					<div className="page-wrap" >
 						<div className="page">
 							<ul className="list-avatars">
@@ -42,6 +48,7 @@ class SettingsAccount extends React.Component {
 											<li key={id} >
 												<Button
 													active={i === 0}
+													tabIndex={i === 0 ? '-1' : '0'}
 													className={`select-${elm}`}
 												/>
 											</li>
@@ -54,9 +61,9 @@ class SettingsAccount extends React.Component {
 							<div className="one-btn-wrap">
 								<Button
 									className="btn-in-light"
-									disabled
+
 									content={
-										<span className="btn-text">Save Changes</span>
+										<span className="btn-text">Save and close</span>
 									}
 								/>
 							</div>

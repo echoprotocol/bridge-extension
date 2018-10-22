@@ -496,15 +496,21 @@
             background-color $speed,
             border $speed;
 
-        &:hover,
-        &:focus {
+        &:hover {
             &:not(.active) {
                 border: 1px solid #b7bdbf;
-
+            }
+        }
+        &:focus {
+            &:not(:active) {
+                border: 1px solid #b7bdbf;
             }
         }
         &.active {
             background-color: #fff;
+            box-shadow:
+            0 -3px 6px rgba(#3f4c4e,0.06),
+            0 3px 6px rgba(#3f4c4e,0.06);
         }
         &:before {
             width: 22px;

@@ -96,7 +96,11 @@ class UserDropdown extends React.PureComponent {
 					onClick={() => this.closeDropDown()}
 					onSelect={() => this.onSelect(name)}
 				>
-					<UserIcon color="green" avatar={`ava${icon}`} />
+					<UserIcon
+						color="green"
+						tabSelect
+						avatar={`ava${icon}`}
+					/>
 					<div className="user-name">{name}</div>
 					<div className={classnames('user-balance', { positive: !!amount })}>
 						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${ECHO}`}
