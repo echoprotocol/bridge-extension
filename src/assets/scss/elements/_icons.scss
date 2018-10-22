@@ -15,6 +15,14 @@
         }
     }
 
+    &.medium {
+        min-width: 41px;
+        height: 41px;
+        [class*="icon-ava"] {
+            font-size: 32px;
+        }
+    }
+
     &.green {
         background-color:#16d6aa;
     }
@@ -63,13 +71,18 @@
             .icon-ava8,
             .icon-ava9,
             .icon-ava10,
-            .icon-ava11 {
+            .icon-ava11,
+            .icon-ava15 {
                 margin: -6px 0 0 3px;
             }
 
             .icon-ava6,
-            .icon-ava2 {
+            .icon-ava12 {
                 margin: -6px 0 0 2px;
+            }
+
+            .icon-ava14 {
+                margin: -6px 0 0 5px;
             }
 
         }

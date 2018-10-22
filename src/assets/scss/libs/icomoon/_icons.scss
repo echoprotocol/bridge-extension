@@ -136,8 +136,12 @@
 }
 
 .icon-closeBig {
+    width: 17px;
+    display: flex;
+    align-items: center;
     &:before {
-        content: $icon-closeBig; 
+
+        content: $icon-closeBig;
     }
 }
 

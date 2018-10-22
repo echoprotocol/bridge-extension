@@ -27,9 +27,12 @@ class UserIcon extends React.PureComponent {
 				className={classnames(
 					'user-icon-wrap',
 					{ big: this.props.big },
+
 					{ 'change-animation': this.props.animationChange },
+
+					{ medium: this.props.medium },
+
 					this.props.color,
-					this.props.avatar,
 				)}
 			>
 				<div className="content">
@@ -49,11 +52,14 @@ UserIcon.propTypes = {
 	color: PropTypes.string,
 	big: PropTypes.bool,
 	animationChange: PropTypes.bool,
+	medium: PropTypes.bool,
 };
 UserIcon.defaultProps = {
 	color: 'green',
 	big: false,
 	animationChange: false,
+
+	medium: false,
 };
 export default connect(
 	() => ({
