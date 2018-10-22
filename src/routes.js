@@ -8,6 +8,7 @@ import {
 	ADD_NETWORK_PATH,
 	SUCCESS_ADD_NETWORK_PATH,
 	RECIEVE_PATH,
+	TRANSACTIONS_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -17,6 +18,7 @@ import AddNetwork from './containers/AddNetwork';
 import SuccessAddNetwork from './containers/SuccessAddNetwork';
 import Wallet from './containers/Wallet';
 import Recieve from './containers/Recieve';
+import Transactions from './containers/Transactions';
 
 class Routes extends React.Component {
 
@@ -30,6 +32,7 @@ class Routes extends React.Component {
 					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={SuccessAddNetwork} />
 					<Route exact path={WALLET_PATH} component={Wallet} />
 					<Route exact path={RECIEVE_PATH} component={Recieve} />
+					<Route exact path={TRANSACTIONS_PATH} component={Transactions} />
 				</div>
 			</App>
 		);

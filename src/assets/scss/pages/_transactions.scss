@@ -1,0 +1,268 @@
+.page-wrap {
+    &.transactions-page {
+        padding-top: 0;
+    }
+}
+
+
+.transactions-wrapper {
+    width: calc(100% - 20px);
+    margin: 0 auto;
+    height: 488px;
+
+    .ui.accordion {
+        padding-top: 10px;
+        padding-bottom: 10px;
+
+        .title {
+            padding: 0;
+            color: #000000;
+            & ~ .content {
+                padding: 5px 0px 25px 0px !important;
+            }
+
+            &.active {
+                .transaction-element {
+                    border-color: transparent;
+
+                    .bottom-block {
+                        .icon {
+                            &-dropdown {
+                                &:before {
+                                    transform: rotate(180deg);
+                                }
+                            }
+                        }
+                    }
+                }
+            }
+        }
+    }
+}
+
+.transaction-element {
+    position: relative;
+    z-index: 1;
+
+    &:after {
+        content: '';
+        transition: all .2s ease-out;
+        width: 100%;
+        height: calc(100% + 2px);
+        position: absolute;
+        top: -1px;
+        left: 0;
+        background-color: #fff;
+        opacity: 0;
+        visibility: hidden;
+        z-index: 1;
+        box-shadow: 0 0 15px rgba(0, 0, 0, 0.09);
+    }
+
+    &:hover {
+        z-index: 2;
+
+        .transaction {
+            &-type {
+                color: #434c53;
+            }
+            &-date {
+                color: #434c53;
+            }
+        }
+        &:after {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .bottom-block {
+            .icon {
+                &-dropdown {
+                    &:before {
+                        color: #434c53;
+                    }
+                }
+            }
+        }
+    }
+
+    &:active {
+        .top-block {
+            opacity: 0.6;
+        }
+        .bottom-block {
+            opacity: 0.6;
+        }
+        &:after {
+            background-color: #f7f9fa;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+        }
+    }
+
+    background-color: #f7f9fa;
+    border-bottom: 1px solid #d3d6d8;
+
+    padding: 10px 11px 9px 11px;
+
+    .top-block {
+        display: flex;
+        width: 100%;
+        flex-direction: row;
+        justify-content: space-between;
+        margin-bottom: 10px;
+        align-items: flex-end;
+        position: relative;
+        z-index: 2;
+    }
+
+    .bottom-block {
+        position: relative;
+        z-index: 2;
+
+        .icon {
+            &-dropdown {
+                position: absolute;
+                right: 0;
+                top: 50%;
+                transform: translateY(-50%);
+                font-size: 11px;
+
+                &:before {
+                    content: "\e901";
+                    transition: all .2s ease-out;
+                    color: #c3c8c9;
+                    display: block;
+                    transform-origin: center;
+                }
+            }
+        }
+    }
+
+    .transaction {
+        &-type {
+            font-family: FNBook;
+            line-height: 19px;
+            font-size: 14px;
+            color: #808b94;
+            display: flex;
+            align-items: flex-end;
+            letter-spacing: .3px;
+            transition: all .2s ease-out;
+
+            .icon {
+                width: 26px;
+                font-size: 21px;
+            }
+
+            &.transaction {
+                .icon {
+                    padding-left: 1px;
+                    &:before {
+                        content: "\e92e";
+                    }
+                }
+            }
+
+            &.account-created {
+                .icon {
+                    padding-left: 1px;
+                    &:before {
+                        content: "\e92a"; 
+                    }
+                }
+            }
+
+            &.contract-created {
+                .icon {
+                    &:before {
+                        content: "\E92B";
+                    }
+                }
+            }
+
+            &.received {
+                .icon {
+                    &:before {
+                        content: "\e92c";
+                    }
+                }
+            }
+
+            &.sent {
+                .icon {
+                    padding-left: 2px;
+                    &:before {
+                        content: "\e92d";
+                    }
+                }
+            }
+
+        }
+        &-date {
+            font-family: FNBook;
+            line-height: 19px;
+            color: #808b94;
+            font-size: 13px;
+            letter-spacing: .3px;
+            transition: all .2s ease-out;
+        }
+        &-value {
+            font-family: FNMedium;
+            font-size: 21px;
+            line-height: 19px;
+            letter-spacing: 1.2px;
+            color: #434c53;
+            padding-left: 5px;
+            
+            padding-right: 40px;
+            word-break: break-all;
+            
+            .currency {
+                font-size: 13px;
+                margin-left: 3px;
+            }
+        }
+    }
+
+    &-content {
+        width: calc(100% - 4px);
+        margin: 0 auto;
+
+        border: 1px solid #d3d6d8;
+        
+        padding-right: 10px;
+        padding-left: 15px;
+        padding-top: 19px;
+        padding-bottom: 17px;
+
+        .row {
+            font-family: FNMedium;
+            font-size: 14px;
+            line-height: 19px;
+            display: flex;
+            justify-content: space-between;
+
+            &:not(:last-child) {
+                margin-bottom: 11px;
+            }
+
+            .left-block {
+                color: #7e8489;
+                flex-shrink: 0;
+                width: 100%;
+                max-width: 115px;
+                letter-spacing: 0.3px;
+            }
+
+            .right-block {
+                text-align: right;
+                color: #323c40;
+                letter-spacing: 0.3px;
+
+                .currency {
+                    margin-left: 3px;
+                }
+            }
+        }
+    }
+}
