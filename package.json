@@ -23,6 +23,7 @@
     "echojs-ws": "^0.1.10",
     "events": "^3.0.0",
     "file-loader": "^1.1.11",
+    "focus-trap-react": "^4.0.1",
     "history": "^4.7.2",
     "immutable": "^3.8.2",
     "intl": "^1.2.5",

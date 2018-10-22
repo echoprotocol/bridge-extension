@@ -12,6 +12,7 @@ import {
 	CREATE_PIN_PATH,
 	WIPE_PIN_PATH,
 	UNLOCK_PATH,
+	TRANSACTIONS_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -23,6 +24,7 @@ import Pin from './containers/PinCode';
 import SuccessAddNetwork from './containers/SuccessAddNetwork';
 import Wallet from './containers/Wallet';
 import Recieve from './containers/Recieve';
+import Transactions from './containers/Transactions';
 
 export default class Routes extends React.Component {
 
@@ -41,7 +43,7 @@ export default class Routes extends React.Component {
 					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={SuccessAddNetwork} />
 					<Route exact path={WALLET_PATH} component={Wallet} />
 					<Route exact path={RECIEVE_PATH} component={Recieve} />
-
+					<Route exact path={TRANSACTIONS_PATH} component={Transactions} />
 				</div>
 			</App>
 		);

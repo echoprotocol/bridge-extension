@@ -4,19 +4,31 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import { Dimmer } from 'semantic-ui-react';
+import { Dimmer, Sidebar } from 'semantic-ui-react';
 
 import { globalInit } from '../actions/GlobalActions';
 
-import Header from '../components/Header';
-import Navbar from '../components/Navbar';
+import Navigator from '../components/Navigator';
+
 
 import { PIN_PATHS } from '../constants/RouterConstants';
 
 class App extends React.Component {
 
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			visible: false,
+		};
+	}
+
 	componentDidMount() {
 		this.props.initApp();
+	}
+
+	onSidebarToggle() {
+		this.setState({ visible: !this.state.visible });
 	}
 
 	renderHeader(pathname) {
@@ -28,11 +40,13 @@ class App extends React.Component {
 			);
 		}
 
+		const { visible } = this.state;
+
 		return (
-			<React.Fragment>
-				<Header />
-				<Navbar />
-			</React.Fragment>
+			<Navigator
+				visible={visible}
+				onSidebarToggle={() => this.onSidebarToggle()}
+			/>
 		);
 	}
 
@@ -41,8 +55,10 @@ class App extends React.Component {
 
 		return (
 			<div className={classnames('app-wrap', { dark: PIN_PATHS.includes(pathname) })}>
-				{ this.renderHeader(pathname) }
-				{children}
+				<Sidebar.Pushable>
+					{ this.renderHeader(pathname) }
+					{children}
+				</Sidebar.Pushable>
 				{ loading ? <Dimmer active inverted /> : null }
 			</div>
 		);

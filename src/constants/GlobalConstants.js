@@ -3,6 +3,7 @@ import {
 	CREATE_SUCCESS_PATH,
 	IMPORT_ACCOUNT_PATH,
 	IMPORT_SUCCESS_PATH,
+	TRANSACTIONS_PATH,
 } from './RouterConstants';
 
 export const HEADER_TITLE = [
@@ -21,6 +22,10 @@ export const HEADER_TITLE = [
 			name: 'Create account',
 			value: CREATE_ACCOUNT_PATH,
 		},
+	},
+	{
+		path: TRANSACTIONS_PATH,
+		title: 'Transactions history',
 	},
 	{
 		path: CREATE_SUCCESS_PATH,
