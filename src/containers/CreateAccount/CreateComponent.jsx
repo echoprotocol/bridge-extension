@@ -8,9 +8,16 @@ import BridgeInput from '../../components/BridgeInput';
 class CreateComponent extends React.Component {
 
 	onChangeName(e) {
-		const { value } = e.target;
 
-		this.props.changeName(value.trim().toLowerCase());
+		this.props.changeName(e.target.value.trim().toLowerCase());
+	}
+
+	isButtonDisabled() {
+		const {
+			name, error,
+		} = this.props;
+
+		return !!(!name || error);
 	}
 
 	render() {
@@ -35,7 +42,7 @@ class CreateComponent extends React.Component {
 								theme="input-light"
 								labelText="Account name"
 								errorText={error}
-								hintText={example}
+								exampleName={example}
 								descriptionText="Unique name will be used to make transaction"
 								value={name}
 								onChange={(e) => this.onChangeName(e)}
@@ -50,7 +57,7 @@ class CreateComponent extends React.Component {
 								content={<span className="btn-text">Create</span>}
 								type="submit"
 								onClick={(e) => this.props.createAccount(e)}
-								disabled={loading}
+								disabled={this.isButtonDisabled()}
 							/>
 						</div>
 					</div>

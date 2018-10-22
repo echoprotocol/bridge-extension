@@ -22,6 +22,11 @@ class AddNetwork extends React.Component {
 		this.props.addNetwork();
 	}
 
+	onClick(e) {
+		e.preventDefault();
+		this.props.history.goBack();
+	}
+
 	onChange(e, lowerCase) {
 		const field = e.target.name;
 		let { value } = e.target;
@@ -33,6 +38,15 @@ class AddNetwork extends React.Component {
 		if (field) {
 			this.props.setFormValue(field, value);
 		}
+	}
+
+	isButtonDisabled() {
+		const {
+			address, name, registrator,
+		} = this.props;
+
+		return !!(!address.value || !name.value || !registrator.value
+			|| address.error || name.error || registrator.error);
 	}
 
 	renderForm() {
@@ -86,7 +100,7 @@ class AddNetwork extends React.Component {
 					<div className="one-btn-wrap" >
 						<Button
 							content={<span className="btn-text">ADD</span>}
-							disabled={loading}
+							disabled={this.isButtonDisabled()}
 							className={classnames('btn-in-light', { disabled: loading })}
 							type="submit"
 							onClick={(e) => this.onAdd(e)}
@@ -101,7 +115,7 @@ class AddNetwork extends React.Component {
 		return (
 			<React.Fragment>
 				<div className="return-block">
-					<a href={undefined} className="link-return" onClick={() => this.props.history.goBack()}>
+					<a href="/" className="link-return" onClick={(e) => this.onClick(e)}>
 						<i className="icon-return" />
 						<span className="link-text">Return</span>
 					</a>
