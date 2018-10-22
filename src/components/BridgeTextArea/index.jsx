@@ -1,6 +1,5 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-// import { TextArea } from 'semantic-ui-react';
 import Textarea from 'react-textarea-autosize';
 
 import classnames from 'classnames';
@@ -58,12 +57,10 @@ class BridgeTextArea extends React.Component {
 }
 
 BridgeTextArea.propTypes = {
-	autoHeight: PropTypes.bool,
 	label: PropTypes.string,
 };
 
 BridgeTextArea.defaultProps = {
-	autoHeight: false,
 	label: null,
 };
 
