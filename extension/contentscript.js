@@ -1,9 +1,14 @@
-const extension = require('./ext');
+/* global EXTENSION */
 
+const extension = require('./extensionizer');
+
+// console.log(extension)
+// extension.runtime.getBackgroundPage().then((page) => console.log(page))
 function setupInjection() {
 	try {
 		const scriptTag = document.createElement('script');
-		scriptTag.src = extension.extension.getURL('dist/inpage.js');
+
+		scriptTag.src = extension.extension.getURL('inpage.js');
 
 		scriptTag.onload = function () { this.parentNode.removeChild(this); };
 		const container = document.head || document.documentElement;
@@ -15,8 +20,8 @@ function setupInjection() {
 		// 	scriptTag.parentNode.removeChild(scriptTag);
 		// };
 	} catch (e) {
-		console.error('Metamask injection failed.', e);
+		console.error('Bridge injection failed.', e);
 	}
 }
 
-setupInjection();
+EXTENSION && setupInjection();

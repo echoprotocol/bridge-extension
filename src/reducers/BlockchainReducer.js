@@ -23,6 +23,8 @@ export default createModule({
 					payload.value.forEach((value, key) => { map.set(key, value); });
 				});
 
+				console.log(payload.field)
+				console.log(newMap.toJS())
 				state = state.set(payload.field, newMap);
 
 				return state;

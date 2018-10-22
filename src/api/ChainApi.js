@@ -1,5 +1,11 @@
+import echoService from '../services/echo';
+
+// const { Apis } = echoService.getWsLib();
+// const { ChainStore } = echoService.getChainLib();
+
 import { Apis } from 'echojs-ws';
-import { ChainStore, ChainValidation } from 'echojs-lib';
+import { ChainStore } from 'echojs-lib';
+
 
 let CHAIN_SUBSCRIBE = null;
 
@@ -9,6 +15,7 @@ let CHAIN_SUBSCRIBE = null;
  * @returns {String}
  */
 const getTypeByKey = (key) => {
+	const { ChainValidation } = echoService.getChainLib();
 	if (ChainValidation.is_object_id(key)) {
 		if (key.search('1.2') === 0) {
 			return 'getAccount';

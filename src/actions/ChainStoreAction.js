@@ -1,8 +1,10 @@
 import { Map, List } from 'immutable';
 import { ChainStore } from 'echojs-lib';
 import { batchActions } from 'redux-batched-actions';
+import { Apis } from 'echojs-ws';
 
 import history from '../history';
+import ext from '../../extension/extensionizer';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
@@ -21,9 +23,9 @@ import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
  * copy object from ChainStore lib to redux every time when triggered
  * @returns {Function}
  */
-export const subscribe = () => (dispatch) => {
+export const subscribe = (map) => (dispatch) => {
 	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
-		const value = ChainStore[origin];
+		const value = map[origin];
 		dispatch(BlockchainReducer.actions.set({ field, value }));
 	});
 };
@@ -61,11 +63,16 @@ export const connect = () => async (dispatch) => {
 	try {
 		await connectToAddress(network.url, subscribeCb);
 
+		// await ext.extension.getBackgroundPage().connectToAddress(network.url, subscribeCb);
+
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 
-		await fetchChain('2.1.0');
+        // const a = await ext.extension.getBackgroundPage().fetchChain('2.1.0');
+        // console.log('aaaaaaaaaaaaaaaaa', a, a.toJS())
+		const block = await fetchChain('2.1.0');
+        console.log(block);
 
-		let accounts = localStorage.getItem(`accounts_${network.name}`);
+        let accounts = localStorage.getItem(`accounts_${network.name}`);
 		accounts = accounts ? JSON.parse(accounts) : [];
 
 		if (!accounts.length) {
@@ -76,6 +83,7 @@ export const connect = () => async (dispatch) => {
 		}
 
 	} catch (err) {
+		console.log(err)
 		dispatch(batchActions([
 			GlobalReducer.actions.set({ field: 'error', value: err }),
 			GlobalReducer.actions.set({ field: 'connected', value: false }),

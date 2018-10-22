@@ -1,12 +1,18 @@
 {
-  "short_name": "React App",
-  "name": "React Extension",
+  "short_name": "BRG",
+  "name": "Echo Bridge",
   "manifest_version": 2,
   "browser_action": {
-    "default_popup": "./dist/index.html",
-    "default_title": "React Ext"
+    "default_popup": "./index.html",
+    "default_title": "Echo Bridge"
   },
   "version": "1.0",
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": true
+  },
   "content_scripts": [
     {
       "matches": [
@@ -15,14 +21,14 @@
         "https://*/*"
       ],
       "js": [
-        "dist/content.js"
+        "./content.js"
       ],
       "run_at": "document_start",
       "all_frames": true
     }
   ],
   "web_accessible_resources": [
-    "dist/inpage.js",
-    "dist/importer.js"
+    "inpage.js",
+    "background.js"
   ]
 }

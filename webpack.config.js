@@ -21,11 +21,12 @@ const { version } = require('./package.json');
 module.exports = {
 	entry: {
 		app: path.resolve('src/index.js'),
-		content: path.resolve('src/utils/contentscript.js'),
-		inpage: path.resolve('src/utils/inpage.js'),
+		content: path.resolve('extension/contentscript.js'),
+		inpage: path.resolve('extension/inpage.js'),
+		background: path.resolve('src/utils/background.js'),
 	},
 	output: {
-		publicPath: './',
+		publicPath: process.env.EXTENSION ? './' : '/',
 		path: path.resolve('dist'),
 		filename: '[name].js',
 		pathinfo: process.env.NODE_ENV === 'local',
@@ -93,6 +94,7 @@ module.exports = {
 		extractSass,
 		new webpack.DefinePlugin({
 			NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+			EXTENSION: !!process.env.EXTENSION,
 		}),
 	],
 	node: {
