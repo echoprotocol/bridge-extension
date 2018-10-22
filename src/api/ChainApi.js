@@ -1,12 +1,5 @@
 import echoService from '../services/echo';
 
-// const { Apis } = echoService.getWsLib();
-// const { ChainStore } = echoService.getChainLib();
-
-import { Apis } from 'echojs-ws';
-import { ChainStore } from 'echojs-lib';
-
-
 let CHAIN_SUBSCRIBE = null;
 
 /**
@@ -37,7 +30,8 @@ const getTypeByKey = (key) => {
  * @param {Function} subscribeCb
  */
 export const connectToAddress = async (address, subscribeCb) => {
-
+	const { Apis } = echoService.getWsLib();
+	const { ChainStore } = echoService.getChainLib();
 	CHAIN_SUBSCRIBE = subscribeCb;
 
 	try {
@@ -65,6 +59,8 @@ export const connectToAddress = async (address, subscribeCb) => {
  * @param {String} address
  */
 export const disconnectFromAddress = async (address) => {
+	const { Apis } = echoService.getWsLib();
+	const { ChainStore } = echoService.getChainLib();
 	const instance = Apis.instance();
 	if (instance.url !== address) {
 		throw new Error('invalid address');
@@ -84,6 +80,7 @@ export const disconnectFromAddress = async (address) => {
  * @returns {Object}
  */
 export const fetchChain = async (key) => {
+	const { ChainStore } = echoService.getChainLib();
 	const method = getTypeByKey(key);
 
 	try {
@@ -102,6 +99,7 @@ export const fetchChain = async (key) => {
  * @returns {Object}
  */
 export const lookupAccounts = async (accountName, limit) => {
+	const { Apis } = echoService.getWsLib();
 	const instance = Apis.instance();
 
 	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);

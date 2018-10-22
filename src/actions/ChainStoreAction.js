@@ -2,7 +2,6 @@ import { Map, List } from 'immutable';
 import { batchActions } from 'redux-batched-actions';
 
 import history from '../history';
-import ext from '../../extension/extensionizer';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
@@ -13,6 +12,8 @@ import { initCrypto } from './CryptoActions';
 
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
 
+import echoService from '../services/echo';
+
 import { NETWORKS } from '../constants/GlobalConstants';
 import { CREATE_ACCOUNT_PATH } from '../constants/RouterConstants';
 import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
@@ -21,9 +22,10 @@ import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
  * copy object from ChainStore lib to redux every time when triggered
  * @returns {Function}
  */
-export const subscribe = (map) => (dispatch) => {
+export const subscribe = () => (dispatch) => {
+	const { ChainStore } = echoService.getChainLib();
 	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
-		const value = map[origin];
+		const value = ChainStore[origin];
 		dispatch(BlockchainReducer.actions.set({ field, value }));
 	});
 };
@@ -61,16 +63,10 @@ export const connect = () => async (dispatch) => {
 	try {
 		await connectToAddress(network.url, subscribeCb);
 
-		// await ext.extension.getBackgroundPage().connectToAddress(network.url, subscribeCb);
-
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
+		await fetchChain('2.1.0');
 
-        // const a = await ext.extension.getBackgroundPage().fetchChain('2.1.0');
-        // console.log('aaaaaaaaaaaaaaaaa', a, a.toJS())
-		const block = await fetchChain('2.1.0');
-        console.log(block);
-
-        let accounts = localStorage.getItem(`accounts_${network.name}`);
+		let accounts = localStorage.getItem(`accounts_${network.name}`);
 		accounts = accounts ? JSON.parse(accounts) : [];
 
 		if (!accounts.length) {

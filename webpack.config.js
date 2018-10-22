@@ -23,7 +23,7 @@ module.exports = {
 		app: path.resolve('src/index.js'),
 		content: path.resolve('extension/contentscript.js'),
 		inpage: path.resolve('extension/inpage.js'),
-		background: path.resolve('src/utils/background.js'),
+		background: path.resolve('extension/background.js'),
 	},
 	output: {
 		publicPath: process.env.EXTENSION ? './' : '/',

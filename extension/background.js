@@ -1,26 +1,12 @@
-
-import chainjs from 'echojs-lib';
 import echojs from 'echojs-ws';
+import chainjs from 'echojs-lib';
 
-import { connectToAddress, fetchChain } from '../api/ChainApi';
+import {} from '../src/services/crypto';
 
-import { NETWORKS } from '../constants/GlobalConstants';
-import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
-
-
-// ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
-//     const value = ChainStore[origin];
-// });
-
-
-window.getWsLib = () => echojs;
-window.getChainLib = () => chainjs;
-window.connectToAddress = async (address, subsCb) => connectToAddress(address, subsCb);
-window.fetchChain = async (key) => fetchChain(key);
-
+import { NETWORKS } from '../src/constants/GlobalConstants';
 
 const instance = echojs.Apis.instance(
-    NETWORKS[0].url,
+	NETWORKS[0].url,
 	true,
 	4000,
 	{ enableCrypto: false },
@@ -31,6 +17,9 @@ echojs.Apis.setAutoReconnect(false);
 instance.init_promise
 	.then(() => chainjs.ChainStore.init())
 	.then(() => {});
+
+window.getWsLib = () => echojs;
+window.getChainLib = () => chainjs;
 
 // const height = 620;
 // const width = 360;
