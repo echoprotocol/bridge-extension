@@ -74,7 +74,6 @@ class Send extends React.Component {
 								innerDropdown={codingCurrencyDropdownData}
 							/>
 							<BridgeTextArea
-								autoHeight
 								label="Note (optional)"
 							/>
 							<Button

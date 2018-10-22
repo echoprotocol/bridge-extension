@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { TextArea } from 'semantic-ui-react';
+// import { TextArea } from 'semantic-ui-react';
+import Textarea from 'react-textarea-autosize';
+
 import classnames from 'classnames';
 
 class BridgeTextArea extends React.Component {
@@ -28,7 +30,7 @@ class BridgeTextArea extends React.Component {
 
 	render() {
 
-		const { autoHeight, label } = this.props;
+		const { label } = this.props;
 
 		const {
 			up, filled,
@@ -42,8 +44,7 @@ class BridgeTextArea extends React.Component {
 					{ filled },
 				)}
 			>
-				<TextArea
-					autoHeight={autoHeight}
+				<Textarea
 					rows={1}
 					onChange={(e) => this.onChange(e)}
 					onFocus={() => this.onFocus()}
