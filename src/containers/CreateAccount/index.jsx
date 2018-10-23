@@ -27,6 +27,15 @@ class CreateAccount extends React.Component {
 		};
 	}
 
+	componentDidMount() {
+		const { pathname, search } = this.props.location;
+		const { wif } = this.state;
+
+		if (`${pathname}${search}` === CREATE_SUCCESS_PATH && !wif) {
+			this.props.history.push(CREATE_ACCOUNT_PATH);
+		}
+	}
+
 	componentWillReceiveProps(nextProps) {
 
 		if (this.state.wif && this.state.name) {
@@ -39,25 +48,11 @@ class CreateAccount extends React.Component {
 		}
 	}
 
-	componentDidMount() {
-		const { pathname, search } = this.props.location;
-		const { wif } = this.state;
-
-		if (`${pathname}${search}` === CREATE_SUCCESS_PATH && !wif) {
-			this.props.history.push(CREATE_ACCOUNT_PATH);
-		}
-	}
-
 	componentWillUnmount() {
 		this.props.clearForm();
 	}
 
-	resetState() {
-		this.setState({
-			name: '',
-			wif: '',
-		});
-	}
+
 	onChangeName(name) {
 		this.setState({ name });
 
@@ -77,6 +72,13 @@ class CreateAccount extends React.Component {
 
 	onProceedClick() {
 		this.props.history.push(INDEX_PATH);
+	}
+
+	resetState() {
+		this.setState({
+			name: '',
+			wif: '',
+		});
 	}
 
 	render() {

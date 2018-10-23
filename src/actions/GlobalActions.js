@@ -141,6 +141,8 @@ export const removeAccount = (name) => async (dispatch, getState) => {
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
+
+	return true;
 };
 
 /**
