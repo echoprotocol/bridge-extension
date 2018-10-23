@@ -66,11 +66,11 @@ export const createAccount = (name) => async (dispatch, getState) => {
 			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
 			return null;
 		}
-		const wif = crypto.generateWIF();
+		const wif = crypto().generateWIF();
 
 		await createWallet(registrator, name, wif);
 
-		await crypto.importByWIF(networkName, wif);
+		await crypto().importByWIF(networkName, wif);
 
 		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
 		await dispatch(addAccount(name, [key, key], networkName));
@@ -113,14 +113,14 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	const account = await fetchChain(name);
 
-	const active = crypto.getPublicKey(name, password);
+	const active = crypto().getPublicKey(name, password);
 
 	if (account.getIn(['active', 'key_auths', '0', '0']) !== active) {
 		dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid password'));
 		return false;
 	}
 
-	await crypto.importByPassword(
+	await crypto().importByPassword(
 		networkName,
 		name,
 		password,
@@ -155,7 +155,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 		let success = true;
 		let keys = [];
-		if (crypto.isWIF(password)) {
+		if (crypto().isWIF(password)) {
 			const active = PrivateKey.fromWif(password).toPublicKey().toString();
 
 			const [accountId] = await ChainStore.FetchChain('getAccountRefsOfKey', active);
@@ -172,7 +172,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 				return false;
 			}
 
-			await crypto.importByWIF(networkName, password);
+			await crypto().importByWIF(networkName, password);
 
 			name = account.get('name');
 			const memo = account.getIn(['options', 'memo_key']);
@@ -181,8 +181,8 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			success = await dispatch(importByPassword(networkName, name, password));
 
 			keys = [
-				crypto.getPublicKey(name, password, ACTIVE_KEY),
-				crypto.getPublicKey(name, password, MEMO_KEY),
+				crypto().getPublicKey(name, password, ACTIVE_KEY),
+				crypto().getPublicKey(name, password, MEMO_KEY),
 			];
 		}
 
