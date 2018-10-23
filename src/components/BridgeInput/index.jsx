@@ -98,6 +98,7 @@ class BridgeInput extends React.Component {
 						{ filled },
 						{ eye: privacyEye },
 						position,
+						{ 'visible-pas': (privacyEye && showPas) },
 					)}
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}

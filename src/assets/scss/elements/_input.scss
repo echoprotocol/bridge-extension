@@ -66,11 +66,18 @@
 
         &.eye {
             input {
-                padding: 0 30px 0 30px;
+                padding: 0 30px 8px 30px;
+
             }
+
             .icon-eye {
                 display: block;
 
+            }
+        }
+        &.visible-pas {
+            input {
+                padding: 0 30px 10px 32px;
             }
         }
 
