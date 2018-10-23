@@ -14,10 +14,24 @@
     &.small {
         height: 21px;
         width: 21px;
+        max-width: 21px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        .content {
+            height: 21px;
+            width: 21px;
+            max-width: 21px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
         [class*="icon-ava"] {
             font-size: 15px;
             margin: 0 0 0 1px;
         }
+
+        .icon-ava4,
         .icon-ava7 {
             font-size: 13px;
         }

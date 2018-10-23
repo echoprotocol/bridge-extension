@@ -20,6 +20,7 @@ class WelcomeComponent extends React.Component {
 				<UserIcon
 					color="green"
 					size="big"
+					animationChange
 					avatar={`ava${icon}`}
 				/>
 
