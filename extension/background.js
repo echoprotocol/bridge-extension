@@ -23,15 +23,3 @@ instance.init_promise
 window.getWsLib = () => echojs;
 window.getChainLib = () => chainjs;
 window.getCrypto = () => crypto;
-
-// const height = 620;
-// const width = 360;
-//
-// let popupId = '';
-//
-// const cb = (currentPopup) => { popupId = currentPopup.id; };
-// // create new notification popup
-// const creation = extension.windows.create({
-// 	url: 'index.html', type: 'popup', width, height
-// }, cb);
-// creation && creation.then && creation.then(cb);

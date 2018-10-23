@@ -254,7 +254,7 @@ export const addNetwork = () => async (dispatch, getState) => {
 		if (nameError || addressError || registratorError) { return null; }
 
 		networks = networks.push(network);
-		await storage.set('custom_networks', networks);
+		await storage.set('custom_networks', networks.toJS());
 		dispatch(set('networks', networks));
 
 		await dispatch(changeNetwork(network));

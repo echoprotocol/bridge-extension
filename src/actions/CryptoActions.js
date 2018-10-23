@@ -5,7 +5,7 @@ import echoService from '../services/echo';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { CREATE_PIN_PATH, UNLOCK_PATH } from '../constants/RouterConstants';
+import { CREATE_PIN_PATH, UNLOCK_PATH, INDEX_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
 import { setValue } from './FormActions';
@@ -51,10 +51,16 @@ export const crypto = echoService.getCrypto();
  */
 export const initCrypto = () => async (dispatch) => {
 	try {
-		const isFirstTime = await crypto.isFirstTime();
+		if (!crypto.isLocked()) {
+			dispatch(changeCrypto({ isLocked: false }));
 
-		history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
+			history.push(INDEX_PATH);
+		} else {
+			const isFirstTime = await crypto.isFirstTime();
 
+			history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
+		}
+		crypto.removeAllListeners();
 		crypto.on('locked', () => dispatch(lockCrypto()));
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));

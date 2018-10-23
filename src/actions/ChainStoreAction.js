@@ -37,17 +37,13 @@ export const connect = () => async (dispatch) => {
 		GlobalReducer.actions.set({ field: 'loading', value: true }),
 		GlobalReducer.actions.set({ field: 'connected', value: false }),
 	]));
-
 	try {
 		let network = await storage.get('current_network');
-
 		if (!network) {
 			[network] = NETWORKS;
 			await storage.set('current_network', network);
 		}
-
 		dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
-
 		const networks = await storage.get('custom_networks');
 
 		if (networks) {

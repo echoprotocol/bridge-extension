@@ -35,16 +35,22 @@ export const connectToAddress = async (address, subscribeCb) => {
 	CHAIN_SUBSCRIBE = subscribeCb;
 
 	try {
-		const instance = Apis.instance(
-			address,
-			true,
-			4000,
-			{ enableCrypto: false },
-		);
+		let instance = Apis.instance();
 
-		Apis.setAutoReconnect(false);
+		if (instance.url !== address) {
+			await Apis.close();
 
-		await instance.init_promise;
+			instance = Apis.instance(
+				address,
+				true,
+				4000,
+				{ enableCrypto: false },
+			);
+
+			Apis.setAutoReconnect(false);
+
+			await instance.init_promise;
+		}
 
 		await ChainStore.init();
 		ChainStore.subscribe(CHAIN_SUBSCRIBE);
@@ -70,8 +76,6 @@ export const disconnectFromAddress = async (address) => {
 	ChainStore.resetCache();
 
 	CHAIN_SUBSCRIBE = null;
-
-	await Apis.close();
 };
 
 /**

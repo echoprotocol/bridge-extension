@@ -2,8 +2,6 @@
 
 const extension = require('./extensionizer');
 
-// console.log(extension)
-// extension.runtime.getBackgroundPage().then((page) => console.log(page))
 function setupInjection() {
 	try {
 		const scriptTag = document.createElement('script');
