@@ -35,30 +35,22 @@ class BridgeInput extends React.Component {
 	}
 
 	renderError() {
+		return (<div className="message-error"> {this.props.errorText}</div>);
+	}
+
+	renderHint() {
+		const { hintText, hintClickable } = this.props;
+
 		return (
-			<React.Fragment>
-
-				<div className="message-error">
-					{ this.props.errorText}
-				</div>
-
-				<div className="message-hint">
-					{
-						this.props.exampleName ?
-							<React.Fragment>
-                                            You can try
-								<button
-									onClick={() => this.props.onClick}
-									className="btn-try"
-								> {this.props.exampleName}
-								</button>
-							</React.Fragment> :
-							this.props.exampleName
-					}
-				</div>
-			</React.Fragment>
+			<div className="message-hint">
+				{
+					hintClickable ?
+						<button onClick={(e) => this.props.onHintClick(e)} className="btn-try">
+							{hintText}
+						</button> : { hintText }
+				}
+			</div>
 		);
-
 	}
 
 	renderPrivacyEye() {
@@ -79,7 +71,8 @@ class BridgeInput extends React.Component {
 	render() {
 		const {
 			name, labelText, type, error, disabled, theme, value,
-			autoFocus, privacyEye, position, descriptionText, onKeyPress,
+			autoFocus, privacyEye, position, descriptionText, hintText,
+			onKeyPress, onKeyDown,
 		} = this.props;
 
 		const {
@@ -109,10 +102,12 @@ class BridgeInput extends React.Component {
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
+					onKeyDown={(e) => (onKeyDown ? onKeyDown(e) : null)}
 					onKeyPress={(e) => onKeyPress && onKeyPress(e)}
 				/>
 
 				{ error ? this.renderError() : null }
+				{ hintText ? this.renderHint() : null }
 				{ descriptionText ? <div className="message-description">{ descriptionText }</div> : null }
 
 			</div>
@@ -133,12 +128,14 @@ BridgeInput.propTypes = {
 	position: PropTypes.string,
 	labelText: PropTypes.string,
 	errorText: PropTypes.string,
-	exampleName: PropTypes.string,
+	hintText: PropTypes.string,
+	hintClickable: PropTypes.bool,
 	descriptionText: PropTypes.string,
-	onChange: PropTypes.func,
-	onClick: PropTypes.func,
-	onKeyPress: PropTypes.func,
 	privacyEye: PropTypes.bool,
+	onChange: PropTypes.func,
+	onHintClick: PropTypes.func,
+	onKeyDown: PropTypes.func,
+	onKeyPress: PropTypes.func,
 };
 
 BridgeInput.defaultProps = {
@@ -152,12 +149,14 @@ BridgeInput.defaultProps = {
 	position: '',
 	labelText: '',
 	errorText: '',
-	exampleName: '',
+	hintText: '',
+	hintClickable: false,
 	descriptionText: '',
-	onChange: null,
-	onClick: null,
-	onKeyPress: null,
 	privacyEye: false,
+	onChange: null,
+	onHintClick: null,
+	onKeyDown: null,
+	onKeyPress: null,
 };
 
 export default BridgeInput;
