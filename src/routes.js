@@ -14,6 +14,7 @@ import {
 	UNLOCK_PATH,
 	TRANSACTIONS_PATH,
 	SEND_PATH,
+	BACKUP_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -27,7 +28,7 @@ import Wallet from './containers/Wallet';
 import Recieve from './containers/Recieve';
 import Transactions from './containers/Transactions';
 import Send from './containers/Send';
-
+import Backup from './containers/Backup';
 
 export default class Routes extends React.Component {
 
@@ -48,6 +49,7 @@ export default class Routes extends React.Component {
 					<Route exact path={RECIEVE_PATH} component={Recieve} />
 					<Route exact path={TRANSACTIONS_PATH} component={Transactions} />
 					<Route exact path={SEND_PATH} component={Send} />
+					<Route exact path={BACKUP_PATH} component={Backup} />
 				</div>
 			</App>
 		);

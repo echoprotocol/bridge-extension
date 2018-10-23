@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'semantic-ui-react';
@@ -20,6 +21,8 @@ class BridgeBtnCopy extends React.Component {
 
 	render() {
 
+		const { btnTextWif } = this.props;
+
 		return (
 			<CopyToClipboard text={this.props.text} >
 				<Button
@@ -29,7 +32,7 @@ class BridgeBtnCopy extends React.Component {
 						<React.Fragment>
 							<div className={classnames('btn-copy', { compact: this.props.compact })} >
 								<i className="icon-copiedBtn" />
-								<span className="btn-text">{this.state.copied ? 'Copied to clipboard' : 'Copy to clipboard'}</span>
+								<span className="btn-text">{this.state.copied ? (btnTextWif ? 'WIF is copied' : 'Copied to clipboard') : (btnTextWif ? 'Copy WIF' : 'Copy to clipboard')}</span>
 							</div>
 						</React.Fragment>
 					}
@@ -42,11 +45,13 @@ class BridgeBtnCopy extends React.Component {
 
 BridgeBtnCopy.propTypes = {
 	text: PropTypes.string,
+	btnTextWif: PropTypes.bool,
 	compact: PropTypes.bool,
 };
 
 BridgeBtnCopy.defaultProps = {
 	text: '',
+	btnTextWif: false,
 	compact: false,
 };
 

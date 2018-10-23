@@ -7,6 +7,7 @@ import {
 	RECIEVE_PATH,
 	WALLET_PATH,
 	SEND_PATH,
+	BACKUP_PATH,
 } from './RouterConstants';
 
 export const HEADER_TITLE = [
@@ -41,6 +42,10 @@ export const HEADER_TITLE = [
 	{
 		path: SEND_PATH,
 		title: 'Send',
+	},
+	{
+		path: BACKUP_PATH,
+		title: 'Backup',
 	},
 	{
 		path: CREATE_SUCCESS_PATH,
