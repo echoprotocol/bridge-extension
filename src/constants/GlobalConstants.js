@@ -4,6 +4,7 @@ import {
 	IMPORT_ACCOUNT_PATH,
 	WALLET_PATH,
 	IMPORT_SUCCESS_PATH,
+	TRANSACTIONS_PATH,
 } from './RouterConstants';
 
 export const HEADER_TITLE = [
@@ -24,6 +25,10 @@ export const HEADER_TITLE = [
 		},
 	},
 	{
+		path: TRANSACTIONS_PATH,
+		title: 'Transactions history',
+	},
+	{
 		path: CREATE_SUCCESS_PATH,
 	},
 	{
@@ -41,6 +46,11 @@ export const NETWORKS = [
 		registrator: 'https://echo-tmp-wallet.pixelplex.io/faucet/registration',
 		url: 'wss://echo-devnet-node.pixelplex.io/ws',
 	},
+	{
+		name: 'testnet',
+		registrator: 'https://echo-tmp-wallet.pixelplex.io/faucet/registration',
+		url: 'wss://echo-devnet-node.pixelplex.io/ws',
+	},
 ];
 
 export const ACCOUNT_COLORS = ['green', 'yellow', 'lemon', 'blue', 'sky', 'pink', 'red'];
@@ -53,3 +63,5 @@ export const MEMO_KEY = 'memo';
 export const CORE_SYMBOL = 'ECHO';
 export const CORE_ID = '1.3.0';
 export const GLOBAL_ID = '2.1.0';
+export const KEY_CODE_ENTER = 13;
+export const KEY_CODE_SPACE = 62;

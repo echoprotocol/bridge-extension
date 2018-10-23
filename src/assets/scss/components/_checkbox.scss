@@ -1,5 +1,6 @@
 .checkbox-container {
     display: inline-block;
+    cursor: pointer;
 
     input {
         width: 0;
@@ -11,6 +12,7 @@
 
     .icon-checkbox {
         cursor: pointer;
+        flex-shrink: 0;
         width: 16px;
         height: 16px;
         border-radius: 2px;
@@ -27,6 +29,7 @@
             transition: all .2s ease-out;
             color: #343f44;
             font-size: 13px;
+            transform: translateY(1px);
         }
     }
 
@@ -35,6 +38,14 @@
         font-size: 14px;
         color: #616669;
         font-weight: 400;
+
+        padding-left: 16px;
+        letter-spacing: 0.3px;
+    }
+
+    label {
+        cursor: pointer;
+        display: flex;
     }
 
     input:checked ~ label {

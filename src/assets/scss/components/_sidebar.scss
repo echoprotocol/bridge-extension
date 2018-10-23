@@ -1,0 +1,147 @@
+
+.sidebar {
+    top: 40px;
+    &-header {
+        height: 150px;
+        background-color: rgba(#324046,1);
+        position: relative;
+        z-index: 1;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        &:before {
+            position: absolute;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            top: 0;
+            content: "";
+            opacity: .07;
+            background-position: center;
+            background-image: url(../images/walletBG.jpg);
+            z-index: -1;
+        }
+        .btn-icon {
+            padding: 12px 4px;
+            font-size: 18px;
+            &:hover,
+            &:focus {
+                color: #d4dede;
+            }
+        }
+
+    }
+    &-body {
+        background-color: rgba(#324046,1);
+        height: calc(100% - 150px);
+        padding: 53px 32px 20px;
+        .panel {
+            margin-bottom: 9px;
+        }
+        .panel-title {
+            a {
+                display: flex;
+                align-items: center;
+                height: 30px;
+                i {
+                    width: 30px;
+                    height: 30px;
+                }
+            }
+            a:not(.collapsed) {
+                color: #61D3AD;
+            }
+        }
+        .panel-body {
+            padding: 4px 0 0 54px;
+
+            div {
+                font-size: 16px;
+                a {
+                    animation: fadeIn .5s;
+                    height: 32px;
+
+                }
+            }
+
+        }
+    }
+    &-user {
+        display: flex;
+        align-items: center;
+        color: #97ACAD;
+        font-family: FNBook;
+        margin: auto 0px 13px 6px;
+        .name {
+            margin: -3px 0px 0 17px;
+            font-size: 20px;
+            letter-spacing: 0.7px;
+
+        }
+    }
+    &-dimmer {
+        position: absolute;
+        width: 42px;
+        background-color: transparent;
+        top: 0;
+        left: 100%;
+        padding: 0;
+        border: 0;
+        bottom: 0;
+        z-index: 33;
+    }
+    .trap-wrap {
+        height: 100%;
+    }
+
+}
+
+.nav-list {
+    li {
+
+        &:not(:last-child):not(:first-child) {
+            margin-bottom: 9px;
+        }
+        a {
+            color: #6d7f80;
+            font-size: 18px;
+            letter-spacing: .5px;
+            height: 30px;
+            display: flex;
+            align-items: center;
+            transition: color $speed;
+            i {
+                width: 30px;
+                height: 30px; 
+            }
+            &:hover,
+            &:focus {
+                color: #d4dede;
+            }
+        }
+    }
+}
+.nav-title {
+    margin-left: 10px;
+}
+.icon-navWallet {
+    font-size: 29px;
+    &:before {
+        margin-left: -2px;
+    }
+}
+
+.icon-navHistory {
+    font-size: 30px;
+    &:before {
+        margin-left: -1px;
+    }
+}
+.icon-navBackup {
+    font-size: 29px;
+}
+
+.icon-navInfo {
+    font-size: 29px;
+}

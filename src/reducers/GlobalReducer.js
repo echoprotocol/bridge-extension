@@ -2,32 +2,31 @@ import { createModule } from 'redux-modules';
 import { Map, List } from 'immutable';
 import _ from 'lodash';
 
+const DEFAULT_LOCKED_FIELDS = Map({
+	account: null,
+	accounts: new Map(),
+});
+
 const DEFAULT_FIELDS = Map({
 	loading: false,
 	error: null,
-	account: new Map({
-		id: '',
-		name: '',
-		icon: '',
-		iconColor: '',
-	}),
 	network: new Map({
 		name: '',
 		registrator: '',
 		url: '',
 	}),
 	networks: new List([]),
+	connected: false,
 	crypto: new Map({
 		isLocked: true,
 		error: null,
+		goBack: false,
 	}),
-	accounts: new List([]),
-	connected: false,
 });
 
 export default createModule({
 	name: 'global',
-	initialState: DEFAULT_FIELDS,
+	initialState: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_LOCKED_FIELDS),
 	transformations: {
 		set: {
 			reducer: (state, { payload }) => {
@@ -47,16 +46,18 @@ export default createModule({
 			},
 		},
 
-		disconnect: {
-			reducer: () => DEFAULT_FIELDS,
-		},
-
 		logout: {
 			reducer: (state) => {
-				const network = state.get('network');
-				const connected = state.get('connected');
+				state = _.cloneDeep(state).merge(DEFAULT_LOCKED_FIELDS.get('account'));
+				return state;
+			},
+		},
 
-				return _.cloneDeep(DEFAULT_FIELDS).merge({ network, connected });
+		lock: {
+			reducer: (state) => {
+				state = _.cloneDeep(state).merge(DEFAULT_LOCKED_FIELDS);
+				state = state.setIn(['crypto', 'goBack'], true);
+				return state.setIn(['crypto', 'isLocked'], true);
 			},
 		},
 	},

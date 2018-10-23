@@ -32,14 +32,26 @@ class UserDropdown extends React.PureComponent {
 		this.setDDMenuHeight();
 	}
 
+	componentWillReceiveProps(nextProps) {
+
+		if (!nextProps.account) {
+			this.setState({
+				opened: false,
+			});
+		}
+	}
+
 	componentDidUpdate() {
 		this.setDDMenuHeight();
 	}
 
 	onSelect(name) {
-		if (!this.props.accounts.find((i) => i.name === name)) {
+		const { accounts, networkName } = this.props;
+
+		if (!accounts.get(networkName).find((i) => i.name === name)) {
 			return;
 		}
+
 		const { account } = this.props;
 
 		if (account.get('name') === name) {
@@ -83,7 +95,7 @@ class UserDropdown extends React.PureComponent {
 	renderList() {
 
 		const {
-			balances, assets, accounts, account: activeAccount,
+			balances, assets, accounts, account: activeAccount, networkName,
 		} = this.props;
 		const asset = assets.get('1.3.0');
 
@@ -91,7 +103,7 @@ class UserDropdown extends React.PureComponent {
 			return null;
 		}
 
-		return accounts.map((account, i) => {
+		return accounts.get(networkName).map((account, i) => {
 
 			const userBalance = balances.find((value) => ((value.get('owner') === account.id) && (value.get('asset_type') === CORE_ID)));
 
@@ -122,6 +134,11 @@ class UserDropdown extends React.PureComponent {
 
 	render() {
 		const { account, accounts } = this.props;
+
+		if (!account) {
+			return null;
+		}
+
 		const menuHeight = {
 			height: `${this.state.menuHeight}px`,
 		};
@@ -181,12 +198,17 @@ class UserDropdown extends React.PureComponent {
 }
 
 UserDropdown.propTypes = {
-	account: PropTypes.object.isRequired,
 	accounts: PropTypes.object.isRequired,
 	balances: PropTypes.object.isRequired,
 	assets: PropTypes.object.isRequired,
+	account: PropTypes.object,
+	networkName: PropTypes.string.isRequired,
 	switchAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
+};
+
+UserDropdown.defaultProps = {
+	account: null,
 };
 
 export default withRouter(connect(
@@ -195,6 +217,7 @@ export default withRouter(connect(
 		assets: state.balance.get('assets'),
 		account: state.global.get('account'),
 		accounts: state.global.get('accounts'),
+		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
 		switchAccount: (name) => dispatch(switchAccount(name)),

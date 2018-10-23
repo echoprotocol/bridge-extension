@@ -9,7 +9,7 @@ import CustomScroll from 'react-custom-scroll';
 import { withRouter } from 'react-router';
 import classnames from 'classnames';
 
-import { changeNetwork, deleteNetwork, switchAccount } from '../../actions/GlobalActions';
+import { changeNetwork, deleteNetwork, switchAccountNetwork, switchAccount } from '../../actions/GlobalActions';
 
 import { NETWORKS } from '../../constants/GlobalConstants';
 import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
@@ -63,19 +63,34 @@ class NetworkDropdown extends React.PureComponent {
 		this.closeDropDown();
 	}
 
-	onSwitchAccount(e, name) {
+	onSwitchAccount(e, accountName, network) {
+		e.stopPropagation();
 		e.preventDefault();
+		const { accounts, network: activeNetwork } = this.props;
 
-		if (!this.props.accounts.find((i) => i.name === name)) {
+		if (!accounts.get(activeNetwork.get('name')).find((i) => i.name === accountName)) {
 			return;
 		}
+
 		const { account } = this.props;
 
-		if (account.get('name') === name) {
+		if (activeNetwork.get('name') === network.name) {
+			if (account.get('name') === accountName) {
+				this.closeDropDown();
+				return;
+			}
+			this.props.switchAccount(accountName);
+
+			this.closeDropDown();
+
 			return;
 		}
 
-		this.props.switchAccount(name);
+		this.props.setGlobalLoad();
+
+		this.props.switchAccountNetwork(accountName, network);
+
+		this.closeDropDown();
 	}
 
 	setDDMenuHeight() {
@@ -95,8 +110,18 @@ class NetworkDropdown extends React.PureComponent {
 		return true;
 	}
 
-	getAccounts() {
-		const { accounts } = this.props;
+	getAccounts(network) {
+		let { accounts } = this.props;
+
+		if (!accounts.size) {
+			return null;
+		}
+
+		accounts = accounts.get(network.name);
+
+		if (!accounts.size) {
+			return null;
+		}
 
 		return accounts
 			.toArray()
@@ -107,8 +132,8 @@ class NetworkDropdown extends React.PureComponent {
 						key={account.id}
 						role="button"
 						tabIndex="0"
-						onClick={(e) => this.onSwitchAccount(e, account.name)}
-						onKeyPress={(e) => this.onSwitchAccount(e, account.name)}
+						onClick={(e) => this.onSwitchAccount(e, account.name, network)}
+						onKeyPress={(e) => this.onSwitchAccount(e, account.name, network)}
 					>
 						<li>
 							<UserIcon
@@ -125,7 +150,7 @@ class NetworkDropdown extends React.PureComponent {
 
 		const name = network.get('name');
 
-		const options = networks.map((n, i) => (
+		return networks.map((n, i) => (
 			<MenuItem
 				onClick={() => this.onChangeNetwork(n.name)}
 				key={n.name}
@@ -135,12 +160,10 @@ class NetworkDropdown extends React.PureComponent {
 				{custom && <Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(e, n.name)} />}
 				<span className="title">{n.name}</span>
 				<ul className="accounts">
-					{this.getAccounts()}
+					{this.getAccounts(n) || 'No accounts'}
 				</ul>
 			</MenuItem>
 		));
-
-		return options;
 	}
 
 	closeDropDown() {
@@ -224,10 +247,11 @@ NetworkDropdown.propTypes = {
 	network: PropTypes.object.isRequired,
 	networks: PropTypes.object.isRequired,
 	accounts: PropTypes.object.isRequired,
-	account: PropTypes.object.isRequired,
+	account: PropTypes.object,
 	changeNetwork: PropTypes.func.isRequired,
 	deleteNetwork: PropTypes.func.isRequired,
 	setGlobalLoad: PropTypes.func.isRequired,
+	switchAccountNetwork: PropTypes.func.isRequired,
 	switchAccount: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	connected: PropTypes.bool,
@@ -235,6 +259,7 @@ NetworkDropdown.propTypes = {
 
 NetworkDropdown.defaultProps = {
 	connected: false,
+	account: null,
 };
 
 export default withRouter(connect(
@@ -249,6 +274,7 @@ export default withRouter(connect(
 		changeNetwork: (network) => dispatch(changeNetwork(network)),
 		deleteNetwork: (network) => dispatch(deleteNetwork(network)),
 		setGlobalLoad: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
+		switchAccountNetwork: (name, network) => dispatch(switchAccountNetwork(name, network)),
 		switchAccount: (name) => dispatch(switchAccount(name)),
 	}),
 )(NetworkDropdown));

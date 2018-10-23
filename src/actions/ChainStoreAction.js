@@ -2,20 +2,15 @@ import { Map, List } from 'immutable';
 import { ChainStore } from 'echojs-lib';
 import { batchActions } from 'redux-batched-actions';
 
-import history from '../history';
-
 import GlobalReducer from '../reducers/GlobalReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
 import BalanceReducer from '../reducers/BalanceReducer';
 
-import { initAccount } from './GlobalActions';
 import { initAssetsBalances } from './BalanceActions';
-import { initCrypto, getCryptoInfo } from './CryptoActions';
 
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
 
 import { NETWORKS, GLOBAL_ID } from '../constants/GlobalConstants';
-import { CREATE_ACCOUNT_PATH } from '../constants/RouterConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 
 import storage from '../services/storage';
@@ -58,9 +53,6 @@ export const connect = () => async (dispatch) => {
 
 		dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
 
-		// TODO remove in BRG-21
-		dispatch(initCrypto());
-
 		const networks = await storage.get('custom_networks');
 
 		if (networks) {
@@ -74,19 +66,6 @@ export const connect = () => async (dispatch) => {
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 
 		await fetchChain(GLOBAL_ID);
-
-		const accounts = await dispatch(getCryptoInfo('accounts'));
-
-		if (accounts && accounts.length) {
-			dispatch(GlobalReducer.actions.set({
-				field: 'accounts',
-				value: new List(accounts),
-			}));
-
-			await dispatch(initAccount(accounts.find((i) => i.active)));
-		} else {
-			history.push(CREATE_ACCOUNT_PATH);
-		}
 	} catch (err) {
 		dispatch(batchActions([
 			GlobalReducer.actions.set({
@@ -110,7 +89,6 @@ export const disconnect = (address) => async (dispatch) => {
 		await disconnectFromAddress(address);
 		dispatch(batchActions([
 			BlockchainReducer.actions.disconnect(),
-			GlobalReducer.actions.disconnect(),
 			BalanceReducer.actions.reset(),
 			GlobalReducer.actions.set({ field: 'connected', value: false }),
 		]));

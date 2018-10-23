@@ -41,7 +41,7 @@ class AesStorage {
 			try {
 				decrypted = Aes.decryptWithChecksum(privateKey, publicKey, '', Buffer.from(encrypted, 'hex'));
 			} catch (err) {
-				throw new Error('Invalid pin');
+				throw new Error('Enter valid PIN');
 			}
 		} else {
 			encrypted = Aes.encryptWithChecksum(privateKey, publicKey, '', decrypted);
@@ -135,6 +135,19 @@ class AesStorage {
 const privateAES = new AesStorage();
 
 class Crypto extends EventEmitter {
+
+	/**
+	 *  @method isFirstTime
+	 *
+	 *  Check is key exist
+	 *
+	 *  @return {Boolean} isFirstTime
+	 */
+	async isFirstTime() {
+		const key = await storage.get('randomKey');
+
+		return Boolean(!key);
+	}
 
 	/**
 	 *  @method setExpiredTime

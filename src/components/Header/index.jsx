@@ -12,7 +12,7 @@ class Header extends React.PureComponent {
 
 		return (
 			<header className="header">
-				{accounts.size ? <UserDropdown /> : null}
+				{(accounts && accounts.size) ? <UserDropdown /> : null}
 				<NetworkDropdown />
 			</header>
 		);
@@ -21,12 +21,18 @@ class Header extends React.PureComponent {
 }
 
 Header.propTypes = {
-	accounts: PropTypes.object.isRequired,
+	accounts: PropTypes.object,
+};
+
+Header.defaultProps = {
+	accounts: null,
 };
 
 export default connect(
-	(state) => ({
-		accounts: state.global.get('accounts'),
-	}),
+	(state) => {
+		const networkName = state.global.getIn(['network', 'name']);
+		const accounts = state.global.getIn(['accounts', networkName]);
+		return { accounts };
+	},
 	() => ({}),
 )(Header);

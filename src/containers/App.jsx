@@ -4,64 +4,72 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
-import { Dimmer } from 'semantic-ui-react';
+import { Dimmer, Sidebar } from 'semantic-ui-react';
 
-import { connect as connectTo } from '../actions/ChainStoreAction';
+import { globalInit } from '../actions/GlobalActions';
+
+import Navigator from '../components/Navigator';
 
 
-import Header from '../components/Header';
-import Navbar from '../components/Navbar';
+import { PIN_PATHS } from '../constants/RouterConstants';
 
 class App extends React.Component {
 
-	componentDidMount() {
-		this.props.connection();
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			visible: false,
+		};
 	}
 
-	renderExtension() {
-		const { children, loading } = this.props;
+	componentDidMount() {
+		this.props.initApp();
+	}
+
+	onSidebarToggle() {
+		this.setState({ visible: !this.state.visible });
+	}
+
+	renderHeader(pathname) {
+		if (PIN_PATHS.includes(pathname)) {
+			return (
+				<div className="header-bridge-image">
+					<span>Bridge</span>
+				</div>
+			);
+		}
+
+		const { visible } = this.state;
 
 		return (
-
-			<React.Fragment>
-				<div className={classnames('app-wrap', 'dark')} >
-					<Header />
-					<Navbar />
-					<div className="header-bridge-image">
-						<span>Bridge</span>
-					</div>
-					{children}
-					{
-						(loading) && <Dimmer active inverted />
-					}
-				</div>
-			</React.Fragment>
+			<Navigator
+				visible={visible}
+				onSidebarToggle={() => this.onSidebarToggle()}
+			/>
 		);
 	}
 
 	renderApp() {
-		const { children, loading } = this.props;
+		const { children, loading, pathname } = this.props;
 
 		return (
-			<div className="temp-wrap">
-				<div className="app-wrap">
-					<Header />
-					<Navbar />
+			<div className={classnames('app-wrap', { dark: PIN_PATHS.includes(pathname) })}>
+				<Sidebar.Pushable>
+					{ this.renderHeader(pathname) }
 					{children}
-					{
-						(loading) && <Dimmer active inverted />
-					}
-				</div>
+				</Sidebar.Pushable>
+				{ loading ? <Dimmer active inverted /> : null }
 			</div>
 		);
 	}
 
-	renderChildren() {
-		return EXTENSION ? this.renderExtension() : this.renderApp();
-	}
-
 	render() {
-		return this.renderChildren();
+		return EXTENSION ? this.renderApp() : (
+			<div className="temp-wrap">
+				{ this.renderApp() }
+			</div>
+		);
 	}
 
 }
@@ -69,13 +77,15 @@ class App extends React.Component {
 App.propTypes = {
 	children: PropTypes.element.isRequired,
 	loading: PropTypes.bool.isRequired,
-	connection: PropTypes.func.isRequired,
+	pathname: PropTypes.string.isRequired,
+	initApp: PropTypes.func.isRequired,
 };
 export default connect(
 	(state) => ({
 		loading: state.global.get('loading'),
+		pathname: state.router.location.pathname,
 	}),
 	(dispatch) => ({
-		connection: () => dispatch(connectTo()),
+		initApp: () => dispatch(globalInit()),
 	}),
 )(App);

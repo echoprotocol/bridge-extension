@@ -108,7 +108,11 @@ class Wallet extends React.Component {
 Wallet.propTypes = {
 	assets: PropTypes.object.isRequired,
 	balances: PropTypes.object.isRequired,
-	account: PropTypes.object.isRequired,
+	account: PropTypes.object,
+};
+
+Wallet.defaultProps = {
+	account: null,
 };
 
 export default connect(

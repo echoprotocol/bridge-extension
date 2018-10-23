@@ -17,8 +17,13 @@ export const initAssetsBalances = () => async (dispatch, getState) => {
 	const stateBalances = balancesState.get('balances');
 
 	const accounts = getState().global.get('accounts');
+	const activeNetworkName = getState().global.getIn(['network', 'name']);
 
-	const allPromises = accounts.map(async (account) => {
+	if (!accounts.get(activeNetworkName)) {
+		return false;
+	}
+
+	const allPromises = accounts.get(activeNetworkName).map(async (account) => {
 
 		const userBalances = (await fetchChain(account.name)).get('balances');
 
@@ -54,6 +59,8 @@ export const initAssetsBalances = () => async (dispatch, getState) => {
 			assets,
 		}));
 	}
+
+	return true;
 
 };
 
