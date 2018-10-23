@@ -10,7 +10,7 @@
     "build-dev": "cross-env NODE_ENV=development webpack --progress --display-error-details --colors --mode production",
     "build-stage": "cross-env NODE_ENV=stage webpack --progress --display-error-details --colors --mode production",
     "lint": "$(npm bin)/eslint 'src/**/*.jsx' 'src/**/*.js'",
-    "lint-win": "cross-env eslint 'src/**/*.jsx' 'src/**/*.js'",
+    "lint-win": "cross-env eslint 'src/**/*.jsx' 'src/**/*.js' --fix",
     "copy-manifest": "copyfiles -f src/assets/extention_config/manifest.json dist/"
   },
   "dependencies": {
@@ -40,6 +40,7 @@
     "react-router": "^4.2.0",
     "react-router-dom": "^4.2.2",
     "react-router-redux": "^5.0.0-alpha.9",
+    "react-textarea-autosize": "^7.0.4",
     "redux": "^3.7.2",
     "redux-batched-actions": "^0.4.1",
     "redux-modules": "^1.1.0",
