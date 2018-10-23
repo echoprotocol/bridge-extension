@@ -1,6 +1,5 @@
 .user-icon-wrap {
-    height: 21px;
-    width: 21px;
+
     border-radius: 50%;
     display: flex;
     align-items: center;
@@ -9,8 +8,24 @@
     background-color: transparent;
     padding: 0;
     border: 0;
+    [class*="icon-ava"] {
+        color: #3f4c4e;
+    }
+    &.small {
+        height: 21px;
+        width: 21px;
+        [class*="icon-ava"] {
+            font-size: 15px;
+            margin: 0 0 0 1px;
+        }
+        .icon-ava7 {
+            font-size: 13px;
+        }
+    }
+
     &.big {
         min-width: 86px;
+        max-width: 86px;
         height: 86px;
         [class*="icon-ava"] {
             font-size: 32px;
@@ -21,7 +36,7 @@
         min-width: 41px;
         height: 41px;
         [class*="icon-ava"] {
-            font-size: 32px;
+            font-size: 28px;
         }
     }
 
@@ -34,8 +49,9 @@
             box-shadow $speed,
             border $speed;
         border: 1px solid transparent;
+
         [class*="icon-ava"] {
-            font-size: 50px;
+            font-size: 36px;
             opacity: .3;
             transition: opacity $speed;
         }
@@ -113,56 +129,26 @@
 
 
 
-
-
-
-
-    [class*="icon-ava"] {
-        color: #3f4c4e;
-        font-size: 19px;
-    }
-
-
     &.change-animation {
         opacity: 1;
-        &.big {
-            [class*="icon-ava"] {
-                font-size: 51px;
-                display: block;
-                margin-top: -6px;
-            }
-            // .icon-ava1,
-            // .icon-ava3,
-            // .icon-ava7,
-            // .icon-ava8,
-            // .icon-ava9,
-            // .icon-ava10,
-            // .icon-ava11,
-            // .icon-ava15 {
-            //     margin: -6px 0 0 3px;
-            // }
-
-            // .icon-ava6,
-            // .icon-ava12 {
-            //     margin: -6px 0 0 2px;
-            // }
-
-            // .icon-ava14 {
-            //     margin: -6px 0 0 5px;
-            // }
-
-        }
-        & > *:not([class^="animation-"]) {
-            transition: opacity .3s;
+        [class*="icon-ava"] {
+            font-size: 35px;
+            display: block;
+            margin-top: -3px;
         }
 
+        .content {
+            transition: opacity $speed;
+        }
         .animation-blobs {
             cursor: pointer;
+            transition: box-shadow $speed;
             &:active {
                 background-color: rgba(#3e4b4e, .2);
             }
             &:hover,
             &:focus {
+                transition: box-shadow $speed;
                 box-shadow:
                     0 -3px 8px rgba(#3f4c4e,0.2),
                     0 3px 8px rgba(#3f4c4e,0.2);
@@ -176,23 +162,24 @@
             position: absolute;
             margin: auto;
             top: auto;
-            bottom: 16px;
+            bottom: 13px;
             background-color: rgba(#405051, .4);
+            will-change: contents;
             transition:
-                transform .2s,
-                border .2s,
-                width .2s,
-                background-color .2s;
+                transform $speed ease,
+                border .1s ease,
+                width .1s ease,
+                background-color $speed ease;
             
             &:first-child {
                 left:0;
                 right: 0;
-                transform: translate(8px, 0);
+                transform: translate(5px, 0);
             }
             &:last-child {
                 left: 0;
                 right: 0;
-                transform: translate(-8px, 0);
+                transform: translate(-5px, 0);
             }
        }
         &:hover {
@@ -201,6 +188,7 @@
                 height: 2px;
                 width: 16px;
                 background-color: #405051;
+                bottom: 15px;
                 &:first-child {
                     transform: translate(0, 0);
                 }
@@ -211,7 +199,7 @@
             .animation-text {
                 display: flex;
             }
-            & > *:not([class^="animation-"]) {
+            .content {
                 opacity: .2;
             }
         }
@@ -219,7 +207,7 @@
 
     &.back-animation {
         [class*="icon-ava"] {
-            font-size: 40px;
+            font-size: 29px;
             display: block;
             margin-top: -21px;
         }
@@ -244,16 +232,17 @@
             height: 2px;
             width: 16px;
             border-radius: 1px;
+            right: 0;
+            left: 0;
             top: auto;
             bottom: 23px;
             background-color: #405051;
+            position: absolute;
+            margin: auto;
             &:first-child {
                 transform: rotate(45deg);
-                right: 0;
-
             }
             &:last-child {
-                left: 0;
                 transform: rotate(-45deg);
             }
         }
@@ -292,4 +281,3 @@
     letter-spacing: .3px;
     user-select: none;
 }
-

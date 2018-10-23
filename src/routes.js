@@ -28,7 +28,7 @@ class Routes extends React.Component {
 		return (
 			<App>
 				<div>
-					<Route exact path={CREATE_ACCOUNT_PATH} component={SettingsAccount} />
+					<Route exact path={CREATE_ACCOUNT_PATH} component={CreateAccount} />
 					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
 					<Route exact path={SETTINGS_ACCOUNT_PATH} component={SettingsAccount} />
 					<Route exact path={ADD_NETWORK_PATH} component={AddNetwork} />

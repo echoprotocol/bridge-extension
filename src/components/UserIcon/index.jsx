@@ -41,8 +41,7 @@ class UserIcon extends React.PureComponent {
 				as="div"
 				className={classnames(
 					'user-icon-wrap',
-					{ big: this.props.big },
-					{ medium: this.props.medium },
+					this.props.size,
 					{ 'change-animation': this.props.animationChange },
 					{ 'back-animation': this.props.animationBack },
 					{ select: this.props.select },
@@ -69,8 +68,7 @@ class UserIcon extends React.PureComponent {
 UserIcon.propTypes = {
 	avatar: PropTypes.string.isRequired,
 	color: PropTypes.string,
-	big: PropTypes.bool,
-	medium: PropTypes.bool,
+	size: PropTypes.string,
 	animationChange: PropTypes.bool,
 	animationBack: PropTypes.bool,
 	select: PropTypes.bool,
@@ -80,8 +78,7 @@ UserIcon.propTypes = {
 };
 UserIcon.defaultProps = {
 	color: 'green',
-	big: false,
-	medium: false,
+	size: 'small',
 	animationChange: false,
 	animationBack: false,
 	select: false,

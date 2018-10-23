@@ -14,9 +14,9 @@ class SettingsAccount extends React.Component {
 				<div className="settings-wrap">
 					<UserIcon
 						color="green"
-						big
+						size="big"
+						// Может быть два состояния: animationChange и animationBack
 						animationChange
-						// animationBack
 						avatar="ava1"
 					/>
 					<div className="page-wrap" >

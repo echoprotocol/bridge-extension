@@ -127,7 +127,11 @@ class UserDropdown extends React.PureComponent {
 				open={this.state.opened}
 			>
 				<Dropdown.Toggle noCaret>
-					<UserIcon color="green" avatar={`ava${activeUser.get('icon')}`} />
+
+					<UserIcon
+						color="green"
+						avatar={`ava${activeUser.get('icon')}`}
+					/>
 					<i aria-hidden="true" className="dropdown icon" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu >
