@@ -321,7 +321,7 @@
         height: 30px;
         border: 0;
         cursor: pointer;
-        font-size: 18px;
+        font-size: 12px;
         color: #5c7071;
         transition: color linear $speed;
         -webkit-transform: translateZ(0);
@@ -384,6 +384,7 @@
         border: 0;
         color: #aeb4b8;
         transition: color $speed;
+        cursor: pointer;
         &:hover {
             color: #363f42;
         }

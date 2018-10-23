@@ -8,7 +8,6 @@ import BridgeInput from '../../components/BridgeInput';
 class CreateComponent extends React.Component {
 
 	onChangeName(e) {
-
 		this.props.changeName(e.target.value.trim().toLowerCase());
 	}
 
@@ -42,10 +41,12 @@ class CreateComponent extends React.Component {
 								theme="input-light"
 								labelText="Account name"
 								errorText={error}
-								exampleName={example}
+								hintText={example ? `You can try ${example}` : null}
+								hintClickable
 								descriptionText="Unique name will be used to make transaction"
 								value={name}
 								onChange={(e) => this.onChangeName(e)}
+								onHintClick={() => this.props.changeName(example)}
 								disabled={loading}
 							/>
 						</div>

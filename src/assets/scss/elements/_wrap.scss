@@ -17,10 +17,26 @@
         background-color: $colorBgLight;
     }
     &.dark {
-        background-color: $colorBgDark;
+        // background-color: $colorBgDark;
+        background-color: #394247;
+
+        input:-webkit-autofill,
+        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:focus
+        textarea:-webkit-autofill,
+        textarea:-webkit-autofill:hover
+        textarea:-webkit-autofill:focus,
+        select:-webkit-autofill,
+        select:-webkit-autofill:hover,
+        select:-webkit-autofill:focus {
+            -webkit-text-fill-color: #3d4b52;
+            -webkit-box-shadow: 0 0 0px 1000px #394247 inset, 0 1px 0px 0 #ebeef0; // 
+            transition: background-color 5000s ease-in-out 0s;
+        }
     }
 
 }
+
 
 .page-wrap {
     padding-top: 70px;
@@ -30,6 +46,14 @@
         padding: 0 28px 35px;
         position: relative;
         min-height: 348px;
+
+        &.enter-pin {
+            min-height: 315px;
+
+            .one-input-wrap {
+                margin-top: 90px;
+            }
+        }
     }
     .one-input-wrap {
         margin-top: 80px;
@@ -44,6 +68,31 @@
     display: flex;
     align-items: flex-start;
     justify-content: center;
+
+    &.pin-screen {
+        height: 64px;
+
+        &.enter-pin {
+            height: 85px;
+            .one-btn-wrap {
+                flex-direction: column;
+                align-items: center;
+                
+                .forgot-password {
+                    margin-top: 15px;
+                }
+            }
+        }
+
+        .one-btn-wrap {
+            .button {
+                &.disabled {
+                    border-color: #4d555a;
+                    color: #61686c;
+                }
+            }
+        }
+    }
 }
 
 .welcome-wrap {
