@@ -234,11 +234,15 @@
     }
 }
 
+.icon-pagePin {
+    text-align: center;
+    font-size: 30px;
+}
+
 .icon-pagePin .path1 {
     &:before {
         content: $icon-pagePin-path1;  
-        color: rgb(0, 0, 0);  
-        opacity: 0.2;
+        color: #434b50;  
     }
 }
 
@@ -246,7 +250,7 @@
     &:before {
         content: $icon-pagePin-path2;  
         margin-left: -1.0400390625em;  
-        color: rgb(0, 0, 0);
+        color: #595f66;
     }
 }
 
@@ -254,7 +258,7 @@
     &:before {
         content: $icon-pagePin-path3;  
         margin-left: -1.0400390625em;  
-        color: rgb(0, 0, 0);
+        color: #595f66;
     }
 }
 
@@ -262,7 +266,7 @@
     &:before {
         content: $icon-pagePin-path4;  
         margin-left: -1.0400390625em;  
-        color: rgb(0, 0, 0);
+        color: #595f66;
     }
 }
 
@@ -270,7 +274,7 @@
     &:before {
         content: $icon-pagePin-path5;  
         margin-left: -1.0400390625em;  
-        color: rgb(0, 0, 0);
+        color: #595f66;
     }
 }
 
@@ -278,7 +282,7 @@
     &:before {
         content: $icon-pagePin-path6;  
         margin-left: -1.0400390625em;  
-        color: rgb(0, 0, 0);
+        color: #595f66;
     }
 }
 

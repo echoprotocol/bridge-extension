@@ -12,15 +12,17 @@ class WelcomeComponent extends React.Component {
 	}
 
 	render() {
-		const { name, wif } = this.props;
+		const { name, wif, icon } = this.props;
 
 		return (
 			<div className="welcome-wrap">
+
 				<UserIcon
 					color="green"
 					size="big"
-					avatar="ava1"
+					avatar={`ava${icon}`}
 				/>
+
 				<div className="page-wrap" >
 					<div className="page">
 						<div className="hi-text">
@@ -72,6 +74,7 @@ WelcomeComponent.defaultProps = {
 WelcomeComponent.propTypes = {
 	wif: PropTypes.string,
 	name: PropTypes.string.isRequired,
+	icon: PropTypes.number.isRequired,
 	unmount: PropTypes.func.isRequired,
 	proceed: PropTypes.func.isRequired,
 };

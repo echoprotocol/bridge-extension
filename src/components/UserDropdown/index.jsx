@@ -8,12 +8,12 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { withRouter } from 'react-router';
 
-import { initAccount, removeAccount } from '../../actions/GlobalActions';
+import { switchAccount, removeAccount } from '../../actions/GlobalActions';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
 import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
-import { ECHO } from '../../constants/GlobalConstants';
+import { CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
 
@@ -32,6 +32,15 @@ class UserDropdown extends React.PureComponent {
 		this.setDDMenuHeight();
 	}
 
+	componentWillReceiveProps(nextProps) {
+
+		if (!nextProps.account) {
+			this.setState({
+				opened: false,
+			});
+		}
+	}
+
 	componentDidUpdate() {
 		this.setDDMenuHeight();
 	}
@@ -40,21 +49,20 @@ class UserDropdown extends React.PureComponent {
 		if (!this.props.preview.find((i) => i.name === name)) {
 			return;
 		}
-		const { activeUser, networkName } = this.props;
+		const { account } = this.props;
 
-		if (activeUser.get('name') === name) {
+		if (account.get('name') === name) {
 			return;
 		}
 
-		this.props.initAccount(name, networkName);
+		this.props.switchAccount(name);
 	}
 
 	onRemoveAccount(e, name) {
 		e.stopPropagation();
+		e.preventDefault();
 
-		const { networkName } = this.props;
-
-		this.props.removeAccount(name, networkName);
+		this.props.removeAccount(name);
 	}
 
 	setDDMenuHeight() {
@@ -82,14 +90,14 @@ class UserDropdown extends React.PureComponent {
 		this.setState({ opened: false });
 	}
 
-	renderList(preview, activeUser) {
+	renderList(preview, account) {
 
 		return preview.map(({
 			name, balance: { amount, precision, symbol }, icon,
 		}, i) => {
 			const content = (
 				<MenuItem
-					active={activeUser.get('name') === name}
+					active={account.get('name') === name}
 					tabIndex="-1"
 					key={name}
 					eventKey={i}
@@ -103,7 +111,7 @@ class UserDropdown extends React.PureComponent {
 					/>
 					<div className="user-name">{name}</div>
 					<div className={classnames('user-balance', { positive: !!amount })}>
-						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${ECHO}`}
+						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${CORE_SYMBOL}`}
 					</div>
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
 				</MenuItem>
@@ -114,7 +122,12 @@ class UserDropdown extends React.PureComponent {
 	}
 
 	render() {
-		const { preview, activeUser } = this.props;
+		const { preview, account } = this.props;
+
+		if (!account) {
+			return null;
+		}
+
 		const menuHeight = {
 			height: `${this.state.menuHeight}px`,
 		};
@@ -130,7 +143,7 @@ class UserDropdown extends React.PureComponent {
 
 					<UserIcon
 						color="green"
-						avatar={`ava${activeUser.get('icon')}`}
+						avatar={`ava${account.get('icon')}`}
 					/>
 					<i aria-hidden="true" className="dropdown icon" />
 				</Dropdown.Toggle>
@@ -145,7 +158,7 @@ class UserDropdown extends React.PureComponent {
 						>
 							<div id="user-menu-container">
 								<ul className="user-list">
-									{this.renderList(preview, activeUser)}
+									{this.renderList(preview, account)}
 								</ul>
 
 							</div>
@@ -178,21 +191,23 @@ class UserDropdown extends React.PureComponent {
 }
 
 UserDropdown.propTypes = {
-	activeUser: PropTypes.object.isRequired,
-	networkName: PropTypes.string.isRequired,
+	account: PropTypes.object,
 	preview: PropTypes.object.isRequired,
-	initAccount: PropTypes.func.isRequired,
+	switchAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
+};
+
+UserDropdown.defaultProps = {
+	account: null,
 };
 
 export default withRouter(connect(
 	(state) => ({
 		preview: state.balance.get('preview'),
-		activeUser: state.global.get('activeUser'),
-		networkName: state.global.getIn(['network', 'name']),
+		account: state.global.get('account'),
 	}),
 	(dispatch) => ({
-		initAccount: (name, network) => dispatch(initAccount(name, network)),
-		removeAccount: (name, network) => dispatch(removeAccount(name, network)),
+		switchAccount: (name) => dispatch(switchAccount(name)),
+		removeAccount: (name) => dispatch(removeAccount(name)),
 	}),
 )(UserDropdown));
