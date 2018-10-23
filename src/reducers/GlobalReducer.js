@@ -3,11 +3,7 @@ import { Map, List } from 'immutable';
 import _ from 'lodash';
 
 const DEFAULT_LOCKED_FIELDS = Map({
-	account: new Map({
-		id: '',
-		name: '',
-		icon: '',
-	}),
+	account: null,
 	accounts: new List([]),
 });
 

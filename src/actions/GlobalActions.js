@@ -122,12 +122,14 @@ export const removeAccount = (name) => async (dispatch, getState) => {
 		await dispatch(setCryptoInfo('accounts', accounts));
 		dispatch(set('accounts', accounts));
 
-		if (accountName !== name) { return; }
+		if (accountName !== name) {
+			return false;
+		}
 
 		if (!accounts.size) {
 			dispatch(GlobalReducer.actions.logout());
 			history.push(CREATE_ACCOUNT_PATH);
-			return;
+			return false;
 		}
 
 		accounts = accounts.set(0, { ...accounts.get(0), active: true });
