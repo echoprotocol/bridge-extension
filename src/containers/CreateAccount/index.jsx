@@ -36,9 +36,22 @@ class CreateAccount extends React.Component {
 		}
 	}
 
+	componentWillReceiveProps(nextProps) {
+
+		if (this.state.wif && this.state.name) {
+
+			const account = nextProps.accounts.find((i) => i.name === this.state.name);
+
+			if (!account) {
+				this.resetState();
+			}
+		}
+	}
+
 	componentWillUnmount() {
 		this.props.clearForm();
 	}
+
 
 	onChangeName(name) {
 		this.setState({ name });
@@ -61,6 +74,13 @@ class CreateAccount extends React.Component {
 		this.props.history.push(INDEX_PATH);
 	}
 
+	resetState() {
+		this.setState({
+			name: '',
+			wif: '',
+		});
+	}
+
 	render() {
 		const { name, wif } = this.state;
 		const {
@@ -70,6 +90,7 @@ class CreateAccount extends React.Component {
 		const { success } = query.parse(location.search);
 
 		if (wif && success) {
+
 			const { icon } = accounts.find((i) => i.name === name);
 
 			return (
@@ -78,7 +99,7 @@ class CreateAccount extends React.Component {
 					name={name}
 					icon={icon}
 					proceed={() => this.onProceedClick()}
-					unmount={() => this.setState({ name: '', wif: '' })}
+					unmount={() => this.resetState()}
 				/>
 			);
 		}

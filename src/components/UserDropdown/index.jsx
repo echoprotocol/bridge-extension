@@ -32,6 +32,15 @@ class UserDropdown extends React.PureComponent {
 		this.setDDMenuHeight();
 	}
 
+	componentWillReceiveProps(nextProps) {
+
+		if (!nextProps.account) {
+			this.setState({
+				opened: false,
+			});
+		}
+	}
+
 	componentDidUpdate() {
 		this.setDDMenuHeight();
 	}
@@ -51,6 +60,7 @@ class UserDropdown extends React.PureComponent {
 
 	onRemoveAccount(e, name) {
 		e.stopPropagation();
+		e.preventDefault();
 
 		this.props.removeAccount(name);
 	}
@@ -109,6 +119,11 @@ class UserDropdown extends React.PureComponent {
 
 	render() {
 		const { preview, account } = this.props;
+
+		if (!account) {
+			return null;
+		}
+
 		const menuHeight = {
 			height: `${this.state.menuHeight}px`,
 		};
@@ -168,10 +183,14 @@ class UserDropdown extends React.PureComponent {
 }
 
 UserDropdown.propTypes = {
-	account: PropTypes.object.isRequired,
+	account: PropTypes.object,
 	preview: PropTypes.object.isRequired,
 	switchAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
+};
+
+UserDropdown.defaultProps = {
+	account: null,
 };
 
 export default withRouter(connect(
