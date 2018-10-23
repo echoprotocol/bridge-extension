@@ -76,6 +76,7 @@
             }
         }
     }
+
     &.two {
         li {
             height: 50%;
@@ -84,6 +85,9 @@
     &.three {
         li {
             height: 33.3333%;
+            .balance-info {
+                margin-top: 0;
+            }
         }
     }
     
@@ -97,6 +101,7 @@
         justify-content: center;
         flex-direction: column;
         transition: background-color $speed;
+        cursor: pointer;
         &:hover {
             background-color: rgba(#fff, .2);
         }

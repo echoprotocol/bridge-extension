@@ -12,6 +12,8 @@ class UserIcon extends React.PureComponent {
 			<div
 				className={classnames(
 					'user-icon-wrap',
+					{ big: this.props.big },
+					{ medium: this.props.medium },
 					this.props.color,
 					this.props.avatar,
 				)}
@@ -28,9 +30,13 @@ class UserIcon extends React.PureComponent {
 UserIcon.propTypes = {
 	avatar: PropTypes.string.isRequired,
 	color: PropTypes.string,
+	big: PropTypes.bool,
+	medium: PropTypes.bool,
 };
 UserIcon.defaultProps = {
 	color: 'green',
+	big: false,
+	medium: false,
 };
 export default connect(
 	() => ({

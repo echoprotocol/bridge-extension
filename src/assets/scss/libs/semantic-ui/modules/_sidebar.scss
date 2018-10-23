@@ -17,7 +17,7 @@
 /* Sidebar Menu */
 .ui.sidebar {
   position: fixed;
-  top: 0;
+  top: 40px;
   left: 0;
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
@@ -28,11 +28,11 @@
           transform: translate3d(0, 0, 0);
   visibility: hidden;
   -webkit-overflow-scrolling: touch;
-  height: 100% !important;
-  max-height: 100%;
-  border-radius: 0em !important;
-  margin: 0em !important;
-  overflow-y: auto !important;
+  
+  height: calc(100% - 40px);
+  max-height: calc(100% - 40px);
+  border-radius: 0;
+  margin: 0em;
   z-index: 102;
 }
 
@@ -42,39 +42,6 @@
           backface-visibility: hidden;
 }
 
-/*--------------
-   Direction
----------------*/
-
-.ui.left.sidebar {
-  right: auto;
-  left: 0px;
-  -webkit-transform: translate3d(-100%, 0, 0);
-          transform: translate3d(-100%, 0, 0);
-}
-.ui.right.sidebar {
-  right: 0px !important;
-  left: auto !important;
-  -webkit-transform: translate3d(100%, 0%, 0);
-          transform: translate3d(100%, 0%, 0);
-}
-.ui.top.sidebar,
-.ui.bottom.sidebar {
-  width: 100% !important;
-  height: auto !important;
-}
-.ui.top.sidebar {
-  top: 0px !important;
-  bottom: auto !important;
-  -webkit-transform: translate3d(0, -100%, 0);
-          transform: translate3d(0, -100%, 0);
-}
-.ui.bottom.sidebar {
-  top: auto !important;
-  bottom: 0px !important;
-  -webkit-transform: translate3d(0, 100%, 0);
-          transform: translate3d(0, 100%, 0);
-}
 
 /*--------------
      Pushable
@@ -82,7 +49,6 @@
 
 .pushable {
   height: 100%;
-  overflow-x: hidden;
   padding: 0em !important;
 }
 
@@ -110,10 +76,10 @@ body.pushable {
   position: fixed;
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
-  -webkit-transition: -webkit-transform 500ms ease;
-  transition: -webkit-transform 500ms ease;
-  transition: transform 500ms ease;
-  transition: transform 500ms ease, -webkit-transform 500ms ease;
+  -webkit-transition: -webkit-transform 200ms ease;
+  transition: -webkit-transform 200ms ease;
+  transition: transform 200ms ease;
+  transition: transform 200ms ease, -webkit-transform 200ms ease;
   will-change: transform;
   z-index: 101;
 }
@@ -122,16 +88,24 @@ body.pushable {
      Page
 ---------------*/
 
+.ui.visible.sidebar ~ .pusher {
+    * {
+        pointer-events: none !important;
+        cursor: not-allowed !important;
+        touch-action: none !important;
+    }
+}
+
 .pushable > .pusher {
   position: relative;
   -webkit-backface-visibility: hidden;
           backface-visibility: hidden;
   overflow: hidden;
-  min-height: 100%;
-  -webkit-transition: -webkit-transform 500ms ease;
-  transition: -webkit-transform 500ms ease;
-  transition: transform 500ms ease;
-  transition: transform 500ms ease, -webkit-transform 500ms ease;
+//   min-height: calc(100% - 40px);
+  -webkit-transition: -webkit-transform 200ms ease;
+  transition: -webkit-transform 200ms ease;
+  transition: transform 200ms ease;
+  transition: transform 200ms ease, -webkit-transform 200ms ease;
   z-index: 2;
 }
 body.pushable > .pusher {
@@ -155,19 +129,12 @@ body.pushable > .pusher {
   background-color: rgba(0, 0, 0, 0.4);
   overflow: hidden;
   opacity: 0;
-  -webkit-transition: opacity 500ms;
-  transition: opacity 500ms;
+  -webkit-transition: opacity 200ms;
+  transition: opacity 200ms;
   will-change: opacity;
   z-index: 1000;
 }
 
-/*--------------
-    Coupling
----------------*/
-
-.ui.sidebar.menu .item {
-  border-radius: 0em !important;
-}
 
 
 /*******************************
@@ -263,25 +230,10 @@ body.pushable > .pusher {
 
 
 /* Left / Right */
-.ui.thin.left.sidebar,
-.ui.thin.right.sidebar {
-  width: 150px;
-}
-.ui[class*="very thin"].left.sidebar,
-.ui[class*="very thin"].right.sidebar {
-  width: 60px;
-}
+
 .ui.left.sidebar,
 .ui.right.sidebar {
-  width: 260px;
-}
-.ui.wide.left.sidebar,
-.ui.wide.right.sidebar {
-  width: 350px;
-}
-.ui[class*="very wide"].left.sidebar,
-.ui[class*="very wide"].right.sidebar {
-  width: 475px;
+  width: 320px;
 }
 
 /* Left Visible */
@@ -365,10 +317,10 @@ body.pushable > .pusher {
 /* Animation */
 .animating.ui.overlay.sidebar,
 .ui.visible.overlay.sidebar {
-  -webkit-transition: -webkit-transform 500ms ease;
-  transition: -webkit-transform 500ms ease;
-  transition: transform 500ms ease;
-  transition: transform 500ms ease, -webkit-transform 500ms ease;
+  -webkit-transition: -webkit-transform 200ms ease;
+  transition: -webkit-transform 200ms ease;
+  transition: transform 200ms ease;
+  transition: transform 200ms ease, -webkit-transform 200ms ease;
 }
 
 /* End - Sidebar */
@@ -403,10 +355,10 @@ body.pushable > .pusher {
 
 /* Initial */
 .ui.push.sidebar {
-  -webkit-transition: -webkit-transform 500ms ease;
-  transition: -webkit-transform 500ms ease;
-  transition: transform 500ms ease;
-  transition: transform 500ms ease, -webkit-transform 500ms ease;
+  -webkit-transition: -webkit-transform 200ms ease;
+  transition: -webkit-transform 200ms ease;
+  transition: transform 200ms ease;
+  transition: transform 200ms ease, -webkit-transform 200ms ease;
   z-index: 102;
 }
 
@@ -450,10 +402,10 @@ body.pushable > .pusher {
 .ui.visible.uncover.sidebar {
   -webkit-transform: translate3d(0, 0, 0);
           transform: translate3d(0, 0, 0);
-  -webkit-transition: -webkit-transform 500ms ease;
-  transition: -webkit-transform 500ms ease;
-  transition: transform 500ms ease;
-  transition: transform 500ms ease, -webkit-transform 500ms ease;
+  -webkit-transition: -webkit-transform 200ms ease;
+  transition: -webkit-transform 200ms ease;
+  transition: transform 200ms ease;
+  transition: transform 200ms ease, -webkit-transform 200ms ease;
 }
 
 /*--------------
@@ -486,10 +438,10 @@ body.pushable > .pusher {
 
 /* Animation */
 .ui.animating.slide.along.sidebar {
-  -webkit-transition: -webkit-transform 500ms ease;
-  transition: -webkit-transform 500ms ease;
-  transition: transform 500ms ease;
-  transition: transform 500ms ease, -webkit-transform 500ms ease;
+  -webkit-transition: -webkit-transform 200ms ease;
+  transition: -webkit-transform 200ms ease;
+  transition: transform 200ms ease;
+  transition: transform 200ms ease, -webkit-transform 200ms ease;
 }
 
 /* End */
@@ -528,10 +480,10 @@ body.pushable > .pusher {
 
 /* Animation */
 .ui.animating.slide.out.sidebar {
-  -webkit-transition: -webkit-transform 500ms ease;
-  transition: -webkit-transform 500ms ease;
-  transition: transform 500ms ease;
-  transition: transform 500ms ease, -webkit-transform 500ms ease;
+  -webkit-transition: -webkit-transform 200ms ease;
+  transition: -webkit-transform 200ms ease;
+  transition: transform 200ms ease;
+  transition: transform 200ms ease, -webkit-transform 200ms ease;
 }
 
 /* End */
@@ -547,10 +499,10 @@ body.pushable > .pusher {
 
 /* Initial */
 .ui.scale.down.sidebar {
-  -webkit-transition: -webkit-transform 500ms ease;
-  transition: -webkit-transform 500ms ease;
-  transition: transform 500ms ease;
-  transition: transform 500ms ease, -webkit-transform 500ms ease;
+  -webkit-transition: -webkit-transform 200ms ease;
+  transition: -webkit-transform 200ms ease;
+  transition: transform 200ms ease;
+  transition: transform 200ms ease, -webkit-transform 200ms ease;
   z-index: 102;
 }
 
@@ -592,10 +544,10 @@ body.pushable > .pusher {
 
 /* Animation */
 .ui.animating.scale.down > .visible.ui.sidebar {
-  -webkit-transition: -webkit-transform 500ms ease;
-  transition: -webkit-transform 500ms ease;
-  transition: transform 500ms ease;
-  transition: transform 500ms ease, -webkit-transform 500ms ease;
+  -webkit-transition: -webkit-transform 200ms ease;
+  transition: -webkit-transform 200ms ease;
+  transition: transform 200ms ease;
+  transition: transform 200ms ease, -webkit-transform 200ms ease;
 }
 .ui.visible.scale.down.sidebar ~ .pusher,
 .ui.animating.scale.down.sidebar ~ .pusher {
@@ -614,15 +566,3 @@ body.pushable > .pusher {
   -webkit-transform: scale(0.75);
           transform: scale(0.75);
 }
-
-
-/*******************************
-         Theme Overrides
-*******************************/
-
-
-
-/*******************************
-         Site Overrides
-*******************************/
-

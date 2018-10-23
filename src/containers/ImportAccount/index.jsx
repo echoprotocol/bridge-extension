@@ -64,14 +64,20 @@ class ImportAccount extends React.Component {
 	}
 
 	render() {
-		const { nameError, passwordError, loading } = this.props;
+		const {
+			nameError, passwordError, loading, accounts,
+		} = this.props;
 		const { name, password, success } = this.state;
 
 		if (success) {
+			const { icon } = accounts.find((i) => i.name === name);
+
 			return (
 				<WelcomeComponent
 					name={name}
+					icon={icon}
 					proceed={() => this.onProceedClick()}
+					unmount={() => this.setState({ name: '', password: '', success: false })}
 				/>
 			);
 		}
@@ -102,6 +108,7 @@ ImportAccount.propTypes = {
 	loading: PropTypes.bool.isRequired,
 	location: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
+	accounts: PropTypes.object.isRequired,
 	importAccount: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
 	clearError: PropTypes.func.isRequired,
@@ -112,6 +119,7 @@ export default connect(
 		loading: state.form.getIn([FORM_SIGN_IN, 'loading']),
 		nameError: state.form.getIn([FORM_SIGN_IN, 'nameError']),
 		passwordError: state.form.getIn([FORM_SIGN_IN, 'passwordError']),
+		accounts: state.global.get('accounts'),
 	}),
 	(dispatch) => ({
 		importAccount: (name, password) => dispatch(importAccount(name, password)),
