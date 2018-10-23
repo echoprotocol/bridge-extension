@@ -66,11 +66,7 @@ class NetworkDropdown extends React.PureComponent {
 	onSwitchAccount(e, accountName, network) {
 		e.stopPropagation();
 		e.preventDefault();
-		const { accounts, network: activeNetwork } = this.props;
-
-		if (!accounts.get(activeNetwork.get('name')).find((i) => i.name === accountName)) {
-			return;
-		}
+		const { network: activeNetwork } = this.props;
 
 		const { account } = this.props;
 
@@ -113,13 +109,13 @@ class NetworkDropdown extends React.PureComponent {
 	getAccounts(network) {
 		let { accounts } = this.props;
 
-		if (!accounts.size) {
+		if (!accounts && !accounts.size) {
 			return null;
 		}
 
 		accounts = accounts.get(network.name);
 
-		if (!accounts.size) {
+		if (!accounts) {
 			return null;
 		}
 
@@ -150,20 +146,24 @@ class NetworkDropdown extends React.PureComponent {
 
 		const name = network.get('name');
 
-		return networks.map((n, i) => (
-			<MenuItem
-				onClick={() => this.onChangeNetwork(n.name)}
-				key={n.name}
-				eventKey={i + eventKey}
-				active={n.name === name}
-			>
-				{custom && <Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(e, n.name)} />}
-				<span className="title">{n.name}</span>
-				<ul className="accounts">
-					{this.getAccounts(n) || 'No accounts'}
-				</ul>
-			</MenuItem>
-		));
+		return networks.map((n, i) => {
+			const accounts = this.getAccounts(n);
+
+			return (
+				<MenuItem
+					onClick={() => this.onChangeNetwork(n.name)}
+					key={n.name}
+					eventKey={i + eventKey}
+					active={n.name === name}
+				>
+					{custom && <Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(e, n.name)} />}
+					<span className="title">{n.name}</span>
+					<ul className="accounts">
+						{(accounts && accounts.length) ? accounts : 'No accounts'}
+					</ul>
+				</MenuItem>
+			);
+		});
 	}
 
 	closeDropDown() {

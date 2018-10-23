@@ -46,11 +46,6 @@ export const NETWORKS = [
 		registrator: 'https://echo-tmp-wallet.pixelplex.io/faucet/registration',
 		url: 'wss://echo-devnet-node.pixelplex.io/ws',
 	},
-	{
-		name: 'testnet',
-		registrator: 'https://echo-tmp-wallet.pixelplex.io/faucet/registration',
-		url: 'wss://echo-devnet-node.pixelplex.io/ws',
-	},
 ];
 
 export const ACCOUNT_COLORS = ['green', 'yellow', 'lemon', 'blue', 'sky', 'pink', 'red'];
