@@ -75,7 +75,7 @@ class CurrencySelect extends React.Component {
 								<div
 									className="user-scroll"
 									// style={{ height: '165px' }}
-									style={{ height: '112px' }}
+									style={{ height: '118px' }}
 								>
 									<CustomScroll
 										flex="1"
