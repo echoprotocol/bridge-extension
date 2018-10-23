@@ -62,9 +62,6 @@
         input {
             height: 30px;
             padding-bottom: 15px;
-            &[type="password"] {
-                height: 40px;
-            }
         }
 
         &.eye {
