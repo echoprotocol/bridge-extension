@@ -3,31 +3,19 @@ import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
 import classnames from 'classnames';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+// import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import { RECIEVE_PATH, SEND_PATH } from '../../constants/RouterConstants';
-// import { Dropdown, MenuItem } from 'react-bootstrap';
+
+import FormatHelper from '../../helpers/FormatHelper';
 
 class Wallet extends React.Component {
 
-	renderWallet() {
-		const balances = [
-			{
-				value: '0.000',
-				key: 'ECHO',
-				type: 'asset',
-			},
-			{
-				value: '234.09',
-				key: 'ZSHC',
-				type: 'asset',
-			},
-			{
-				value: '0.000392',
-				key: 'EBTC',
-				type: 'token',
-			},
-
-		];
+	render() {
+		const { assets, balances, account } = this.props;
+		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size;
 
 		return (
 			<React.Fragment>
@@ -46,7 +34,7 @@ class Wallet extends React.Component {
 					<div className="page">
 						<div className={classnames(
 							'scroll-wrap',
-							{ two: balances.length === 2 },
+							{ two: balancesCount === 2 },
 						)}
 						>
 							<CustomScroll
@@ -55,33 +43,37 @@ class Wallet extends React.Component {
 							>
 								<ul className={classnames(
 									'wallet-list',
-									{ one: balances.length === 1 },
-									{ two: balances.length === 2 },
-									{ three: balances.length === 3 },
+									{ one: balancesCount === 1 },
+									{ two: balancesCount === 2 },
+									{ three: balancesCount === 3 },
 								)}
 								>
 									{
+										balances.toArray().map((balance) => {
+											const asset = assets.get(balance.get('asset_type'));
 
-										balances.map((balance, i) => {
-											const id = i;
+											if (!asset || account.get('id') !== balance.get('owner')) {
+												return null;
+											}
+
 											return (
 
-												<li key={id}>
+												<li key={balance.get('id')}>
 													<div className="balance-info">
-														<span>{balance.value}</span>
-														<span>{balance.key}</span>
+														<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
+														<span>{asset.get('symbol')}</span>
 													</div>
-													{
-														balance.type === 'token' ?
-															<React.Fragment>
-																<Button className="btn-icon icon-closeBig" />
-																<div className="token-info">
-																	<span>ERC20</span>
-																	<span>TOKEN</span>
-																</div>
-															</React.Fragment> :
-															null
-													}
+													{/* { */}
+													{/* asset.type === 'token' ? */}
+													{/* <React.Fragment> */}
+													{/* <Button className="btn-icon icon-closeBig" /> */}
+													{/* <div className="token-info"> */}
+													{/* <span>ERC20</span> */}
+													{/* <span>TOKEN</span> */}
+													{/* </div> */}
+													{/* </React.Fragment> : */}
+													{/* null */}
+													{/* } */}
 												</li>
 
 											);
@@ -113,12 +105,23 @@ class Wallet extends React.Component {
 		);
 	}
 
-	render() {
-		return (
-			this.renderWallet()
-		);
-	}
-
 }
 
-export default Wallet;
+Wallet.propTypes = {
+	assets: PropTypes.object.isRequired,
+	balances: PropTypes.object.isRequired,
+	account: PropTypes.object,
+};
+
+Wallet.defaultProps = {
+	account: null,
+};
+
+export default connect(
+	(state) => ({
+		assets: state.balance.get('assets'),
+		balances: state.balance.get('balances'),
+		account: state.global.get('account'),
+	}),
+	() => ({}),
+)(Wallet);

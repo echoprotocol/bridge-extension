@@ -100,10 +100,13 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
  *
  * 	@param {String} field
  * 	@param {Any} value
+ * 	@param {String} networkName
  */
-export const setCryptoInfo = (field, value) => async (dispatch, getState) => {
+export const setCryptoInfo = (field, value, networkName) => async (dispatch, getState) => {
 	try {
-		const networkName = getState().global.getIn(['network', 'name']);
+		if (!networkName) {
+			networkName = getState().global.getIn(['network', 'name']);
+		}
 
 		await crypto.setInByNetwork(networkName, field, value);
 	} catch (err) {
@@ -117,10 +120,13 @@ export const setCryptoInfo = (field, value) => async (dispatch, getState) => {
  *  Get value by field in network storage
  *
  * 	@param {String} field
+ * 	@param {String} networkName
  */
-export const getCryptoInfo = (field) => async (dispatch, getState) => {
+export const getCryptoInfo = (field, networkName) => async (dispatch, getState) => {
 	try {
-		const networkName = getState().global.getIn(['network', 'name']);
+		if (!networkName) {
+			networkName = getState().global.getIn(['network', 'name']);
+		}
 
 		const value = await crypto.getInByNetwork(networkName, field);
 
@@ -138,9 +144,11 @@ export const getCryptoInfo = (field) => async (dispatch, getState) => {
  *
  * 	@param {String} field
  */
-export const removeCryptoInfo = (field) => async (dispatch, getState) => {
+export const removeCryptoInfo = (field, networkName) => async (dispatch, getState) => {
 	try {
-		const networkName = getState().global.getIn(['network', 'name']);
+		if (!networkName) {
+			networkName = getState().global.getIn(['network', 'name']);
+		}
 
 		await crypto.removeInByNetwork(networkName, field);
 	} catch (err) {
