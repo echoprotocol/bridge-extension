@@ -2,10 +2,10 @@ import {
 	CREATE_ACCOUNT_PATH,
 	CREATE_SUCCESS_PATH,
 	IMPORT_ACCOUNT_PATH,
+	WALLET_PATH,
 	IMPORT_SUCCESS_PATH,
 	TRANSACTIONS_PATH,
 	RECIEVE_PATH,
-	WALLET_PATH,
 	SEND_PATH,
 	BACKUP_PATH,
 } from './RouterConstants';
@@ -53,6 +53,10 @@ export const HEADER_TITLE = [
 	{
 		path: IMPORT_SUCCESS_PATH,
 	},
+	{
+		path: WALLET_PATH,
+		title: 'Wallet',
+	},
 ];
 
 export const NETWORKS = [
@@ -62,6 +66,8 @@ export const NETWORKS = [
 		url: 'wss://echo-devnet-node.pixelplex.io/ws',
 	},
 ];
+
+export const ACCOUNT_COLORS = ['green', 'yellow', 'lemon', 'blue', 'sky', 'pink', 'red'];
 
 export const TIMEOUT = 10 * 60 * 1000;
 export const RANDOM_SIZE = 2048;
@@ -73,3 +79,7 @@ export const CORE_ID = '1.3.0';
 export const GLOBAL_ID = '2.1.0';
 export const KEY_CODE_ENTER = 13;
 export const KEY_CODE_SPACE = 62;
+export const ICONS_COUNT = 15;
+export const ICON_COLORS_COUNT = 7;
+export const BASE_ICON = 1;
+export const BASE_ICON_COLOR = 'green';

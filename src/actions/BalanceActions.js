@@ -1,64 +1,92 @@
-import { List } from 'immutable';
-
 import BalanceReducer from '../reducers/BalanceReducer';
 
 import { fetchChain } from '../api/ChainApi';
 
-import { CORE_ID } from '../constants/GlobalConstants';
+/**
+ *  @method initAssetsBalances
+ *
+ * 	Initialization user's assets
+ *
+ */
+export const initAssetsBalances = () => async (dispatch, getState) => {
 
-export const getPreviewBalances = () => async (dispatch, getState) => {
-	/**
-     *  Preview structure
-     *  preview: [{
-     *  	balance: {
-     *  		id,
-     *  		amount,
-     *  	 	symbol,
-     *  		precision,
-     *  	},
-     *  	name,
-	 *  	icon,
-     *  }]
-     */
+	const balancesPromises = [];
+	const assetsPromises = [];
+	const balancesState = getState().balance;
+	const stateAssets = balancesState.get('assets');
+	const stateBalances = balancesState.get('balances');
 
 	const accounts = getState().global.get('accounts');
+	const activeNetworkName = getState().global.getIn(['network', 'name']);
 
-	if (!accounts) { return; }
+	if (!accounts.get(activeNetworkName)) {
+		return false;
+	}
 
-	const fetchedAsset = await fetchChain(CORE_ID);
+	const allPromises = accounts.get(activeNetworkName).map(async (account) => {
 
-	const balances = accounts.map(async ({ name, icon }) => {
-		const account = await fetchChain(name);
-		const balance = account.getIn(['balances', CORE_ID]);
+		const userBalances = (await fetchChain(account.name)).get('balances');
 
-		const preview = {
-			balance: {
-				amount: 0,
-				symbol: fetchedAsset.get('symbol'),
-				precision: fetchedAsset.get('precision'),
-			},
-			name,
-			icon,
-		};
+		userBalances.forEach((value) => balancesPromises.push(fetchChain(value)));
+		userBalances.mapKeys((value) => assetsPromises.push(fetchChain(value)));
 
-		if (account && account.get('balances') && balance) {
-			const balanceAmount = (await fetchChain(balance)).get('balance');
-			preview.balance.amount = balanceAmount || 0;
-			preview.balance.id = balance;
-		}
+		const balancesPromise = Promise.all(balancesPromises);
+		const assetsPromise = Promise.all(assetsPromises);
 
-		return preview;
+		return Promise.all([balancesPromise, assetsPromise]);
+
 	});
 
-	balances.reduce(
-		(resolved, balance) =>
-			resolved.then((array) => balance.then((result) => [...array, result]).catch(() => array)),
-		Promise.resolve([]),
-	).then((result) => {
-		dispatch(BalanceReducer.actions.set({ field: 'preview', value: new List(result) }));
+	const balancesAssets = await Promise.all(allPromises);
+
+	let balances = stateBalances;
+	let assets = stateAssets;
+
+	balancesAssets.forEach(([balancesResult, assetsResult]) => {
+
+		balancesResult.forEach((value) => {
+			balances = balances.set(value.get('id'), value);
+		});
+		assetsResult.forEach((value) => {
+			assets = assets.set(value.get('id'), value);
+		});
+
 	});
+
+	if ((stateAssets !== assets) || (stateBalances !== balances)) {
+		dispatch(BalanceReducer.actions.setAssets({
+			balances,
+			assets,
+		}));
+	}
+
+	return true;
+
 };
 
-export const initBalances = () => async (dispatch) => {
-	await dispatch(getPreviewBalances());
+/**
+ *  @method removeBalances
+ *
+ * 	Remove balances and assets by deleted user's id
+ *
+ * 	@param {String} accountId
+ */
+export const removeBalances = (accountId) => (dispatch, getState) => {
+	let balances = getState().balance.get('balances');
+	let assets = getState().balance.get('assets');
+
+	balances.forEach((balance) => {
+		if (balance.get('owner') === accountId) {
+			balances = balances.delete(balance.get('id'));
+
+			if (!balances.find((val) => val.get('asset_type') === balance.get('asset_type'))) {
+				assets = assets.delete(balance.get('asset_type'));
+			}
+		}
+	});
+
+	dispatch(BalanceReducer.actions.setAssets({
+		balances,
+		assets,
+	}));
 };
