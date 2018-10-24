@@ -1,0 +1,62 @@
+.wallet-send-block {
+    width: calc(100% - 55px);
+    margin: 0 auto;
+    padding-top: 35px;
+
+    .input-wrap + .input-wrap {
+        margin-top: 19px;
+        input {
+            &::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
+                letter-spacing: 1.5px;
+            }
+            
+            &:-ms-input-placeholder { /* Internet Explorer 10-11 */
+                letter-spacing: 1.5px;
+                
+            }
+            
+            &::-ms-input-placeholder { /* Microsoft Edge */
+                letter-spacing: 1.5px;
+            }
+        }
+        &.textarea-wrap {
+            margin-top: 22px;
+        }
+    }
+
+    .input-wrap {
+        position: relative;
+        
+        .input-image {
+            position: absolute;
+            top: 14px;
+            left: 0;
+        }
+
+
+        .input {
+            height: 43px;
+
+            &.readOnly {
+                height: 46px;
+
+                input {
+                    padding-bottom: 11px;
+                }
+            }
+            .label {
+                letter-spacing: 0.3px;
+            }
+        }
+
+        input {
+            padding-bottom: 5px;
+        }
+    }
+
+    .btn-in-light {
+        width: 200px;
+        margin: 46px auto 25px;
+        display: block;
+    }
+}

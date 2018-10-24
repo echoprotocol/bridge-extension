@@ -2,6 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Input, Button } from 'semantic-ui-react';
 import classnames from 'classnames';
+import UserIcon from '../UserIcon';
+import CurrencySelect from '../../components/CurrencySelect';
 
 class BridgeInput extends React.Component {
 
@@ -16,13 +18,13 @@ class BridgeInput extends React.Component {
 	}
 
 
-	componentDidUpdate() {
-		const { name, setFocus } = this.props;
-
-		if (setFocus) {
-			this[name].focus();
-		}
-	}
+	// componentDidUpdate() {
+	// 	const { name, setFocus } = this.props;
+	//
+	// 	if (setFocus) {
+	// 		this[name].focus();
+	// 	}
+	// }
 
 
 	onFocus() {
@@ -45,35 +47,36 @@ class BridgeInput extends React.Component {
 	}
 
 	renderError() {
+		return (<div className="message-error"> {this.props.errorText}</div>);
+	}
+
+	renderHint() {
+		const { hintText, hintClickable } = this.props;
+
 		return (
-			<React.Fragment>
-
-				<div className="message-error">
-					{ this.props.errorText}
-				</div>
-
-				<div className="message-hint">
-					{
-						this.props.exampleName ?
-							<React.Fragment>
-                                            You can try
-								<button
-									onClick={() => this.props.onClick}
-									className="btn-try"
-								> {this.props.exampleName}
-								</button>
-							</React.Fragment> :
-							this.props.exampleName
-					}
-				</div>
-			</React.Fragment>
+			<div className="message-hint">
+				{
+					hintClickable ?
+						<button onClick={(e) => this.props.onHintClick(e)} className="btn-try">
+							{hintText}
+						</button> : { hintText }
+				}
+			</div>
 		);
+	}
 
+	renderImage(color, id) {
+		return (
+			<div className="input-image">
+				<UserIcon color={color} avatar={`ava${id}`} />
+			</div>
+		);
 	}
 
 	renderPrivacyEye() {
 		return (
 			<Button
+				tabIndex="-1"
 				className={
 					classnames(
 						'icon-eye',
@@ -85,10 +88,12 @@ class BridgeInput extends React.Component {
 			/>
 		);
 	}
+
 	render() {
 		const {
 			name, labelText, type, error, disabled, theme, value,
-			autoFocus, privacyEye, position, descriptionText,
+			autoFocus, privacyEye, position, descriptionText, leftLabel, placeholder,
+			defaultUp, readOnly, userIcon, innerDropdown, hintText, onKeyPress, onKeyDown,
 		} = this.props;
 
 		const {
@@ -97,7 +102,12 @@ class BridgeInput extends React.Component {
 
 		return (
 
-			<div className={classnames('input-wrap', theme)} >
+			<div className={classnames(
+				'input-wrap',
+				theme,
+				{ 'inner-dropdown': innerDropdown },
+			)}
+			>
 				<Input
 					value={value}
 					name={name}
@@ -107,22 +117,31 @@ class BridgeInput extends React.Component {
 					disabled={disabled}
 					autoFocus={autoFocus}
 					icon={privacyEye ? this.renderPrivacyEye() : false}
-					ref={(bridgeInput) => { this[name] = bridgeInput; }}
+					ref={(bridgeInput) => { this.bridgeInput = bridgeInput; }}
 					className={classnames(
 						{ up },
 						{ focused: focus },
 						{ filled },
 						{ eye: privacyEye },
+						{ 'left-label': leftLabel },
+						{ filled: defaultUp },
+						{ readOnly },
+						{ 'with-image': userIcon },
 						position,
 					)}
+					placeholder={placeholder}
+					// ref={this.handleRef}
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
+					action={(innerDropdown) && (<CurrencySelect data={innerDropdown} />)}
+					onKeyDown={(e) => (onKeyDown ? onKeyDown(e) : null)}
+					onKeyPress={(e) => onKeyPress && onKeyPress(e)}
 				/>
-
+				{ userIcon ? this.renderImage('green', 3) : null}
 				{ error ? this.renderError() : null }
+				{ hintText ? this.renderHint() : null }
 				{ descriptionText ? <div className="message-description">{ descriptionText }</div> : null }
-
 			</div>
 
 		);
@@ -137,16 +156,25 @@ BridgeInput.propTypes = {
 	error: PropTypes.bool,
 	disabled: PropTypes.bool,
 	autoFocus: PropTypes.bool,
+	leftLabel: PropTypes.bool,
+	defaultUp: PropTypes.bool,
+	readOnly: PropTypes.bool,
 	type: PropTypes.string,
+	placeholder: PropTypes.string,
 	position: PropTypes.string,
 	labelText: PropTypes.string,
 	errorText: PropTypes.string,
-	exampleName: PropTypes.string,
+	hintText: PropTypes.string,
+	hintClickable: PropTypes.bool,
 	descriptionText: PropTypes.string,
 	setFocus: PropTypes.bool,
 	onChange: PropTypes.func,
-	onClick: PropTypes.func,
 	privacyEye: PropTypes.bool,
+	innerDropdown: PropTypes.array,
+	userIcon: PropTypes.string,
+	onHintClick: PropTypes.func,
+	onKeyDown: PropTypes.func,
+	onKeyPress: PropTypes.func,
 };
 
 BridgeInput.defaultProps = {
@@ -156,16 +184,25 @@ BridgeInput.defaultProps = {
 	error: false,
 	disabled: false,
 	autoFocus: false,
+	leftLabel: false,
+	defaultUp: false,
+	readOnly: false,
 	type: 'text',
+	placeholder: '',
 	position: '',
 	labelText: '',
 	errorText: '',
-	exampleName: '',
+	hintText: '',
+	hintClickable: false,
 	descriptionText: '',
 	setFocus: false,
 	onChange: null,
-	onClick: null,
 	privacyEye: false,
+	innerDropdown: null,
+	userIcon: null,
+	onHintClick: null,
+	onKeyDown: null,
+	onKeyPress: null,
 };
 
 export default BridgeInput;

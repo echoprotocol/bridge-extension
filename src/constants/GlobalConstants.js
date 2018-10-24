@@ -3,6 +3,11 @@ import {
 	CREATE_SUCCESS_PATH,
 	IMPORT_ACCOUNT_PATH,
 	IMPORT_SUCCESS_PATH,
+	TRANSACTIONS_PATH,
+	RECIEVE_PATH,
+	WALLET_PATH,
+	SEND_PATH,
+	BACKUP_PATH,
 } from './RouterConstants';
 
 export const HEADER_TITLE = [
@@ -21,6 +26,26 @@ export const HEADER_TITLE = [
 			name: 'Create account',
 			value: CREATE_ACCOUNT_PATH,
 		},
+	},
+	{
+		path: TRANSACTIONS_PATH,
+		title: 'Transactions history',
+	},
+	{
+		path: WALLET_PATH,
+		title: 'Wallet',
+	},
+	{
+		path: RECIEVE_PATH,
+		title: 'Recieve',
+	},
+	{
+		path: SEND_PATH,
+		title: 'Send',
+	},
+	{
+		path: BACKUP_PATH,
+		title: 'Backup',
 	},
 	{
 		path: CREATE_SUCCESS_PATH,
@@ -43,4 +68,8 @@ export const RANDOM_SIZE = 2048;
 export const OWNER_KEY = 'owner';
 export const ACTIVE_KEY = 'active';
 export const MEMO_KEY = 'memo';
-export const ECHO = 'ECHO';
+export const CORE_SYMBOL = 'ECHO';
+export const CORE_ID = '1.3.0';
+export const GLOBAL_ID = '2.1.0';
+export const KEY_CODE_ENTER = 13;
+export const KEY_CODE_SPACE = 62;

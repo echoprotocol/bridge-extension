@@ -4,6 +4,14 @@ import extension from '../../extension/extensionizer';
 
 class Storage {
 
+	/**
+	 *  @method set
+	 *
+	 *  Set value by key in storage
+	 *
+	 *  @param {String} key
+	 *  @param {Any} value
+	 */
 	static set(key, value) {
 		if (extension.storage && extension.storage.local) {
 			const { local } = extension.storage;
@@ -28,6 +36,13 @@ class Storage {
 		return Promise.resolve();
 	}
 
+	/**
+	 *  @method get
+	 *
+	 *  Get value by key from storage
+	 *
+	 *  @param {String} key
+	 */
 	static get(key) {
 		if (extension.storage && extension.storage.local) {
 			const { local } = extension.storage;
@@ -39,7 +54,7 @@ class Storage {
 					if (err) {
 						reject(err);
 					} else {
-						resolve(result.key);
+						resolve(result[key]);
 					}
 				});
 			});
@@ -53,6 +68,13 @@ class Storage {
 		return Promise.resolve();
 	}
 
+	/**
+	 *  @method remove
+	 *
+	 *  Remove value by key from storage
+	 *
+	 *  @param {String} key
+	 */
 	static remove(key) {
 		if (extension.storage && extension.storage.local) {
 			const { local } = extension.storage;

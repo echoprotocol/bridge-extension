@@ -11,7 +11,7 @@ import {
 import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
 import { createAccount } from '../../actions/AuthActions';
-import { setFormError, clearForm } from '../../actions/FormActions';
+import { setValue, clearForm } from '../../actions/FormActions';
 
 import CreateComponent from './CreateComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
@@ -36,15 +36,28 @@ class CreateAccount extends React.Component {
 		}
 	}
 
+	componentWillReceiveProps(nextProps) {
+
+		if (this.state.wif && this.state.name) {
+
+			const account = nextProps.accounts.find((i) => i.name === this.state.name);
+
+			if (!account) {
+				this.resetState();
+			}
+		}
+	}
+
 	componentWillUnmount() {
 		this.props.clearForm();
 	}
 
+
 	onChangeName(name) {
 		this.setState({ name });
 
-		if (this.props.name.error) {
-			this.props.clearError();
+		if (this.props.name.error || this.props.name.example) {
+			this.props.setValue({ error: null, example: '' });
 		}
 	}
 
@@ -61,21 +74,32 @@ class CreateAccount extends React.Component {
 		this.props.history.push(INDEX_PATH);
 	}
 
+	resetState() {
+		this.setState({
+			name: '',
+			wif: '',
+		});
+	}
+
 	render() {
 		const { name, wif } = this.state;
 		const {
-			loading, name: { error, example }, location,
+			loading, name: { error, example }, location, accounts,
 		} = this.props;
 
 		const { success } = query.parse(location.search);
 
 		if (wif && success) {
+
+			const { icon } = accounts.find((i) => i.name === name);
+
 			return (
 				<WelcomeComponent
 					wif={wif}
 					name={name}
+					icon={icon}
 					proceed={() => this.onProceedClick()}
-					unmount={() => this.setState({ name: '', wif: '' })}
+					unmount={() => this.resetState()}
 				/>
 			);
 		}
@@ -99,8 +123,9 @@ CreateAccount.propTypes = {
 	name: PropTypes.object.isRequired,
 	location: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
+	accounts: PropTypes.object.isRequired,
 	createAccount: PropTypes.func.isRequired,
-	clearError: PropTypes.func.isRequired,
+	setValue: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
 };
 
@@ -108,10 +133,11 @@ export default connect(
 	(state) => ({
 		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
 		name: state.form.getIn([FORM_SIGN_UP, 'accountName']),
+		accounts: state.global.get('accounts'),
 	}),
 	(dispatch) => ({
 		createAccount: (name) => dispatch(createAccount(name)),
-		clearError: () => dispatch(setFormError(FORM_SIGN_UP, 'accountName', null)),
 		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
+		setValue: (value) => dispatch(setValue(FORM_SIGN_UP, 'accountName', value)),
 	}),
 )(CreateAccount);

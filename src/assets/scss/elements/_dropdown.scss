@@ -332,7 +332,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 9px 0 15px;
+            padding: 0 3px 0 15px;
             height: 40px;
             background-color: transparent;
             border: 0;
@@ -348,9 +348,12 @@
                 }
             }
             .icon {
-                margin: 3px 5px 0 7px;
+                margin: 4px 5px 0 7px;
                 color: #495b5f;
                 font-size: 11px;
+            }
+            .user-icon-wrap {
+                margin: 1px -1px 0 1px;
             }
     
         }
