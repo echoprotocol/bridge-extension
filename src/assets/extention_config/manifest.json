@@ -27,6 +27,15 @@
       "all_frames": true
     }
   ],
+  "externally_connectable": {
+    "matches": [
+      "<all_urls>",
+      "http://localhost:3000/",
+      "localhost:3000",
+      "http://*/*",
+      "https://*/*"
+    ]
+  },
   "permissions": [
     "storage",
     "clipboardWrite",
