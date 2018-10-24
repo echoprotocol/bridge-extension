@@ -10,17 +10,28 @@ class ImportComponent extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.state = {
+			focused: false,
+		};
+
 		this.nameRef = null;
 		this.passwordRef = null;
 	}
 
 
-	componentDidUpdate(prevProps, prevState) {
+	componentDidUpdate() {
 		const { nameError, passwordError } = this.props;
+
+		if (!this.state.focused) {
+			return false;
+		}
 
 		if (nameError && this.nameRef) {
 			this.nameRef.focus();
+		} else if (passwordError && this.passwordRef) {
+			this.passwordRef.focus();
 		}
+		return true;
 	}
 
 

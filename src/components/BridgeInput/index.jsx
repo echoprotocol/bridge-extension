@@ -41,8 +41,7 @@ class BridgeInput extends React.Component {
 	}
 
 	onChange(e) {
-		const { name } = this.props;
-		this.setState({ filled: !!this[name].inputRef.value });
+		this.setState({ filled: !!this.bridgeInput.inputRef.value });
 		this.props.onChange(e);
 	}
 
