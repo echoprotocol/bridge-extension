@@ -5,12 +5,14 @@ import GlobalReducer from '../reducers/GlobalReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
 import BalanceReducer from '../reducers/BalanceReducer';
 
+import { initAssetsBalances } from './BalanceActions';
+
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
 
 import echoService from '../services/echo';
 
 import { NETWORKS, GLOBAL_ID } from '../constants/GlobalConstants';
-import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
+import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 
 import storage from '../services/storage';
 
@@ -24,8 +26,12 @@ export const subscribe = () => (dispatch) => {
 	const { ChainStore } = echoService.getChainLib();
 	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
 		const value = ChainStore[origin];
+
 		dispatch(BlockchainReducer.actions.set({ field, value }));
 	});
+
+	dispatch(initAssetsBalances());
+
 };
 
 /**
@@ -37,13 +43,17 @@ export const connect = () => async (dispatch) => {
 		GlobalReducer.actions.set({ field: 'loading', value: true }),
 		GlobalReducer.actions.set({ field: 'connected', value: false }),
 	]));
+
 	try {
 		let network = await storage.get('current_network');
+
 		if (!network) {
 			[network] = NETWORKS;
 			await storage.set('current_network', network);
 		}
+
 		dispatch(GlobalReducer.actions.set({ field: 'network', value: new Map(network) }));
+
 		const networks = await storage.get('custom_networks');
 
 		if (networks) {
@@ -57,7 +67,6 @@ export const connect = () => async (dispatch) => {
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 
 		await fetchChain(GLOBAL_ID);
-
 	} catch (err) {
 		dispatch(batchActions([
 			GlobalReducer.actions.set({

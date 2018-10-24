@@ -4,7 +4,7 @@ import _ from 'lodash';
 
 const DEFAULT_LOCKED_FIELDS = Map({
 	account: null,
-	accounts: new List([]),
+	accounts: new Map(),
 });
 
 const DEFAULT_FIELDS = Map({
@@ -47,7 +47,10 @@ export default createModule({
 		},
 
 		logout: {
-			reducer: (state) => (_.cloneDeep(state).merge(DEFAULT_LOCKED_FIELDS)),
+			reducer: (state) => {
+				state = _.cloneDeep(state).merge(DEFAULT_LOCKED_FIELDS.get('account'));
+				return state;
+			},
 		},
 
 		lock: {

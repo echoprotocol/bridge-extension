@@ -36,6 +36,24 @@ class ImportAccount extends React.Component {
 		}
 	}
 
+	componentWillReceiveProps(nextProps) {
+		const { pathname: nextPath, search: nextSearch } = nextProps.location;
+		const { pathname, search } = this.props.location;
+
+		if ((`${nextPath}${nextSearch}` !== `${pathname}${search}`) && (`${nextPath}${nextSearch}` === IMPORT_ACCOUNT_PATH)) {
+			this.setState({ success: false });
+		}
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		const { success } = this.state;
+		const { success: prevSuccess } = prevState;
+
+		if (!success && (success !== prevSuccess)) {
+			this.props.history.push(IMPORT_ACCOUNT_PATH);
+		}
+	}
+
 	componentWillUnmount() {
 		this.props.clearForm();
 	}
@@ -65,17 +83,26 @@ class ImportAccount extends React.Component {
 
 	render() {
 		const {
-			nameError, passwordError, loading, accounts,
+			nameError, passwordError, loading, accounts, networkName,
 		} = this.props;
 		const { name, password, success } = this.state;
 
 		if (success) {
-			const { icon } = accounts.find((i) => i.name === name);
+			if (!accounts.get(networkName)) {
+				return null;
+			}
+
+			const account = accounts.get(networkName).find((i) => i.name === name);
+
+			if (!account) {
+				return null;
+			}
 
 			return (
 				<WelcomeComponent
 					name={name}
-					icon={icon}
+					icon={account.icon}
+					iconColor={account.iconColor}
 					proceed={() => this.onProceedClick()}
 					unmount={() => this.setState({ name: '', password: '', success: false })}
 				/>
@@ -109,6 +136,7 @@ ImportAccount.propTypes = {
 	location: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
 	accounts: PropTypes.object.isRequired,
+	networkName: PropTypes.string.isRequired,
 	importAccount: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
 	clearError: PropTypes.func.isRequired,
@@ -120,6 +148,7 @@ export default connect(
 		nameError: state.form.getIn([FORM_SIGN_IN, 'nameError']),
 		passwordError: state.form.getIn([FORM_SIGN_IN, 'passwordError']),
 		accounts: state.global.get('accounts'),
+		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
 		importAccount: (name, password) => dispatch(importAccount(name, password)),

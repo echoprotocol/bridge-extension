@@ -9,12 +9,14 @@ import CustomScroll from 'react-custom-scroll';
 import { withRouter } from 'react-router';
 import classnames from 'classnames';
 
-import { changeNetwork, deleteNetwork } from '../../actions/GlobalActions';
+import { changeNetwork, deleteNetwork, switchAccountNetwork, switchAccount } from '../../actions/GlobalActions';
 
 import { NETWORKS } from '../../constants/GlobalConstants';
 import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
 
 import GlobalReducer from '../../reducers/GlobalReducer';
+
+import UserIcon from '../UserIcon';
 
 class NetworkDropdown extends React.PureComponent {
 
@@ -61,6 +63,32 @@ class NetworkDropdown extends React.PureComponent {
 		this.closeDropDown();
 	}
 
+	onSwitchAccount(e, accountName, network) {
+		e.stopPropagation();
+		e.preventDefault();
+		const { network: activeNetwork } = this.props;
+
+		const { account } = this.props;
+
+		if (activeNetwork.get('name') === network.name) {
+			if (account.get('name') === accountName) {
+				this.closeDropDown();
+				return;
+			}
+			this.props.switchAccount(accountName);
+
+			this.closeDropDown();
+
+			return;
+		}
+
+		this.props.setGlobalLoad();
+
+		this.props.switchAccountNetwork(accountName, network);
+
+		this.closeDropDown();
+	}
+
 	setDDMenuHeight() {
 
 		const MAX_MENU_HEIGHT = 350;
@@ -78,27 +106,63 @@ class NetworkDropdown extends React.PureComponent {
 		return true;
 	}
 
+	getAccounts(network) {
+		let { accounts } = this.props;
+
+		if (!accounts && !accounts.size) {
+			return null;
+		}
+
+		accounts = accounts.get(network.name);
+
+		if (!accounts) {
+			return null;
+		}
+
+		return accounts
+			.toArray()
+			.slice(Math.max(accounts.size - 4, 0))
+			.map((account) =>
+				(
+					<li key={account.id}>
+						<div
+							role="button"
+							tabIndex="0"
+							onClick={(e) => this.onSwitchAccount(e, account.name, network)}
+							onKeyPress={(e) => this.onSwitchAccount(e, account.name, network)}
+						>
+							<UserIcon
+								avatar={`ava${account.icon}`}
+								color={account.iconColor}
+							/>
+						</div>
+					</li>
+				));
+	}
+
 	getNetworks(networks, eventKey = 0, custom = false) {
 		const { network } = this.props;
 
 		const name = network.get('name');
 
-		const options = networks.map((n, i) => (
-			<MenuItem
-				onClick={() => this.onChangeNetwork(n.name)}
-				key={n.name}
-				eventKey={i + eventKey}
-				active={n.name === name}
-			>
-				{custom && <Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(e, n.name)} />}
-				<span className="title">{n.name}</span>
-				<ul className="accounts">
-					<li>No accounts</li>
-				</ul>
-			</MenuItem>
-		));
+		return networks.map((n, i) => {
+			const accounts = this.getAccounts(n);
 
-		return options;
+			return (
+				<MenuItem
+					onClick={() => this.onChangeNetwork(n.name)}
+					key={n.name}
+					eventKey={i + eventKey}
+					active={n.name === name}
+				>
+					{custom && <Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(e, n.name)} />}
+					<span className="title">{n.name}</span>
+					<ul className="accounts">
+						{(accounts && accounts.length) ? accounts : 'No accounts'}
+					</ul>
+				</MenuItem>
+			);
+		});
 	}
 
 	closeDropDown() {
@@ -181,15 +245,20 @@ class NetworkDropdown extends React.PureComponent {
 NetworkDropdown.propTypes = {
 	network: PropTypes.object.isRequired,
 	networks: PropTypes.object.isRequired,
+	accounts: PropTypes.object.isRequired,
+	account: PropTypes.object,
 	changeNetwork: PropTypes.func.isRequired,
 	deleteNetwork: PropTypes.func.isRequired,
 	setGlobalLoad: PropTypes.func.isRequired,
+	switchAccountNetwork: PropTypes.func.isRequired,
+	switchAccount: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	connected: PropTypes.bool,
 };
 
 NetworkDropdown.defaultProps = {
 	connected: false,
+	account: null,
 };
 
 export default withRouter(connect(
@@ -197,11 +266,15 @@ export default withRouter(connect(
 		network: state.global.get('network'),
 		networks: state.global.get('networks'),
 		connected: state.global.get('connected'),
+		accounts: state.global.get('accounts'),
+		account: state.global.get('account'),
 	}),
 	(dispatch) => ({
 		changeNetwork: (network) => dispatch(changeNetwork(network)),
 		deleteNetwork: (network) => dispatch(deleteNetwork(network)),
 		setGlobalLoad: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
+		switchAccountNetwork: (name, network) => dispatch(switchAccountNetwork(name, network)),
+		switchAccount: (name) => dispatch(switchAccount(name)),
 	}),
 )(NetworkDropdown));
 
