@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withRouter } from 'react-router';
+import CustomScroll from 'react-custom-scroll';
 
 import { clearForm, setFormValue } from '../../actions/FormActions';
 import { addNetwork } from '../../actions/GlobalActions';
@@ -120,10 +121,17 @@ class AddNetwork extends React.Component {
 						<span className="link-text">Return</span>
 					</a>
 				</div>
-				<div className="page-wrap">
-					{
-						this.renderForm()
-					}
+				<div className="networks-scroll">
+					<CustomScroll
+						flex="1"
+						heightRelativeToParent="calc(100%)"
+					>
+						<div className="page-wrap">
+							{
+								this.renderForm()
+							}
+						</div>
+					</CustomScroll>
 				</div>
 
 			</React.Fragment>
