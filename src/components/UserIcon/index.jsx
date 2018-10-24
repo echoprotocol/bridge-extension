@@ -48,6 +48,7 @@ class UserIcon extends React.PureComponent {
 					{ active: this.props.active },
 					this.props.color,
 				)}
+				onClick={this.props.onChangeIcon && (() => this.props.onChangeIcon())}
 			>
 				<div className="content">
 					<i
@@ -74,6 +75,7 @@ UserIcon.propTypes = {
 	select: PropTypes.bool,
 	active: PropTypes.bool,
 	tabSelect: PropTypes.bool,
+	onChangeIcon: PropTypes.func,
 
 };
 UserIcon.defaultProps = {
@@ -84,6 +86,7 @@ UserIcon.defaultProps = {
 	select: false,
 	active: false,
 	tabSelect: false,
+	onChangeIcon: null,
 
 };
 export default connect(

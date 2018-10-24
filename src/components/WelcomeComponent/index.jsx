@@ -1,14 +1,21 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router';
 
 import BridgeBtnCopy from '../BridgeBtnCopy';
 import UserIcon from '../UserIcon';
+
+import { SETTINGS_ACCOUNT_PATH } from '../../constants/RouterConstants';
 
 class WelcomeComponent extends React.Component {
 
 	componentWillUnmount() {
 		this.props.unmount();
+	}
+
+	onChangeIcon() {
+		this.props.history.push(SETTINGS_ACCOUNT_PATH);
 	}
 
 	render() {
@@ -19,7 +26,13 @@ class WelcomeComponent extends React.Component {
 		return (
 			<div className="welcome-wrap">
 
-				<UserIcon color={iconColor} animationChange size="big" avatar={`ava${icon}`} />
+				<UserIcon
+					color={iconColor}
+					animationChange
+					size="big"
+					avatar={`ava${icon}`}
+					onChangeIcon={() => this.onChangeIcon()}
+				/>
 
 				<div className="page-wrap" >
 					<div className="page">
@@ -76,6 +89,7 @@ WelcomeComponent.propTypes = {
 	iconColor: PropTypes.string.isRequired,
 	unmount: PropTypes.func.isRequired,
 	proceed: PropTypes.func.isRequired,
+	history: PropTypes.object.isRequired,
 };
 
-export default WelcomeComponent;
+export default withRouter(WelcomeComponent);
