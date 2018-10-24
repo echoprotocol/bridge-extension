@@ -40,12 +40,22 @@ class CreateAccount extends React.Component {
 	componentWillReceiveProps(nextProps) {
 
 		if (this.state.wif && this.state.name) {
+			const { accounts, networkName } = nextProps;
 
-			const account = nextProps.accounts.find((i) => i.name === this.state.name);
+			const account = accounts.get(networkName).find((i) => i.name === this.state.name);
 
 			if (!account) {
 				this.resetState();
 			}
+		}
+	}
+
+	componentDidUpdate(prevProps, prevState) {
+		const { wif } = this.state;
+		const { wif: prevWif } = prevState;
+
+		if (!wif && (wif !== prevWif)) {
+			this.props.history.push(CREATE_ACCOUNT_PATH);
 		}
 	}
 
@@ -64,7 +74,6 @@ class CreateAccount extends React.Component {
 
 	async onCreateAccount() {
 		const wif = await this.props.createAccount(this.state.name);
-
 		if (wif) {
 			this.setState({ wif });
 			this.props.history.push(CREATE_SUCCESS_PATH);
@@ -85,20 +94,28 @@ class CreateAccount extends React.Component {
 	render() {
 		const { name, wif } = this.state;
 		const {
-			loading, name: { error, example }, location, accounts,
+			loading, name: { error, example }, location, accounts, networkName,
 		} = this.props;
 
 		const { success } = query.parse(location.search);
 
 		if (wif && success) {
+			if (!accounts.get(networkName)) {
+				return null;
+			}
 
-			const { icon } = accounts.find((i) => i.name === name);
+			const account = accounts.get(networkName).find((i) => i.name === name);
+
+			if (!account) {
+				return null;
+			}
 
 			return (
 				<WelcomeComponent
 					wif={wif}
 					name={name}
-					icon={icon}
+					icon={account.icon}
+					iconColor={account.iconColor}
 					proceed={() => this.onProceedClick()}
 					unmount={() => this.resetState()}
 				/>
@@ -125,6 +142,7 @@ CreateAccount.propTypes = {
 	location: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
 	accounts: PropTypes.object.isRequired,
+	networkName: PropTypes.string.isRequired,
 	createAccount: PropTypes.func.isRequired,
 	setValue: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
@@ -135,6 +153,7 @@ export default connect(
 		loading: state.form.getIn([FORM_SIGN_UP, 'loading']),
 		name: state.form.getIn([FORM_SIGN_UP, 'accountName']),
 		accounts: state.global.get('accounts'),
+		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
 		createAccount: (name) => dispatch(createAccount(name)),

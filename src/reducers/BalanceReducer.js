@@ -1,8 +1,9 @@
 import { createModule } from 'redux-modules';
-import { Map, List } from 'immutable';
+import { Map } from 'immutable';
 
 const DEFAULT_FIELDS = Map({
-	preview: new List([]),
+	balances: new Map({}),
+	assets: new Map({}),
 });
 
 export default createModule({
@@ -22,6 +23,14 @@ export default createModule({
 				Object.keys(payload.params).forEach((field) => {
 					state = state.setIn([payload.field, field], payload.params[field]);
 				});
+
+				return state;
+			},
+		},
+
+		setAssets: {
+			reducer: (state, { payload }) => {
+				state = state.set('balances', payload.balances).set('assets', payload.assets);
 
 				return state;
 			},

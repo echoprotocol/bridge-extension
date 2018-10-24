@@ -6,10 +6,12 @@ import GlobalReducer from '../reducers/GlobalReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
 import BalanceReducer from '../reducers/BalanceReducer';
 
+import { initAssetsBalances } from './BalanceActions';
+
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
 
 import { NETWORKS, GLOBAL_ID } from '../constants/GlobalConstants';
-import { ChainStoreCacheNames } from '../constants/ChainStoreConstants';
+import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 
 import storage from '../services/storage';
 
@@ -20,10 +22,15 @@ import FormatHelper from '../helpers/FormatHelper';
  * @returns {Function}
  */
 export const subscribe = () => (dispatch) => {
+
 	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
 		const value = ChainStore[origin];
+
 		dispatch(BlockchainReducer.actions.set({ field, value }));
 	});
+
+	dispatch(initAssetsBalances());
+
 };
 
 /**
@@ -59,7 +66,6 @@ export const connect = () => async (dispatch) => {
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 
 		await fetchChain(GLOBAL_ID);
-
 	} catch (err) {
 		dispatch(batchActions([
 			GlobalReducer.actions.set({
