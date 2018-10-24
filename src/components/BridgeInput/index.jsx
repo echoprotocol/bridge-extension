@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Input, Button } from 'semantic-ui-react';
 import classnames from 'classnames';
 import UserIcon from '../UserIcon';
-import CurrencySelect from '../../components/CurrencySelect';
+import CurrencySelect from '../CurrencySelect/index';
 
 class BridgeInput extends React.Component {
 
@@ -118,6 +118,7 @@ class BridgeInput extends React.Component {
 						{ readOnly },
 						{ 'with-image': userIcon },
 						position,
+						{ 'visible-pas': (privacyEye && showPas) },
 					)}
 					placeholder={placeholder}
 					// ref={this.handleRef}

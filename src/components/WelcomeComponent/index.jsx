@@ -18,7 +18,9 @@ class WelcomeComponent extends React.Component {
 
 		return (
 			<div className="welcome-wrap">
-				<UserIcon color={iconColor} big avatar={`ava${icon}`} />
+
+				<UserIcon color={iconColor} animationChange size="big" avatar={`ava${icon}`} />
+
 				<div className="page-wrap" >
 					<div className="page">
 						<div className="hi-text">

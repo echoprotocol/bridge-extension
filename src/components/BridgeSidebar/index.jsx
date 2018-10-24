@@ -31,7 +31,7 @@ class BridgeSidebar extends React.PureComponent {
 							<UserIcon
 								color="green"
 								avatar="ava1"
-								medium
+								size="medium"
 							/>
 							<div className="name">Homersimpson46</div>
 						</div>

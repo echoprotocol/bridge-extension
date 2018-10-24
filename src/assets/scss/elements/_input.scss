@@ -90,18 +90,22 @@
         input {
             height: 30px;
             padding-bottom: 15px;
-            &[type="password"] {
-                height: 40px;
-            }
         }
 
         &.eye {
             input {
-                padding: 0 30px 0 30px;
+                padding: 0 30px 8px 30px;
+
             }
+
             .icon-eye {
                 display: block;
 
+            }
+        }
+        &.visible-pas {
+            input {
+                padding: 0 30px 10px 32px;
             }
         }
 

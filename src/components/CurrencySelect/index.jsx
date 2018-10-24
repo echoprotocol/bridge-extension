@@ -87,8 +87,9 @@ class CurrencySelect extends React.Component {
 													<div className="title">{elem.title}</div>
 													<ul>
 														{
-															elem.list.map((text) => (
+															elem.list.map((text, i) => (
 																<MenuItem
+																	eventKey={i}
 																	key={Math.random()}
 																	onClick={(e) => { this.handleClick(text); e.preventDefault(); }}
 																>
