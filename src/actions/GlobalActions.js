@@ -1,4 +1,5 @@
 import { Map, List } from 'immutable';
+import { batchActions } from 'redux-batched-actions';
 
 import { initCrypto, setCryptoInfo, getCryptoInfo, removeCryptoInfo } from './CryptoActions';
 
@@ -370,4 +371,40 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
 export const globalInit = () => async (dispatch) => {
 	await dispatch(initCrypto());
 	await dispatch(connect());
+};
+
+/**
+ *  @method changeAccountIcon
+ *
+ * 	Change account icon and it's color
+ *
+ *  @param {Number} icon
+ *  @param {String} iconColor
+ */
+export const changeAccountIcon = (icon, iconColor) => async (dispatch, getState) => {
+	const networkName = getState().global.getIn(['network', 'name']);
+	let account = getState().global.get('account');
+	let accounts = getState().global.get('accounts');
+
+	accounts = accounts.set(
+		networkName,
+		accounts.get(networkName).map((i) => {
+			if (i.name === account.get('name')) {
+				return { ...i, icon, iconColor };
+			}
+			return i;
+		}),
+	);
+
+	account = account.set('icon', icon).set('iconColor', iconColor);
+
+	try {
+		dispatch(batchActions([
+			setCryptoInfo('accounts', accounts.get(networkName)),
+			set('accounts', accounts),
+			set('account', account),
+		]));
+	} catch (err) {
+		dispatch(set('error', FormatHelper.formatError(err)));
+	}
 };
