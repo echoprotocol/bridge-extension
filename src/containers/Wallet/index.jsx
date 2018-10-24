@@ -2,6 +2,9 @@ import React from 'react';
 import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
 import classnames from 'classnames';
+import { Link } from 'react-router-dom';
+
+import { RECIEVE_PATH, SEND_PATH } from '../../constants/RouterConstants';
 // import { Dropdown, MenuItem } from 'react-bootstrap';
 
 class Wallet extends React.Component {
@@ -90,15 +93,18 @@ class Wallet extends React.Component {
 						</div>
 						<div className="page-action-wrap">
 							<div className="two-btn-wrap" >
-								<Button
+								<Link
 									className="btn-transparent"
-									content={<span className="btn-text">Recieve</span>}
-								/>
-								<Button
+									to={RECIEVE_PATH}
+								>
+									<span className="btn-text">Recieve</span>
+								</Link>
+								<Link
 									className="btn-in-light"
-									content={<span className="btn-text">Send</span>}
-								/>
-
+									to={SEND_PATH}
+								>
+									<span className="btn-text">Send</span>
+								</Link>
 							</div>
 						</div>
 					</div>

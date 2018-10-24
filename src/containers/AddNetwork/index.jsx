@@ -14,6 +14,35 @@ import BridgeInput from '../../components/BridgeInput';
 
 class AddNetwork extends React.Component {
 
+	constructor(props) {
+		super(props);
+
+		this.nameRef = null;
+		this.addressRef = null;
+		this.registratorRef = null;
+	}
+
+	componentDidUpdate(prevProps) {
+		const { name: prevName, address: prevAddress, registrator: prevRegistrator } = prevProps;
+		const { name, address, registrator } = this.props;
+
+		if (
+			(name.value !== prevName.value)
+			|| (address.value !== prevAddress.value)
+			|| (registrator.value !== prevRegistrator.value)
+		) {
+			return;
+		}
+
+		if (name.error && this.nameRef) {
+			this.nameRef.focus();
+		} else if (address.error && this.addressRef) {
+			this.addressRef.focus();
+		} else if (registrator.error && this.registratorRef) {
+			this.registratorRef.focus();
+		}
+	}
+
 	componentWillUnmount() {
 		this.props.clearForm();
 	}
@@ -49,6 +78,12 @@ class AddNetwork extends React.Component {
 			|| address.error || name.error || registrator.error);
 	}
 
+	handleRef(ref, type) {
+		if (ref) {
+			this[`${type}Ref`] = ref.bridgeInput;
+		}
+	}
+
 	renderForm() {
 		const {
 			address, name, registrator, loading,
@@ -73,6 +108,7 @@ class AddNetwork extends React.Component {
 							errorText={name.error}
 							value={name.value}
 							onChange={(e) => this.onChange(e)}
+							ref={(r) => this.handleRef(r, 'name')}
 						/>
 						<BridgeInput
 							error={!!address.error}
@@ -83,6 +119,7 @@ class AddNetwork extends React.Component {
 							errorText={address.error}
 							value={address.value}
 							onChange={(e) => this.onChange(e)}
+							ref={(r) => this.handleRef(r, 'address')}
 						/>
 						<BridgeInput
 							error={!!registrator.error}
@@ -93,6 +130,7 @@ class AddNetwork extends React.Component {
 							errorText={registrator.error}
 							value={registrator.value}
 							onChange={(e) => this.onChange(e)}
+							ref={(r) => this.handleRef(r, 'registrator')}
 						/>
 					</div>
 				</div>

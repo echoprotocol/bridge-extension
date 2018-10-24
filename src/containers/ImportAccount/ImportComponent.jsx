@@ -10,20 +10,18 @@ class ImportComponent extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			focused: false,
-		};
-
 		this.nameRef = null;
 		this.passwordRef = null;
 	}
 
+	componentDidUpdate(prevProps) {
+		const { name: prevName, password: prevPassword } = prevProps;
+		const {
+			nameError, passwordError, name, password,
+		} = this.props;
 
-	componentDidUpdate() {
-		const { nameError, passwordError } = this.props;
-
-		if (!this.state.focused) {
-			return false;
+		if ((name !== prevName) || (password !== prevPassword)) {
+			return;
 		}
 
 		if (nameError && this.nameRef) {
@@ -31,7 +29,6 @@ class ImportComponent extends React.Component {
 		} else if (passwordError && this.passwordRef) {
 			this.passwordRef.focus();
 		}
-		return true;
 	}
 
 
@@ -85,7 +82,6 @@ class ImportComponent extends React.Component {
 								onChange={(e) => this.onChange(e, true)}
 								onKeyPress={(e) => this.onPressEnter(e)}
 								disabled={loading}
-								setFocus={!!nameError}
 								ref={(r) => this.handleRef(r, 'name')}
 							/>
 							<BridgeInput
@@ -100,7 +96,6 @@ class ImportComponent extends React.Component {
 								onChange={(e) => this.onChange(e)}
 								onKeyPress={(e) => this.onPressEnter(e)}
 								disabled={loading}
-								setFocus={!nameError && !!passwordError}
 								ref={(r) => this.handleRef(r, 'password')}
 							/>
 						</div>

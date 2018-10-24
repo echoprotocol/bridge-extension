@@ -8,6 +8,9 @@
 
 %btn {
     @include noSelection();
+    display: flex;
+    justify-content: center;
+    align-items: center;
     font-family: FNBold;
     text-transform: uppercase;
     line-height: 0;
@@ -79,7 +82,7 @@
     $innerBorderWidth,
     $color
     ) {
-    display: inline-block;
+    display: flex;
     position: relative;
 
     @include hardwareAccel();
@@ -148,6 +151,10 @@
 
     &-text {
         margin-right: -3px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
     }
 
     &-in-light {
@@ -402,6 +409,9 @@
             0px,
             #dde1e4
         );
+        .icon-copiedBtn {
+            margin: 0 -20px 0 8px;
+        }
     }
     &:active {
         .btn-copy {
@@ -415,6 +425,9 @@
     }
     &.copied {
         width: 226px;
+        .icon-copiedBtn {
+            margin: 0 -18px 0 8px;
+        }
     }
 
     &:after {
@@ -465,7 +478,8 @@
  .two-btn-wrap {
     display: flex;
 
-    button {
+    button,
+    a {
         &:not(:last-child) {
             margin-right: 12px;
         }
