@@ -40,7 +40,7 @@ const lockCrypto = () => (dispatch) => {
  *
  * 	Instance of Сrypto class
  */
-export const crypto = () => echoService.getCrypto();
+export const getCrypto = () => echoService.getCrypto();
 
 /**
  *  @method initCrypto
@@ -51,17 +51,17 @@ export const crypto = () => echoService.getCrypto();
  */
 export const initCrypto = () => async (dispatch) => {
 	try {
-		if (!crypto().isLocked()) {
+		if (!getCrypto().isLocked()) {
 			dispatch(changeCrypto({ isLocked: false }));
 
 			history.push(INDEX_PATH);
 		} else {
-			const isFirstTime = await crypto().isFirstTime();
+			const isFirstTime = await getCrypto().isFirstTime();
 
 			history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
 		}
-		crypto().removeAllListeners();
-		crypto().on('locked', () => dispatch(lockCrypto()));
+		getCrypto().removeAllListeners();
+		getCrypto().on('locked', () => dispatch(lockCrypto()));
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
@@ -87,7 +87,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 	try {
 		dispatch(setValue(form, 'loading', true));
 
-		await crypto().unlock(pin);
+		await getCrypto().unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
 		await dispatch(loadInfo());
 		return true;
@@ -111,7 +111,7 @@ export const setCryptoInfo = (field, value) => async (dispatch, getState) => {
 	try {
 		const networkName = getState().global.getIn(['network', 'name']);
 
-		await crypto().setInByNetwork(networkName, field, value);
+		await getCrypto().setInByNetwork(networkName, field, value);
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
@@ -128,7 +128,7 @@ export const getCryptoInfo = (field) => async (dispatch, getState) => {
 	try {
 		const networkName = getState().global.getIn(['network', 'name']);
 
-		const value = await crypto().getInByNetwork(networkName, field);
+		const value = await getCrypto().getInByNetwork(networkName, field);
 
 		return value;
 	} catch (err) {
@@ -148,7 +148,7 @@ export const removeCryptoInfo = (field) => async (dispatch, getState) => {
 	try {
 		const networkName = getState().global.getIn(['network', 'name']);
 
-		await crypto().removeInByNetwork(networkName, field);
+		await getCrypto().removeInByNetwork(networkName, field);
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
