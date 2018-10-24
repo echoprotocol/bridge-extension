@@ -3,8 +3,8 @@ import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
 import BridgeInput from '../../components/BridgeInput';
 import BridgeTextArea from '../../components/BridgeTextArea';
-import ErrorTransaction from './ErrorTransaction';
-import SuccessTransaction from './SuccessTransaction';
+// import ErrorTransaction from './ErrorTransaction';
+// import SuccessTransaction from './SuccessTransaction';
 
 
 class Send extends React.Component {
