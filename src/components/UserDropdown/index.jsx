@@ -120,10 +120,16 @@ class UserDropdown extends React.PureComponent {
 					onClick={() => this.closeDropDown()}
 					onSelect={() => this.onSelect(account.name)}
 				>
-					<UserIcon color={account.iconColor} avatar={`ava${account.icon}`} />
+
+					<UserIcon
+						color={account.iconColor}
+						tabSelect
+						avatar={`ava${account.icon}`}
+					/>
 					<div className="user-name">{account.name}</div>
 					<div className={classnames('user-balance', { positive: !!userBalance.get('balance') })}>
 						{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${CORE_SYMBOL}`}
+
 					</div>
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.name)} />
 				</MenuItem>
@@ -151,7 +157,12 @@ class UserDropdown extends React.PureComponent {
 				open={this.state.opened}
 			>
 				<Dropdown.Toggle noCaret>
-					<UserIcon color={account.get('iconColor')} avatar={`ava${account.get('icon')}`} />
+
+					<UserIcon
+						color={account.get('iconColor')}
+						avatar={`ava${account.get('icon')}`}
+					/>
+
 					<i aria-hidden="true" className="dropdown icon" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu >
