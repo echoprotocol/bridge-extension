@@ -1,0 +1,22 @@
+.list-avatars {
+    display: flex;
+    flex-wrap: wrap;
+    margin: 0 auto;
+    padding: 26px 0 0;
+    max-width: 320px;
+    li {
+        width: 20%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin-bottom: 3px;
+    }
+}
+
+.list-colors {
+    max-width: 320px;
+    padding: 44px 7px 0;
+    margin: auto;
+    display: flex;
+    justify-content: space-between;
+}
