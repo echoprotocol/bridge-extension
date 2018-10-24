@@ -337,7 +337,8 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 
 		if (currentNetworkName === network.name) {
 			await storage.remove('current_network');
-			dispatch(connect());
+			await dispatch(connect());
+			await dispatch(loadInfo());
 		}
 
 		dispatch(set('networks', networks));
