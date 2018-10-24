@@ -52,7 +52,7 @@ class BridgeSidebar extends React.PureComponent {
 												<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>Send</Link>
 											</div>
 											<div>
-												<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>Recieve</Link>
+												<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>Receive</Link>
 											</div>
 											<div>
 												<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>
