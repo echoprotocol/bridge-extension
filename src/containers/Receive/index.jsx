@@ -1,7 +1,7 @@
 import React from 'react';
 import BridgeBtnCopy from '../../components/BridgeBtnCopy';
 
-class Recieve extends React.Component {
+class Receive extends React.Component {
 
 	render() {
 		return (
@@ -31,4 +31,4 @@ class Recieve extends React.Component {
 
 }
 
-export default Recieve;
+export default Receive;
