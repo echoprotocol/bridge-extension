@@ -18,7 +18,7 @@ const DEFAULT_FIELDS = Map({
 	networks: new List([]),
 	connected: false,
 	crypto: new Map({
-		isLocked: false, // исправить на true
+		isLocked: true,
 		error: null,
 		goBack: false,
 	}),

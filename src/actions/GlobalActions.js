@@ -307,6 +307,6 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
  *  Initialize crypto and connect to blockchain
  */
 export const globalInit = () => async (dispatch) => {
-	// await dispatch(initCrypto()); раскоментить
+	await dispatch(initCrypto());
 	await dispatch(connect());
 };

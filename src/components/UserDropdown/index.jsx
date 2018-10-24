@@ -13,7 +13,7 @@ import { switchAccount, removeAccount } from '../../actions/GlobalActions';
 import FormatHelper from '../../helpers/FormatHelper';
 
 import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
-import { CORE_SYMBOL } from '../../constants/GlobalConstants';
+import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
 
@@ -46,9 +46,12 @@ class UserDropdown extends React.PureComponent {
 	}
 
 	onSelect(name) {
-		if (!this.props.preview.find((i) => i.name === name)) {
+		const { accounts, networkName } = this.props;
+
+		if (!accounts.get(networkName).find((i) => i.name === name)) {
 			return;
 		}
+
 		const { account } = this.props;
 
 		if (account.get('name') === name) {
@@ -61,7 +64,6 @@ class UserDropdown extends React.PureComponent {
 	onRemoveAccount(e, name) {
 		e.stopPropagation();
 		e.preventDefault();
-
 		this.props.removeAccount(name);
 	}
 
@@ -90,39 +92,54 @@ class UserDropdown extends React.PureComponent {
 		this.setState({ opened: false });
 	}
 
-	renderList(preview, account) {
+	renderList() {
 
-		return preview.map(({
-			name, balance: { amount, precision, symbol }, icon,
-		}, i) => {
-			const content = (
+		const {
+			balances, assets, accounts, account: activeAccount, networkName,
+		} = this.props;
+		const asset = assets.get('1.3.0');
+
+		if (!asset) {
+			return null;
+		}
+
+		return accounts.get(networkName).map((account, i) => {
+
+			const userBalance = balances.find((value) => ((value.get('owner') === account.id) && (value.get('asset_type') === CORE_ID)));
+
+			if (!userBalance) {
+				return null;
+			}
+
+			return (
 				<MenuItem
-					active={account.get('name') === name}
+					active={activeAccount.get('name') === account.name}
 					tabIndex="-1"
-					key={name}
+					key={account.name}
 					eventKey={i}
 					onClick={() => this.closeDropDown()}
-					onSelect={() => this.onSelect(name)}
+					onSelect={() => this.onSelect(account.name)}
 				>
+
 					<UserIcon
-						color="green"
+						color={account.iconColor}
 						tabSelect
-						avatar={`ava${icon}`}
+						avatar={`ava${account.icon}`}
 					/>
-					<div className="user-name">{name}</div>
-					<div className={classnames('user-balance', { positive: !!amount })}>
-						{FormatHelper.formatAmount(amount, precision, symbol) || `0 ${CORE_SYMBOL}`}
+					<div className="user-name">{account.name}</div>
+					<div className={classnames('user-balance', { positive: !!userBalance.get('balance') })}>
+						{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${CORE_SYMBOL}`}
+
 					</div>
-					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, name)} />
+					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.name)} />
 				</MenuItem>
 			);
 
-			return content;
 		});
 	}
 
 	render() {
-		const { preview, account } = this.props;
+		const { account, accounts } = this.props;
 
 		if (!account) {
 			return null;
@@ -142,9 +159,10 @@ class UserDropdown extends React.PureComponent {
 				<Dropdown.Toggle noCaret>
 
 					<UserIcon
-						color="green"
+						color={account.get('iconColor')}
 						avatar={`ava${account.get('icon')}`}
 					/>
+
 					<i aria-hidden="true" className="dropdown icon" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu >
@@ -158,7 +176,7 @@ class UserDropdown extends React.PureComponent {
 						>
 							<div id="user-menu-container">
 								<ul className="user-list">
-									{this.renderList(preview, account)}
+									{this.renderList()}
 								</ul>
 
 							</div>
@@ -170,7 +188,7 @@ class UserDropdown extends React.PureComponent {
 						<MenuItem
 							onClick={() => this.closeDropDown()}
 							href={`#${CREATE_ACCOUNT_PATH}`}
-							eventKey={preview.size + 1}
+							eventKey={accounts.size + 1}
 						>
 										create
 						</MenuItem>
@@ -178,7 +196,7 @@ class UserDropdown extends React.PureComponent {
 						<MenuItem
 							onClick={() => this.closeDropDown()}
 							href={`#${IMPORT_ACCOUNT_PATH}`}
-							eventKey={preview.size + 2}
+							eventKey={accounts.size + 2}
 						>
 										import
 						</MenuItem>
@@ -191,8 +209,11 @@ class UserDropdown extends React.PureComponent {
 }
 
 UserDropdown.propTypes = {
+	accounts: PropTypes.object.isRequired,
+	balances: PropTypes.object.isRequired,
+	assets: PropTypes.object.isRequired,
 	account: PropTypes.object,
-	preview: PropTypes.object.isRequired,
+	networkName: PropTypes.string.isRequired,
 	switchAccount: PropTypes.func.isRequired,
 	removeAccount: PropTypes.func.isRequired,
 };
@@ -203,8 +224,11 @@ UserDropdown.defaultProps = {
 
 export default withRouter(connect(
 	(state) => ({
-		preview: state.balance.get('preview'),
+		balances: state.balance.get('balances'),
+		assets: state.balance.get('assets'),
 		account: state.global.get('account'),
+		accounts: state.global.get('accounts'),
+		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
 		switchAccount: (name) => dispatch(switchAccount(name)),
