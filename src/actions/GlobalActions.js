@@ -13,7 +13,14 @@ import FormatHelper from '../helpers/FormatHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { ACCOUNT_COLORS, NETWORKS } from '../constants/GlobalConstants';
+import {
+	ACCOUNT_COLORS,
+	BASE_ICON,
+	BASE_ICON_COLOR,
+	ICON_COLORS_COUNT,
+	ICONS_COUNT,
+	NETWORKS,
+} from '../constants/GlobalConstants';
 import {
 	CREATE_ACCOUNT_PATH,
 	SUCCESS_ADD_NETWORK_PATH,
@@ -93,8 +100,15 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
 		let accounts = getState().global.get('accounts');
 		accounts =
 			accounts.set(networkName, accounts.get(networkName).map((i) => ({ ...i, active: false })));
-		const icon = Math.floor(Math.random() * 15) + 1;
-		const iconColor = ACCOUNT_COLORS[Math.floor(Math.random() * 7)];
+
+		let icon = BASE_ICON;
+		let iconColor = BASE_ICON_COLOR;
+
+		if (accounts.get(networkName).size) {
+			icon = Math.floor(Math.random() * ICONS_COUNT) + 1;
+			iconColor = ACCOUNT_COLORS[Math.floor(Math.random() * ICON_COLORS_COUNT)];
+		}
+
 		accounts = accounts.set(networkName, accounts.get(networkName).push({
 			id: account.get('id'), active: true, icon, iconColor, name, keys,
 		}));

@@ -123,21 +123,20 @@ class NetworkDropdown extends React.PureComponent {
 			.toArray()
 			.slice(Math.max(accounts.size - 4, 0))
 			.map((account) =>
-				( // TODO fix div styles
-					<div
-						key={account.id}
-						role="button"
-						tabIndex="0"
-						onClick={(e) => this.onSwitchAccount(e, account.name, network)}
-						onKeyPress={(e) => this.onSwitchAccount(e, account.name, network)}
-					>
-						<li>
+				(
+					<li key={account.id}>
+						<div
+							role="button"
+							tabIndex="0"
+							onClick={(e) => this.onSwitchAccount(e, account.name, network)}
+							onKeyPress={(e) => this.onSwitchAccount(e, account.name, network)}
+						>
 							<UserIcon
 								avatar={`ava${account.icon}`}
 								color={account.iconColor}
 							/>
-						</li>
-					</div>
+						</div>
+					</li>
 				));
 	}
 
