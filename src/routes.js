@@ -16,11 +16,9 @@ import {
 	TRANSACTIONS_PATH,
 	SEND_PATH,
 	BACKUP_PATH,
-<<<<<<< HEAD
 	INCOMING_TRANSACTION_PATH,
-=======
 	WATCH_TOKEN_PATH,
->>>>>>> 8dc6c488b04d37c1be5b3a8d94dcad720594f8d7
+
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -35,12 +33,10 @@ import Receive from './containers/Receive';
 import Transactions from './containers/Transactions';
 import Send from './containers/Send';
 import Backup from './containers/Backup';
-<<<<<<< HEAD
+
 import IncomingTransaction from './containers/IncomingTransaction';
 
-=======
 import WatchToken from './containers/WatchToken';
->>>>>>> 8dc6c488b04d37c1be5b3a8d94dcad720594f8d7
 
 export default class Routes extends React.Component {
 
@@ -63,11 +59,10 @@ export default class Routes extends React.Component {
 					<Route exact path={TRANSACTIONS_PATH} component={Transactions} />
 					<Route exact path={SEND_PATH} component={Send} />
 					<Route exact path={BACKUP_PATH} component={Backup} />
-<<<<<<< HEAD
+
 					<Route exact path={INCOMING_TRANSACTION_PATH} component={IncomingTransaction} />
-=======
+
 					<Route exact path={WATCH_TOKEN_PATH} component={WatchToken} />
->>>>>>> 8dc6c488b04d37c1be5b3a8d94dcad720594f8d7
 
 				</div>
 			</App>

@@ -4,9 +4,9 @@ class IncomingTransaction extends React.Component {
 
 	render() {
 		return (
-			<div className="page-wrap incoming-transaction-page">
+			<div className="incoming-transaction-wrap">
 
-				<div className="page">
+				<div className="incoming-transaction-page">
                     sadasdasd
 				</div>
 			</div>
