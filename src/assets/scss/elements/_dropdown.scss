@@ -281,6 +281,9 @@
                 & + .dropdown-footer {
                     height: 35px;
                     align-items: flex-start;
+                    li {
+                        margin-top: 4px;
+                    }
                 }
                 & > li {
                     a {
