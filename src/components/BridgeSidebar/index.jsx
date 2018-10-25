@@ -3,6 +3,10 @@ import PropTypes from 'prop-types';
 import { Sidebar, Button } from 'semantic-ui-react';
 import { PanelGroup, Panel } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+
+import { sidebarToggle } from '../../actions/GlobalActions';
+
 import {
 	BACKUP_PATH,
 	CREATE_ACCOUNT_PATH,
@@ -11,23 +15,29 @@ import {
 	TRANSACTIONS_PATH,
 	WATCH_TOKEN_PATH,
 } from '../../constants/RouterConstants';
+
 import UserIcon from '../UserIcon';
 
 
 class BridgeSidebar extends React.PureComponent {
 
 	render() {
-		const { visible, onSidebarToggle } = this.props;
+		const { visibleSidebar, account } = this.props;
+
+		if (!account) {
+			return null;
+		}
+
 		return (
 			<React.Fragment>
 				<Sidebar
-					visible={visible}
+					visible={visibleSidebar}
 					animation="overlay"
 				>
 					<div className="sidebar-header">
 						<Button
 							className="btn-icon"
-							onClick={() => onSidebarToggle()}
+							onClick={() => this.props.sidebarToggle(visibleSidebar)}
 							content={
 								<React.Fragment>
 									<i className="icon-closeBig" />
@@ -36,11 +46,11 @@ class BridgeSidebar extends React.PureComponent {
 						/>
 						<div className="sidebar-user">
 							<UserIcon
-								color="green"
-								avatar="ava1"
+								color={account.get('iconColor')}
+								avatar={`ava${account.get('icon')}`}
 								size="medium"
 							/>
-							<div className="name">Homersimpson46</div>
+							<div className="name">{account.get('name')}</div>
 						</div>
 					</div>
 					<nav className="sidebar-body">
@@ -56,13 +66,26 @@ class BridgeSidebar extends React.PureComponent {
 										</Panel.Heading>
 										<Panel.Body collapsible>
 											<div>
-												<Link onClick={() => onSidebarToggle()} to={SEND_PATH}>Send</Link>
+												<Link
+													onClick={() => this.props.sidebarToggle(visibleSidebar)}
+													to={SEND_PATH}
+												>
+													Send
+												</Link>
 											</div>
 											<div>
-												<Link onClick={() => onSidebarToggle()} to={RECEIVE_PATH}>Receive</Link>
+												<Link
+													onClick={() => this.props.sidebarToggle(visibleSidebar)}
+													to={RECEIVE_PATH}
+												>
+													Receive
+												</Link>
 											</div>
 											<div>
-												<Link onClick={() => onSidebarToggle()} to={WATCH_TOKEN_PATH}>
+												<Link
+													onClick={() => this.props.sidebarToggle(visibleSidebar)}
+													to={WATCH_TOKEN_PATH}
+												>
                                                     Watch token
 												</Link>
 											</div>
@@ -73,20 +96,23 @@ class BridgeSidebar extends React.PureComponent {
 								</PanelGroup>
 							</li>
 							<li>
-								<Link onClick={() => onSidebarToggle()} to={TRANSACTIONS_PATH}>
+								<Link
+									onClick={() => this.props.sidebarToggle(visibleSidebar)}
+									to={TRANSACTIONS_PATH}
+								>
 									<i className="icon-navHistory" />
 									<div className="nav-title">Transactions history</div>
 								</Link>
 							</li>
 							<li>
-								<Link onClick={() => onSidebarToggle()} to={BACKUP_PATH}>
+								<Link onClick={() => this.props.sidebarToggle(visibleSidebar)} to={BACKUP_PATH}>
 									<i className="icon-navBackup" />
 									<div className="nav-title">Backup account</div>
 								</Link>
 							</li>
 							<li>
 								<Link
-									onClick={() => onSidebarToggle()}
+									onClick={() => this.props.sidebarToggle(visibleSidebar)}
 									to={CREATE_ACCOUNT_PATH}
 								>
 									<i className="icon-navInfo" />
@@ -96,7 +122,7 @@ class BridgeSidebar extends React.PureComponent {
 						</ul>
 					</nav>
 					<Button
-						onClick={() => onSidebarToggle()}
+						onClick={() => this.props.sidebarToggle(visibleSidebar)}
 						tabIndex="-1"
 						className="sidebar-dimmer"
 					/>
@@ -109,9 +135,21 @@ class BridgeSidebar extends React.PureComponent {
 }
 
 BridgeSidebar.propTypes = {
-	visible: PropTypes.bool.isRequired,
-	onSidebarToggle: PropTypes.func.isRequired,
-
+	account: PropTypes.object,
+	visibleSidebar: PropTypes.bool.isRequired,
+	sidebarToggle: PropTypes.func.isRequired,
 };
 
-export default BridgeSidebar;
+BridgeSidebar.defaultProps = {
+	account: null,
+};
+
+export default connect(
+	(state) => ({
+		visibleSidebar: state.global.get('visibleSidebar'),
+		account: state.global.get('account'),
+	}),
+	(dispatch) => ({
+		sidebarToggle: (value) => dispatch(sidebarToggle(value)),
+	}),
+)(BridgeSidebar);

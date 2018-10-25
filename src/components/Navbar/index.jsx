@@ -3,6 +3,9 @@ import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+
+import { sidebarToggle } from '../../actions/GlobalActions';
 
 import { HEADER_TITLE } from '../../constants/GlobalConstants';
 
@@ -10,12 +13,13 @@ class Navbar extends React.PureComponent {
 
 	onClick(e) {
 		e.target.blur();
-		this.props.onSidebarToggle();
+		this.props.sidebarToggle(this.props.visibleSidebar);
 	}
 
 	renderTitle() {
 		const { pathname, search } = this.props.location;
 
+		console.log(pathname, search);
 		const item = HEADER_TITLE.find(({ path }) => (path === `${pathname}${search}`));
 
 		return item || {};
@@ -49,8 +53,16 @@ class Navbar extends React.PureComponent {
 }
 
 Navbar.propTypes = {
+	visibleSidebar: PropTypes.bool.isRequired,
 	location: PropTypes.object.isRequired,
-	onSidebarToggle: PropTypes.func.isRequired,
+	sidebarToggle: PropTypes.func.isRequired,
 };
 
-export default withRouter(Navbar);
+export default withRouter(connect(
+	(state) => ({
+		visibleSidebar: state.global.get('visibleSidebar'),
+	}),
+	(dispatch) => ({
+		sidebarToggle: (value) => dispatch(sidebarToggle(value)),
+	}),
+)(Navbar));
