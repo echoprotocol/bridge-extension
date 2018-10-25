@@ -215,6 +215,20 @@
 
     &-transparent {
         @extend %btn;
+        &.link {
+            &:not(.disabled):not(:active) {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            &:active,
+            &.disabled {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+
+        }
         background-color: transparent;
         color: #535e65;
         border-radius: $angularMax;

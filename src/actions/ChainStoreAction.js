@@ -1,5 +1,4 @@
 import { Map, List } from 'immutable';
-import { ChainStore } from 'echojs-lib';
 import { batchActions } from 'redux-batched-actions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
@@ -9,6 +8,8 @@ import BalanceReducer from '../reducers/BalanceReducer';
 import { initAssetsBalances } from './BalanceActions';
 
 import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
+
+import echoService from '../services/echo';
 
 import { NETWORKS, GLOBAL_ID } from '../constants/GlobalConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
@@ -22,7 +23,7 @@ import FormatHelper from '../helpers/FormatHelper';
  * @returns {Function}
  */
 export const subscribe = () => (dispatch) => {
-
+	const { ChainStore } = echoService.getChainLib();
 	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
 		const value = ChainStore[origin];
 
