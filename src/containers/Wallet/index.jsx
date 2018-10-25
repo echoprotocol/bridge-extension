@@ -1,5 +1,4 @@
 import React from 'react';
-import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
@@ -82,17 +81,11 @@ class Wallet extends React.Component {
 						</div>
 						<div className="page-action-wrap">
 							<div className="two-btn-wrap" >
-								<Link to={RECEIVE_PATH}>
-									<Button
-										className="btn-transparent"
-										content={<span className="btn-text">Recieve</span>}
-									/>
+								<Link className="btn-transparent link" to={RECEIVE_PATH}>
+									<span className="btn-text">Recieve</span>
 								</Link>
-								<Link to={SEND_PATH}>
-									<Button
-										className="btn-in-light"
-										content={<span className="btn-text">Send</span>}
-									/>
+								<Link className="btn-in-light link" to={SEND_PATH}>
+									<span className="btn-text">Send</span>
 								</Link>
 							</div>
 						</div>
