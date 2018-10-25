@@ -121,7 +121,6 @@ class BridgeInput extends React.Component {
 						{ 'visible-pas': (privacyEye && showPas) },
 					)}
 					placeholder={placeholder}
-					// ref={this.handleRef}
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
