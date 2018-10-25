@@ -7,6 +7,31 @@ import BridgeInput from '../../components/BridgeInput';
 
 class ImportComponent extends React.Component {
 
+	constructor(props) {
+		super(props);
+
+		this.nameRef = null;
+		this.passwordRef = null;
+	}
+
+	componentDidUpdate(prevProps) {
+		const { name: prevName, password: prevPassword } = prevProps;
+		const {
+			nameError, passwordError, name, password,
+		} = this.props;
+
+		if ((name !== prevName) || (password !== prevPassword)) {
+			return;
+		}
+
+		if (nameError && this.nameRef) {
+			this.nameRef.focus();
+		} else if (passwordError && this.passwordRef) {
+			this.passwordRef.focus();
+		}
+	}
+
+
 	onChange(e, lowercase) {
 		const { name, value } = e.target;
 
@@ -26,6 +51,12 @@ class ImportComponent extends React.Component {
 		} = this.props;
 
 		return !!(!password || nameError || passwordError);
+	}
+
+	handleRef(ref, type) {
+		if (ref) {
+			this[`${type}Ref`] = ref.bridgeInput;
+		}
 	}
 
 	render() {
@@ -51,6 +82,7 @@ class ImportComponent extends React.Component {
 								onChange={(e) => this.onChange(e, true)}
 								onKeyPress={(e) => this.onPressEnter(e)}
 								disabled={loading}
+								ref={(r) => this.handleRef(r, 'name')}
 							/>
 							<BridgeInput
 								privacyEye
@@ -64,6 +96,7 @@ class ImportComponent extends React.Component {
 								onChange={(e) => this.onChange(e)}
 								onKeyPress={(e) => this.onPressEnter(e)}
 								disabled={loading}
+								ref={(r) => this.handleRef(r, 'password')}
 							/>
 						</div>
 					</div>

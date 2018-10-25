@@ -7,6 +7,20 @@ import BridgeInput from '../../components/BridgeInput';
 
 class CreateComponent extends React.Component {
 
+	constructor(props) {
+		super(props);
+
+		this.inputRef = null;
+	}
+
+	componentDidUpdate() {
+		const { error } = this.props;
+
+		if (error && this.inputRef) {
+			this.inputRef.focus();
+		}
+	}
+
 	onChangeName(e) {
 		this.props.changeName(e.target.value.trim().toLowerCase());
 	}
@@ -17,6 +31,12 @@ class CreateComponent extends React.Component {
 		} = this.props;
 
 		return !!(!name || error);
+	}
+
+	handleRef(ref) {
+		if (ref) {
+			this.inputRef = ref.bridgeInput;
+		}
 	}
 
 	render() {
@@ -48,6 +68,7 @@ class CreateComponent extends React.Component {
 								onChange={(e) => this.onChangeName(e)}
 								onHintClick={() => this.props.changeName(example)}
 								disabled={loading}
+								ref={(r) => this.handleRef(r)}
 							/>
 						</div>
 					</div>

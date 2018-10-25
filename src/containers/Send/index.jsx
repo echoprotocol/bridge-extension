@@ -1,12 +1,19 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
+import { Link } from 'react-router-dom';
+
 import BridgeInput from '../../components/BridgeInput';
 import BridgeTextArea from '../../components/BridgeTextArea';
+// import ErrorTransaction from './ErrorTransaction';
+// import SuccessTransaction from './SuccessTransaction';
+
+
+import { INDEX_PATH } from '../../constants/RouterConstants';
 
 class Send extends React.Component {
 
-	render() {
+	renderSend() {
 		const codingCurrencyDropdownData = [
 			{
 				id: 0,
@@ -19,10 +26,14 @@ class Send extends React.Component {
 				list: ['ECHO', 'EchoTest', 'EchoEcho', 'EchoEcho245'],
 			},
 		];
-
 		return (
 			<React.Fragment>
-				<div className="return-block"><a href="#" className="link-return"><i className="icon-return" /><span className="link-text">Return</span></a></div>
+				<div className="return-block">
+					<Link to={INDEX_PATH} className="link-return">
+						<i className="icon-return" />
+						<span className="link-text">Return</span>
+					</Link>
+				</div>
 				<div
 					className="user-scroll"
 					style={{ height: '440px' }}
@@ -85,6 +96,16 @@ class Send extends React.Component {
 				</div>
 			</React.Fragment>
 		);
+	}
+
+	render() {
+		return (
+			this.renderSend()
+		// Для отображения ErrorTransaction и SuccessTransaction - убрать блок return и Navbar !!!
+			// <ErrorTransaction />
+		// <SuccessTransaction />
+		);
+
 	}
 
 }
