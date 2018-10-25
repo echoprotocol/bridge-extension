@@ -8,10 +8,6 @@ import UserIcon from '../UserIcon';
 
 class WelcomeComponent extends React.Component {
 
-	componentWillUnmount() {
-		this.props.unmount();
-	}
-
 	render() {
 		const {
 			name, wif, icon, iconColor,
@@ -25,7 +21,7 @@ class WelcomeComponent extends React.Component {
 					animationChange
 					size="big"
 					avatar={`ava${icon}`}
-					onChangeIcon={() => this.props.onChangeIcon()}
+					onSwitchToIcon={() => this.props.onChangeIcon()}
 				/>
 
 				<div className="page-wrap" >
@@ -73,6 +69,7 @@ class WelcomeComponent extends React.Component {
 
 WelcomeComponent.defaultProps = {
 	wif: '',
+	onChangeIcon: null,
 };
 
 WelcomeComponent.propTypes = {
@@ -80,9 +77,8 @@ WelcomeComponent.propTypes = {
 	name: PropTypes.string.isRequired,
 	icon: PropTypes.number.isRequired,
 	iconColor: PropTypes.string.isRequired,
-	unmount: PropTypes.func.isRequired,
 	proceed: PropTypes.func.isRequired,
-	onChangeIcon: PropTypes.func.isRequired,
+	onChangeIcon: PropTypes.func,
 };
 
 export default withRouter(WelcomeComponent);

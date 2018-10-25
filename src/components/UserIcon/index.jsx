@@ -7,11 +7,12 @@ import { Button } from 'semantic-ui-react';
 class UserIcon extends React.PureComponent {
 
 	onClick() {
-		console.log(this.props.onChangeIcon, this.props.onPressBack);
 		if (this.props.onChangeIcon) {
 			this.props.onChangeIcon();
 		} else if (this.props.onPressBack) {
 			this.props.onPressBack();
+		} else if (this.props.onSwitchToIcon) {
+			this.props.onSwitchToIcon();
 		}
 	}
 
@@ -51,7 +52,6 @@ class UserIcon extends React.PureComponent {
 	}
 
 	render() {
-
 		return (
 			<Button
 				tabIndex={this.props.tabSelect && !this.props.active ? '0' : '-1'}
@@ -96,6 +96,7 @@ UserIcon.propTypes = {
 	onChangeIcon: PropTypes.func,
 	onSelectIcon: PropTypes.func,
 	onPressBack: PropTypes.func,
+	onSwitchToIcon: PropTypes.func,
 
 };
 UserIcon.defaultProps = {
@@ -109,11 +110,8 @@ UserIcon.defaultProps = {
 	onChangeIcon: null,
 	onSelectIcon: null,
 	onPressBack: null,
+	onSwitchToIcon: null,
 
 };
-export default connect(
-	() => ({
-	}),
-	() => ({}),
-)(UserIcon);
+export default connect()(UserIcon);
 
