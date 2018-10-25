@@ -167,8 +167,33 @@
         background-color: #344148;
         border-radius: $angularMax;
         border: 1px solid #344148;
-
         color: #16d6aa;
+        &.success {
+            color: #7ad5ab;
+            &:not(.disabled) {
+                @include onBtnFocus (
+                    $angularMax,
+                    2px,
+                    2px,
+                    rgba(#515560,.3)
+                );
+            }
+        }
+        &.error {
+            color: #d56468;
+
+            &:not(.disabled) {
+                &:active {
+                    color: #d56468;
+                }
+                @include onBtnFocus (
+                    $angularMax,
+                    2px,
+                    2px,
+                    rgba(#515560,.3)
+                );
+            }
+        }
         &:not(.disabled) {
             &:hover {
                 border: 1px solid #21292e;

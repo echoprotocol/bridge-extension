@@ -25,6 +25,10 @@ class Navbar extends React.PureComponent {
 		const { title, link } = this.renderTitle();
 
 		return (
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// НУЖНО СКРЫВАТЬ НАВБАР, ПОСЛЕ ОТПРАВКИ ТРАНЗАКЦИИ НА СТРАНИЦАХ
+		// ErrorTransactions и SuccessTransactions
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 			<div className="navbar">
 				<ul>
 					<li className="btn-nav-wrap" >
