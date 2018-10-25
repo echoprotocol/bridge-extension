@@ -17,6 +17,7 @@ import {
 	SEND_PATH,
 	BACKUP_PATH,
 	WATCH_TOKEN_PATH,
+	SIGN_TRANSACTION_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -32,6 +33,7 @@ import Transactions from './containers/Transactions';
 import Send from './containers/Send';
 import Backup from './containers/Backup';
 import WatchToken from './containers/WatchToken';
+import SignTransaction from './containers/SignTransaction';
 
 export default class Routes extends React.Component {
 
@@ -55,6 +57,8 @@ export default class Routes extends React.Component {
 					<Route exact path={SEND_PATH} component={Send} />
 					<Route exact path={BACKUP_PATH} component={Backup} />
 					<Route exact path={WATCH_TOKEN_PATH} component={WatchToken} />
+
+					<Route exact path={SIGN_TRANSACTION_PATH} component={SignTransaction} />
 
 				</div>
 			</App>

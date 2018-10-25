@@ -67,6 +67,10 @@ export const NETWORKS = [
 	},
 ];
 
+export const APPROVED_STATUS = 'approved';
+export const CANCELED_STATUS = 'canceled';
+export const ERROR_STATUS = 'error';
+
 export const ACCOUNT_COLORS = ['green', 'yellow', 'lemon', 'blue', 'sky', 'pink', 'red'];
 
 export const TIMEOUT = 10 * 60 * 1000;

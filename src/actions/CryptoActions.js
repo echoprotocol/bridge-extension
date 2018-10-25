@@ -31,7 +31,9 @@ const changeCrypto = (params) => (dispatch) => {
  * 	Lock crypto in GlobalReducer and redirect to unlock
  */
 const lockCrypto = () => (dispatch) => {
-	dispatch(GlobalReducer.actions.lock());
+	dispatch(GlobalReducer.actions.lock({
+		goTo: history.location.pathname,
+	}));
 	history.push(UNLOCK_PATH);
 };
 

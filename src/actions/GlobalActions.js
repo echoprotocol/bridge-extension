@@ -7,6 +7,7 @@ import history from '../history';
 import { setFormError, toggleLoading } from './FormActions';
 import { disconnect, connect } from './ChainStoreAction';
 import { initAssetsBalances, removeBalances } from './BalanceActions';
+import { loadRequests } from './SignActions';
 
 import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
 import FormatHelper from '../helpers/FormatHelper';
@@ -223,12 +224,8 @@ export const loadInfo = () => async (dispatch, getState) => {
 
 	if (accounts && accounts.length) {
 		await dispatch(initAccount(accounts.find((account) => account.active)));
-
-		if (getState().global.getIn(['crypto', 'goBack'])) {
-			history.goBack();
-		} else {
-			history.push(INDEX_PATH);
-		}
+		const path = getState().global.getIn(['crypto', 'goTo']) || INDEX_PATH;
+		history.push(path);
 	} else {
 		history.push(CREATE_ACCOUNT_PATH);
 	}
@@ -371,4 +368,5 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
 export const globalInit = () => async (dispatch) => {
 	await dispatch(initCrypto());
 	await dispatch(connect());
+	dispatch(loadRequests());
 };

@@ -23,3 +23,5 @@ instance.init_promise
 window.getWsLib = () => echojs;
 window.getChainLib = () => chainjs;
 window.getCrypto = () => crypto;
+window.getEmitter = () => ({ on: () => {}, emit: () => {} });
+window.getRequests = () => ([]);
