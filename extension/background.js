@@ -53,14 +53,15 @@ const onExternalMessage = (request, sender, sendResponse) => {
 	}
 
 	// todo onClose popup event and remove it from openBridgeTabsIDs map
+	// todo detect is extension open
 	// https://developer.chrome.com/extensions/windows#method-create
 };
 
 const onResponse = (err, id, status) => {
-	const request = requestQueue.find(({ id: requestId }) => requestId === id);
-	if (!request) return;
+	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
+	if (requestIndex === -1) return;
 
-	request.cb({ status, text: err });
+	requestQueue.splice(requestIndex, 1)[0].cb({ status, text: err });
 };
 
 

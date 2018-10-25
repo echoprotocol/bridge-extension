@@ -375,5 +375,4 @@ export const globalInit = () => async (dispatch) => {
 	await dispatch(connect());
 
 	echoService.getEmitter().on('request', (id, options) => { console.log(id, options); });
-	echoService.getEmitter().emit('response', null, '1', 'approved');
 };
