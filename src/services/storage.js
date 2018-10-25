@@ -1,5 +1,3 @@
-/* global NODE_ENV */
-
 import extension from '../../extension/extensionizer';
 
 class Storage {
