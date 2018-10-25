@@ -133,6 +133,7 @@ class NetworkDropdown extends React.PureComponent {
 						>
 							<UserIcon
 								avatar={`ava${account.icon}`}
+								tabSelect
 								color={account.iconColor}
 							/>
 						</div>
