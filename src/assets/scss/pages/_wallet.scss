@@ -106,7 +106,8 @@
             cursor: pointer;
             transition: background-color $speed;
             color: #3E4851;
-            &:hover {
+            &:hover,
+            &:focus {
                 background-color: rgba(#fff, .2);
             }
             &:active {

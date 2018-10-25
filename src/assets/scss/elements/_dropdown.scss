@@ -325,6 +325,30 @@
                     max-width: 190px;
                 }
             }
+
+            .custom-networks {
+                background-color: rgba(#0e1416,.2);
+                & + .dropdown-footer {
+                    height: 35px;
+                    align-items: flex-start;
+                    li {
+                        margin-top: 4px;
+                    }
+                }
+                & > li {
+                    a {
+                        &:hover,
+                        &:focus {
+                            box-shadow:
+                                -1px -1px 4px rgba(0, 0, 0, .1),
+                                1px 1px 4px rgba(0, 0, 0, .1);
+                        }
+                    }
+                }
+                .title {
+                    max-width: 100%;
+                }
+            }
         }
         &-footer {
             height: 55px;
