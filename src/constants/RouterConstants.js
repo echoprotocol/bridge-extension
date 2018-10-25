@@ -20,7 +20,7 @@ export const SEND_PATH = '/send';
 
 export const BACKUP_PATH = '/backup';
 
-export const WATCH_TOKEN_PATH = '/watch-token';
+export const WATCH_TOKEN_PATH = '/tokens/watch';
 
 
 export const INDEX_PATH = WALLET_PATH;
