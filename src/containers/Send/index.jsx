@@ -98,7 +98,7 @@ class Send extends React.Component {
 		return (
 			this.renderSend()
 		// Для отображения ErrorTransaction и SuccessTransaction - убрать блок return и Navbar !!!
-		// <ErrorTransaction />
+			// <ErrorTransaction />
 		// <SuccessTransaction />
 		);
 
