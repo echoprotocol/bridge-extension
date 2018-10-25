@@ -3,7 +3,7 @@ import PropTypes from 'prop-types';
 import { Sidebar, Button } from 'semantic-ui-react';
 import { PanelGroup, Panel } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { WALLET_PATH } from '../../constants/RouterConstants';
+import { WALLET_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
 import UserIcon from '../UserIcon';
 
 
@@ -55,7 +55,7 @@ class BridgeSidebar extends React.PureComponent {
 												<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>Receive</Link>
 											</div>
 											<div>
-												<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>
+												<Link onClick={() => onSidebarToggle()} to={WATCH_TOKEN_PATH}>
                                                     Watch token
 												</Link>
 											</div>

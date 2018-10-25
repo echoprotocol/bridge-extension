@@ -1,0 +1,15 @@
+.watch-scroll {
+    height: 443px;
+    .page-wrap {
+        padding-top: 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .page {
+            min-height: 348px;
+        }
+        .one-input-wrap {
+            margin-top: 109px;
+        }
+    }
+}

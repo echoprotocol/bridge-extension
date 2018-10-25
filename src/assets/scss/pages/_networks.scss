@@ -4,16 +4,6 @@
     align-items: center;
     background-color: #dfe2e4;
     padding: 0 20px;
-    & + .page-wrap {
-        padding-top: 25px;
-        height: 443px;
-        display: flex;
-        flex-direction: column;
-        justify-content: space-between;
-        .page {
-            min-height: 332px;
-        }
-    }
 }
 
 .icon-pageNetwork {
@@ -51,6 +41,19 @@
                 min-width: 155px;
             }
             justify-content: center;
+        }
+    }
+}
+
+.networks-scroll {
+    height: 443px;
+    .page-wrap {
+        padding-top: 25px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+        .page {
+            min-height: 332px;
         }
     }
 }
