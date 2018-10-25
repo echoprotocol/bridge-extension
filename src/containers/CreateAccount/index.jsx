@@ -17,6 +17,7 @@ import CreateComponent from './CreateComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
 import SettingsAccount from '../SettingsAccount';
 
+
 class CreateAccount extends React.Component {
 
 	constructor(props) {

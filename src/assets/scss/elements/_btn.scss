@@ -152,6 +152,19 @@
 
     &-in-light {
         @extend %btnIn;
+        &.link {
+            &:not(.disabled):not(:active) {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            &:active,
+            &.disabled {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
         &:not(.disabled) {
            @include onBtnFocus(
                 $angularMax,
@@ -167,8 +180,33 @@
         background-color: #344148;
         border-radius: $angularMax;
         border: 1px solid #344148;
-
         color: #16d6aa;
+        &.success {
+            color: #7ad5ab;
+            &:not(.disabled) {
+                @include onBtnFocus (
+                    $angularMax,
+                    2px,
+                    2px,
+                    rgba(#515560,.3)
+                );
+            }
+        }
+        &.error {
+            color: #d56468;
+
+            &:not(.disabled) {
+                &:active {
+                    color: #d56468;
+                }
+                @include onBtnFocus (
+                    $angularMax,
+                    2px,
+                    2px,
+                    rgba(#515560,.3)
+                );
+            }
+        }
         &:not(.disabled) {
             &:hover {
                 border: 1px solid #21292e;
@@ -190,6 +228,19 @@
 
     &-transparent {
         @extend %btn;
+        &.link {
+            &:not(.disabled):not(:active) {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            &:active,
+            &.disabled {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
         background-color: transparent;
         color: #535e65;
         border-radius: $angularMax;
@@ -465,7 +516,8 @@
  .two-btn-wrap {
     display: flex;
 
-    button {
+    button,
+    a {
         &:not(:last-child) {
             margin-right: 12px;
         }

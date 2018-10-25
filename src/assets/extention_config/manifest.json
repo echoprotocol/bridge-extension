@@ -6,5 +6,35 @@
     "default_popup": "./index.html",
     "default_title": "Echo Bridge"
   },
-  "version": "1.0"
+  "version": "1.0",
+  "background": {
+    "scripts": [
+      "background.js"
+    ],
+    "persistent": true
+  },
+  "content_scripts": [
+    {
+      "matches": [
+        "file://*/*",
+        "http://*/*",
+        "https://*/*"
+      ],
+      "js": [
+        "./content.js"
+      ],
+      "run_at": "document_start",
+      "all_frames": true
+    }
+  ],
+  "permissions": [
+    "storage",
+    "clipboardWrite",
+    "notifications"
+  ],
+  "web_accessible_resources": [
+    "inpage.js",
+    "background.js",
+    "unlimitedStorage.js"
+  ]
 }

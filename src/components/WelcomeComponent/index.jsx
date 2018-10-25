@@ -51,10 +51,10 @@ class WelcomeComponent extends React.Component {
 								className="btn-noborder"
 								onClick={(e) => this.props.proceed(e)}
 								content={
-									<React.Fragment>
+									<div className="btn-text">
 										<i className="icon-arrowDown" />
-										<span className="btn-text">Proceed</span>
-									</React.Fragment>
+											Proceed
+									</div>
 								}
 							/>
 						</div>

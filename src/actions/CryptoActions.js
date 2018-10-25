@@ -1,11 +1,11 @@
 import history from '../history';
-import Crypto from '../services/crypto';
 
 import storage from '../services/storage';
+import echoService from '../services/echo';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { CREATE_PIN_PATH, UNLOCK_PATH } from '../constants/RouterConstants';
+import { CREATE_PIN_PATH, UNLOCK_PATH, INDEX_PATH } from '../constants/RouterConstants';
 import { NETWORKS } from '../constants/GlobalConstants';
 
 import { setValue } from './FormActions';
@@ -40,7 +40,7 @@ const lockCrypto = () => (dispatch) => {
  *
  * 	Instance of Сrypto class
  */
-export const crypto = new Crypto();
+export const getCrypto = () => echoService.getCrypto();
 
 /**
  *  @method initCrypto
@@ -51,11 +51,17 @@ export const crypto = new Crypto();
  */
 export const initCrypto = () => async (dispatch) => {
 	try {
-		const isFirstTime = await crypto.isFirstTime();
+		if (!getCrypto().isLocked()) {
+			dispatch(changeCrypto({ isLocked: false }));
 
-		history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
+			history.push(INDEX_PATH);
+		} else {
+			const isFirstTime = await getCrypto().isFirstTime();
 
-		crypto.on('locked', () => dispatch(lockCrypto()));
+			history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
+		}
+		getCrypto().removeAllListeners();
+		getCrypto().on('locked', () => dispatch(lockCrypto()));
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
@@ -81,7 +87,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 	try {
 		dispatch(setValue(form, 'loading', true));
 
-		await crypto.unlock(pin);
+		await getCrypto().unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
 		await dispatch(loadInfo());
 		return true;
@@ -108,7 +114,7 @@ export const setCryptoInfo = (field, value, networkName) => async (dispatch, get
 			networkName = getState().global.getIn(['network', 'name']);
 		}
 
-		await crypto.setInByNetwork(networkName, field, value);
+		await getCrypto().setInByNetwork(networkName, field, value);
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
@@ -128,7 +134,7 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
 			networkName = getState().global.getIn(['network', 'name']);
 		}
 
-		const value = await crypto.getInByNetwork(networkName, field);
+		const value = await getCrypto().getInByNetwork(networkName, field);
 
 		return value;
 	} catch (err) {
@@ -150,7 +156,7 @@ export const removeCryptoInfo = (field, networkName) => async (dispatch, getStat
 			networkName = getState().global.getIn(['network', 'name']);
 		}
 
-		await crypto.removeInByNetwork(networkName, field);
+		await getCrypto().removeInByNetwork(networkName, field);
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
