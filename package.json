@@ -3,7 +3,7 @@
   "description": "PixelPlex React Redux app",
   "version": "0.1.0",
   "scripts": {
-    "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8081",
+    "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8080",
     "build": "cross-env NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
     "build-ext": "cross-env EXTENSION=TRUE NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
     "postbuild-ext": "npm run copy-manifest",

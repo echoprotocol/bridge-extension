@@ -28,11 +28,7 @@ class Storage {
 			});
 		}
 
-		if (NODE_ENV === 'local') {
-			localStorage.setItem(key, JSON.stringify(value));
-			return Promise.resolve();
-		}
-
+		localStorage.setItem(key, JSON.stringify(value));
 		return Promise.resolve();
 	}
 
@@ -60,12 +56,9 @@ class Storage {
 			});
 		}
 
-		if (NODE_ENV === 'local') {
-			const value = localStorage.getItem(key);
-			return Promise.resolve(value ? JSON.parse(value) : value);
-		}
+		const value = localStorage.getItem(key);
+		return Promise.resolve(value ? JSON.parse(value) : value);
 
-		return Promise.resolve();
 	}
 
 	/**
@@ -92,11 +85,7 @@ class Storage {
 			});
 		}
 
-		if (NODE_ENV === 'local') {
-			localStorage.removeItem(key);
-			return Promise.resolve();
-		}
-
+		localStorage.removeItem(key);
 		return Promise.resolve();
 	}
 
