@@ -1,6 +1,9 @@
 import React from 'react';
 import CustomScroll from 'react-custom-scroll';
 import { Button } from 'semantic-ui-react';
+import { Link } from 'react-router-dom';
+import { WALLET_PATH } from '../../constants/RouterConstants';
+
 
 import BridgeInput from '../../components/BridgeInput';
 
@@ -11,10 +14,13 @@ export default class WatchTokens extends React.Component {
 		return (
 			<React.Fragment>
 				<div className="return-block">
-					<a href="/" className="link-return" onClick={(e) => this.onClick(e)}>
+					<Link
+						to={WALLET_PATH}
+						className="link-return"
+					>
 						<i className="icon-return" />
 						<span className="link-text">Back</span>
-					</a>
+					</Link>
 				</div>
 				<div className="watch-scroll">
 					<CustomScroll
