@@ -10,7 +10,7 @@ class SuccessTransaction extends React.PureComponent {
 				<div className="transaction-status-body">
 					<div className="title">Success</div>
 					<div className="description">
-                        Your transaction has been succesfully<br /> sent
+                        Your transaction has been successfully<br /> sent
 					</div>
 				</div>
 				<div className="page-action-wrap">

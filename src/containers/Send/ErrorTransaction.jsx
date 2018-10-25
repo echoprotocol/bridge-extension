@@ -10,7 +10,7 @@ class ErrorTransaction extends React.PureComponent {
 				<div className="transaction-status-body">
 					<div className="title">Error</div>
 					<div className="description">
-                    A problem has occured while sending <br /> your transaction
+                    A problem has occurred while sending <br /> your transaction
 					</div>
 				</div>
 				<div className="page-action-wrap">
