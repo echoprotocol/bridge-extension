@@ -14,7 +14,10 @@ class SuccessAddNetwork extends React.Component {
 		const networkName = network.get('name');
 		return (
 			<div className="page">
-				<div className="icon-network" />
+				<div className="icon-pageNetwork">
+					<span className="path1" />
+					<span className="path2" />
+				</div>
 				<div className="success-text"> Success </div>
 				<div className="success-desc">
                     Network <span>{networkName}</span> was succesfully created
