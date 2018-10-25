@@ -6,10 +6,10 @@ import { Link } from 'react-router-dom';
 import {
 	BACKUP_PATH,
 	CREATE_ACCOUNT_PATH,
-	RECIEVE_PATH,
+	RECEIVE_PATH,
 	SEND_PATH,
 	TRANSACTIONS_PATH,
-	WALLET_PATH,
+	WATCH_TOKEN_PATH,
 } from '../../constants/RouterConstants';
 import UserIcon from '../UserIcon';
 
@@ -38,7 +38,7 @@ class BridgeSidebar extends React.PureComponent {
 							<UserIcon
 								color="green"
 								avatar="ava1"
-								medium
+								size="medium"
 							/>
 							<div className="name">Homersimpson46</div>
 						</div>
@@ -59,10 +59,10 @@ class BridgeSidebar extends React.PureComponent {
 												<Link onClick={() => onSidebarToggle()} to={SEND_PATH}>Send</Link>
 											</div>
 											<div>
-												<Link onClick={() => onSidebarToggle()} to={RECIEVE_PATH}>Receive</Link>
+												<Link onClick={() => onSidebarToggle()} to={RECEIVE_PATH}>Receive</Link>
 											</div>
 											<div>
-												<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>
+												<Link onClick={() => onSidebarToggle()} to={WATCH_TOKEN_PATH}>
                                                     Watch token
 												</Link>
 											</div>

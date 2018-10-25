@@ -5,7 +5,7 @@ import {
 	WALLET_PATH,
 	IMPORT_SUCCESS_PATH,
 	TRANSACTIONS_PATH,
-	RECIEVE_PATH,
+	RECEIVE_PATH,
 	SEND_PATH,
 	BACKUP_PATH,
 } from './RouterConstants';
@@ -36,8 +36,8 @@ export const HEADER_TITLE = [
 		title: 'Wallet',
 	},
 	{
-		path: RECIEVE_PATH,
-		title: 'Recieve',
+		path: RECEIVE_PATH,
+		title: 'Receive',
 	},
 	{
 		path: SEND_PATH,

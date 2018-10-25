@@ -1,16 +1,20 @@
 import React from 'react';
+import { Link } from 'react-router-dom';
+
 import BridgeBtnCopy from '../../components/BridgeBtnCopy';
 
-class Recieve extends React.Component {
+import { INDEX_PATH } from '../../constants/RouterConstants';
+
+class Receive extends React.Component {
 
 	render() {
 		return (
 			<React.Fragment>
 				<div className="return-block">
-					<a href="#" className="link-return">
+					<Link to={INDEX_PATH} className="link-return">
 						<i className="icon-return" />
 						<span className="link-text">Return</span>
-					</a>
+					</Link>
 				</div>
 				<div className="page-wrap">
 					<div className="page recieve-page">
@@ -31,4 +35,4 @@ class Recieve extends React.Component {
 
 }
 
-export default Recieve;
+export default Receive;

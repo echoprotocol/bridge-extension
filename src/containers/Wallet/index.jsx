@@ -1,13 +1,13 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
-import classnames from 'classnames';
 import { Link } from 'react-router-dom';
+import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 // import { Dropdown, MenuItem } from 'react-bootstrap';
 
-import { RECIEVE_PATH, SEND_PATH } from '../../constants/RouterConstants';
+import { RECEIVE_PATH, SEND_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
@@ -21,14 +21,11 @@ class Wallet extends React.Component {
 			<React.Fragment>
 				<div className="wallet-block">
 					<h4>Assets and tokens</h4>
-
-					<Button
-						compact
-						content={
-							<span className="btn-text">Watch tokens</span>
-						}
-						className="btn-transparent"
-					/>
+					<Link
+						className="compact btn-transparent link"
+						to={WATCH_TOKEN_PATH}
+					><span className="btn-text">Watch tokens</span>
+					</Link>
 				</div>
 				<div className="page-wrap">
 					<div className="page">
@@ -85,7 +82,7 @@ class Wallet extends React.Component {
 						</div>
 						<div className="page-action-wrap">
 							<div className="two-btn-wrap" >
-								<Link to={RECIEVE_PATH}>
+								<Link to={RECEIVE_PATH}>
 									<Button
 										className="btn-transparent"
 										content={<span className="btn-text">Recieve</span>}

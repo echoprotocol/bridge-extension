@@ -1,5 +1,4 @@
-import { Apis } from 'echojs-ws';
-import { ChainStore, ChainValidation } from 'echojs-lib';
+import echoService from '../services/echo';
 
 let CHAIN_SUBSCRIBE = null;
 
@@ -9,6 +8,7 @@ let CHAIN_SUBSCRIBE = null;
  * @returns {String}
  */
 const getTypeByKey = (key) => {
+	const { ChainValidation } = echoService.getChainLib();
 	if (ChainValidation.is_object_id(key)) {
 		if (key.search('1.2') === 0) {
 			return 'getAccount';
@@ -30,20 +30,27 @@ const getTypeByKey = (key) => {
  * @param {Function} subscribeCb
  */
 export const connectToAddress = async (address, subscribeCb) => {
-
+	const { Apis } = echoService.getWsLib();
+	const { ChainStore } = echoService.getChainLib();
 	CHAIN_SUBSCRIBE = subscribeCb;
 
 	try {
-		const instance = Apis.instance(
-			address,
-			true,
-			4000,
-			{ enableCrypto: false },
-		);
+		let instance = Apis.instance();
 
-		Apis.setAutoReconnect(false);
+		if (instance.url !== address) {
+			await Apis.close();
 
-		await instance.init_promise;
+			instance = Apis.instance(
+				address,
+				true,
+				4000,
+				{ enableCrypto: false },
+			);
+
+			Apis.setAutoReconnect(false);
+
+			await instance.init_promise;
+		}
 
 		await ChainStore.init();
 		ChainStore.subscribe(CHAIN_SUBSCRIBE);
@@ -58,6 +65,8 @@ export const connectToAddress = async (address, subscribeCb) => {
  * @param {String} address
  */
 export const disconnectFromAddress = async (address) => {
+	const { Apis } = echoService.getWsLib();
+	const { ChainStore } = echoService.getChainLib();
 	const instance = Apis.instance();
 	if (instance.url !== address) {
 		throw new Error('invalid address');
@@ -67,8 +76,6 @@ export const disconnectFromAddress = async (address) => {
 	ChainStore.resetCache();
 
 	CHAIN_SUBSCRIBE = null;
-
-	await Apis.close();
 };
 
 /**
@@ -77,6 +84,7 @@ export const disconnectFromAddress = async (address) => {
  * @returns {Object}
  */
 export const fetchChain = async (key) => {
+	const { ChainStore } = echoService.getChainLib();
 	const method = getTypeByKey(key);
 
 	try {
@@ -95,6 +103,7 @@ export const fetchChain = async (key) => {
  * @returns {Object}
  */
 export const lookupAccounts = async (accountName, limit) => {
+	const { Apis } = echoService.getWsLib();
 	const instance = Apis.instance();
 
 	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);
