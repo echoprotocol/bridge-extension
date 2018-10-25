@@ -16,6 +16,7 @@ import { setValue, clearForm } from '../../actions/FormActions';
 import CreateComponent from './CreateComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
 
+
 class CreateAccount extends React.Component {
 
 	constructor(props) {
