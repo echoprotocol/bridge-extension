@@ -34,7 +34,7 @@ class Navigator extends React.PureComponent {
 					/>
 				</FocusTrap>
 
-				<Navbar onSidebarToggle={onSidebarToggle} />
+				{/* <Navbar onSidebarToggle={onSidebarToggle} /> */}
 			</React.Fragment>
 		);
 	}
