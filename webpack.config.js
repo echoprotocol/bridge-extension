@@ -21,11 +21,14 @@ const { version } = require('./package.json');
 module.exports = {
 	entry: {
 		app: path.resolve('src/index.js'),
+		content: path.resolve('extension/contentscript.js'),
+		inpage: path.resolve('extension/inpage.js'),
+		background: path.resolve('extension/background.js'),
 	},
 	output: {
 		publicPath: process.env.EXTENSION ? './' : '/',
 		path: path.resolve('dist'),
-		filename: `[name].${version}.js`,
+		filename: '[name].js',
 		pathinfo: process.env.NODE_ENV === 'local',
 		sourceMapFilename: '[name].js.map',
 		chunkFilename: '[name].bundle.js',
@@ -77,18 +80,6 @@ module.exports = {
 				}),
 			},
 		],
-	},
-	optimization: {
-		splitChunks: {
-			cacheGroups: {
-				default: false,
-				commons: {
-					test: /[\\/]node_modules[\\/]/,
-					name: 'vendor',
-					chunks: 'all',
-				},
-			},
-		},
 	},
 	resolve: {
 		modules: [
