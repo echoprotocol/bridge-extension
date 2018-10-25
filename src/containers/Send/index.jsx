@@ -1,11 +1,15 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
+import { Link } from 'react-router-dom';
+
 import BridgeInput from '../../components/BridgeInput';
 import BridgeTextArea from '../../components/BridgeTextArea';
 // import ErrorTransaction from './ErrorTransaction';
 // import SuccessTransaction from './SuccessTransaction';
 
+
+import { INDEX_PATH } from '../../constants/RouterConstants';
 
 class Send extends React.Component {
 
@@ -25,10 +29,10 @@ class Send extends React.Component {
 		return (
 			<React.Fragment>
 				<div className="return-block">
-					<a href="#" className="link-return">
+					<Link to={INDEX_PATH} className="link-return">
 						<i className="icon-return" />
 						<span className="link-text">Return</span>
-					</a>
+					</Link>
 				</div>
 				<div
 					className="user-scroll"

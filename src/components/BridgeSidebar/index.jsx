@@ -3,7 +3,14 @@ import PropTypes from 'prop-types';
 import { Sidebar, Button } from 'semantic-ui-react';
 import { PanelGroup, Panel } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
-import { WALLET_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
+import {
+	BACKUP_PATH,
+	CREATE_ACCOUNT_PATH,
+	RECEIVE_PATH,
+	SEND_PATH,
+	TRANSACTIONS_PATH,
+	WATCH_TOKEN_PATH,
+} from '../../constants/RouterConstants';
 import UserIcon from '../UserIcon';
 
 
@@ -49,10 +56,10 @@ class BridgeSidebar extends React.PureComponent {
 										</Panel.Heading>
 										<Panel.Body collapsible>
 											<div>
-												<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>Send</Link>
+												<Link onClick={() => onSidebarToggle()} to={SEND_PATH}>Send</Link>
 											</div>
 											<div>
-												<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>Receive</Link>
+												<Link onClick={() => onSidebarToggle()} to={RECEIVE_PATH}>Receive</Link>
 											</div>
 											<div>
 												<Link onClick={() => onSidebarToggle()} to={WATCH_TOKEN_PATH}>
@@ -66,13 +73,13 @@ class BridgeSidebar extends React.PureComponent {
 								</PanelGroup>
 							</li>
 							<li>
-								<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>
+								<Link onClick={() => onSidebarToggle()} to={TRANSACTIONS_PATH}>
 									<i className="icon-navHistory" />
 									<div className="nav-title">Transactions history</div>
 								</Link>
 							</li>
 							<li>
-								<Link onClick={() => onSidebarToggle()} to={WALLET_PATH}>
+								<Link onClick={() => onSidebarToggle()} to={BACKUP_PATH}>
 									<i className="icon-navBackup" />
 									<div className="nav-title">Backup account</div>
 								</Link>
@@ -80,7 +87,7 @@ class BridgeSidebar extends React.PureComponent {
 							<li>
 								<Link
 									onClick={() => onSidebarToggle()}
-									to={WALLET_PATH}
+									to={CREATE_ACCOUNT_PATH}
 								>
 									<i className="icon-navInfo" />
 									<div className="nav-title">About Bridge</div>

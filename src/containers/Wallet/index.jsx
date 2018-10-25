@@ -1,14 +1,14 @@
 import React from 'react';
-import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+// import { Dropdown, MenuItem } from 'react-bootstrap';
 
-import { WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
+import { RECEIVE_PATH, SEND_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
+
 import FormatHelper from '../../helpers/FormatHelper';
-
 
 class Wallet extends React.Component {
 
@@ -81,15 +81,12 @@ class Wallet extends React.Component {
 						</div>
 						<div className="page-action-wrap">
 							<div className="two-btn-wrap" >
-								<Button
-									className="btn-transparent"
-									content={<span className="btn-text">Recieve</span>}
-								/>
-								<Button
-									className="btn-in-light"
-									content={<span className="btn-text">Send</span>}
-								/>
-
+								<Link className="btn-transparent link" to={RECEIVE_PATH}>
+									<span className="btn-text">Recieve</span>
+								</Link>
+								<Link className="btn-in-light link" to={SEND_PATH}>
+									<span className="btn-text">Send</span>
+								</Link>
 							</div>
 						</div>
 					</div>

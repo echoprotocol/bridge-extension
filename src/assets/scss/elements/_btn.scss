@@ -152,6 +152,19 @@
 
     &-in-light {
         @extend %btnIn;
+        &.link {
+            &:not(.disabled):not(:active) {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            &:active,
+            &.disabled {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
         &:not(.disabled) {
            @include onBtnFocus(
                 $angularMax,
@@ -227,7 +240,6 @@
                 align-items: center;
                 justify-content: center;
             }
-
         }
         background-color: transparent;
         color: #535e65;
@@ -504,7 +516,8 @@
  .two-btn-wrap {
     display: flex;
 
-    button {
+    button,
+    a {
         &:not(:last-child) {
             margin-right: 12px;
         }

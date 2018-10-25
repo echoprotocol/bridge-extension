@@ -17,7 +17,6 @@ class BridgeInput extends React.Component {
 		};
 	}
 
-
 	onFocus() {
 		this.setState({ up: true });
 	}
@@ -157,10 +156,10 @@ BridgeInput.propTypes = {
 	hintText: PropTypes.string,
 	hintClickable: PropTypes.bool,
 	descriptionText: PropTypes.string,
+	onChange: PropTypes.func,
 	privacyEye: PropTypes.bool,
 	innerDropdown: PropTypes.array,
 	userIcon: PropTypes.string,
-	onChange: PropTypes.func,
 	onHintClick: PropTypes.func,
 	onKeyDown: PropTypes.func,
 	onKeyPress: PropTypes.func,
@@ -184,10 +183,10 @@ BridgeInput.defaultProps = {
 	hintText: '',
 	hintClickable: false,
 	descriptionText: '',
+	onChange: null,
 	privacyEye: false,
 	innerDropdown: null,
 	userIcon: null,
-	onChange: null,
 	onHintClick: null,
 	onKeyDown: null,
 	onKeyPress: null,
