@@ -41,9 +41,8 @@ import storage from '../services/storage';
  * 	@param {String} field
  * 	@param {Any} value
  */
-const set = (field, value) => (dispatch) => {
-	dispatch(GlobalReducer.actions.set({ field, value }));
-};
+const set = (field, value) => (dispatch) => dispatch(GlobalReducer.actions.set({ field, value }));
+
 
 /**
  *  @method initAccount
@@ -399,10 +398,11 @@ export const changeAccountIcon = (icon, iconColor) => async (dispatch, getState)
 	account = account.set('icon', icon).set('iconColor', iconColor);
 
 	try {
+		dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+
 		dispatch(batchActions([
-			setCryptoInfo('accounts', accounts.get(networkName)),
-			set('accounts', accounts),
-			set('account', account),
+			GlobalReducer.actions.set({ field: 'accounts', value: accounts }),
+			GlobalReducer.actions.set({ field: 'account', value: account }),
 		]));
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));

@@ -3,6 +3,8 @@ import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
+import { changeAccountIcon } from '../../actions/GlobalActions';
+
 import UserIcon from '../../components/UserIcon';
 
 import { ACCOUNT_COLORS } from '../../constants/GlobalConstants';
@@ -40,6 +42,12 @@ class SettingsAccount extends React.Component {
 		}
 
 		this.setState({ iconColor: value });
+	}
+
+	onSaveIcon() {
+		const { icon, iconColor } = this.state;
+
+		this.props.changeAccountIcon(icon, iconColor);
 	}
 
 	render() {
@@ -105,7 +113,7 @@ class SettingsAccount extends React.Component {
 							<div className="one-btn-wrap">
 								<Button
 									className="btn-in-light"
-
+									onClick={() => this.onSaveIcon()}
 									content={
 										<span className="btn-text">Save and close</span>
 									}
@@ -125,6 +133,7 @@ class SettingsAccount extends React.Component {
 
 SettingsAccount.propTypes = {
 	account: PropTypes.object,
+	changeAccountIcon: PropTypes.func.isRequired,
 };
 
 SettingsAccount.defaultProps = {
@@ -135,5 +144,7 @@ export default connect(
 	(state) => ({
 		account: state.global.get('account'),
 	}),
-	() => ({}),
+	(dispatch) => ({
+		changeAccountIcon: (icon, color) => dispatch(changeAccountIcon(icon, color)),
+	}),
 )(SettingsAccount);

@@ -100,7 +100,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
  *
  * 	@param {String} field
  * 	@param {Any} value
- * 	@param {String} networkName
+ * 	@param {String?} networkName
  */
 export const setCryptoInfo = (field, value, networkName) => async (dispatch, getState) => {
 	try {
