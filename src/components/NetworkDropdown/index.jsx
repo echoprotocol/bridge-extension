@@ -225,7 +225,7 @@ class NetworkDropdown extends React.PureComponent {
 									<MenuItem
 										onClick={() => this.addNetwork()}
 										eventKey={addNetworkEventKey}
-									>+ Add Networks
+									>+ Add Network
 									</MenuItem>
 								</div>
 							</div>

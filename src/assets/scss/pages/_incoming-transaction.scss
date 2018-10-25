@@ -1,0 +1,99 @@
+.incoming-transaction {
+    &-wrap {
+        .wallet-info {
+            height: 62px;
+            background-color: #dfe3e7;
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            padding: 0 20px;
+            color: #90999A;
+            font-family: FNBook;
+            font-size: 14px;
+            .name {
+                font-size: 16px;
+                color: #2D3A3D;
+                margin-left: 10px;
+                letter-spacing: 0.7px;
+            }
+        }
+        .transaction-info {
+            margin-top: 40px;
+            .line {
+                display: flex;
+                justify-content: space-between;
+                font-size: 14px;
+                padding: 0 20px;
+                letter-spacing: .3px;
+                &:not(:last-child) {
+                    margin-bottom: 15px;
+                }
+            }
+            .key {
+                font-family: FNBook;
+                color: #90999A;
+                white-space: nowrap;
+
+            }
+            .value {
+                font-family: FNMedium;
+                color: #2C393D;
+                white-space: nowrap;
+                display: flex;
+            }
+            .balance {
+                @include cutTxt();
+                max-width: 132px;
+                margin-right: 5px;
+            }
+        }
+    }
+    &-user {
+        display: flex;
+        align-items: center;
+    }
+    &-page {
+        padding: 9px;
+        height: 364px;
+    }
+    &-bg {
+        height: 117px;
+        background-color: rgba(#324046,1);
+        position: relative;
+        z-index: 1;
+        padding: 10px;
+        display: flex;
+        flex-direction: column;
+        align-items: flex-start;
+        &:before {
+            position: absolute;
+            right: 0;
+            left: 0;
+            bottom: 0;
+            top: 0;
+            content: "";
+            opacity: .07;
+            background-position: center -66%;
+            background-image: url(../images/walletBG.jpg);
+            background-size: 130%;
+            z-index: -1;
+        }
+        .title {
+            font-family: FNBook;
+            color: #fff;
+            font-size: 20px;
+            margin: auto 18px 17px;
+            letter-spacing: .7px;
+        }
+        .btn-icon {
+            margin-top: 11px;
+            font-size: 17px;
+            color: #97ACAD;
+            &:hover,
+            &:focus {
+                color: #fff;
+            } 
+        }
+    }
+    
+}
