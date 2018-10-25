@@ -53,6 +53,7 @@ class NetworkDropdown extends React.PureComponent {
 		const currentNetworkName = network.get('name');
 
 		if (currentNetworkName === name) {
+			this.closeDropDown();
 			return;
 		}
 
