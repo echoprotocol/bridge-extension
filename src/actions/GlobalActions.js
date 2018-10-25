@@ -369,6 +369,6 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
  *  Initialize crypto and connect to blockchain
  */
 export const globalInit = () => async (dispatch) => {
-	await dispatch(initCrypto());
+	// await dispatch(initCrypto());
 	await dispatch(connect());
 };
