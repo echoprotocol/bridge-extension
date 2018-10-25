@@ -1,5 +1,6 @@
 import echojs from 'echojs-ws';
 import chainjs from 'echojs-lib';
+import EventEmitter from 'events';
 
 import Crypto from '../src/services/crypto';
 import extensionizer from './extensionizer';
@@ -8,63 +9,70 @@ import NotificationManager from './NotificationManager';
 import { NETWORKS } from '../src/constants/GlobalConstants';
 
 const notificationManager = new NotificationManager();
-
+const emitter = new EventEmitter();
 const crypto = new Crypto();
 
 const popupIsOpen = false;
 const notificationIsOpen = false;
-const openMetamaskTabsIDs = {};
+const openBridgeTabsIDs = {};
+const requestQueue = [];
 
-const instance = echojs.Apis.instance(
-	NETWORKS[0].url,
-	true,
-	4000,
-	{ enableCrypto: false },
-);
+const createSocket = () => {
+	const instance = echojs.Apis.instance(NETWORKS[0].url, true, 4000);
 
-echojs.Apis.setAutoReconnect(false);
+	echojs.Apis.setAutoReconnect(false);
 
-instance.init_promise
-	.then(() => chainjs.ChainStore.init())
-	.then(() => {});
-
-window.getWsLib = () => echojs;
-window.getChainLib = () => chainjs;
-window.getCrypto = () => crypto;
-
-
-const createPopup = () => {
-	const height = 591;
-	const width = 362;
-
-	let popupId = '';
-
-	const cb = (currentPopup) => { popupId = currentPopup.id; };
-
-	const creation = extensionizer.windows.create({
-		url: 'index.html#transactions', type: 'popup', width, height,
-	}, cb);
-	creation && creation.then && creation.then(cb);
+	instance.init_promise
+		.then(() => chainjs.ChainStore.init())
+		.then(() => {});
 };
 
-const triggerUi = () => {
+const triggerUi = (tabId) => {
 	extensionizer.tabs.query({ active: true }, (tabs) => {
-		const currentlyActiveMetamaskTab = Boolean(tabs.find((tab) => openMetamaskTabsIDs[tab.id]));
+		const currentlyActiveMetamaskTab = Boolean(tabs.find((tab) => openBridgeTabsIDs[tab.id]));
 		if (!popupIsOpen && !currentlyActiveMetamaskTab && !notificationIsOpen) {
 			notificationManager.showPopup();
+			openBridgeTabsIDs[tabId] = true;
+
 		}
 	});
 };
 
+const isPopupOpen = (tabId) => openBridgeTabsIDs[tabId];
+
 const onExternalMessage = (request, sender, sendResponse) => {
-	switch (request.window) {
-		case 'send':
-
+	const id = Date.now();
+	requestQueue.push({
+		request, sender, id, cb: sendResponse,
+	});
+	const tabId = sender.tab.id;
+	if (isPopupOpen(tabId)) {
+		emitter.emit('request', id, request);
+	} else {
+		triggerUi(tabId);
 	}
-	if (request.window === 'send') {
 
-	}
+	// todo onClose popup event and remove it from openBridgeTabsIDs map
+	// https://developer.chrome.com/extensions/windows#method-create
 };
+
+const onResponse = (err, id, status) => {
+	const request = requestQueue.find(({ id: requestId }) => requestId === id);
+	if (!request) return;
+
+	request.cb({ status, text: err });
+};
+
+
+createSocket();
+
+window.getWsLib = () => echojs;
+window.getChainLib = () => chainjs;
+window.getCrypto = () => crypto;
+window.getEmitter = () => emitter;
+window.getList = () => requestQueue.map(({ id, request }) => ({ id, request }));
+
+emitter.on('response', onResponse);
 
 extensionizer.runtime.onMessageExternal.addListener(onExternalMessage);
 

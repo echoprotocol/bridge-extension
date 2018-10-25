@@ -13,6 +13,8 @@ import FormatHelper from '../helpers/FormatHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
+import echoService from '../services/echo';
+
 import {
 	ACCOUNT_COLORS,
 	BASE_ICON,
@@ -371,4 +373,7 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
 export const globalInit = () => async (dispatch) => {
 	await dispatch(initCrypto());
 	await dispatch(connect());
+
+	echoService.getEmitter().on('request', (id, options) => { console.log(id, options); });
+	echoService.getEmitter().emit('response', null, '1', 'approved');
 };

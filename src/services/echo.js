@@ -2,11 +2,13 @@
 
 import echojs from 'echojs-ws';
 import chainlib from 'echojs-lib';
+import EventEmitter from 'events';
 
 import Crypto from '../services/crypto';
 import extension from '../../extension/extensionizer';
 
 const crypto = new Crypto();
+const emitter = new EventEmitter();
 
 class Echo {
 
@@ -20,6 +22,10 @@ class Echo {
 
 	static getCrypto() {
 		return EXTENSION ? extension.extension.getBackgroundPage().getCrypto() : crypto;
+	}
+
+	static getEmitter() {
+		return EXTENSION ? extension.extension.getBackgroundPage().getEmitter() : emitter;
 	}
 
 }

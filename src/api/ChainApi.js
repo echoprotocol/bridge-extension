@@ -110,3 +110,18 @@ export const lookupAccounts = async (accountName, limit) => {
 
 	return result;
 };
+
+/**
+ * lookup account
+ * @param {String} accountName
+ * @param {Number} limit
+ * @returns {Object}
+ */
+export const getAccountRefsOfKey = async (key) => {
+	const { ChainStore } = echoService.getChainLib();
+
+	const result = await ChainStore.FetchChain('getAccountRefsOfKey', key);
+
+	return result;
+};
+

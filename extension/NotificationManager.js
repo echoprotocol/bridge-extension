@@ -11,16 +11,21 @@ class NotificationManager {
 
 			// Bring focus to chrome popup
 			if (popup) {
-				// bring focus to existing chrome popup
 				extensionizer.windows.update(popup.id, { focused: true });
 			} else {
 				const cb = (currentPopup) => { this.popupId = currentPopup.id; };
+
+				// top params offset from top
+				// left params offset from left
+
 				// create new notification popup
 				const creation = extensionizer.windows.create({
 					url: 'index.html',
 					type: 'popup',
 					width,
 					height,
+					focused: true,
+
 				}, cb);
 				creation && creation.then && creation.then(cb);
 			}
