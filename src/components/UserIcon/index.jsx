@@ -6,6 +6,23 @@ import { Button } from 'semantic-ui-react';
 
 class UserIcon extends React.PureComponent {
 
+	onClick() {
+		console.log(this.props.onChangeIcon, this.props.onPressBack);
+		if (this.props.onChangeIcon) {
+			this.props.onChangeIcon();
+		} else if (this.props.onPressBack) {
+			this.props.onPressBack();
+		}
+	}
+
+	onKeyPress(e) {
+		const code = e.keyCode || e.which;
+
+		if (this.props.onSelectIcon && [13, 32].includes(code)) {
+			this.props.onSelectIcon();
+		}
+	}
+
 	renderAnimationChange() {
 		return (
 			<React.Fragment>
@@ -48,7 +65,8 @@ class UserIcon extends React.PureComponent {
 					{ active: this.props.active },
 					this.props.color,
 				)}
-				onClick={this.props.onChangeIcon && (() => this.props.onChangeIcon())}
+				onClick={(e) => this.onClick(e)}
+				onKeyPress={(e) => this.onKeyPress(e)}
 			>
 				<div className="content">
 					<i
@@ -76,6 +94,8 @@ UserIcon.propTypes = {
 	active: PropTypes.bool,
 	tabSelect: PropTypes.bool,
 	onChangeIcon: PropTypes.func,
+	onSelectIcon: PropTypes.func,
+	onPressBack: PropTypes.func,
 
 };
 UserIcon.defaultProps = {
@@ -87,6 +107,8 @@ UserIcon.defaultProps = {
 	active: false,
 	tabSelect: false,
 	onChangeIcon: null,
+	onSelectIcon: null,
+	onPressBack: null,
 
 };
 export default connect(

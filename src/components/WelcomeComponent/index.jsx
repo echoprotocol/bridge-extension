@@ -6,16 +6,10 @@ import { withRouter } from 'react-router';
 import BridgeBtnCopy from '../BridgeBtnCopy';
 import UserIcon from '../UserIcon';
 
-import { SETTINGS_ACCOUNT_PATH } from '../../constants/RouterConstants';
-
 class WelcomeComponent extends React.Component {
 
 	componentWillUnmount() {
 		this.props.unmount();
-	}
-
-	onChangeIcon() {
-		this.props.history.push(SETTINGS_ACCOUNT_PATH);
 	}
 
 	render() {
@@ -31,7 +25,7 @@ class WelcomeComponent extends React.Component {
 					animationChange
 					size="big"
 					avatar={`ava${icon}`}
-					onChangeIcon={() => this.onChangeIcon()}
+					onChangeIcon={() => this.props.onChangeIcon()}
 				/>
 
 				<div className="page-wrap" >
@@ -44,8 +38,8 @@ class WelcomeComponent extends React.Component {
 							wif ?
 								<React.Fragment>
 									<div className="instruction-text">
-										Save your WIF key and don’t loose it.
-										You <br /> will need it to restore account.
+                                        Save your WIF key and don’t loose it.
+                                        You <br /> will need it to restore account.
 									</div>
 									<div className="wif-wrap">
 										<div className="wif">{wif}</div>
@@ -72,7 +66,6 @@ class WelcomeComponent extends React.Component {
 				</div>
 			</div>
 		);
-
 	}
 
 }
@@ -89,7 +82,7 @@ WelcomeComponent.propTypes = {
 	iconColor: PropTypes.string.isRequired,
 	unmount: PropTypes.func.isRequired,
 	proceed: PropTypes.func.isRequired,
-	history: PropTypes.object.isRequired,
+	onChangeIcon: PropTypes.func.isRequired,
 };
 
 export default withRouter(WelcomeComponent);

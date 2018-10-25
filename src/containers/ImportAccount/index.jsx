@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import {
 	IMPORT_ACCOUNT_PATH,
 	IMPORT_SUCCESS_PATH,
-	INDEX_PATH,
+	INDEX_PATH, SETTINGS_ACCOUNT_PATH,
 } from '../../constants/RouterConstants';
 import { FORM_SIGN_IN } from '../../constants/FormConstants';
 
@@ -14,6 +14,7 @@ import { clearForm, setValue } from '../../actions/FormActions';
 
 import ImportComponent from './ImportComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
+import SettingsAccount from '../SettingsAccount';
 
 class ImportAccount extends React.Component {
 
@@ -81,11 +82,27 @@ class ImportAccount extends React.Component {
 		this.props.history.push(INDEX_PATH);
 	}
 
+	onChangeIcon() {
+
+		this.props.history.push(SETTINGS_ACCOUNT_PATH);
+	}
+
+	onBack() {
+		this.setState({
+			success: true,
+			settings: false,
+		});
+
+		this.props.history.goBack();
+	}
+
 	render() {
 		const {
 			nameError, passwordError, loading, accounts, networkName,
 		} = this.props;
-		const { name, password, success } = this.state;
+		const {
+			name, password, success, settings,
+		} = this.state;
 
 		if (success) {
 			if (!accounts.get(networkName)) {
@@ -105,8 +122,12 @@ class ImportAccount extends React.Component {
 					iconColor={account.iconColor}
 					proceed={() => this.onProceedClick()}
 					unmount={() => this.setState({ name: '', password: '', success: false })}
+					onChangeIcon={() => this.onChangeIcon()}
 				/>
 			);
+		} else if (settings) {
+			console.log(settings);
+			return <SettingsAccount onBack={() => this.onBack()} />;
 		}
 
 		return (

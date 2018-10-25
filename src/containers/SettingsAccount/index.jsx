@@ -50,6 +50,11 @@ class SettingsAccount extends React.Component {
 		this.props.changeAccountIcon(icon, iconColor);
 	}
 
+	onPressBack() {
+		this.props.onBack();
+		this.props.history.goBack();
+	}
+
 	render() {
 		if (!this.state) {
 			return null;
@@ -66,6 +71,7 @@ class SettingsAccount extends React.Component {
 						size="big"
 						animationBack
 						avatar={`ava${icon}`}
+						onPressBack={() => this.onPressBack()}
 					/>
 					<div className="page-wrap" >
 						<div className="page">
@@ -84,6 +90,7 @@ class SettingsAccount extends React.Component {
 													color="transparent"
 													avatar={`ava${i + 1}`}
 													onChangeIcon={() => this.onChangeIcon(i + 1)}
+													onSelectIcon={() => this.onChangeIcon(i + 1)}
 												/>
 											</li>
 										);
@@ -133,7 +140,9 @@ class SettingsAccount extends React.Component {
 
 SettingsAccount.propTypes = {
 	account: PropTypes.object,
+	history: PropTypes.object.isRequired,
 	changeAccountIcon: PropTypes.func.isRequired,
+	onBack: PropTypes.func.isRequired,
 };
 
 SettingsAccount.defaultProps = {

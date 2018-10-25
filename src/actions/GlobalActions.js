@@ -404,6 +404,8 @@ export const changeAccountIcon = (icon, iconColor) => async (dispatch, getState)
 			GlobalReducer.actions.set({ field: 'accounts', value: accounts }),
 			GlobalReducer.actions.set({ field: 'account', value: account }),
 		]));
+
+		history.push(INDEX_PATH);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}

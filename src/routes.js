@@ -40,7 +40,7 @@ export default class Routes extends React.Component {
 					<Route exact path={CREATE_ACCOUNT_PATH} component={CreateAccount} />
 					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
 
-					<Route exact path={SETTINGS_ACCOUNT_PATH} component={SettingsAccount} />
+					{/*<Route exact path={SETTINGS_ACCOUNT_PATH} component={SettingsAccount} />*/}
 
 					<Route exact path={CREATE_PIN_PATH} component={Pin.Create} />
 					<Route exact path={WIPE_PIN_PATH} component={Pin.Wipe} />
