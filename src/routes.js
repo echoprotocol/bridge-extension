@@ -16,7 +16,6 @@ import {
 	TRANSACTIONS_PATH,
 	SEND_PATH,
 	BACKUP_PATH,
-	INCOMING_TRANSACTION_PATH,
 	WATCH_TOKEN_PATH,
 	SIGN_TRANSACTION_PATH,
 } from './constants/RouterConstants';
@@ -33,9 +32,6 @@ import Receive from './containers/Receive';
 import Transactions from './containers/Transactions';
 import Send from './containers/Send';
 import Backup from './containers/Backup';
-
-import IncomingTransaction from './containers/IncomingTransaction';
-
 import WatchToken from './containers/WatchToken';
 import SignTransaction from './containers/SignTransaction';
 
@@ -60,8 +56,6 @@ export default class Routes extends React.Component {
 					<Route exact path={TRANSACTIONS_PATH} component={Transactions} />
 					<Route exact path={SEND_PATH} component={Send} />
 					<Route exact path={BACKUP_PATH} component={Backup} />
-
-					<Route exact path={INCOMING_TRANSACTION_PATH} component={IncomingTransaction} />
 
 					<Route exact path={WATCH_TOKEN_PATH} component={WatchToken} />
 

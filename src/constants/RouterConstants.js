@@ -15,8 +15,6 @@ export const SUCCESS_ADD_NETWORK_PATH = '/networks/success';
 export const RECEIVE_PATH = '/receive';
 
 export const TRANSACTIONS_PATH = '/transactions';
-export const INCOMING_TRANSACTION_PATH = '/transactions/incoming';
-
 
 export const SEND_PATH = '/send';
 
