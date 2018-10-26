@@ -32,7 +32,7 @@ class AddNetwork extends React.Component {
 			|| (address.value !== prevAddress.value)
 			|| (registrator.value !== prevRegistrator.value)
 		) {
-			return;
+			return false;
 		}
 
 		if (name.error && this.nameRef) {
@@ -42,6 +42,8 @@ class AddNetwork extends React.Component {
 		} else if (registrator.error && this.registratorRef) {
 			this.registratorRef.focus();
 		}
+
+		return true;
 	}
 
 	componentWillUnmount() {

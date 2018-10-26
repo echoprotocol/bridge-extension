@@ -54,7 +54,7 @@ class NetworkDropdown extends React.PureComponent {
 
 		if (currentNetworkName === name) {
 			this.closeDropDown();
-			return null;
+			return false;
 		}
 
 		this.props.setGlobalLoad();
@@ -63,7 +63,7 @@ class NetworkDropdown extends React.PureComponent {
 		setTimeout(() => this.props.changeNetwork(newNetwork), 0);
 		this.closeDropDown();
 
-		return null;
+		return true;
 	}
 
 	onSwitchAccount(e, accountName, network) {
@@ -74,7 +74,7 @@ class NetworkDropdown extends React.PureComponent {
 		const { account } = this.props;
 
 		if (!account || !activeNetwork) {
-			return;
+			return false;
 		}
 
 		if (activeNetwork.get('name') === network.name) {
@@ -86,7 +86,7 @@ class NetworkDropdown extends React.PureComponent {
 
 			this.closeDropDown();
 
-			return null;
+			return false;
 		}
 
 		this.props.setGlobalLoad();
@@ -95,7 +95,7 @@ class NetworkDropdown extends React.PureComponent {
 
 		this.closeDropDown();
 
-		return null;
+		return true;
 	}
 
 	setDDMenuHeight() {
