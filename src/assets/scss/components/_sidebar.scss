@@ -111,6 +111,8 @@
             display: flex;
             align-items: center;
             transition: color $speed;
+            -webkit-font-smoothing: antialiased;
+            -moz-osx-font-smoothing: grayscale;
             i {
                 width: 30px;
                 height: 30px; 

@@ -149,51 +149,39 @@
             letter-spacing: .3px;
             transition: all .2s ease-out;
 
-            .icon {
-                width: 26px;
-                font-size: 21px;
-            }
-
-            &.transaction {
-                .icon {
-                    padding-left: 1px;
-                    &:before {
-                        content: "\e92e";
-                    }
+            .icon-PicAccount {
+                &:before {
+                    content: "\e92a";
+                    font-size: 19px;
+                    margin-right: 5px;
                 }
             }
-
-            &.account-created {
-                .icon {
-                    padding-left: 1px;
-                    &:before {
-                        content: "\e92a"; 
-                    }
+            .icon-PicContract {
+                &:before {
+                    content: "\e92b";
+                    font-size: 20px;
+                    margin-right: 3px;
                 }
             }
-
-            &.contract-created {
-                .icon {
-                    &:before {
-                        content: "\E92B";
-                    }
+            .icon-PicRecieved {
+                &:before {
+                    content: "\e92c";
+                    font-size: 22px;
+                    margin-right: 1px;                
                 }
             }
-
-            &.received {
-                .icon {
-                    &:before {
-                        content: "\e92c";
-                    }
+            .icon-PicSent {
+                &:before {
+                    content: "\e92d";
+                    font-size: 21px;
+                    margin-right: 3px;
                 }
             }
-
-            &.sent {
-                .icon {
-                    padding-left: 2px;
-                    &:before {
-                        content: "\e92d";
-                    }
+            .icon-PicTransaction {
+                &:before {
+                    content: "\e92e";
+                    font-size: 19px;
+                    margin-right: 6px;
                 }
             }
 

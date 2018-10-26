@@ -10,7 +10,12 @@ class CheckBox extends React.Component {
 
 		return (
 			<div className={`checkbox-container ${(additionalClass) && additionalClass}`}>
-				<input type="checkbox" id={id} checked={checked} onChange={(e) => this.props.onChange(e)} />
+				<input
+					type="checkbox"
+					id={id}
+					checked={checked}
+					onChange={(e) => this.props.onChange(e)}
+				/>
 				<label htmlFor={id}>
 					<div className="icon-checkbox" />
 					{
