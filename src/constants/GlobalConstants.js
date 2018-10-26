@@ -77,7 +77,7 @@ export const NETWORKS = [
 	},
 ];
 
-export const ACCOUNT_COLORS = ['green', 'yellow', 'lemon', 'blue', 'sky', 'pink', 'red'];
+export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
 
 export const TIMEOUT = 10 * 60 * 1000;
 export const RANDOM_SIZE = 2048;
@@ -88,7 +88,7 @@ export const CORE_SYMBOL = 'ECHO';
 export const CORE_ID = '1.3.0';
 export const GLOBAL_ID = '2.1.0';
 export const KEY_CODE_ENTER = 13;
-export const KEY_CODE_SPACE = 62;
+export const KEY_CODE_SPACE = 32;
 export const ICONS_COUNT = 15;
 export const ICON_COLORS_COUNT = 7;
 export const BASE_ICON = 1;
