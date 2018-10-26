@@ -19,7 +19,7 @@ export default class WatchTokens extends React.Component {
 						className="link-return"
 					>
 						<i className="icon-return" />
-						<span className="link-text">Back</span>
+						<span className="link-text">Return</span>
 					</Link>
 				</div>
 				<div className="watch-scroll">
