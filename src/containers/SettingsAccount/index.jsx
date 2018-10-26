@@ -7,15 +7,15 @@ import { changeAccountIcon } from '../../actions/GlobalActions';
 
 import UserIcon from '../../components/UserIcon';
 
-import { ACCOUNT_COLORS } from '../../constants/GlobalConstants';
+import { ACCOUNT_COLORS, BASE_ICON, BASE_ICON_COLOR, ICONS_COUNT } from '../../constants/GlobalConstants';
 
 class SettingsAccount extends React.Component {
 
 	constructor(props) {
 		super(props);
 
-		let accountIcon = 0;
-		let accountColor = '';
+		let accountIcon = BASE_ICON;
+		let accountColor = BASE_ICON_COLOR;
 
 		if (props.account) {
 			accountIcon = props.account.get('icon');
@@ -32,20 +32,24 @@ class SettingsAccount extends React.Component {
 		const { icon } = this.state;
 
 		if (icon === value) {
-			return;
+			return false;
 		}
 
 		this.setState({ icon: value });
+
+		return true;
 	}
 
 	onChangeColor(value) {
 		const { iconColor } = this.state;
 
 		if (iconColor === value) {
-			return;
+			return false;
 		}
 
 		this.setState({ iconColor: value });
+
+		return true;
 	}
 
 	onSaveIcon() {
@@ -55,10 +59,6 @@ class SettingsAccount extends React.Component {
 	}
 
 	render() {
-		if (!this.state) {
-			return null;
-		}
-
 		const { icon, iconColor } = this.state;
 
 		return (
@@ -70,14 +70,14 @@ class SettingsAccount extends React.Component {
 						size="big"
 						animationBack
 						avatar={`ava${icon}`}
-						onChangeIcon={() => this.props.onBack()}
+						onClickIcon={() => this.props.onBack()}
 					/>
 					<div className="page-wrap" >
 						<div className="page">
 							<ul className="list-avatars">
 
 								{
-									Array(15).fill(undefined).map((elm, i) => {
+									Array(ICONS_COUNT).fill(undefined).map((elm, i) => {
 										const id = i;
 
 										return (
@@ -88,7 +88,7 @@ class SettingsAccount extends React.Component {
 													active={i === (icon - 1)}
 													color="transparent"
 													avatar={`ava${i + 1}`}
-													onChangeIcon={() => this.onChangeIcon(i + 1)}
+													onClickIcon={() => this.onChangeIcon(i + 1)}
 												/>
 											</li>
 										);

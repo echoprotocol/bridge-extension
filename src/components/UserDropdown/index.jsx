@@ -49,24 +49,26 @@ class UserDropdown extends React.PureComponent {
 		const { accounts, networkName } = this.props;
 
 		if (!accounts) {
-			return;
+			return false;
 		}
 
 		if (!accounts.get(networkName).find((i) => i.name === name)) {
-			return;
+			return false;
 		}
 
 		const { account } = this.props;
 
 		if (!account) {
-			return;
+			return false;
 		}
 
 		if (account.get('name') === name) {
-			return;
+			return false;
 		}
 
 		this.props.switchAccount(name);
+
+		return true;
 	}
 
 	onRemoveAccount(e, name) {

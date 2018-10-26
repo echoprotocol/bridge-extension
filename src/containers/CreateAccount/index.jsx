@@ -44,7 +44,7 @@ class CreateAccount extends React.Component {
 			const { accounts, networkName } = nextProps;
 
 			if (!accounts) {
-				return;
+				return false;
 			}
 
 			const account = accounts.get(networkName).find((i) => i.name === this.state.name);
@@ -66,6 +66,8 @@ class CreateAccount extends React.Component {
 				wif: '',
 			});
 		}
+
+		return true;
 	}
 
 	componentDidUpdate(prevProps, prevState) {

@@ -8,16 +8,16 @@ import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants'
 class UserIcon extends React.PureComponent {
 
 	onClick() {
-		if (this.props.onChangeIcon) {
-			this.props.onChangeIcon();
+		if (this.props.onClickIcon) {
+			this.props.onClickIcon();
 		}
 	}
 
 	onKeyPress(e) {
 		const code = e.keyCode || e.which;
 
-		if (this.props.onChangeIcon && [KEY_CODE_ENTER, KEY_CODE_SPACE].includes(code)) {
-			this.props.onChangeIcon();
+		if (this.props.onClickIcon && [KEY_CODE_ENTER, KEY_CODE_SPACE].includes(code)) {
+			this.props.onClickIcon();
 		}
 	}
 
@@ -90,7 +90,7 @@ UserIcon.propTypes = {
 	select: PropTypes.bool,
 	active: PropTypes.bool,
 	tabSelect: PropTypes.bool,
-	onChangeIcon: PropTypes.func,
+	onClickIcon: PropTypes.func,
 
 };
 UserIcon.defaultProps = {
@@ -101,7 +101,7 @@ UserIcon.defaultProps = {
 	select: false,
 	active: false,
 	tabSelect: false,
-	onChangeIcon: null,
+	onClickIcon: null,
 
 };
 export default UserIcon;
