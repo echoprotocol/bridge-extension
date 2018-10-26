@@ -24,10 +24,6 @@ class BridgeSidebar extends React.PureComponent {
 	render() {
 		const { visibleSidebar, account } = this.props;
 
-		if (!account) {
-			return null;
-		}
-
 		return (
 			<React.Fragment>
 				<Sidebar
@@ -44,14 +40,17 @@ class BridgeSidebar extends React.PureComponent {
 								</React.Fragment>
 							}
 						/>
-						<div className="sidebar-user">
-							<UserIcon
-								color={account.get('iconColor')}
-								avatar={`ava${account.get('icon')}`}
-								size="medium"
-							/>
-							<div className="name">{account.get('name')}</div>
-						</div>
+						{
+							account &&
+							<div className="sidebar-user">
+								<UserIcon
+									color={account.get('iconColor')}
+									avatar={`ava${account.get('icon')}`}
+									size="medium"
+								/>
+								<div className="name">{account.get('name')}</div>
+							</div>
+						}
 					</div>
 					<nav className="sidebar-body">
 						<ul className="nav-list">

@@ -48,7 +48,6 @@ class App extends React.Component {
 	}
 
 	render() {
-		console.log(1);
 		return EXTENSION ? this.renderApp() : (
 			<div className="temp-wrap">
 				{ this.renderApp() }
