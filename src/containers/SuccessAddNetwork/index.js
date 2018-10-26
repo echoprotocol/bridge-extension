@@ -11,7 +11,13 @@ class SuccessAddNetwork extends React.Component {
 
 	renderSuccess() {
 		const { network } = this.props;
+
+		if (!network) {
+			return null;
+		}
+
 		const networkName = network.get('name');
+
 		return (
 			<div className="page">
 				<div className="icon-pageNetwork">
