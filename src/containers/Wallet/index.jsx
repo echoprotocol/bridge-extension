@@ -55,7 +55,7 @@ class Wallet extends React.Component {
 											return (
 
 												<li key={balance.get('id')}>
-													<a href="">
+													<a>
 														<div className="balance-info">
 															<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
 															<span>{asset.get('symbol')}</span>
