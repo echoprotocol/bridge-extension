@@ -1,3 +1,4 @@
+/* eslint-disable no-nested-ternary */
 import echojs from 'echojs-ws';
 import chainjs from 'echojs-lib';
 import EventEmitter from 'events';
@@ -12,9 +13,7 @@ const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
 
-const popupIsOpen = false;
-const notificationIsOpen = false;
-const openBridgeTabsIDs = {};
+let isPopupOpen = false;
 const requestQueue = [];
 
 const createSocket = () => {
@@ -27,34 +26,65 @@ const createSocket = () => {
 		.then(() => {});
 };
 
-const triggerUi = (tabId) => {
-	extensionizer.tabs.query({ active: true }, (tabs) => {
-		const currentlyActiveMetamaskTab = Boolean(tabs.find((tab) => openBridgeTabsIDs[tab.id]));
-		if (!popupIsOpen && !currentlyActiveMetamaskTab && !notificationIsOpen) {
-			notificationManager.showPopup();
-			openBridgeTabsIDs[tabId] = true;
+const triggerUi = () => {
+	console.log('trigger');
+	isPopupOpen = true;
+	notificationManager.showPopup();
 
-		}
-	});
 };
 
-const isPopupOpen = (tabId) => openBridgeTabsIDs[tabId];
+const closeUi = () => {
+	isPopupOpen = false;
+	notificationManager.closePopup();
+};
+
+const setBadge = () => {
+	const { length } = requestQueue;
+	const text = length === 0 ? '' : (length > 9 ? '9+' : length.toString());
+	extensionizer.browserAction.setBadgeText({ text });
+};
+
+const getAccountList = () => {
+
+};
 
 const onExternalMessage = (request, sender, sendResponse) => {
-	const id = Date.now();
-	requestQueue.push({
-		request, sender, id, cb: sendResponse,
-	});
-	const tabId = sender.tab.id;
-	if (isPopupOpen(tabId)) {
-		emitter.emit('request', id, request);
-	} else {
-		triggerUi(tabId);
-	}
+	if (!request.method) return;
 
-	// todo onClose popup event and remove it from openBridgeTabsIDs map
-	// todo detect is extension open
-	// https://developer.chrome.com/extensions/windows#method-create
+	if (request.method === 'confirm' && request.data) {
+
+		const id = Date.now();
+
+		requestQueue.push({
+			data: request.data, sender, id, cb: sendResponse,
+		});
+
+		setBadge();
+		emitter.emit('request', id, request);
+
+		notificationManager.getPopup((err, popup) => {
+			console.log(err, popup, err || !popup);
+			if (err || !popup) triggerUi();
+		});
+	} else if (request.method === 'accounts') {
+		requestQueue.shift().cb(request.method);
+		// sendResponse();
+
+		setBadge();
+
+		notificationManager.getPopup((popupErr, popup) => {
+			if (requestQueue.length === 0 || !popup) closeUi();
+		});
+
+		// let res = [];
+		// try {
+		// 	res = getAccountList();
+		// } catch (e) {
+		// 	res = e;
+		// } finally {
+		// 	sendResponse(res);
+		// }
+	}
 };
 
 const onResponse = (err, id, status) => {
@@ -62,6 +92,12 @@ const onResponse = (err, id, status) => {
 	if (requestIndex === -1) return;
 
 	requestQueue.splice(requestIndex, 1)[0].cb({ status, text: err });
+
+	setBadge();
+
+	notificationManager.getPopup((popupErr, popup) => {
+		if (requestQueue.length === 0 || !popup) closeUi();
+	});
 };
 
 
@@ -71,9 +107,10 @@ window.getWsLib = () => echojs;
 window.getChainLib = () => chainjs;
 window.getCrypto = () => crypto;
 window.getEmitter = () => emitter;
+window.isPopupOpen = () => isPopupOpen;
 window.getList = () => requestQueue.map(({ id, request }) => ({ id, request }));
 
 emitter.on('response', onResponse);
 
 extensionizer.runtime.onMessageExternal.addListener(onExternalMessage);
-
+extensionizer.browserAction.setBadgeBackgroundColor({ color: [70, 120, 50, 255] });

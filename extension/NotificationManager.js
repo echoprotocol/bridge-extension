@@ -6,30 +6,21 @@ const width = 362;
 class NotificationManager {
 
 	showPopup() {
-		this.getPopup((err, popup) => {
-			if (err) throw err;
+		console.log('show')
+		const cb = (popup) => { this.popupId = popup.id; };
 
-			// Bring focus to chrome popup
-			if (popup) {
-				extensionizer.windows.update(popup.id, { focused: true });
-			} else {
-				const cb = (currentPopup) => { this.popupId = currentPopup.id; };
+		// top params offset from top
+		// left params offset from left
 
-				// top params offset from top
-				// left params offset from left
+		// create new notification popup
+		const creation = extensionizer.windows.create({
+			url: 'index.html',
+			type: 'popup',
+			width,
+			height,
+		}, cb);
 
-				// create new notification popup
-				const creation = extensionizer.windows.create({
-					url: 'index.html',
-					type: 'popup',
-					width,
-					height,
-					focused: true,
-
-				}, cb);
-				creation && creation.then && creation.then(cb);
-			}
-		});
+		if (creation && creation.then) creation.then(cb);
 	}
 
 	/**
@@ -39,9 +30,8 @@ class NotificationManager {
 	closePopup() {
 		// closes notification popup
 		this.getPopup((err, popup) => {
-			if (err) throw err;
-			if (!popup) return;
-			extensionizer.windows.remove(popup.id, console.error);
+			if (err || !popup) return;
+			extensionizer.windows.remove(this.popupId, console.error);
 		});
 	}
 
@@ -55,8 +45,8 @@ class NotificationManager {
      */
 	getPopup(cb) {
 		this.getWindows((err, windows) => {
-			if (err) throw err;
-			cb(null, this.getPopupIn(windows));
+			if (err) return cb(err);
+			return cb(null, this.getPopupIn(windows));
 		});
 	}
 
@@ -79,7 +69,6 @@ class NotificationManager {
 
 	getPopupIn(windows) {
 		return windows ? windows.find((win) =>
-		// Returns notification popup
 			(win && win.type === 'popup' && win.id === this.popupId)) : null;
 	}
 

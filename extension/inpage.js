@@ -8,7 +8,7 @@ window.send = (to = '1.2.15', amount = 1, cb) => {
 	extensionizer.runtime.sendMessage(
 		ID,
 		{
-			window: 'send',
+			method: 'confirm',
 			data: {
 				to,
 				amount,
@@ -16,4 +16,9 @@ window.send = (to = '1.2.15', amount = 1, cb) => {
 		},
 		cb,
 	);
+};
+
+
+window.delete = (cb) => {
+	extensionizer.runtime.sendMessage(ID, { method: 'accounts' }, cb);
 };
