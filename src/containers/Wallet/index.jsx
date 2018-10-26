@@ -15,7 +15,7 @@ class Wallet extends React.Component {
 	render() {
 		const { assets, balances, account } = this.props;
 
-		if (!account || !balances || !assets) {
+		if (!account) {
 			return null;
 		}
 
