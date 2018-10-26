@@ -88,7 +88,7 @@ class ImportAccount extends React.Component {
 		const { name, password, success } = this.state;
 
 		if (success) {
-			if (!accounts.get(networkName)) {
+			if (!accounts || !accounts.get(networkName)) {
 				return null;
 			}
 

@@ -70,6 +70,10 @@ class NetworkDropdown extends React.PureComponent {
 
 		const { account } = this.props;
 
+		if (!account || !activeNetwork) {
+			return;
+		}
+
 		if (activeNetwork.get('name') === network.name) {
 			if (account.get('name') === accountName) {
 				this.closeDropDown();

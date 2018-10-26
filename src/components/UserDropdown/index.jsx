@@ -48,11 +48,19 @@ class UserDropdown extends React.PureComponent {
 	onSelect(name) {
 		const { accounts, networkName } = this.props;
 
+		if (!accounts) {
+			return;
+		}
+
 		if (!accounts.get(networkName).find((i) => i.name === name)) {
 			return;
 		}
 
 		const { account } = this.props;
+
+		if (!account) {
+			return;
+		}
 
 		if (account.get('name') === name) {
 			return;
@@ -97,6 +105,11 @@ class UserDropdown extends React.PureComponent {
 		const {
 			balances, assets, accounts, account: activeAccount, networkName,
 		} = this.props;
+
+		if (!balances || !assets || !accounts || !activeAccount) {
+			return null;
+		}
+
 		const asset = assets.get('1.3.0');
 
 		if (!asset) {
@@ -141,7 +154,7 @@ class UserDropdown extends React.PureComponent {
 	render() {
 		const { account, accounts } = this.props;
 
-		if (!account) {
+		if (!account || !accounts) {
 			return null;
 		}
 
