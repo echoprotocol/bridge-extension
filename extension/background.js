@@ -13,13 +13,18 @@ const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
 
+console.log('background')
+
+const storage = extensionizer.storage.local;
+
+
 let isPopupOpen = false;
 const requestQueue = [];
 
 const createSocket = () => {
-	const instance = echojs.Apis.instance(NETWORKS[0].url, true, 4000);
+    const instance = echojs.Apis.instance(NETWORKS[0].url, true, 4000);
 
-	echojs.Apis.setAutoReconnect(false);
+    echojs.Apis.setAutoReconnect(false);
 
 	instance.init_promise
 		.then(() => chainjs.ChainStore.init())
@@ -44,11 +49,29 @@ const setBadge = () => {
 	extensionizer.browserAction.setBadgeText({ text });
 };
 
-const getAccountList = () => {
+const getAccountList = async () => {
+    const currentNetworkPromise = new Promise((resolve, reject) => {
+        storage.get(null, (result) => {
+            const err = extensionizer.runtime.lastError;
 
+            if (err) {
+                reject(err);
+            } else {
+                resolve(result.current_network);
+            }
+        });
+    });
+
+    const network = await currentNetworkPromise || NETWORKS[0];
+	console.log(network);
+	const accounts = await crypto.getInByNetwork(network.name, 'accounts');
+
+	console.log(accounts)
+
+	return accounts;
 };
 
-const onExternalMessage = (request, sender, sendResponse) => {
+const onExternalMessage = async (request, sender, sendResponse) => {
 	if (!request.method) return;
 
 	if (request.method === 'confirm' && request.data) {
@@ -63,27 +86,18 @@ const onExternalMessage = (request, sender, sendResponse) => {
 		emitter.emit('request', id, request);
 
 		notificationManager.getPopup((err, popup) => {
-			console.log(err, popup, err || !popup);
+			console.log(err, popup)
 			if (err || !popup) triggerUi();
 		});
 	} else if (request.method === 'accounts') {
-		requestQueue.shift().cb(request.method);
-		// sendResponse();
-
-		setBadge();
-
-		notificationManager.getPopup((popupErr, popup) => {
-			if (requestQueue.length === 0 || !popup) closeUi();
-		});
-
-		// let res = [];
-		// try {
-		// 	res = getAccountList();
-		// } catch (e) {
-		// 	res = e;
-		// } finally {
-		// 	sendResponse(res);
-		// }
+		let res = [];
+		try {
+			res = await getAccountList();
+		} catch (e) {
+			res = e;
+		} finally {
+			sendResponse(res);
+		}
 	}
 };
 
