@@ -45,6 +45,17 @@ const set = (field, value) => (dispatch) => {
 };
 
 /**
+ *  @method sidebarToggle
+ *
+ * 	Toggle sidebar visibility
+ *
+ * 	@param {Boolean} value
+ */
+export const sidebarToggle = (value) => (dispatch) => {
+	dispatch(GlobalReducer.actions.sidebarToggle({ value }));
+};
+
+/**
  *  @method initAccount
  *
  * 	Initialize account
