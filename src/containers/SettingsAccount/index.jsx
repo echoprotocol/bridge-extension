@@ -14,13 +14,17 @@ class SettingsAccount extends React.Component {
 	constructor(props) {
 		super(props);
 
-		if (!props.account) {
-			return;
+		let accountIcon = 0;
+		let accountColor = '';
+
+		if (props.account) {
+			accountIcon = props.account.get('icon');
+			accountColor = props.account.get('iconColor');
 		}
 
 		this.state = {
-			icon: props.account.get('icon'),
-			iconColor: props.account.get('iconColor'),
+			icon: accountIcon,
+			iconColor: accountColor,
 		};
 	}
 
@@ -66,7 +70,7 @@ class SettingsAccount extends React.Component {
 						size="big"
 						animationBack
 						avatar={`ava${icon}`}
-						onPressBack={() => this.props.onBack()}
+						onChangeIcon={() => this.props.onBack()}
 					/>
 					<div className="page-wrap" >
 						<div className="page">
@@ -85,7 +89,6 @@ class SettingsAccount extends React.Component {
 													color="transparent"
 													avatar={`ava${i + 1}`}
 													onChangeIcon={() => this.onChangeIcon(i + 1)}
-													onSelectIcon={() => this.onChangeIcon(i + 1)}
 												/>
 											</li>
 										);

@@ -21,7 +21,7 @@ class WelcomeComponent extends React.Component {
 					animationChange
 					size="big"
 					avatar={`ava${icon}`}
-					onSwitchToIcon={() => this.props.onChangeIcon()}
+					onChangeIcon={() => this.props.onChangeIcon()}
 				/>
 
 				<div className="page-wrap" >

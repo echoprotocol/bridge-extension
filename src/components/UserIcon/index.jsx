@@ -1,26 +1,23 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Button } from 'semantic-ui-react';
+
+import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants';
 
 class UserIcon extends React.PureComponent {
 
 	onClick() {
 		if (this.props.onChangeIcon) {
 			this.props.onChangeIcon();
-		} else if (this.props.onPressBack) {
-			this.props.onPressBack();
-		} else if (this.props.onSwitchToIcon) {
-			this.props.onSwitchToIcon();
 		}
 	}
 
 	onKeyPress(e) {
 		const code = e.keyCode || e.which;
 
-		if (this.props.onSelectIcon && [13, 32].includes(code)) {
-			this.props.onSelectIcon();
+		if (this.props.onChangeIcon && [KEY_CODE_ENTER, KEY_CODE_SPACE].includes(code)) {
+			this.props.onChangeIcon();
 		}
 	}
 
@@ -94,9 +91,6 @@ UserIcon.propTypes = {
 	active: PropTypes.bool,
 	tabSelect: PropTypes.bool,
 	onChangeIcon: PropTypes.func,
-	onSelectIcon: PropTypes.func,
-	onPressBack: PropTypes.func,
-	onSwitchToIcon: PropTypes.func,
 
 };
 UserIcon.defaultProps = {
@@ -108,10 +102,6 @@ UserIcon.defaultProps = {
 	active: false,
 	tabSelect: false,
 	onChangeIcon: null,
-	onSelectIcon: null,
-	onPressBack: null,
-	onSwitchToIcon: null,
 
 };
-export default connect()(UserIcon);
-
+export default UserIcon;
