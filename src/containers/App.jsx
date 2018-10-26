@@ -46,6 +46,7 @@ class App extends React.Component {
 			<Navigator
 				visible={visible}
 				onSidebarToggle={() => this.onSidebarToggle()}
+				pathname={pathname}
 			/>
 		);
 	}

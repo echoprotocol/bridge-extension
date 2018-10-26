@@ -25,3 +25,4 @@ window.getChainLib = () => chainjs;
 window.getCrypto = () => crypto;
 window.getEmitter = () => ({ on: () => {}, emit: () => {} });
 window.getRequests = () => ([]);
+window.isPopupOpen = () => (false);

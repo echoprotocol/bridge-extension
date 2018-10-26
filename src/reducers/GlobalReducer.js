@@ -23,6 +23,7 @@ const DEFAULT_FIELDS = Map({
 		goTo: null,
 	}),
 	sign: new Map({
+		current: null,
 		transactions: new List([]),
 		goTo: null,
 	}),

@@ -32,6 +32,10 @@ class Echo {
 		return EXTENSION ? extension.extension.getBackgroundPage().getRequests() : [];
 	}
 
+	static isPopupOpen() {
+		return EXTENSION ? extension.extension.getBackgroundPage().isPopupOpen() : false;
+	}
+
 }
 
 export default Echo;

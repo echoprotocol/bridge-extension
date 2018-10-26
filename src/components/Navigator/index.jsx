@@ -5,6 +5,7 @@ import Header from '../Header';
 import Navbar from '../Navbar';
 import BridgeSidebar from '../BridgeSidebar';
 
+import { SIGN_TRANSACTION_PATH } from '../../constants/RouterConstants';
 
 class Navigator extends React.PureComponent {
 
@@ -21,7 +22,7 @@ class Navigator extends React.PureComponent {
 	}
 
 	render() {
-		const { visible, onSidebarToggle } = this.props;
+		const { visible, onSidebarToggle, pathname } = this.props;
 
 
 		return (
@@ -33,8 +34,10 @@ class Navigator extends React.PureComponent {
 						onSidebarToggle={onSidebarToggle}
 					/>
 				</FocusTrap>
-
-				<Navbar onSidebarToggle={onSidebarToggle} />
+				{
+					pathname !== SIGN_TRANSACTION_PATH ?
+						<Navbar onSidebarToggle={onSidebarToggle} /> : null
+				}
 			</React.Fragment>
 		);
 	}
@@ -44,7 +47,7 @@ class Navigator extends React.PureComponent {
 Navigator.propTypes = {
 	visible: PropTypes.bool.isRequired,
 	onSidebarToggle: PropTypes.func.isRequired,
-
+	pathname: PropTypes.string.isRequired,
 };
 
 export default Navigator;

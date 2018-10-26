@@ -4,7 +4,13 @@ import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 import UserIcon from '../../components/UserIcon';
-import { approveTransaction, cancelTransaction } from '../../actions/SignActions';
+import {
+	approveTransaction,
+	cancelTransaction,
+	errorTransaction,
+} from '../../actions/SignActions';
+import { formatToShow } from '../../services/operation';
+import { operationKeys, operationTypes } from '../../constants/OperationConstants';
 
 class SignTransaction extends React.Component {
 
@@ -19,20 +25,22 @@ class SignTransaction extends React.Component {
 	}
 
 	onCancel() {
-		this.props.cancel(this.props.transaction);
+		this.props.cancel(this.props.transaction.get('id'));
 	}
 
 	render() {
 		const { transaction } = this.props;
 
+		if (!transaction) { return null; }
+
+		const options = transaction.get('options');
+
+		const show = formatToShow(options.type, options);
+		const accountKey = operationKeys[options.type];
+
 		return (
 			<div className="incoming-transaction-wrap">
 				<div className="incoming-transaction-bg">
-					<Button
-						className="btn-icon"
-						content={<i className="icon-closeBig" />}
-					/>
-
 					<div className="title">New unsigned transaction</div>
 				</div>
 				<div className="incoming-transaction-page">
@@ -44,15 +52,25 @@ class SignTransaction extends React.Component {
 								color="green"
 								avatar="ava1"
 							/>
-							<div className="name">Homersimpson435</div>
+							<div className="name">
+								{show[accountKey]}
+							</div>
 						</div>
 					</div>
 					<div className="transaction-info">
 						<div className="line">
 							<div className="key">Type</div>
-							<div className="value">New contract</div>
+							<div className="value">{operationTypes[options.type]}</div>
 						</div>
-						<div className="line">
+						{
+							Object.entries(show).map(([key, value]) => (
+								<div className="line" key={key}>
+									<div className="key">{key}</div>
+									<div className="value">{value}</div>
+								</div>
+							))
+						}
+						{/* <div className="line">
 							<div className="key">Amount</div>
 							<div className="value">None</div>
 						</div>
@@ -66,7 +84,7 @@ class SignTransaction extends React.Component {
 						<div className="line">
 							<div className="key">Max total</div>
 							<div className="value"> {'<'} 0.0000001 ECHO</div>
-						</div>
+						</div> */}
 					</div>
 				</div>
 				<div className="page-action-wrap">
@@ -94,9 +112,11 @@ class SignTransaction extends React.Component {
 
 SignTransaction.propTypes = {
 	transaction: PropTypes.any,
+	// accounts: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
 	approve: PropTypes.func.isRequired,
 	cancel: PropTypes.func.isRequired,
+	// error: PropTypes.func.isRequired,
 };
 
 SignTransaction.defaultProps = {
@@ -105,10 +125,12 @@ SignTransaction.defaultProps = {
 
 export default connect(
 	(state) => ({
-		transaction: state.global.getIn(['sign', 'transactions', 0]),
+		transaction: state.global.getIn(['sign', 'current']),
+		accounts: state.global.get('accounts'),
 	}),
 	(dispatch) => ({
 		approve: (transaction) => dispatch(approveTransaction(transaction)),
 		cancel: (transaction) => dispatch(cancelTransaction(transaction)),
+		error: (error, transaction) => dispatch(errorTransaction(transaction)),
 	}),
 )(SignTransaction);
