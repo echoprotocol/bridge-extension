@@ -21,7 +21,7 @@ class ImportComponent extends React.Component {
 		} = this.props;
 
 		if ((name !== prevName) || (password !== prevPassword)) {
-			return;
+			return false;
 		}
 
 		if (nameError && this.nameRef) {
@@ -29,6 +29,8 @@ class ImportComponent extends React.Component {
 		} else if (passwordError && this.passwordRef) {
 			this.passwordRef.focus();
 		}
+
+		return true;
 	}
 
 

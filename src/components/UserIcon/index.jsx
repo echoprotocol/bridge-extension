@@ -1,10 +1,25 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { Button } from 'semantic-ui-react';
 
+import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants';
+
 class UserIcon extends React.PureComponent {
+
+	onClick() {
+		if (this.props.onClickIcon) {
+			this.props.onClickIcon();
+		}
+	}
+
+	onKeyPress(e) {
+		const code = e.keyCode || e.which;
+
+		if (this.props.onClickIcon && [KEY_CODE_ENTER, KEY_CODE_SPACE].includes(code)) {
+			this.props.onClickIcon();
+		}
+	}
 
 	renderAnimationChange() {
 		return (
@@ -34,7 +49,6 @@ class UserIcon extends React.PureComponent {
 	}
 
 	render() {
-
 		return (
 			<Button
 				tabIndex={this.props.tabSelect && !this.props.active ? '0' : '-1'}
@@ -48,6 +62,8 @@ class UserIcon extends React.PureComponent {
 					{ active: this.props.active },
 					this.props.color,
 				)}
+				onClick={(e) => this.onClick(e)}
+				onKeyPress={(e) => this.onKeyPress(e)}
 			>
 				<div className="content">
 					<i
@@ -74,6 +90,7 @@ UserIcon.propTypes = {
 	select: PropTypes.bool,
 	active: PropTypes.bool,
 	tabSelect: PropTypes.bool,
+	onClickIcon: PropTypes.func,
 
 };
 UserIcon.defaultProps = {
@@ -84,11 +101,7 @@ UserIcon.defaultProps = {
 	select: false,
 	active: false,
 	tabSelect: false,
+	onClickIcon: null,
 
 };
-export default connect(
-	() => ({
-	}),
-	() => ({}),
-)(UserIcon);
-
+export default UserIcon;

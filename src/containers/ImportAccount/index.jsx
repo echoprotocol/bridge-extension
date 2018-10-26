@@ -5,7 +5,7 @@ import PropTypes from 'prop-types';
 import {
 	IMPORT_ACCOUNT_PATH,
 	IMPORT_SUCCESS_PATH,
-	INDEX_PATH,
+	INDEX_PATH, IMPORT_SETTINGS_PATH,
 } from '../../constants/RouterConstants';
 import { FORM_SIGN_IN } from '../../constants/FormConstants';
 
@@ -14,6 +14,7 @@ import { clearForm, setValue } from '../../actions/FormActions';
 
 import ImportComponent from './ImportComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
+import SettingsAccount from '../SettingsAccount';
 
 class ImportAccount extends React.Component {
 
@@ -24,6 +25,7 @@ class ImportAccount extends React.Component {
 			name: '',
 			password: '',
 			success: false,
+			settings: false,
 		};
 	}
 
@@ -40,16 +42,29 @@ class ImportAccount extends React.Component {
 		const { pathname: nextPath, search: nextSearch } = nextProps.location;
 		const { pathname, search } = this.props.location;
 
-		if ((`${nextPath}${nextSearch}` !== `${pathname}${search}`) && (`${nextPath}${nextSearch}` === IMPORT_ACCOUNT_PATH)) {
-			this.setState({ success: false });
+		if (
+			(`${nextPath}${nextSearch}` !== `${pathname}${search}`)
+			&& (`${nextPath}${nextSearch}` === IMPORT_ACCOUNT_PATH)
+		) {
+			this.setState({
+				name: '',
+				password: '',
+				success: false,
+				settings: false,
+			});
 		}
 	}
 
 	componentDidUpdate(prevProps, prevState) {
-		const { success } = this.state;
-		const { success: prevSuccess } = prevState;
+		const { success, settings } = this.state;
+		const { success: prevSuccess, settings: prevSettings } = prevState;
 
-		if (!success && (success !== prevSuccess)) {
+		if (
+			!success
+			&& !settings
+			&& (settings !== prevSettings)
+			&& (success !== prevSuccess)
+		) {
 			this.props.history.push(IMPORT_ACCOUNT_PATH);
 		}
 	}
@@ -81,11 +96,31 @@ class ImportAccount extends React.Component {
 		this.props.history.push(INDEX_PATH);
 	}
 
+	onChangeIcon() {
+		this.setState({
+			success: false,
+			settings: true,
+		});
+
+		this.props.history.push(IMPORT_SETTINGS_PATH);
+	}
+
+	onBack() {
+		this.setState({
+			success: true,
+			settings: false,
+		});
+
+		this.props.history.goBack();
+	}
+
 	render() {
 		const {
 			nameError, passwordError, loading, accounts, networkName,
 		} = this.props;
-		const { name, password, success } = this.state;
+		const {
+			name, password, success, settings,
+		} = this.state;
 
 		if (success) {
 			if (!accounts || !accounts.get(networkName)) {
@@ -104,7 +139,13 @@ class ImportAccount extends React.Component {
 					icon={account.icon}
 					iconColor={account.iconColor}
 					proceed={() => this.onProceedClick()}
-					unmount={() => this.setState({ name: '', password: '', success: false })}
+					onChangeIcon={() => this.onChangeIcon()}
+				/>
+			);
+		} else if (settings) {
+			return (
+				<SettingsAccount
+					onBack={() => this.onBack()}
 				/>
 			);
 		}
