@@ -53,7 +53,8 @@ class NetworkDropdown extends React.PureComponent {
 		const currentNetworkName = network.get('name');
 
 		if (currentNetworkName === name) {
-			return;
+			this.closeDropDown();
+			return null;
 		}
 
 		this.props.setGlobalLoad();
@@ -61,6 +62,8 @@ class NetworkDropdown extends React.PureComponent {
 		const newNetwork = networks.concat(NETWORKS).find((i) => i.name === name);
 		setTimeout(() => this.props.changeNetwork(newNetwork), 0);
 		this.closeDropDown();
+
+		return null;
 	}
 
 	onSwitchAccount(e, accountName, network) {
@@ -70,16 +73,20 @@ class NetworkDropdown extends React.PureComponent {
 
 		const { account } = this.props;
 
+		if (!account || !activeNetwork) {
+			return;
+		}
+
 		if (activeNetwork.get('name') === network.name) {
 			if (account.get('name') === accountName) {
 				this.closeDropDown();
-				return;
+				return null;
 			}
 			this.props.switchAccount(accountName);
 
 			this.closeDropDown();
 
-			return;
+			return null;
 		}
 
 		this.props.setGlobalLoad();
@@ -87,6 +94,8 @@ class NetworkDropdown extends React.PureComponent {
 		this.props.switchAccountNetwork(accountName, network);
 
 		this.closeDropDown();
+
+		return null;
 	}
 
 	setDDMenuHeight() {
@@ -133,6 +142,7 @@ class NetworkDropdown extends React.PureComponent {
 						>
 							<UserIcon
 								avatar={`ava${account.icon}`}
+								tabSelect
 								color={account.iconColor}
 							/>
 						</div>
@@ -225,7 +235,7 @@ class NetworkDropdown extends React.PureComponent {
 									<MenuItem
 										onClick={() => this.addNetwork()}
 										eventKey={addNetworkEventKey}
-									>+ Add Networks
+									>+ Add Network
 									</MenuItem>
 								</div>
 							</div>

@@ -1,13 +1,17 @@
+@mixin onCheckboxFocus ( $color ) {
+    @include hardwareAccel();
+    &:after {
+        border: 2px solid $color;
+    }
+}
+
 .checkbox-container {
     display: inline-block;
     cursor: pointer;
 
     input {
-        width: 0;
-        height: 0;
+        z-index: -1;
         position: absolute;
-        visibility: hidden;
-        opacity: 0;
     }
 
     .icon-checkbox {
@@ -16,19 +20,39 @@
         width: 16px;
         height: 16px;
         border-radius: 2px;
-        border: 1px solid #495155;
-        background: transparent;
+        border: 1px solid #465054;
+        background-color: transparent;
         position: relative;
         display: flex;
         align-items: center;
         justify-content: center;
-        
+        transition:
+        border-color $speed,
+        background-color $speed,
+        opacity $speed;
+        &:after {
+            transition: border-color $speed .1s;
+            border-color: transparent;
+            position: absolute;
+            border-radius: 3px;
+            top: -4px;
+            right: -4px;
+            bottom: -4px;
+            left: -4px;
+            content: '';
+        }
         &:before {
             opacity: 0;
             visibility: hidden;
             transition: all .2s ease-out;
             color: #343f44;
             font-size: 13px;
+            margin-top: 2px;
+            background-color: transparent;
+        }
+        &:hover {
+            border-color: #5D686C;
+            background-color: rgba(#606669, .1);
         }
     }
 
@@ -37,7 +61,6 @@
         font-size: 14px;
         color: #616669;
         font-weight: 400;
-
         padding-left: 16px;
         letter-spacing: 0.3px;
     }
@@ -47,14 +70,38 @@
         display: flex;
     }
 
-    input:checked ~ label {
+    input:active ~ label {
         .icon-checkbox {
-            background-color: #7ad5ab;
-            border-color: #7ad5ab;
+            border-color: #445055;
+        }
+    }
+    input:focus ~ label {
+        .icon-checkbox {
+            @include onCheckboxFocus(rgba(#fff, .1));
+            background-color: rgba(#606669,.1);
+            border-color: transparent;
+        }
+    }
+
+    input:checked ~ label {
+        
+        .icon-checkbox {
+            background-color: #61D3AD;
+            border-color: #61D3AD;
+            &:hover {
+                background-color: #71E4BE;
+                border-color: #71E4BE;  
+            }
             &:before {
                 opacity: 1;
                 visibility: visible;
             }
         }
     }
+    input:checked:active ~ label {
+        .icon-checkbox {
+            opacity: .5;
+        }
+    }
+
 }

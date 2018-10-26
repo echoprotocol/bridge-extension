@@ -8,6 +8,8 @@ import {
 	RECEIVE_PATH,
 	SEND_PATH,
 	BACKUP_PATH,
+	SUCCESS_ADD_NETWORK_PATH,
+	WATCH_TOKEN_PATH,
 } from './RouterConstants';
 
 export const HEADER_TITLE = [
@@ -56,6 +58,14 @@ export const HEADER_TITLE = [
 	{
 		path: WALLET_PATH,
 		title: 'Wallet',
+	},
+	{
+		path: SUCCESS_ADD_NETWORK_PATH,
+		title: 'Add Network',
+	},
+	{
+		path: WATCH_TOKEN_PATH,
+		title: 'Watch token',
 	},
 ];
 

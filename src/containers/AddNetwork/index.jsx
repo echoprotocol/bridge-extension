@@ -96,6 +96,9 @@ class AddNetwork extends React.Component {
 					<div className="icon-pageNetwork">
 						<span className="path1" />
 						<span className="path2" />
+						<span className="path3" />
+						<span className="path4" />
+						<span className="path5" />
 					</div>
 
 					<div className="three-input-wrap">

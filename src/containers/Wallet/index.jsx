@@ -14,6 +14,11 @@ class Wallet extends React.Component {
 
 	render() {
 		const { assets, balances, account } = this.props;
+
+		if (!account || !balances || !assets) {
+			return null;
+		}
+
 		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size;
 
 		return (
@@ -55,10 +60,12 @@ class Wallet extends React.Component {
 											return (
 
 												<li key={balance.get('id')}>
-													<div className="balance-info">
-														<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
-														<span>{asset.get('symbol')}</span>
-													</div>
+													<a>
+														<div className="balance-info">
+															<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
+															<span>{asset.get('symbol')}</span>
+														</div>
+													</a>
 													{/* { */}
 													{/* asset.type === 'token' ? */}
 													{/* <React.Fragment> */}

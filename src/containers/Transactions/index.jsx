@@ -29,7 +29,7 @@ class Transactions extends React.Component {
 			{
 				id: 0,
 				transaction: {
-					type: 'contract-created',
+					type: 'Contract',
 					typeName: 'Contract created',
 					date: '01 Oct, 11:35',
 					value: '-230.000',
@@ -45,8 +45,8 @@ class Transactions extends React.Component {
 			{
 				id: 1,
 				transaction: {
-					type: 'received',
-					typeName: 'Received',
+					type: 'Recieved',
+					typeName: 'Recieved',
 					date: '23 Oct, 11:35',
 					value: '+ 0.000231234892',
 					currency: 'RLY',
@@ -61,7 +61,7 @@ class Transactions extends React.Component {
 			{
 				id: 2,
 				transaction: {
-					type: 'transaction',
+					type: 'Transaction',
 					typeName: 'Transaction',
 					date: '23 Oct, 11:35',
 					value: '+ 0.000231234892',
@@ -77,7 +77,7 @@ class Transactions extends React.Component {
 			{
 				id: 3,
 				transaction: {
-					type: 'sent',
+					type: 'Sent',
 					typeName: 'Sent',
 					date: '23 Oct, 11:35',
 					value: '+ 0.000231234892',
@@ -93,7 +93,7 @@ class Transactions extends React.Component {
 			{
 				id: 4,
 				transaction: {
-					type: 'account-created',
+					type: 'Account',
 					typeName: 'Account created',
 					date: '23 Oct, 11:35',
 					value: '- 0.000',
@@ -128,14 +128,17 @@ class Transactions extends React.Component {
 												>
 													<div className="transaction-element">
 														<div className="top-block">
-															<div className={`transaction-type ${elem.transaction.type}`}>
-																<div className="icon" />
+															<div className="transaction-type">
+																<div className={`icon-Pic${elem.transaction.type}`} />
 																{elem.transaction.typeName}
 															</div>
 															<div className="transaction-date">{elem.transaction.date}</div>
 														</div>
 														<div className="bottom-block">
-															<div className="transaction-value">{elem.transaction.value}<span className="currency">{elem.transaction.currency}</span></div>
+															<div className="transaction-value">
+																{elem.transaction.value}
+																<span className="currency">{elem.transaction.currency}</span>
+															</div>
 															<div className="icon icon-dropdown" />
 														</div>
 													</div>

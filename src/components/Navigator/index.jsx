@@ -1,6 +1,8 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import FocusTrap from 'focus-trap-react';
+import { connect } from 'react-redux';
+
 import Header from '../Header';
 import Navbar from '../Navbar';
 import BridgeSidebar from '../BridgeSidebar';
@@ -21,20 +23,17 @@ class Navigator extends React.PureComponent {
 	}
 
 	render() {
-		const { visible, onSidebarToggle } = this.props;
+		const { visibleSidebar } = this.props;
 
 
 		return (
 			<React.Fragment>
-				<FocusTrap active={visible} className="trap-wrap">
+				<FocusTrap active={visibleSidebar} className="trap-wrap">
 					<Header />
-					<BridgeSidebar
-						visible={visible}
-						onSidebarToggle={onSidebarToggle}
-					/>
+					<BridgeSidebar />
 				</FocusTrap>
 
-				<Navbar onSidebarToggle={onSidebarToggle} />
+				<Navbar />
 			</React.Fragment>
 		);
 	}
@@ -42,9 +41,13 @@ class Navigator extends React.PureComponent {
 }
 
 Navigator.propTypes = {
-	visible: PropTypes.bool.isRequired,
-	onSidebarToggle: PropTypes.func.isRequired,
+	visibleSidebar: PropTypes.bool.isRequired,
 
 };
 
-export default Navigator;
+export default connect(
+	(state) => ({
+		visibleSidebar: state.global.get('visibleSidebar'),
+	}),
+	() => ({}),
+)(Navigator);
