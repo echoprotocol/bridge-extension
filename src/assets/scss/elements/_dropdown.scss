@@ -374,7 +374,6 @@
         li {
             font-size: 14px;
             transition: color $speed;
-            letter-spacing: 1px;
             &:not(:last-child) {
                 margin-right: 6px;
             }
@@ -404,7 +403,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 3px 0 15px;
+            padding: 0px 3px 0 16px;
             height: 40px;
             background-color: transparent;
             border: 0;
@@ -425,9 +424,9 @@
                 color: #495b5f;
                 font-size: 11px;
             }
-            .user-icon-wrap {
-                margin: 1px -1px 0 1px;
-            }
+            // .user-icon-wrap {
+            //     margin: 1px -1px 0 1px;
+            // }
     
         }
         &-menu {
