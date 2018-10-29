@@ -40,14 +40,14 @@ export const connectToAddress = async (address, subscribeCb) => {
 		if (instance.url !== address) {
 			await Apis.close();
 
+			Apis.setAutoReconnect(false);
+
 			instance = Apis.instance(
 				address,
 				true,
 				4000,
 				{ enableCrypto: false },
 			);
-
-			Apis.setAutoReconnect(false);
 
 			await instance.init_promise;
 		}
