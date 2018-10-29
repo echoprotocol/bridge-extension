@@ -43,11 +43,13 @@ class CreateAccount extends React.Component {
 		if (this.state.wif && this.state.name) {
 			const { accounts, networkName } = nextProps;
 
-			if (!accounts) {
+			const accountsNetwork = accounts.get(networkName);
+
+			if (!accountsNetwork) {
 				return false;
 			}
 
-			const account = accounts.get(networkName).find((i) => i.name === this.state.name);
+			const account = accountsNetwork.find((i) => i.name === this.state.name);
 
 			if (!account) {
 				this.resetState();
@@ -134,11 +136,13 @@ class CreateAccount extends React.Component {
 		const { success, settings } = query.parse(location.search);
 
 		if (wif && success) {
-			if (!accounts || !accounts.get(networkName)) {
+			const accountsNetwork = accounts.get(networkName);
+
+			if (!accountsNetwork) {
 				return null;
 			}
 
-			const account = accounts.get(networkName).find((i) => i.name === name);
+			const account = accountsNetwork.find((i) => i.name === name);
 
 			if (!account) {
 				return null;

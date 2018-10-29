@@ -123,11 +123,13 @@ class ImportAccount extends React.Component {
 		} = this.state;
 
 		if (success) {
-			if (!accounts || !accounts.get(networkName)) {
+			const accountsNetwork = accounts.get(networkName);
+
+			if (!accountsNetwork) {
 				return null;
 			}
 
-			const account = accounts.get(networkName).find((i) => i.name === name);
+			const account = accountsNetwork.find((i) => i.name === name);
 
 			if (!account) {
 				return null;
