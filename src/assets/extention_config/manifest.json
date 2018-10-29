@@ -28,21 +28,13 @@
     }
   ],
   "externally_connectable": {
-    "matches": [
-      "<all_urls>",
-      "http://localhost:3000/",
-      "localhost:3000",
-      "http://*/*",
-      "https://*/*"
-    ],
     "ids": [
       "*"
     ]
   },
   "permissions": [
     "storage",
-    "clipboardWrite",
-    "notifications"
+    "clipboardWrite"
   ],
   "web_accessible_resources": [
     "inpage.js",

@@ -6,7 +6,6 @@ const width = 362;
 class NotificationManager {
 
 	showPopup() {
-		console.log('show')
 		const cb = (popup) => { this.popupId = popup.id; };
 
 		// top params offset from top
@@ -27,12 +26,13 @@ class NotificationManager {
      * Closes a MetaMask notification if it window exists.
      *
      */
-	closePopup() {
-		// closes notification popup
-		this.getPopup((err, popup) => {
-			if (err || !popup) return;
-			extensionizer.windows.remove(this.popupId, console.error);
-		});
+	async closePopup() {
+		try {
+			const popup = await this.getPopup();
+			if (!popup) extensionizer.windows.remove(this.popupId);
+		} catch (e) {
+			throw e;
+		}
 	}
 
 	/**
@@ -43,11 +43,13 @@ class NotificationManager {
      * @param {Function} cb A node style callback that to whcih the found notification window will be passed.
      *
      */
-	getPopup(cb) {
-		this.getWindows((err, windows) => {
-			if (err) return cb(err);
-			return cb(null, this.getPopupIn(windows));
-		});
+	async getPopup() {
+		try {
+			const windows = await this.getWindows();
+			return this.getPopupIn(windows);
+		} catch (e) {
+			throw e;
+		}
 	}
 
 	/**
@@ -57,13 +59,15 @@ class NotificationManager {
      * @param {Function} cb A node style callback that to which the windows will be passed.
      *
      */
-	getWindows(cb) {
-		if (!extensionizer.windows) {
-			return cb();
-		}
+	getWindows() {
+		return new Promise((resolve, reject) => {
+			if (!extensionizer.windows) {
+				return reject();
+			}
 
-		extensionizer.windows.getAll({}, (windows) => {
-			cb(null, windows);
+			return extensionizer.windows.getAll({}, (windows) => {
+				resolve(windows);
+			});
 		});
 	}
 

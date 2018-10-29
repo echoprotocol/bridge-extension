@@ -13,18 +13,14 @@ const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
 
-console.log('background')
-
 const storage = extensionizer.storage.local;
 
-
-let isPopupOpen = false;
 const requestQueue = [];
 
 const createSocket = () => {
-    const instance = echojs.Apis.instance(NETWORKS[0].url, true, 4000);
+	const instance = echojs.Apis.instance(NETWORKS[0].url, true, 4000);
 
-    echojs.Apis.setAutoReconnect(false);
+	echojs.Apis.setAutoReconnect(false);
 
 	instance.init_promise
 		.then(() => chainjs.ChainStore.init())
@@ -32,15 +28,12 @@ const createSocket = () => {
 };
 
 const triggerUi = () => {
-	console.log('trigger');
-	isPopupOpen = true;
 	notificationManager.showPopup();
 
 };
 
 const closeUi = () => {
-	isPopupOpen = false;
-	notificationManager.closePopup();
+	notificationManager.closePopup().then(() => {});
 };
 
 const setBadge = () => {
@@ -50,29 +43,31 @@ const setBadge = () => {
 };
 
 const getAccountList = async () => {
-    const currentNetworkPromise = new Promise((resolve, reject) => {
-        storage.get(null, (result) => {
-            const err = extensionizer.runtime.lastError;
+	const currentNetworkPromise = new Promise((resolve) => {
+		storage.get(null, (result) => {
+			const err = extensionizer.runtime.lastError;
 
-            if (err) {
-                reject(err);
-            } else {
-                resolve(result.current_network);
-            }
-        });
-    });
+			if (err) {
+				return resolve(NETWORKS[0]);
+			}
 
-    const network = await currentNetworkPromise || NETWORKS[0];
-	console.log(network);
-	const accounts = await crypto.getInByNetwork(network.name, 'accounts');
+			return resolve(result.current_network || NETWORKS[0]);
 
-	console.log(accounts)
+		});
+	});
 
-	return accounts;
+	const network = await currentNetworkPromise;
+
+	try {
+		const accounts = await crypto.getInByNetwork(network.name, 'accounts');
+		return accounts;
+	} catch (e) {
+		return { error: e.message };
+	}
 };
 
-const onExternalMessage = async (request, sender, sendResponse) => {
-	if (!request.method) return;
+const onExternalMessage = (request, sender, sendResponse) => {
+	if (!request.method) return false;
 
 	if (request.method === 'confirm' && request.data) {
 
@@ -82,38 +77,31 @@ const onExternalMessage = async (request, sender, sendResponse) => {
 			data: request.data, sender, id, cb: sendResponse,
 		});
 
-		setBadge();
 		emitter.emit('request', id, request);
 
-		notificationManager.getPopup((err, popup) => {
-			console.log(err, popup)
-			if (err || !popup) triggerUi();
-		});
+		notificationManager.getPopup()
+			.then((popup) => !popup && triggerUi())
+			.catch(triggerUi);
+
+
 	} else if (request.method === 'accounts') {
-		let res = [];
-		try {
-			res = await getAccountList();
-		} catch (e) {
-			res = e;
-		} finally {
-			sendResponse(res);
-		}
+		getAccountList().then(sendResponse);
 	}
+
+	return true;
 };
 
-const onResponse = (err, id, status) => {
+const onResponse = async (err, id, status) => {
 	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
 	if (requestIndex === -1) return;
 
 	requestQueue.splice(requestIndex, 1)[0].cb({ status, text: err });
 
-	setBadge();
-
-	notificationManager.getPopup((popupErr, popup) => {
-		if (requestQueue.length === 0 || !popup) closeUi();
-	});
+	notificationManager.getPopup()
+		.then((popup) => {
+			if (requestQueue.length === 0 || !popup) closeUi();
+		});
 };
-
 
 createSocket();
 
@@ -121,10 +109,11 @@ window.getWsLib = () => echojs;
 window.getChainLib = () => chainjs;
 window.getCrypto = () => crypto;
 window.getEmitter = () => emitter;
-window.isPopupOpen = () => isPopupOpen;
 window.getList = () => requestQueue.map(({ id, request }) => ({ id, request }));
 
 emitter.on('response', onResponse);
 
 extensionizer.runtime.onMessageExternal.addListener(onExternalMessage);
-extensionizer.browserAction.setBadgeBackgroundColor({ color: [70, 120, 50, 255] });
+// extensionizer.runtime.onConnectExternal.addListener(console.log)
+
+extensionizer.browserAction.setBadgeText({ text: 'BETA' });

@@ -1,12 +1,12 @@
 /* global EXTENSION */
 
-const extension = require('./extensionizer');
+const extensionizer = require('./extensionizer');
 
 function setupInjection() {
 	try {
 		const scriptTag = document.createElement('script');
 
-		scriptTag.src = extension.extension.getURL('inpage.js');
+		scriptTag.src = extensionizer.extension.getURL('inpage.js');
 
 		scriptTag.onload = function () { this.parentNode.removeChild(this); };
 		const container = document.head || document.documentElement;
@@ -20,6 +20,7 @@ function setupInjection() {
 	} catch (e) {
 		console.error('Bridge injection failed.', e);
 	}
+
 }
 
 EXTENSION && setupInjection();
