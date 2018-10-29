@@ -86,6 +86,7 @@ class SettingsAccount extends React.Component {
 													select
 													tabSelect
 													active={i === (icon - 1)}
+													size="custom"
 													color="transparent"
 													avatar={`ava${i + 1}`}
 													onClickIcon={() => this.onChangeIcon(i + 1)}
