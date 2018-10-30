@@ -33,7 +33,7 @@ const triggerUi = () => {
 };
 
 const closeUi = () => {
-	notificationManager.closePopup().then(() => {});
+	notificationManager.closePopup();
 };
 
 const setBadge = () => {
@@ -59,7 +59,7 @@ const getAccountList = async () => {
 	const network = await currentNetworkPromise;
 
 	try {
-		const accounts = await crypto.getInByNetwork(network.name, 'accounts');
+		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
 		return accounts;
 	} catch (e) {
 		return { error: e.message };
@@ -67,11 +67,11 @@ const getAccountList = async () => {
 };
 
 const onExternalMessage = (request, sender, sendResponse) => {
-	if (!request.method) return false;
+	if (!request.method || !request.id) return false;
+
+	const { id } = request;
 
 	if (request.method === 'confirm' && request.data) {
-
-		const id = Date.now();
 
 		requestQueue.push({
 			data: request.data, sender, id, cb: sendResponse,
@@ -83,9 +83,8 @@ const onExternalMessage = (request, sender, sendResponse) => {
 			.then((popup) => !popup && triggerUi())
 			.catch(triggerUi);
 
-
 	} else if (request.method === 'accounts') {
-		getAccountList().then(sendResponse);
+		getAccountList().then((res) => sendResponse({ id, res }));
 	}
 
 	return true;
@@ -95,7 +94,7 @@ const onResponse = async (err, id, status) => {
 	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
 	if (requestIndex === -1) return;
 
-	requestQueue.splice(requestIndex, 1)[0].cb({ status, text: err });
+	requestQueue.splice(requestIndex, 1)[0].cb({ id, status, text: err });
 
 	notificationManager.getPopup()
 		.then((popup) => {
@@ -113,7 +112,6 @@ window.getList = () => requestQueue.map(({ id, request }) => ({ id, request }));
 
 emitter.on('response', onResponse);
 
-extensionizer.runtime.onMessageExternal.addListener(onExternalMessage);
-// extensionizer.runtime.onConnectExternal.addListener(console.log)
+extensionizer.runtime.onMessage.addListener(onExternalMessage);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });

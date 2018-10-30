@@ -26,13 +26,9 @@ class NotificationManager {
      * Closes a MetaMask notification if it window exists.
      *
      */
-	async closePopup() {
-		try {
-			const popup = await this.getPopup();
-			if (!popup) extensionizer.windows.remove(this.popupId);
-		} catch (e) {
-			throw e;
-		}
+	closePopup() {
+		this.getPopup()
+			.then((popup) => (popup && extensionizer.windows.remove(popup.id, console.error)));
 	}
 
 	/**

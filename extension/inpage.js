@@ -1,35 +1,68 @@
 import echojslib from 'echojs-lib';
 import echojsws from 'echojs-ws';
 
-import extensionizer from './extensionizer';
+const requestQueue = [];
 
-// find ip for client
-// https://stackoverflow.com/questions/21497781/how-to-change-chrome-packaged-app-id-or-why-do-we-need-key-field-in-the-manifest/21500707#21500707
-const ID = 'inehljcgpfbhihkianpgjpjaapgchlni';
+const onMessage = (event) => {
+	const { id, target } = event.data;
 
-// const port = extensionizer.runtime.connect(ID);
-// console.log(port)
-// port.onMessage.addListener(console.log)
-const confirm = (data) => new Promise((resolve, reject) => {
-	extensionizer.runtime.sendMessage(ID, { method: 'confirm', data }, (res) => {
-		if (res.error) reject(res.error);
-		resolve(res);
+	if (!id || target !== 'inpage') return;
+
+	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
+	if (requestIndex === -1) return;
+
+	requestQueue.splice(requestIndex, 1)[0].cb(event);
+};
+
+const confirm = (options) => {
+
+	const id = Date.now();
+	const result = new Promise((resolve, reject) => {
+		const cb = ({ data }) => {
+
+			const { status, text } = data;
+
+			if (status === 'approved') {
+				resolve({ status });
+			} else {
+				reject(text || status);
+			}
+		};
+		requestQueue.push({ id, cb });
+		window.postMessage({
+			method: 'confirm', data: options, id, target: 'content',
+		}, '*');
+
 	});
-});
 
-const getAccounts = () => new Promise((resolve, reject) => {
-    // port.postMessage({ method: 'accounts' });
-    // resolve();
-	extensionizer.runtime.sendMessage(ID, , (res) => {
-		if (res.status === 'approved') {
-			resolve(res);
-		} else {
-			reject(res);
-		}
+	return result;
+
+};
+
+const getAccounts = () => {
+	const id = Date.now();
+	const result = new Promise((resolve, reject) => {
+
+		const cb = ({ data }) => {
+
+			if (data.res.error) {
+				reject(data.res.error);
+			} else {
+				resolve(data.res);
+			}
+		};
+
+		requestQueue.push({ id, cb });
+		window.postMessage({ method: 'accounts', id, target: 'content' }, '*');
+
 	});
-});
+
+	return result;
+};
+
 
 window.echojslib = echojslib;
 window.echojsws = echojsws;
 window.getAccounts = () => getAccounts();
 window.confirm = (data) => confirm(data);
+window.addEventListener('message', onMessage, false);
