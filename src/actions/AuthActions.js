@@ -1,4 +1,4 @@
-import { PrivateKey, ChainStore } from 'echojs-lib';
+import { PrivateKey } from 'echojs-lib';
 
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 import FormatHelper from '../helpers/FormatHelper';
