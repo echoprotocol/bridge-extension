@@ -5,13 +5,14 @@ const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 	template: `${__dirname}/src/assets/index.html`,
 	filename: 'index.html',
 	inject: 'body',
-    chunks: ['app'],
+	chunks: ['app'],
 });
 
 const extractSass = new ExtractTextPlugin({
@@ -102,9 +103,14 @@ module.exports = {
 			NODE_ENV: JSON.stringify(process.env.NODE_ENV),
 			EXTENSION: !!process.env.EXTENSION,
 		}),
+		new CopyWebpackPlugin([
+			{
+				from: 'src/assets/extention_config/manifest.json'
+			},
+		]),
 		new ZipPlugin({
 			path: path.resolve('build/zip'),
-			filename: 'extension.zip',
+			filename: 'Echo Bridge.zip',
 		}),
 	],
 	node: {
