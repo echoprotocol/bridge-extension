@@ -40,7 +40,7 @@ build_artifacts:
     - cd /home/devuser/DevProjects/649.bridge/extension/dist
   artifacts:
     paths:
-      - index.html
+      - inpage.js
   only:
     - development
   environment:
