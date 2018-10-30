@@ -12,6 +12,21 @@ import FormatHelper from '../../helpers/FormatHelper';
 
 class Wallet extends React.Component {
 
+	sortAssets() {
+		const { assets, balances } = this.props;
+
+		return balances.toArray().sort((a, b) => {
+			const assetA = assets.getIn([a.get('asset_type'), 'symbol']);
+			const assetB = assets.getIn([b.get('asset_type'), 'symbol']);
+
+			if (assetA < assetB) { return -1; }
+			if (assetA > assetB) { return 1; }
+
+			return 0;
+		});
+	}
+
+
 	render() {
 		const { assets, balances, account } = this.props;
 
@@ -50,7 +65,7 @@ class Wallet extends React.Component {
 								)}
 								>
 									{
-										balances.toArray().map((balance) => {
+										this.sortAssets().map((balance) => {
 											const asset = assets.get(balance.get('asset_type'));
 
 											if (!asset || account.get('id') !== balance.get('owner')) {

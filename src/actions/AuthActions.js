@@ -102,7 +102,8 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	const nameError = ValidateAccountHelper.validateAccountName(name);
 	const addedError = dispatch(isAccountAdded(name)) ? 'Account already added' : null;
-	const existError = await validateImportAccountExist(name, true);
+
+	const existError = await validateImportAccountExist(name, true, networkName);
 
 	if (nameError || addedError || existError) {
 		const error = nameError || addedError || existError;
