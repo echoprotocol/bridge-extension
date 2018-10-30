@@ -1,7 +1,8 @@
 stages:
   - lint
   - build
-  
+  - artifacts
+
 cache:
   paths:
   - node_modules/
@@ -24,6 +25,22 @@ build_development:
   artifacts:
         paths:
           - /home/devuser/DevProjects/649.bridge/extension/dist/index.html
+  only:
+    - development
+  environment:
+    name: development
+  tags:
+    - pp-projects
+
+build_artifacts:
+  stage: artifacts
+  script:
+    - cd /home/devuser/DevProjects/649.bridge/extension
+    - npm run build-dev
+    - cd /home/devuser/DevProjects/649.bridge/extension/dist
+  artifacts:
+        paths:
+          - index.html
   only:
     - development
   environment:
