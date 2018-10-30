@@ -32,7 +32,13 @@ class Wipe extends React.Component {
 		return (
 			<div className="no-restored-pin-container">
 				<div className="top-section">
-					<Link className="link link-return_icn green" to={UNLOCK_PATH}><span className="icon-return" />Return</Link>
+					<Link
+						className="link link-return_icn green"
+						to={UNLOCK_PATH}
+					>
+						<span className="icon-return" />
+						Return
+					</Link>
 					<div className="title">Your PIN number can not be restored.</div>
 					<div className="description">
 						<span>You can clear your account data from
@@ -44,12 +50,17 @@ class Wipe extends React.Component {
 				</div>
 				<div className="confirm-container">
 					<section>
-						<CheckBox id="1" checked={checked} label="I understand that Bridge does not store backups of my account keys, and I will lose access to them by clearing my account data." onChange={(e) => this.onCheckBox(e)} />
+						<CheckBox
+							id="1"
+							checked={checked}
+							label="I understand that Bridge does not store backups of my account keys, and I will lose access to them by clearing my account data."
+							onChange={(e) => this.onCheckBox(e)}
+						/>
 					</section>
 					<div className="one-btn-wrap" >
 						<Button
 							type="submit"
-							className="btn-in-light"
+							className="btn-in-dark"
 							disabled={loading || !checked}
 							content={<span className="btn-text">Clear Bridge data</span>}
 							onClick={(e) => this.onSubmit(e)}

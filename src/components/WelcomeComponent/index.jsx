@@ -34,7 +34,7 @@ class WelcomeComponent extends React.Component {
 							wif ?
 								<React.Fragment>
 									<div className="instruction-text">
-                                        Save your WIF key and don’t loose it.
+                                        Save your WIF key and don’t lose it.
                                         You <br /> will need it to restore account.
 									</div>
 									<div className="wif-wrap">

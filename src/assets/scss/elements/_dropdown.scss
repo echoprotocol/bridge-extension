@@ -197,7 +197,6 @@
             font-size: 13px;
 
 
-
             .default-networks,
             .custom-networks {
                 display: block;
@@ -224,8 +223,19 @@
 
                     &.active {
                         a, a:focus, a:hover {
-                            color:#E4E6E8;
-                        }
+							color:#E4E6E8;
+						}
+						a {
+							.accounts {
+								color: rgba(129, 136, 141, 0.8);
+							}
+							&:hover,
+							&:focus {
+								.accounts {
+									color: rgba(114, 122, 129, 0.8);
+								}	
+							}
+						}
                     }
                     a {
                         display: flex;
@@ -342,20 +352,45 @@
             align-items: center;
             padding: 0 20px;
             background-color: rgba(#0e1416,.2);
-            letter-spacing: 2.2px;
+			letter-spacing: 2.2px;
+			
             a {
                 color: #59B597;
-                font-size: 10px;
+				font-size: 10px;
+				font-family: FNBold;
                 text-transform: uppercase;
-
+				transition: color $speed;
+				position: relative;
                 &:hover {
 					color: #71E4BE;
-                    text-decoration: none;
 				}
 				&:active {
 					color: rgba(#71E4BE,.5);
+				}
+
+				@include hardwareAccel();
+				&:before {
+					content: '';
+					position: absolute;
+					border-radius: $angularMin + 2px;
+					top: -5px;
+					right: -8px;
+					bottom: -5px;
+					left: -8px;
+					border: 2px solid transparent;
+					transition: border-color $speed;
 
 				}
+				&:not(:active) {
+					&:focus {
+						color: #71E4BE;
+						&:before {
+							border: 2px solid rgba(#fff, .15);
+
+						}
+					}
+				}
+
             }
         }
     }
@@ -369,16 +404,20 @@
                 margin-right: 6px;
             }
 
-            .user-icon-wrap {
+			.user-icon-wrap {
+				will-change: transform;
 				transition:
 				transform .2s ease,
-				opacity .2s ease;
-				opacity: .7;
-                &:hover {
-					opacity: 1;
-					transform: scale(1.03);
-                }
-            }
+				opacity .2s;
+				&:active {
+					opacity: .7;
+				}
+				&:not(:active) {
+					&:hover {
+						transform: scale(1.03);
+					}
+				}
+			}
         }
     }
 }
@@ -481,7 +520,7 @@
                         }
                         &:focus,
                         &:hover {
-                            background-color: #475054;
+                            background-color: #444F53;
                             box-shadow:
                                 -1px -1px 4px rgba(0, 0, 0, .1),
                                 1px 1px 4px rgba(0, 0, 0, .1);
@@ -497,9 +536,17 @@
                         }
 					}
 					.user-icon-wrap {
-						transition: transform .2s ease;
-						&:hover {
-							transform: scale(1.03);
+						will-change: transform;
+						transition:
+						transform .2s ease,
+						opacity .2s;
+						&:active {
+							opacity: .7;
+						}
+						&:not(:active) {
+							&:hover {
+								transform: scale(1.03);
+							}
 						}
 					}
                 }
@@ -526,27 +573,51 @@
             padding: 0 20px;
             background-color: rgba(#0e1416,.2);
             letter-spacing: 2.2px;
-            font-size: 11px;
+			font-size: 10px;
+			font-family: FNBold;
             text-transform: uppercase;
             
             span {
-                color: #ADB4BA;
+                color: #E4E7E8;
                 margin-right: 6px;
             }
             li {
                 & + span {
-                    color: #828C94;
+                    color: #838C94;
                     margin-left: 6px;
                 }
             }
 
             a {
-                color: #61D3AD;
-
-
-                &:hover {
-                    text-decoration: none;
-                }
+				color: #59B597;
+				position: relative;
+				transition: color $speed;
+				&:hover {
+					color: #71E4BE;
+				}
+				&:active {
+					color: rgba(#71E4BE,.5);
+				}
+				@include hardwareAccel();
+				&:before {
+					content: '';
+					position: absolute;
+					transition: border-color $speed;
+					border: 2px solid transparent;
+					top: -4px;
+					right: -4px;
+					bottom: -4px;
+					left: -6px;
+					border-radius: 5px;
+				}
+				&:not(:active) {
+					&:focus {
+						color: #71E4BE;
+						&:before {
+							border-color: rgba(#fff, .15);;
+						}
+					}
+				}
             }
         }
     }
