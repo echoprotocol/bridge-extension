@@ -36,12 +36,6 @@ const closeUi = () => {
 	notificationManager.closePopup();
 };
 
-const setBadge = () => {
-	const { length } = requestQueue;
-	const text = length === 0 ? '' : (length > 9 ? '9+' : length.toString());
-	extensionizer.browserAction.setBadgeText({ text });
-};
-
 const getAccountList = async () => {
 	const currentNetworkPromise = new Promise((resolve) => {
 		storage.get(null, (result) => {
