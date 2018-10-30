@@ -42,9 +42,37 @@
         .link-nav {
             font-family: FNBook;
             a {
-                color: #61D3AD;
+                color: #59B597;
                 font-size: 13px;
-                letter-spacing: 1px;
+				letter-spacing: 1px;
+				position: relative;
+				transition: color $speed;
+				&:hover {
+					color: #71E4BE;
+				}
+				&:active {
+					color: rgba(#71E4BE,.5)
+				}
+				@include hardwareAccel();
+				&:before {
+					content: '';
+					position: absolute;
+					transition: border-color $speed;
+					border: 2px solid transparent;
+					border-radius: $angularMin + 2px;
+					top: -4px;
+					right: -8px;
+					bottom: -6px;
+					left: -8px;
+				}
+				&:not(:active) {
+					&:focus {
+						color: #71E4BE;
+						&:before {
+							border-color: rgba(#fff, .15);;
+						}
+					}
+				}
             }
         }
         .btn-nav {

@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Sidebar, Button } from 'semantic-ui-react';
-import { PanelGroup, Panel } from 'react-bootstrap';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 
@@ -14,6 +13,7 @@ import {
 	SEND_PATH,
 	TRANSACTIONS_PATH,
 	WATCH_TOKEN_PATH,
+	WALLET_PATH,
 } from '../../constants/RouterConstants';
 
 import UserIcon from '../UserIcon';
@@ -55,44 +55,39 @@ class BridgeSidebar extends React.PureComponent {
 					<nav className="sidebar-body">
 						<ul className="nav-list">
 							<li>
-								<PanelGroup accordion id="accordion-example">
-									<Panel eventKey="1">
-										<Panel.Heading>
-											<Panel.Title toggle>
-												<i className="icon-navWallet" />
-												<div className="nav-title">My wallet</div>
-											</Panel.Title>
-										</Panel.Heading>
-										<Panel.Body collapsible>
-											<div>
-												<Link
-													onClick={() => this.props.sidebarToggle(visibleSidebar)}
-													to={SEND_PATH}
-												>
+								<div className="panel">
+									<Link
+										onClick={() => this.props.sidebarToggle(visibleSidebar)}
+										className="active"
+										to={WALLET_PATH}
+									>
+										<i className="icon-navWallet" />
+										<div className="nav-title">My wallet</div>
+									</Link>
+									<div className="panel-body">
+										<Link
+											onClick={() => this.props.sidebarToggle(visibleSidebar)}
+											to={SEND_PATH}
+										>
 													Send
-												</Link>
-											</div>
-											<div>
-												<Link
-													onClick={() => this.props.sidebarToggle(visibleSidebar)}
-													to={RECEIVE_PATH}
-												>
+										</Link>
+
+										<Link
+											onClick={() => this.props.sidebarToggle(visibleSidebar)}
+											to={RECEIVE_PATH}
+										>
 													Receive
-												</Link>
-											</div>
-											<div>
-												<Link
-													onClick={() => this.props.sidebarToggle(visibleSidebar)}
-													to={WATCH_TOKEN_PATH}
-												>
+										</Link>
+
+										<Link
+											onClick={() => this.props.sidebarToggle(visibleSidebar)}
+											to={WATCH_TOKEN_PATH}
+										>
                                                     Watch token
-												</Link>
-											</div>
+										</Link>
 
-
-										</Panel.Body>
-									</Panel>
-								</PanelGroup>
+									</div>
+								</div>
 							</li>
 							<li>
 								<Link
