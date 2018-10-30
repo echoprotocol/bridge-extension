@@ -21,6 +21,9 @@ build_development:
     - git pull origin development
     - npm i
     - npm run build-dev
+  artifacts:
+        paths:
+        - dist/index.html
   only:
     - development
   environment:
