@@ -35,6 +35,11 @@
 				align-items: center;
 				justify-content: center;
 			}
+			&.icon-ava4 {
+				&:before {
+					left: 1px;
+				}
+			}
 		}
     }
 

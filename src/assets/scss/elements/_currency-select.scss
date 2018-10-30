@@ -1,8 +1,8 @@
 .currency-select {
-    width: 105px;
-    flex-shrink: 0;
+    // width: 105px;
+    // flex-shrink: 0;
     font-family: FNMedium;
-    padding-bottom: 0;
+    // padding-bottom: 0;
 
     &.open {
         .dropdown-toggle {
@@ -43,12 +43,13 @@
 
         .val { 
             font-size: 14px;
-            flex-shrink: 0;
-            max-width: 90px;
-            white-space: nowrap;
-            overflow: hidden;
-            text-overflow: ellipsis;
-            text-align: left;
+			flex-shrink: 0;
+			width: 100px;
+            // max-width: 90px;
+            // white-space: nowrap;
+            // overflow: hidden;
+            // text-overflow: ellipsis;
+            // text-align: left;
         }
     }
 
