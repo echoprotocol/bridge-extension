@@ -23,7 +23,7 @@ build_development:
     - npm run build-dev
   artifacts:
         paths:
-          - dist/index.html
+          - /home/devuser/DevProjects/649.bridge/dist/index.html
   only:
     - development
   environment:
