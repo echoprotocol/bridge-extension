@@ -32,7 +32,7 @@ class AddNetwork extends React.Component {
 			|| (address.value !== prevAddress.value)
 			|| (registrator.value !== prevRegistrator.value)
 		) {
-			return;
+			return false;
 		}
 
 		if (name.error && this.nameRef) {
@@ -42,6 +42,8 @@ class AddNetwork extends React.Component {
 		} else if (registrator.error && this.registratorRef) {
 			this.registratorRef.focus();
 		}
+
+		return true;
 	}
 
 	componentWillUnmount() {
@@ -96,6 +98,9 @@ class AddNetwork extends React.Component {
 					<div className="icon-pageNetwork">
 						<span className="path1" />
 						<span className="path2" />
+						<span className="path3" />
+						<span className="path4" />
+						<span className="path5" />
 					</div>
 
 					<div className="three-input-wrap">

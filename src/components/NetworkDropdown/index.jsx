@@ -50,10 +50,15 @@ class NetworkDropdown extends React.PureComponent {
 	onChangeNetwork(name) {
 		const { network, networks } = this.props;
 
+		if (!network) {
+			return false;
+		}
+
 		const currentNetworkName = network.get('name');
 
 		if (currentNetworkName === name) {
-			return;
+			this.closeDropDown();
+			return false;
 		}
 
 		this.props.setGlobalLoad();
@@ -61,6 +66,8 @@ class NetworkDropdown extends React.PureComponent {
 		const newNetwork = networks.concat(NETWORKS).find((i) => i.name === name);
 		setTimeout(() => this.props.changeNetwork(newNetwork), 0);
 		this.closeDropDown();
+
+		return true;
 	}
 
 	onSwitchAccount(e, accountName, network) {
@@ -70,16 +77,20 @@ class NetworkDropdown extends React.PureComponent {
 
 		const { account } = this.props;
 
+		if (!account || !activeNetwork) {
+			return false;
+		}
+
 		if (activeNetwork.get('name') === network.name) {
 			if (account.get('name') === accountName) {
 				this.closeDropDown();
-				return;
+				return null;
 			}
 			this.props.switchAccount(accountName);
 
 			this.closeDropDown();
 
-			return;
+			return false;
 		}
 
 		this.props.setGlobalLoad();
@@ -87,6 +98,8 @@ class NetworkDropdown extends React.PureComponent {
 		this.props.switchAccountNetwork(accountName, network);
 
 		this.closeDropDown();
+
+		return true;
 	}
 
 	setDDMenuHeight() {
@@ -109,10 +122,6 @@ class NetworkDropdown extends React.PureComponent {
 	getAccounts(network) {
 		let { accounts } = this.props;
 
-		if (!accounts && !accounts.size) {
-			return null;
-		}
-
 		accounts = accounts.get(network.name);
 
 		if (!accounts) {
@@ -133,6 +142,7 @@ class NetworkDropdown extends React.PureComponent {
 						>
 							<UserIcon
 								avatar={`ava${account.icon}`}
+								tabSelect
 								color={account.iconColor}
 							/>
 						</div>
@@ -142,6 +152,10 @@ class NetworkDropdown extends React.PureComponent {
 
 	getNetworks(networks, eventKey = 0, custom = false) {
 		const { network } = this.props;
+
+		if (!network) {
+			return null;
+		}
 
 		const name = network.get('name');
 
@@ -184,6 +198,11 @@ class NetworkDropdown extends React.PureComponent {
 		};
 
 		const { network, networks, connected } = this.props;
+
+		if (!network) {
+			return null;
+		}
+
 		const name = network.get('name');
 		const defaultNetworks = this.getNetworks(NETWORKS);
 		const customNetworks = this.getNetworks(networks.toJS(), defaultNetworks.length, true);

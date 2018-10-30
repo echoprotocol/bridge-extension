@@ -8,6 +8,8 @@ import SignDropdown from '../SignDropdown';
 
 import { SIGN_TRANSACTION_PATH } from '../../constants/RouterConstants';
 
+import { sidebarToggle } from '../../actions/GlobalActions';
+
 class Header extends React.PureComponent {
 
 	render() {
@@ -22,7 +24,13 @@ class Header extends React.PureComponent {
 		}
 
 		return (
-			<header className="header">
+			<header
+				className="header"
+				role="button"
+				onClick={() => this.props.sidebarToggle(true)}
+				onKeyPress={() => this.props.sidebarToggle(true)}
+				tabIndex="-1"
+			>
 				{(accounts && accounts.size) ? <UserDropdown /> : null}
 				<NetworkDropdown />
 			</header>
@@ -34,6 +42,7 @@ class Header extends React.PureComponent {
 Header.propTypes = {
 	accounts: PropTypes.object,
 	pathname: PropTypes.string.isRequired,
+	sidebarToggle: PropTypes.func.isRequired,
 };
 
 Header.defaultProps = {
@@ -46,5 +55,7 @@ export default connect(
 		const accounts = state.global.getIn(['accounts', networkName]);
 		return { accounts };
 	},
-	() => ({}),
+	(dispatch) => ({
+		sidebarToggle: (value) => dispatch(sidebarToggle(value)),
+	}),
 )(Header);

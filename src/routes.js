@@ -5,7 +5,6 @@ import { Route } from 'react-router';
 import {
 	IMPORT_ACCOUNT_PATH,
 	CREATE_ACCOUNT_PATH,
-	SETTINGS_ACCOUNT_PATH,
 	WALLET_PATH,
 	ADD_NETWORK_PATH,
 	SUCCESS_ADD_NETWORK_PATH,
@@ -23,7 +22,6 @@ import {
 import App from './containers/App';
 import CreateAccount from './containers/CreateAccount';
 import ImportAccount from './containers/ImportAccount';
-import SettingsAccount from './containers/SettingsAccount';
 import AddNetwork from './containers/AddNetwork';
 import Pin from './containers/PinCode';
 import SuccessAddNetwork from './containers/SuccessAddNetwork';
@@ -51,8 +49,6 @@ export default class Routes extends React.Component {
 
 					<Route exact path={SIGN_TRANSACTION_PATH} component={required(SignTransaction)} />
 
-
-					<Route exact path={SETTINGS_ACCOUNT_PATH} component={required(SettingsAccount)} />
 					<Route exact path={ADD_NETWORK_PATH} component={required(AddNetwork)} />
 					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={required(SuccessAddNetwork)} />
 					<Route exact path={WALLET_PATH} component={required(Wallet)} />

@@ -12,6 +12,11 @@ class NetworkInfo extends React.PureComponent {
 		};
 
 		const { network, headBlock } = this.props;
+
+		if (!network) {
+			return null;
+		}
+
 		const registrator = network.get('registrator');
 		const url = network.get('url');
 

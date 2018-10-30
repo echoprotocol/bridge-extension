@@ -40,14 +40,14 @@ export const connectToAddress = async (address, subscribeCb) => {
 		if (instance.url !== address) {
 			await Apis.close();
 
+			Apis.setAutoReconnect(false);
+
 			instance = Apis.instance(
 				address,
 				true,
 				4000,
 				{ enableCrypto: false },
 			);
-
-			Apis.setAutoReconnect(false);
 
 			await instance.init_promise;
 		}
@@ -110,3 +110,18 @@ export const lookupAccounts = async (accountName, limit) => {
 
 	return result;
 };
+
+/**
+ * lookup account
+ * @param {String} accountName
+ * @param {Number} limit
+ * @returns {Object}
+ */
+export const getAccountRefsOfKey = async (key) => {
+	const { ChainStore } = echoService.getChainLib();
+
+	const result = await ChainStore.FetchChain('getAccountRefsOfKey', key);
+
+	return result;
+};
+

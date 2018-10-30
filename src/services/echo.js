@@ -29,7 +29,7 @@ class Echo {
 	}
 
 	static getRequests() {
-		return EXTENSION ? extension.extension.getBackgroundPage().getRequests() : [];
+		return EXTENSION ? extension.extension.getBackgroundPage().getList() : [];
 	}
 
 }

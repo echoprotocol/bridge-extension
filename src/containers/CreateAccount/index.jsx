@@ -6,7 +6,7 @@ import { connect } from 'react-redux';
 import {
 	CREATE_ACCOUNT_PATH,
 	CREATE_SUCCESS_PATH,
-	INDEX_PATH,
+	INDEX_PATH, CREATE_SETTINGS_PATH,
 } from '../../constants/RouterConstants';
 import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
@@ -15,6 +15,7 @@ import { setValue, clearForm } from '../../actions/FormActions';
 
 import CreateComponent from './CreateComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
+import SettingsAccount from '../SettingsAccount';
 
 
 class CreateAccount extends React.Component {
@@ -42,19 +43,46 @@ class CreateAccount extends React.Component {
 		if (this.state.wif && this.state.name) {
 			const { accounts, networkName } = nextProps;
 
-			const account = accounts.get(networkName).find((i) => i.name === this.state.name);
+			const accountsNetwork = accounts.get(networkName);
+
+			if (!accountsNetwork) {
+				return false;
+			}
+
+			const account = accountsNetwork.find((i) => i.name === this.state.name);
 
 			if (!account) {
 				this.resetState();
 			}
 		}
+
+		const { pathname: nextPath, search: nextSearch } = nextProps.location;
+		const { pathname, search } = this.props.location;
+
+		if (
+			(`${nextPath}${nextSearch}` !== `${pathname}${search}`)
+            && (`${nextPath}${nextSearch}` === CREATE_ACCOUNT_PATH)
+		) {
+			this.setState({
+				name: '',
+				wif: '',
+			});
+		}
+
+		return true;
 	}
 
 	componentDidUpdate(prevProps, prevState) {
 		const { wif } = this.state;
 		const { wif: prevWif } = prevState;
 
-		if (!wif && (wif !== prevWif)) {
+		const { location } = this.props;
+		const { settings } = query.parse(location.search);
+
+		const { location: prevLocation } = prevProps;
+		const { settings: prevSettings } = query.parse(prevLocation.search);
+
+		if (!wif && !settings && (wif !== prevWif) && (settings !== prevSettings)) {
 			this.props.history.push(CREATE_ACCOUNT_PATH);
 		}
 	}
@@ -84,6 +112,14 @@ class CreateAccount extends React.Component {
 		this.props.history.push(INDEX_PATH);
 	}
 
+	onChangeIcon() {
+		this.props.history.push(CREATE_SETTINGS_PATH);
+	}
+
+	onBack() {
+		this.props.history.goBack();
+	}
+
 	resetState() {
 		this.setState({
 			name: '',
@@ -97,14 +133,16 @@ class CreateAccount extends React.Component {
 			loading, name: { error, example }, location, accounts, networkName,
 		} = this.props;
 
-		const { success } = query.parse(location.search);
+		const { success, settings } = query.parse(location.search);
 
 		if (wif && success) {
-			if (!accounts.get(networkName)) {
+			const accountsNetwork = accounts.get(networkName);
+
+			if (!accountsNetwork) {
 				return null;
 			}
 
-			const account = accounts.get(networkName).find((i) => i.name === name);
+			const account = accountsNetwork.find((i) => i.name === name);
 
 			if (!account) {
 				return null;
@@ -117,7 +155,13 @@ class CreateAccount extends React.Component {
 					icon={account.icon}
 					iconColor={account.iconColor}
 					proceed={() => this.onProceedClick()}
-					unmount={() => this.resetState()}
+					onChangeIcon={() => this.onChangeIcon()}
+				/>
+			);
+		} else if (settings) {
+			return (
+				<SettingsAccount
+					onBack={() => this.onBack()}
 				/>
 			);
 		}

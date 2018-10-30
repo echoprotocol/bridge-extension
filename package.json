@@ -11,7 +11,7 @@
     "build-stage": "cross-env NODE_ENV=stage webpack --progress --display-error-details --colors --mode production",
     "lint": "$(npm bin)/eslint 'src/**/*.jsx' 'src/**/*.js'",
     "lint-win": "cross-env eslint 'src/**/*.jsx' 'src/**/*.js' --fix",
-    "copy-manifest": "copyfiles -f src/assets/extention_config/manifest.json dist/"
+    "copy-manifest": "copyfiles -f src/assets/extention_config/manifest.json build/src"
   },
   "dependencies": {
     "autoprefixer": "^8.1.0",
@@ -84,6 +84,7 @@
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.1",
     "webpack-dev-middleware": "^3.4.0",
-    "webpack-dev-server": "^3.1.9"
+    "webpack-dev-server": "^3.1.9",
+    "zip-webpack-plugin": "^3.0.0"
   }
 }

@@ -9,15 +9,31 @@ import { IMPORT_ACCOUNT_PATH } from '../../constants/RouterConstants';
 
 class SuccessAddNetwork extends React.Component {
 
+	onClick(e) {
+		e.preventDefault();
+		this.props.history.goBack();
+	}
 	renderSuccess() {
 		const { network } = this.props;
+
+		if (!network) {
+			return null;
+		}
+
 		const networkName = network.get('name');
+
 		return (
 			<div className="page">
-				<div className="icon-network" />
+				<div className="icon-pageNetwork">
+					<span className="path1" />
+					<span className="path2" />
+					<span className="path3" />
+					<span className="path4" />
+					<span className="path5" />
+				</div>
 				<div className="success-text"> Success </div>
 				<div className="success-desc">
-                    Network <span>{networkName}</span> was succesfully created
+                    Network <span>{networkName}</span> was successfully created
 				</div>
 				<div className="one-btn-wrap">
 					<Button
@@ -35,7 +51,11 @@ class SuccessAddNetwork extends React.Component {
 		return (
 			<React.Fragment>
 				<div className="return-block">
-					<a href={undefined} className="link-return" onClick={() => this.props.history.goBack()}>
+					<a
+						href="/"
+						className="link-return"
+						onClick={(e) => this.onClick(e)}
+					>
 						<i className="icon-return" />
 						<span className="link-text">Return</span>
 					</a>

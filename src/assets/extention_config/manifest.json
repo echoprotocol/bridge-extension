@@ -11,7 +11,7 @@
     "scripts": [
       "background.js"
     ],
-    "persistent": true
+    "persistent": false
   },
   "content_scripts": [
     {
@@ -27,10 +27,14 @@
       "all_frames": true
     }
   ],
+  "externally_connectable": {
+    "ids": [
+      "*"
+    ]
+  },
   "permissions": [
     "storage",
-    "clipboardWrite",
-    "notifications"
+    "clipboardWrite"
   ],
   "web_accessible_resources": [
     "inpage.js",

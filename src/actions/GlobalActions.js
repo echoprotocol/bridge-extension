@@ -1,4 +1,5 @@
 import { Map, List } from 'immutable';
+import { batchActions } from 'redux-batched-actions';
 
 import { initCrypto, setCryptoInfo, getCryptoInfo, removeCryptoInfo } from './CryptoActions';
 
@@ -13,6 +14,8 @@ import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
 import FormatHelper from '../helpers/FormatHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
+
+import echoService from '../services/echo';
 
 import {
 	ACCOUNT_COLORS,
@@ -41,8 +44,18 @@ import storage from '../services/storage';
  * 	@param {String} field
  * 	@param {Any} value
  */
-const set = (field, value) => (dispatch) => {
-	dispatch(GlobalReducer.actions.set({ field, value }));
+const set = (field, value) => (dispatch) => dispatch(GlobalReducer.actions.set({ field, value }));
+
+
+/**
+ *  @method sidebarToggle
+ *
+ * 	Toggle sidebar visibility
+ *
+ * 	@param {Boolean} value
+ */
+export const sidebarToggle = (value) => (dispatch) => {
+	dispatch(GlobalReducer.actions.sidebarToggle({ value }));
 };
 
 /**
@@ -370,4 +383,45 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
 export const globalInit = () => async (dispatch) => {
 	await dispatch(initCrypto());
 	await dispatch(connect());
+
+	echoService.getEmitter().on('request', (id, options) => { console.log(id, options); });
+};
+
+/**
+ *  @method changeAccountIcon
+ *
+ * 	Change account icon and it's color
+ *
+ *  @param {Number} icon
+ *  @param {String} iconColor
+ */
+export const changeAccountIcon = (icon, iconColor) => async (dispatch, getState) => {
+	const networkName = getState().global.getIn(['network', 'name']);
+	let account = getState().global.get('account');
+	let accounts = getState().global.get('accounts');
+
+	accounts = accounts.set(
+		networkName,
+		accounts.get(networkName).map((i) => {
+			if (i.name === account.get('name')) {
+				return { ...i, icon, iconColor };
+			}
+			return i;
+		}),
+	);
+
+	account = account.set('icon', icon).set('iconColor', iconColor);
+
+	try {
+		dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+
+		dispatch(batchActions([
+			GlobalReducer.actions.set({ field: 'accounts', value: accounts }),
+			GlobalReducer.actions.set({ field: 'account', value: account }),
+		]));
+
+		history.push(INDEX_PATH);
+	} catch (err) {
+		dispatch(set('error', FormatHelper.formatError(err)));
+	}
 };

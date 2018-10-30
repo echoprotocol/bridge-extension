@@ -56,7 +56,7 @@ export const initCrypto = () => async (dispatch) => {
 		if (!getCrypto().isLocked()) {
 			dispatch(changeCrypto({ isLocked: false }));
 
-			history.push(INDEX_PATH);
+			// history.push(INDEX_PATH);
 		} else {
 			const isFirstTime = await getCrypto().isFirstTime();
 
@@ -108,7 +108,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
  *
  * 	@param {String} field
  * 	@param {Any} value
- * 	@param {String} networkName
+ * 	@param {String?} networkName
  */
 export const setCryptoInfo = (field, value, networkName) => async (dispatch, getState) => {
 	try {

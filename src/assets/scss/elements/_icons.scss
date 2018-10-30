@@ -9,15 +9,12 @@
     padding: 0;
     border: 0;
     [class*="icon-ava"] {
-        color: #3f4c4e;
+		color: #3f4c4e;
+		&:before {
+			display: block;
+		}
     }
     &.small {
-        height: 21px;
-        width: 21px;
-        max-width: 21px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
         .content {
             height: 21px;
             width: 21px;
@@ -26,14 +23,19 @@
             align-items: center;
             justify-content: center;
         }
-        [class*="icon-ava"] {
-            font-size: 15px;
-        }
-
-        .icon-ava4,
-        .icon-ava7 {
-            font-size: 13px;
-        }
+        i {
+			font-size: 15px;
+			&:before {
+				position: absolute;
+				right: 0;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
+		}
     }
 
     &.big {
@@ -63,15 +65,13 @@
             border $speed;
         border: 1px solid transparent;
 
-        [class*="icon-ava"] {
-            font-size: 36px;
-            opacity: .3;
-            transition: opacity $speed;
-        }
         .content {
             pointer-events: none;
             i {
-                pointer-events: none;
+				pointer-events: none;
+				font-size: 36px;
+				color: rgba(#3f4c4e, .3);
+				transition: color $speed;
             }
         }
         &.active {
@@ -79,12 +79,12 @@
                 0 -3px 6px rgba(#3f4c4e,0.06),
                 0 3px 6px rgba(#3f4c4e,0.06);
             background-color: #fff;
-            [class*="icon-ava"] {
-                opacity: 1;
+            i {
+                color: #3f4c4e;
             }
             &:hover {
-                [class*="icon-ava"] {
-                    opacity: 1;
+                i {
+                    color: #3f4c4e;
                 }
             }
         }
@@ -92,10 +92,11 @@
         &:focus {
             &:not(.active) {
                 border: 1px solid #b7bdbf;
-
-                [class*="icon-ava"] {
-                    opacity: .6;
-                }
+				.content {
+					i {
+						color: rgba(#3f4c4e, .6);
+					}
+				}
             }
         }
     }

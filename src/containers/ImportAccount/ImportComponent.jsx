@@ -21,7 +21,7 @@ class ImportComponent extends React.Component {
 		} = this.props;
 
 		if ((name !== prevName) || (password !== prevPassword)) {
-			return;
+			return false;
 		}
 
 		if (nameError && this.nameRef) {
@@ -29,6 +29,8 @@ class ImportComponent extends React.Component {
 		} else if (passwordError && this.passwordRef) {
 			this.passwordRef.focus();
 		}
+
+		return true;
 	}
 
 
@@ -104,7 +106,7 @@ class ImportComponent extends React.Component {
 						<div className="one-btn-wrap" >
 							<Button
 								disabled={this.isButtonDisabled()}
-								className={classnames('btn-in-dark', { loading })}
+								className={classnames('btn-in-light', { loading })}
 								content={<span className="btn-text">Import</span>}
 								type="submit"
 								onClick={(e) => this.props.importAccount(e)}
