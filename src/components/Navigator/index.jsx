@@ -28,7 +28,7 @@ class Navigator extends React.PureComponent {
 		return (
 			<React.Fragment>
 				<FocusTrap active={visible} className="trap-wrap">
-					<Header />
+					<Header pathname={pathname} />
 					<BridgeSidebar
 						visible={visible}
 						onSidebarToggle={onSidebarToggle}

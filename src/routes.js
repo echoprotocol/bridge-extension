@@ -35,31 +35,32 @@ import Backup from './containers/Backup';
 import WatchToken from './containers/WatchToken';
 import SignTransaction from './containers/SignTransaction';
 
+import { required } from './components/Require';
+
 export default class Routes extends React.Component {
 
 	render() {
 		return (
 			<App>
 				<div>
-					<Route exact path={CREATE_ACCOUNT_PATH} component={CreateAccount} />
-					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
-
-					<Route exact path={SETTINGS_ACCOUNT_PATH} component={SettingsAccount} />
-
 					<Route exact path={CREATE_PIN_PATH} component={Pin.Create} />
 					<Route exact path={WIPE_PIN_PATH} component={Pin.Wipe} />
 					<Route exact path={UNLOCK_PATH} component={Pin.Unlock} />
-					<Route exact path={ADD_NETWORK_PATH} component={AddNetwork} />
-					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={SuccessAddNetwork} />
-					<Route exact path={WALLET_PATH} component={Wallet} />
-					<Route exact path={RECEIVE_PATH} component={Receive} />
-					<Route exact path={TRANSACTIONS_PATH} component={Transactions} />
-					<Route exact path={SEND_PATH} component={Send} />
-					<Route exact path={BACKUP_PATH} component={Backup} />
+					<Route exact path={CREATE_ACCOUNT_PATH} component={CreateAccount} />
+					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
 
-					<Route exact path={WATCH_TOKEN_PATH} component={WatchToken} />
+					<Route exact path={SIGN_TRANSACTION_PATH} component={required(SignTransaction)} />
 
-					<Route exact path={SIGN_TRANSACTION_PATH} component={SignTransaction} />
+
+					<Route exact path={SETTINGS_ACCOUNT_PATH} component={required(SettingsAccount)} />
+					<Route exact path={ADD_NETWORK_PATH} component={required(AddNetwork)} />
+					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={required(SuccessAddNetwork)} />
+					<Route exact path={WALLET_PATH} component={required(Wallet)} />
+					<Route exact path={RECEIVE_PATH} component={required(Receive)} />
+					<Route exact path={TRANSACTIONS_PATH} component={required(Transactions)} />
+					<Route exact path={SEND_PATH} component={required(Send)} />
+					<Route exact path={BACKUP_PATH} component={required(Backup)} />
+					<Route exact path={WATCH_TOKEN_PATH} component={required(WatchToken)} />
 
 				</div>
 			</App>

@@ -53,7 +53,9 @@ export default createModule({
 
 		logout: {
 			reducer: (state) => {
-				state = _.cloneDeep(state).merge(DEFAULT_LOCKED_FIELDS.get('account'));
+				state = _.cloneDeep(state).merge({
+					account: DEFAULT_LOCKED_FIELDS.get('account'),
+				});
 				return state;
 			},
 		},

@@ -229,6 +229,8 @@ export const loadInfo = () => async (dispatch, getState) => {
 	} else {
 		history.push(CREATE_ACCOUNT_PATH);
 	}
+
+	dispatch(loadRequests());
 };
 
 /**
@@ -368,5 +370,4 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
 export const globalInit = () => async (dispatch) => {
 	await dispatch(initCrypto());
 	await dispatch(connect());
-	dispatch(loadRequests());
 };

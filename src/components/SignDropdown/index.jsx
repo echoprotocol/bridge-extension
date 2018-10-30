@@ -1,23 +1,21 @@
 import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 import CustomScroll from 'react-custom-scroll';
-
-import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { withRouter } from 'react-router';
 
-import { switchAccount, removeAccount } from '../../actions/GlobalActions';
+import { formatToShow } from '../../services/operation';
+import { switchTransactionAccount } from '../../actions/SignActions';
+
+import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
+import { operationKeys } from '../../constants/OperationConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
-
-import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
-import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
-
 import UserIcon from '../UserIcon';
 
-class UserDropdown extends React.PureComponent {
+class SignDropdown extends React.PureComponent {
 
 	constructor(props) {
 		super(props);
@@ -32,39 +30,25 @@ class UserDropdown extends React.PureComponent {
 		this.setDDMenuHeight();
 	}
 
-	componentWillReceiveProps(nextProps) {
-
-		if (!nextProps.account) {
-			this.setState({
-				opened: false,
-			});
-		}
-	}
-
 	componentDidUpdate() {
 		this.setDDMenuHeight();
 	}
 
 	onSelect(name) {
-		const { accounts, networkName } = this.props;
+		const { accounts } = this.props;
+		const options = this.props.transaction.get('options');
 
-		if (!accounts.get(networkName).find((i) => i.name === name)) {
+		if (!accounts.find((i) => i.name === name)) {
 			return;
 		}
 
-		const { account } = this.props;
+		const show = formatToShow(options.type, options);
+		const accountKey = operationKeys[options.type];
+		const account = accounts.find((a) => a.name === show[accountKey]);
 
-		if (account.get('name') === name) {
-			return;
-		}
+		if (account.name === name) { return; }
 
 		this.props.switchAccount(name);
-	}
-
-	onRemoveAccount(e, name) {
-		e.stopPropagation();
-		e.preventDefault();
-		this.props.removeAccount(name);
 	}
 
 	setDDMenuHeight() {
@@ -92,18 +76,15 @@ class UserDropdown extends React.PureComponent {
 		this.setState({ opened: false });
 	}
 
-	renderList() {
-
-		const {
-			balances, assets, accounts, account: activeAccount, networkName,
-		} = this.props;
-		const asset = assets.get('1.3.0');
+	renderList(activeAccount) {
+		const { balances, assets, accounts } = this.props;
+		const asset = assets.get(CORE_ID);
 
 		if (!asset) {
 			return null;
 		}
 
-		return accounts.get(networkName).map((account, i) => {
+		return accounts.map((account, i) => {
 
 			const userBalance = balances.find((value) => ((value.get('owner') === account.id) && (value.get('asset_type') === CORE_ID)));
 
@@ -113,7 +94,7 @@ class UserDropdown extends React.PureComponent {
 
 			return (
 				<MenuItem
-					active={activeAccount.get('name') === account.name}
+					active={activeAccount.name === account.name}
 					tabIndex="-1"
 					key={account.name}
 					eventKey={i}
@@ -128,10 +109,14 @@ class UserDropdown extends React.PureComponent {
 					/>
 					<div className="user-name">{account.name}</div>
 					<div className={classnames('user-balance', { positive: !!userBalance.get('balance') })}>
-						{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${CORE_SYMBOL}`}
-
+						{
+							FormatHelper.formatAmount(
+								userBalance.get('balance'),
+								asset.get('precision'),
+								asset.get('symbol'),
+							) || `0 ${CORE_SYMBOL}`
+						}
 					</div>
-					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.name)} />
 				</MenuItem>
 			);
 
@@ -139,11 +124,15 @@ class UserDropdown extends React.PureComponent {
 	}
 
 	render() {
-		const { account, accounts } = this.props;
+		const { transaction, accounts, loading } = this.props;
 
-		if (!account) {
-			return null;
-		}
+		if (!transaction) { return null; }
+
+		const options = transaction.get('options');
+
+		const show = formatToShow(options.type, options);
+		const accountKey = operationKeys[options.type];
+		const account = accounts.find((a) => a.name === show[accountKey]);
 
 		const menuHeight = {
 			height: `${this.state.menuHeight}px`,
@@ -151,6 +140,7 @@ class UserDropdown extends React.PureComponent {
 
 		return (
 			<Dropdown
+				disabled={loading}
 				className="dropdown-user"
 				id="dropdown-user"
 				onToggle={() => this.toggleDropdown()}
@@ -159,8 +149,8 @@ class UserDropdown extends React.PureComponent {
 				<Dropdown.Toggle noCaret>
 
 					<UserIcon
-						color={account.get('iconColor')}
-						avatar={`ava${account.get('icon')}`}
+						color={account.iconColor}
+						avatar={`ava${account.icon}`}
 					/>
 
 					<i aria-hidden="true" className="dropdown icon" />
@@ -176,30 +166,12 @@ class UserDropdown extends React.PureComponent {
 						>
 							<div id="user-menu-container">
 								<ul className="user-list">
-									{this.renderList()}
+									{this.renderList(account)}
 								</ul>
 
 							</div>
 
 						</CustomScroll>
-					</div>
-					<div className="dropdown-footer">
-						<span>Add account: </span>
-						<MenuItem
-							onClick={() => this.closeDropDown()}
-							href={`#${CREATE_ACCOUNT_PATH}`}
-							eventKey={accounts.size + 1}
-						>
-							create
-						</MenuItem>
-						<span>or </span>
-						<MenuItem
-							onClick={() => this.closeDropDown()}
-							href={`#${IMPORT_ACCOUNT_PATH}`}
-							eventKey={accounts.size + 2}
-						>
-							import
-						</MenuItem>
 					</div>
 				</Dropdown.Menu>
 			</Dropdown>
@@ -208,30 +180,33 @@ class UserDropdown extends React.PureComponent {
 
 }
 
-UserDropdown.propTypes = {
-	accounts: PropTypes.object.isRequired,
+SignDropdown.propTypes = {
+	loading: PropTypes.bool,
+	transaction: PropTypes.object,
+	accounts: PropTypes.object,
 	balances: PropTypes.object.isRequired,
 	assets: PropTypes.object.isRequired,
-	account: PropTypes.object,
-	networkName: PropTypes.string.isRequired,
 	switchAccount: PropTypes.func.isRequired,
-	removeAccount: PropTypes.func.isRequired,
 };
 
-UserDropdown.defaultProps = {
-	account: null,
+SignDropdown.defaultProps = {
+	loading: false,
+	transaction: null,
+	accounts: null,
 };
 
 export default withRouter(connect(
 	(state) => ({
+		loading: state.global.get('loading'),
+		transaction: state.global.getIn(['sign', 'current']),
 		balances: state.balance.get('balances'),
 		assets: state.balance.get('assets'),
-		account: state.global.get('account'),
-		accounts: state.global.get('accounts'),
-		networkName: state.global.getIn(['network', 'name']),
+		accounts: state.global.getIn([
+			'accounts',
+			state.global.getIn(['network', 'name']),
+		]),
 	}),
 	(dispatch) => ({
-		switchAccount: (name) => dispatch(switchAccount(name)),
-		removeAccount: (name) => dispatch(removeAccount(name)),
+		switchAccount: (name) => dispatch(switchTransactionAccount(name)),
 	}),
-)(UserDropdown));
+)(SignDropdown));

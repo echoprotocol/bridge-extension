@@ -1,4 +1,4 @@
-import { PrivateKey } from 'echojs-lib';
+import { TransactionHelper, Aes, PrivateKey, ops } from 'echojs-lib';
 
 import { lookupAccounts } from './ChainApi';
 
@@ -82,13 +82,34 @@ export const createWallet = async (registrator, account, wif) => {
 	}
 };
 
-export const sendTransaction = async (options) => (Promise.all(options));
-// {
-// 	const tr = new TransactionBuilder();
-// 	tr.add_type_operation(operation, options);
-//
-// 	await tr.set_required_fees(options.asset_id);
-// 	tr.add_signer(privateKey);
-//
-// 	return tr.broadcast();
-// };
+export const getMemoFee = (global, memo) => {
+	const nonce = TransactionHelper.unique_nonce_uint64();
+	const pKey = PrivateKey.fromWif('5KGG3tFb5F4h3aiUSKNnKeDcNbL5y1ZVXQXVqpWVMYhW82zBrNb');
+	const memoFromKey = 'ECHO7WBUN97NJfSXbDVDqLDQDKu8FasTb7YBdpbWoJF3RYo6qYY6aX';
+	const memoToKey = 'ECHO7WBUN97NJfSXbDVDqLDQDKu8FasTb7YBdpbWoJF3RYo6qYY6aX';
+
+	const message = Aes.encryptWithChecksum(pKey, memoToKey, nonce, Buffer.from(memo, 'utf-8'));
+
+	const memoObject = {
+		from: memoFromKey,
+		to: memoToKey,
+		nonce,
+		message,
+	};
+
+	const serialized = ops.memo_data.fromObject(memoObject);
+	const stringified = JSON.stringify(ops.memo_data.toHex(serialized));
+	const byteLength = Buffer.byteLength(stringified, 'hex');
+
+	const optionFee = global.getIn(['parameters', 'current_fees', 'parameters', 0, 1, 'price_per_kbyte']);
+
+	return optionFee * (byteLength / 1024);
+};
+
+export const sendTransaction = async (signedTransaction, operation, options) => {
+	signedTransaction.add_type_operation(operation, options);
+
+	await signedTransaction.set_required_fees(options.asset_id);
+
+	return signedTransaction.broadcast();
+};

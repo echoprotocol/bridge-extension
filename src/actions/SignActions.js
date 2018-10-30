@@ -1,33 +1,82 @@
 import { Map, List } from 'immutable';
+import { TransactionBuilder } from 'echojs-lib';
+import BN from 'bignumber.js';
 
 import history from '../history';
 import store from '../store';
 
-import { sendTransaction } from '../api/WalletApi';
+import { sendTransaction, getMemoFee } from '../api/WalletApi';
 import { fetchChain } from '../api/ChainApi';
 
 import echoService from '../services/echo';
-import { getFetchMap } from '../services/operation';
+import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
 
 import FormatHelper from '../helpers/FormatHelper';
-import {
-	UNLOCK_PATH,
-	SIGN_TRANSACTION_PATH,
-	INDEX_PATH,
-	NOT_RETURNED_PATHS,
-} from '../constants/RouterConstants';
+import { INDEX_PATH, NOT_RETURNED_PATHS } from '../constants/RouterConstants';
 import {
 	APPROVED_STATUS,
 	CANCELED_STATUS,
 	ERROR_STATUS,
+	GLOBAL_ID_0,
+	CORE_ID,
 } from '../constants/GlobalConstants';
+import { operationKeys, operationTypes } from '../constants/OperationConstants';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
 const emitter = echoService.getEmitter();
 
 // TODO REMOVE!!!!
-window.emitter = emitter;
+// window.emitter = emitter;
+
+const validateTransaction = (options) => (dispatch, getState) => {
+	const error = validateOperation(options);
+
+	if (error) {
+		return error;
+	}
+
+	const networkName = getState().global.getIn(['network', 'name']);
+	const accounts = getState().global.getIn(['accounts', networkName]);
+	const account = options[operationKeys[options.type]];
+
+	if (!accounts.find((a) => [a.id, a.name].includes(account))) {
+		return 'Account not found';
+	}
+
+	return null;
+};
+
+const getTransactionFee = async ({ fee, type, memo }) => {
+	const global = await fetchChain(GLOBAL_ID_0);
+
+	const { code } = operationTypes[type];
+	let amount = global.getIn(['parameters', 'current_fees', 'parameters', code, 1, 'fee']);
+
+	if (memo) {
+		amount = new BN(amount).plus(getMemoFee(global, memo));
+	}
+
+	fee = fee || {};
+	const asset = await fetchChain(fee.asset_id || CORE_ID);
+
+	if (asset.get('id') !== CORE_ID) {
+		const core = await fetchChain(CORE_ID);
+
+		const price = new BN(asset.getIn(['options', 'core_exchange_rate', 'quote', 'amount']))
+			.div(asset.getIn(['options', 'core_exchange_rate', 'base', 'amount']))
+			.times(10 ** (core.get('precision') - asset.get('precision')));
+
+		amount = new BN(amount).div(10 ** core.get('precision'));
+		amount = price.times(amount).times(10 ** asset.get('precision'));
+	}
+
+	return FormatHelper.formatAmount(
+		new BN(amount).integerValue(BN.ROUND_UP).toString(),
+		asset.get('precision'),
+		asset.get('symbol'),
+	);
+};
 
 const setTransaction = ({ id, options }) => async (dispatch) => {
 	const fetchList = Object.entries(getFetchMap(options.type, options));
@@ -49,6 +98,8 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 			options[key] = fetched[key];
 		}
 	});
+
+	options.fee = await getTransactionFee(options);
 
 	dispatch(GlobalReducer.actions.setIn({
 		field: 'sign',
@@ -73,23 +124,17 @@ const removeTransaction = (id) => (dispatch, getState) => {
 	}
 };
 
-const redirectToSign = () => (dispatch, getState) => {
-	const isLocked = getState().global.getIn(['crypto', 'isLocked']);
+emitter.on('request', async (id, options) => {
+	const isLocked = store.getState().global.getIn(['crypto', 'isLocked']);
 
 	if (isLocked) {
-		dispatch(GlobalReducer.actions.setIn({
-			field: 'crypto',
-			params: { goTo: SIGN_TRANSACTION_PATH },
-		}));
-		history.push(UNLOCK_PATH);
-	} else {
-		history.push(SIGN_TRANSACTION_PATH);
+		emitter.emit('response', 'Unlock required', id, ERROR_STATUS);
+		return;
 	}
-};
 
-emitter.on('request', async (id, options) => {
-	if (!options.type) {
-		emitter.emit('response', 'Operation type is required', id, ERROR_STATUS);
+	const error = store.dispatch(validateTransaction(options));
+	if (error) {
+		emitter.emit('response', error, id, ERROR_STATUS);
 		return;
 	}
 
@@ -103,17 +148,17 @@ emitter.on('request', async (id, options) => {
 		field: 'sign',
 		params: { transactions: transactions.push({ id, options }) },
 	}));
-
-	store.dispatch(redirectToSign());
 });
 
 export const loadRequests = () => async (dispatch) => {
 	const transactions = echoService.getRequests().filter(({ id, options }) => {
-		if (!options.type) {
-			emitter.emit('response', 'Operation type is required', id, ERROR_STATUS);
+		const error = dispatch(validateTransaction(options));
+
+		if (error) {
+			emitter.emit('response', error, id, ERROR_STATUS);
 		}
 
-		return !!options.type;
+		return !error;
 	});
 
 	if (!transactions.length) { return; }
@@ -129,21 +174,43 @@ export const loadRequests = () => async (dispatch) => {
 	}));
 
 	await dispatch(setTransaction(transactions[0]));
-
-	dispatch(redirectToSign());
 };
 
-export const approveTransaction = (transaction) => async (dispatch) => {
+
+export const approveTransaction = (transaction) => async (dispatch, getState) => {
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
+
+	const networkName = getState().global.getIn(['network', 'name']);
+
 	try {
-		// TODO check operationKeys account
-		await sendTransaction(transaction.get('options'));
+		const { type, memo } = transaction.get('options');
+		const account = transaction.get('options')[operationKeys[type]];
+		const options = formatToSend(type, transaction.get('options'));
+
+		const publicKey = account.getIn(['active', 'key_auths', '0', '0']);
+
+		let tr = new TransactionBuilder();
+		tr = await echoService.getCrypto().sign(networkName, tr, publicKey);
+
+		if (memo) {
+			const { to } = transaction.get('options');
+
+			options.memo = await echoService.getCrypto().encryptMemo(
+				networkName,
+				account.getIn(['options', 'memo_key']),
+				to.getIn(['options', 'memo_key']),
+				memo,
+			);
+		}
+
+		await sendTransaction(tr, type, options);
 		emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
 	} catch (err) {
-		// TODO check if locked - go to unlock
 		const error = FormatHelper.formatError(err);
 		emitter.emit('response', error, transaction.get('id'), ERROR_STATUS);
 	} finally {
 		dispatch(removeTransaction(transaction.get('id')));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
 
@@ -153,8 +220,21 @@ export const cancelTransaction = (id) => (dispatch) => {
 	dispatch(removeTransaction(id));
 };
 
-export const errorTransaction = (error, id) => (dispatch) => {
-	emitter.emit('response', error, id, ERROR_STATUS);
+export const switchTransactionAccount = (name) => async (dispatch, getState) => {
+	const account = await fetchChain(name);
+	const transaction = getState().global.getIn(['sign', 'current']);
+	const key = operationKeys[transaction.get('options').type];
 
-	dispatch(removeTransaction(id));
+	dispatch(GlobalReducer.actions.setIn({
+		field: 'sign',
+		params: {
+			current: new Map({
+				id: transaction.get('id'),
+				options: {
+					...transaction.get('options'),
+					[key]: account,
+				},
+			}),
+		},
+	}));
 };
