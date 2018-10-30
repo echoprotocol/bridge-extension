@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import Header from '../Header';
 import Navbar from '../Navbar';
-import BridgeSidebar from '../BridgeSidebar';
+// import BridgeSidebar from '../BridgeSidebar';
 
 
 class Navigator extends React.PureComponent {
