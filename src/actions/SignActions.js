@@ -1,5 +1,4 @@
 import { Map, List } from 'immutable';
-import { TransactionBuilder } from 'echojs-lib';
 import BN from 'bignumber.js';
 
 import history from '../history';
@@ -197,7 +196,7 @@ export const approveTransaction = (transaction) => async (dispatch, getState) =>
 		const options = formatToSend(type, transaction.get('options'));
 
 		const publicKey = account.getIn(['active', 'key_auths', '0', '0']);
-
+		const { TransactionBuilder } = await echoService.getChainLib();
 		let tr = new TransactionBuilder();
 		tr = await echoService.getCrypto().sign(networkName, tr, publicKey);
 
