@@ -37,10 +37,9 @@ build_artifacts:
   script:
     - cd /home/devuser/DevProjects/649.bridge/extension
     - npm run build-dev
-    - cd /home/devuser/DevProjects/649.bridge/extension/dist
   artifacts:
     paths:
-      - inpage.js
+      - dist/inpage.js
   only:
     - development
   environment:
