@@ -1,3 +1,4 @@
+/* eslint-disable global-require */
 /* global EXTENSION */
 
 import echojs from 'echojs-ws';
@@ -9,6 +10,13 @@ import extension from '../../extension/extensionizer';
 
 const crypto = new Crypto();
 const emitter = new EventEmitter();
+
+
+if (EXTENSION) {
+	require('../assets/images/16.png');
+	require('../assets/images/48.png');
+	require('../assets/images/128.png');
+}
 
 class Echo {
 
