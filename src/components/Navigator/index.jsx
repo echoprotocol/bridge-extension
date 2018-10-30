@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 
 import Header from '../Header';
 import Navbar from '../Navbar';
-import BridgeSidebar from '../BridgeSidebar';
+// import BridgeSidebar from '../BridgeSidebar';
 
 import { SIGN_TRANSACTION_PATH } from '../../constants/RouterConstants';
 
@@ -31,7 +31,7 @@ class Navigator extends React.PureComponent {
 			<React.Fragment>
 				<FocusTrap active={visibleSidebar} className="trap-wrap">
 					<Header pathname={pathname} />
-					<BridgeSidebar />
+					{/* <BridgeSidebar /> */}
 				</FocusTrap>
 				{ pathname !== SIGN_TRANSACTION_PATH ? <Navbar /> : null }
 			</React.Fragment>

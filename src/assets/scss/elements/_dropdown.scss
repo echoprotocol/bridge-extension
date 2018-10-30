@@ -94,7 +94,25 @@
                 margin-top: -1px;
             }
         }
-    }
+	}
+	&-menu {
+		.user-icon-wrap {
+			transition:
+			opacity .2s,
+			width .4s,
+			height .4s;
+			opacity: 0.8;
+			&:hover {
+				margin: -1px;
+				opacity: 1;
+				width: 23px;
+				height: 23px;
+			}
+			&:active {
+				opacity: .7;
+			}
+		}
+	}
 }
 
 .dropdown-network {
@@ -403,21 +421,6 @@
             &:not(:last-child) {
                 margin-right: 6px;
             }
-
-			.user-icon-wrap {
-				will-change: transform;
-				transition:
-				transform .2s ease,
-				opacity .2s;
-				&:active {
-					opacity: .7;
-				}
-				&:not(:active) {
-					&:hover {
-						transform: scale(1.03);
-					}
-				}
-			}
         }
     }
 }
@@ -535,20 +538,7 @@
                             }
                         }
 					}
-					.user-icon-wrap {
-						will-change: transform;
-						transition:
-						transform .2s ease,
-						opacity .2s;
-						&:active {
-							opacity: .7;
-						}
-						&:not(:active) {
-							&:hover {
-								transform: scale(1.03);
-							}
-						}
-					}
+
                 }
             }
             .user-name {
@@ -621,8 +611,4 @@
             }
         }
     }
-
-
-
-
 }

@@ -54,6 +54,13 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		return null;
 	}
 
+	const isConnected = getState().global.get('connected');
+
+	if (!isConnected) {
+		dispatch(setValue(FORM_SIGN_UP, 'accountName', { error: 'Network error', example }));
+		return null;
+	}
+
 	try {
 		const registrator = getState().global.getIn(['network', 'registrator']);
 		const networkName = getState().global.getIn(['network', 'name']);
@@ -147,6 +154,13 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 	if (passwordError) {
 		dispatch(setValue(FORM_SIGN_IN, 'passwordError', passwordError));
+		return false;
+	}
+
+	const isConnected = getState().global.get('connected');
+
+	if (!isConnected) {
+		dispatch(setValue(FORM_SIGN_IN, 'nameError', 'Network error'));
 		return false;
 	}
 
