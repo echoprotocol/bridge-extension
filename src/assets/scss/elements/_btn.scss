@@ -543,7 +543,8 @@
         position: relative;
         border: 0;
         background-color: transparent;
-        border: 1px solid transparent;
+		border: 1px solid transparent;
+		cursor: pointer;
         transition:
             background-color $speed,
             border $speed;

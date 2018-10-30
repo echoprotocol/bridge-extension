@@ -192,7 +192,11 @@
                     &:after {
                         background-color: $colorError;
                     }
-                }
+				}
+				input {
+					-webkit-text-fill-color: #D94152 !important;
+
+				}
             }
 
             .label {

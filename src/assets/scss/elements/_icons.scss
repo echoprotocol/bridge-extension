@@ -16,30 +16,26 @@
     }
     &.small {
         .content {
-            height: 22px;
-            width: 22px;
-            max-width: 22px;
+            height: 21px;
+            width: 21px;
+            max-width: 21px;
             display: flex;
             align-items: center;
             justify-content: center;
         }
         i {
 			font-size: 15px;
-			width: 14px;
-			height: 14px;
+			&:before {
+				position: absolute;
+				right: 0;
+				left: 0;
+				top: 0;
+				bottom: 0;
+				display: flex;
+				align-items: center;
+				justify-content: center;
+			}
 		}
-		.icon-ava4,
-		.icon-ava6 {
-			height: 16px;
-		}
-
-		.icon-ava11 {
-			width: 13px;
-		}
-		
-        .icon-ava7 {
-			margin-top: -1px;
-        }
     }
 
     &.big {
