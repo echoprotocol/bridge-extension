@@ -39,8 +39,8 @@ build_artifacts:
     - npm run build-dev
     - cd /home/devuser/DevProjects/649.bridge/extension/dist
   artifacts:
-        paths:
-          - index.html
+    paths:
+      - index.html
   only:
     - development
   environment:
