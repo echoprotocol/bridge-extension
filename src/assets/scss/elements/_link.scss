@@ -5,41 +5,6 @@
     align-items: center;
     justify-content: center;
 }
-@mixin onLinkFocus (
-    $angular,
-    $outerBorderWidth,
-    $innerBorderWidth,
-    $color
-    ) {
-    position: relative;
-    
-    @include hardwareAccel();
-    
-    &:before {
-        content: '';
-        position: absolute;
-        transition: top $speed,
-                    right $speed /2,
-                    bottom $speed /2,
-                    left $speed;
-        border-radius: $angular + 2px;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-    }
-    &:not(:active) {
-        &:focus {
-            &:before {
-                border: $outerBorderWidth solid $color;
-                top: -($outerBorderWidth + $innerBorderWidth);
-                right: -($outerBorderWidth + $innerBorderWidth);
-                bottom: -($outerBorderWidth + $innerBorderWidth);
-                left: -($outerBorderWidth + $innerBorderWidth);
-            }
-        }
-    }
-}
 
 .link {
     transition: all .2s ease-out;
@@ -52,12 +17,31 @@
         text-transform: uppercase;
         cursor: pointer;
         &:not(.disabled) {
-            @include onLinkFocus(
-                 $angularMin,
-                 2px,
-                 0,
-                 #ccd2d6
-            );
+			@include hardwareAccel();
+			&:before {
+				content: '';
+				position: absolute;
+				transition: top $speed,
+							right $speed /2,
+							bottom $speed /2,
+							left $speed;
+				border-radius: $angularMin + 2px;
+				top: 0;
+				right: 0;
+				bottom: 0;
+				left: 5px;
+			}
+			&:not(:active) {
+				&:focus {
+					&:before {
+						border: 2px solid #ccd2d6;
+						top: -2px;
+						right: -2px;
+						bottom: -2px;
+						left: 2px;
+					}
+				}
+			}
         }
         i {
             width: 12px;

@@ -9,6 +9,10 @@ import { IMPORT_ACCOUNT_PATH } from '../../constants/RouterConstants';
 
 class SuccessAddNetwork extends React.Component {
 
+	onClick(e) {
+		e.preventDefault();
+		this.props.history.goBack();
+	}
 	renderSuccess() {
 		const { network } = this.props;
 
@@ -47,7 +51,11 @@ class SuccessAddNetwork extends React.Component {
 		return (
 			<React.Fragment>
 				<div className="return-block">
-					<a href={undefined} className="link-return" onClick={() => this.props.history.goBack()}>
+					<a
+						href="/"
+						className="link-return"
+						onClick={(e) => this.onClick(e)}
+					>
 						<i className="icon-return" />
 						<span className="link-text">Return</span>
 					</a>
