@@ -2,6 +2,8 @@ import React from 'react';
 import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
 import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import BridgeInput from '../../components/BridgeInput';
 import BridgeTextArea from '../../components/BridgeTextArea';
@@ -10,8 +12,23 @@ import BridgeTextArea from '../../components/BridgeTextArea';
 
 
 import { INDEX_PATH } from '../../constants/RouterConstants';
+import { setFormValue } from '../../actions/FormActions';
+import { FORM_SEND } from '../../constants/FormConstants';
 
 class Send extends React.Component {
+
+	onChange(e, lowerCase) {
+		const field = e.target.name;
+		let { value } = e.target;
+
+		if (lowerCase) {
+			value = value.toLowerCase();
+		}
+
+		if (field) {
+			this.props.setFormValue(field, value);
+		}
+	}
 
 	renderSend() {
 		const codingCurrencyDropdownData = [
@@ -26,6 +43,10 @@ class Send extends React.Component {
 				list: ['ECHO', 'EchoTest', 'EchoEcho', 'EchoEcho245'],
 			},
 		];
+		const {
+			to, amount, fee, note,
+		} = this.props;
+
 		return (
 			<React.Fragment>
 				<div className="return-block">
@@ -56,26 +77,30 @@ class Send extends React.Component {
 							/>
 							<BridgeInput
 								autoFocus
-								name="To"
+								name="to"
 								theme="input-light"
 								labelText="To"
 								defaultUp
 								placeholder="Reciever's name"
 								leftLabel
+								value={to.value}
+								onChange={(e) => this.onChange(e, true)}
 							/>
 							<BridgeInput
 								autoFocus
-								name="Amount"
+								name="amount"
 								theme="input-light"
 								placeholder="0.000"
 								defaultUp
 								labelText="Amount"
 								leftLabel
 								innerDropdown={codingCurrencyDropdownData}
+								value={amount.value}
+								onChange={(e) => this.onChange(e)}
 							/>
 							<BridgeInput
 								autoFocus
-								name="Fee"
+								name="fee"
 								theme="input-light"
 								placeholder="0.000"
 								// value=""
@@ -83,6 +108,8 @@ class Send extends React.Component {
 								labelText="Fee"
 								leftLabel
 								innerDropdown={codingCurrencyDropdownData}
+								value={fee.value}
+								onChange={(e) => this.onChange(e)}
 							/>
 							<BridgeTextArea
 								label="Note (optional)"
@@ -110,5 +137,22 @@ class Send extends React.Component {
 
 }
 
+Send.propTypes = {
+	to: PropTypes.object.isRequired,
+	amount: PropTypes.object.isRequired,
+	fee: PropTypes.object.isRequired,
+	note: PropTypes.object.isRequired,
+	setFormValue: PropTypes.func.isRequired,
+};
 
-export default Send;
+export default connect(
+	(state) => ({
+		to: state.form.getIn([FORM_SEND, 'to']),
+		amount: state.form.getIn([FORM_SEND, 'amount']),
+		fee: state.form.getIn([FORM_SEND, 'fee']),
+		note: state.form.getIn([FORM_SEND, 'note']),
+	}),
+	(dispatch) => ({
+		setFormValue: (field, value) => dispatch(setFormValue(FORM_SEND, field, value)),
+	}),
+)(Send);
