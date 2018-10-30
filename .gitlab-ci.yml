@@ -23,7 +23,7 @@ build_development:
     - npm run build-dev
   artifacts:
         paths:
-        - dist/index.html
+          - dist/index.html
   only:
     - development
   environment:
