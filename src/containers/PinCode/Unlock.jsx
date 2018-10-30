@@ -102,7 +102,7 @@ class Unlock extends React.Component {
 				<div className="page-action-wrap pin-screen enter-pin">
 					<div className="one-btn-wrap">
 						<Button
-							className={classnames('btn-in-light', { loading })}
+							className={classnames('btn-in-dark', { loading })}
 							disabled={Boolean(loading || !pin || error)}
 							content={<span className="btn-text">Unlock</span>}
 							type="submit"

@@ -4,6 +4,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { withRouter } from 'react-router';
+import CustomScroll from 'react-custom-scroll';
 
 import { clearForm, setFormValue } from '../../actions/FormActions';
 import { addNetwork } from '../../actions/GlobalActions';
@@ -13,6 +14,37 @@ import { FORM_ADD_NETWORK } from '../../constants/FormConstants';
 import BridgeInput from '../../components/BridgeInput';
 
 class AddNetwork extends React.Component {
+
+	constructor(props) {
+		super(props);
+
+		this.nameRef = null;
+		this.addressRef = null;
+		this.registratorRef = null;
+	}
+
+	componentDidUpdate(prevProps) {
+		const { name: prevName, address: prevAddress, registrator: prevRegistrator } = prevProps;
+		const { name, address, registrator } = this.props;
+
+		if (
+			(name.value !== prevName.value)
+			|| (address.value !== prevAddress.value)
+			|| (registrator.value !== prevRegistrator.value)
+		) {
+			return false;
+		}
+
+		if (name.error && this.nameRef) {
+			this.nameRef.focus();
+		} else if (address.error && this.addressRef) {
+			this.addressRef.focus();
+		} else if (registrator.error && this.registratorRef) {
+			this.registratorRef.focus();
+		}
+
+		return true;
+	}
 
 	componentWillUnmount() {
 		this.props.clearForm();
@@ -49,6 +81,12 @@ class AddNetwork extends React.Component {
 			|| address.error || name.error || registrator.error);
 	}
 
+	handleRef(ref, type) {
+		if (ref) {
+			this[`${type}Ref`] = ref.bridgeInput;
+		}
+	}
+
 	renderForm() {
 		const {
 			address, name, registrator, loading,
@@ -60,6 +98,9 @@ class AddNetwork extends React.Component {
 					<div className="icon-pageNetwork">
 						<span className="path1" />
 						<span className="path2" />
+						<span className="path3" />
+						<span className="path4" />
+						<span className="path5" />
 					</div>
 
 					<div className="three-input-wrap">
@@ -73,6 +114,7 @@ class AddNetwork extends React.Component {
 							errorText={name.error}
 							value={name.value}
 							onChange={(e) => this.onChange(e)}
+							ref={(r) => this.handleRef(r, 'name')}
 						/>
 						<BridgeInput
 							error={!!address.error}
@@ -83,6 +125,7 @@ class AddNetwork extends React.Component {
 							errorText={address.error}
 							value={address.value}
 							onChange={(e) => this.onChange(e)}
+							ref={(r) => this.handleRef(r, 'address')}
 						/>
 						<BridgeInput
 							error={!!registrator.error}
@@ -93,6 +136,7 @@ class AddNetwork extends React.Component {
 							errorText={registrator.error}
 							value={registrator.value}
 							onChange={(e) => this.onChange(e)}
+							ref={(r) => this.handleRef(r, 'registrator')}
 						/>
 					</div>
 				</div>
@@ -120,10 +164,17 @@ class AddNetwork extends React.Component {
 						<span className="link-text">Return</span>
 					</a>
 				</div>
-				<div className="page-wrap">
-					{
-						this.renderForm()
-					}
+				<div className="networks-scroll">
+					<CustomScroll
+						flex="1"
+						heightRelativeToParent="calc(100%)"
+					>
+						<div className="page-wrap">
+							{
+								this.renderForm()
+							}
+						</div>
+					</CustomScroll>
 				</div>
 
 			</React.Fragment>

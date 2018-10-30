@@ -18,9 +18,9 @@ const storage = extensionizer.storage.local;
 const requestQueue = [];
 
 const createSocket = () => {
-	const instance = echojs.Apis.instance(NETWORKS[0].url, true, 4000);
-
 	echojs.Apis.setAutoReconnect(false);
+
+	const instance = echojs.Apis.instance(NETWORKS[0].url, true, 4000);
 
 	instance.init_promise
 		.then(() => chainjs.ChainStore.init())

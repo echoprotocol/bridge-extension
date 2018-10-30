@@ -10,6 +10,7 @@ const DEFAULT_LOCKED_FIELDS = Map({
 const DEFAULT_FIELDS = Map({
 	loading: false,
 	error: null,
+	visibleSidebar: false,
 	network: new Map({
 		name: '',
 		registrator: '',
@@ -59,6 +60,10 @@ export default createModule({
 				state = state.setIn(['crypto', 'goBack'], true);
 				return state.setIn(['crypto', 'isLocked'], true);
 			},
+		},
+
+		sidebarToggle: {
+			reducer: (state, { payload }) => state.set('visibleSidebar', !payload.value),
 		},
 	},
 });

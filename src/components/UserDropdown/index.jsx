@@ -46,19 +46,19 @@ class UserDropdown extends React.PureComponent {
 	}
 
 	onSelect(name) {
-		const { accounts, networkName } = this.props;
-
-		if (!accounts.get(networkName).find((i) => i.name === name)) {
-			return;
-		}
-
 		const { account } = this.props;
 
+		if (!account) {
+			return false;
+		}
+
 		if (account.get('name') === name) {
-			return;
+			return false;
 		}
 
 		this.props.switchAccount(name);
+
+		return true;
 	}
 
 	onRemoveAccount(e, name) {
@@ -97,13 +97,14 @@ class UserDropdown extends React.PureComponent {
 		const {
 			balances, assets, accounts, account: activeAccount, networkName,
 		} = this.props;
-		const asset = assets.get('1.3.0');
+		const asset = assets.get(CORE_ID);
+		const accountsNetwork = accounts.get(networkName);
 
-		if (!asset) {
+		if (!activeAccount || !asset || !accountsNetwork) {
 			return null;
 		}
 
-		return accounts.get(networkName).map((account, i) => {
+		return accountsNetwork.map((account, i) => {
 
 			const userBalance = balances.find((value) => ((value.get('owner') === account.id) && (value.get('asset_type') === CORE_ID)));
 
@@ -190,7 +191,7 @@ class UserDropdown extends React.PureComponent {
 							href={`#${CREATE_ACCOUNT_PATH}`}
 							eventKey={accounts.size + 1}
 						>
-										create
+                            create
 						</MenuItem>
 						<span>or </span>
 						<MenuItem
@@ -198,7 +199,7 @@ class UserDropdown extends React.PureComponent {
 							href={`#${IMPORT_ACCOUNT_PATH}`}
 							eventKey={accounts.size + 2}
 						>
-										import
+                            import
 						</MenuItem>
 					</div>
 				</Dropdown.Menu>

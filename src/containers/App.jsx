@@ -15,20 +15,8 @@ import { PIN_PATHS } from '../constants/RouterConstants';
 
 class App extends React.Component {
 
-	constructor(props) {
-		super(props);
-
-		this.state = {
-			visible: false,
-		};
-	}
-
 	componentDidMount() {
 		this.props.initApp();
-	}
-
-	onSidebarToggle() {
-		this.setState({ visible: !this.state.visible });
 	}
 
 	renderHeader(pathname) {
@@ -40,13 +28,8 @@ class App extends React.Component {
 			);
 		}
 
-		const { visible } = this.state;
-
 		return (
-			<Navigator
-				visible={visible}
-				onSidebarToggle={() => this.onSidebarToggle()}
-			/>
+			<Navigator />
 		);
 	}
 

@@ -1,31 +1,35 @@
 import React from 'react';
-import { Button } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
+import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+// import { Dropdown, MenuItem } from 'react-bootstrap';
+
+import { RECEIVE_PATH, SEND_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
-
 
 class Wallet extends React.Component {
 
 	render() {
 		const { assets, balances, account } = this.props;
+
+		if (!account) {
+			return null;
+		}
+
 		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size;
 
 		return (
 			<React.Fragment>
 				<div className="wallet-block">
 					<h4>Assets and tokens</h4>
-
-					<Button
-						compact
-						content={
-							<span className="btn-text">Watch tokens</span>
-						}
-						className="btn-transparent"
-					/>
+					<Link
+						className="compact btn-transparent link"
+						to={WATCH_TOKEN_PATH}
+					><span className="btn-text">Watch tokens</span>
+					</Link>
 				</div>
 				<div className="page-wrap">
 					<div className="page">
@@ -56,10 +60,12 @@ class Wallet extends React.Component {
 											return (
 
 												<li key={balance.get('id')}>
-													<div className="balance-info">
-														<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
-														<span>{asset.get('symbol')}</span>
-													</div>
+													<a>
+														<div className="balance-info">
+															<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
+															<span>{asset.get('symbol')}</span>
+														</div>
+													</a>
 													{/* { */}
 													{/* asset.type === 'token' ? */}
 													{/* <React.Fragment> */}
@@ -82,15 +88,12 @@ class Wallet extends React.Component {
 						</div>
 						<div className="page-action-wrap">
 							<div className="two-btn-wrap" >
-								<Button
-									className="btn-transparent"
-									content={<span className="btn-text">Recieve</span>}
-								/>
-								<Button
-									className="btn-in-light"
-									content={<span className="btn-text">Send</span>}
-								/>
-
+								<Link className="btn-transparent link" to={RECEIVE_PATH}>
+									<span className="btn-text">Recieve</span>
+								</Link>
+								<Link className="btn-in-light link" to={SEND_PATH}>
+									<span className="btn-text">Send</span>
+								</Link>
 							</div>
 						</div>
 					</div>

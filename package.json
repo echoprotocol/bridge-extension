@@ -1,6 +1,6 @@
 {
-  "name": "PixelPlex-app",
-  "description": "PixelPlex React Redux app",
+  "name": "echo-bridge",
+  "description": "Echo Bridge",
   "version": "0.1.0",
   "scripts": {
     "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8081",

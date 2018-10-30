@@ -1,15 +1,12 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
+import { withRouter } from 'react-router';
 
 import BridgeBtnCopy from '../BridgeBtnCopy';
 import UserIcon from '../UserIcon';
 
 class WelcomeComponent extends React.Component {
-
-	componentWillUnmount() {
-		this.props.unmount();
-	}
 
 	render() {
 		const {
@@ -19,7 +16,13 @@ class WelcomeComponent extends React.Component {
 		return (
 			<div className="welcome-wrap">
 
-				<UserIcon color={iconColor} animationChange size="big" avatar={`ava${icon}`} />
+				<UserIcon
+					color={iconColor}
+					animationChange
+					size="big"
+					avatar={`ava${icon}`}
+					onClickIcon={() => this.props.onChangeIcon()}
+				/>
 
 				<div className="page-wrap" >
 					<div className="page">
@@ -31,8 +34,8 @@ class WelcomeComponent extends React.Component {
 							wif ?
 								<React.Fragment>
 									<div className="instruction-text">
-										Save your WIF key and don’t loose it.
-										You <br /> will need it to restore account.
+                                        Save your WIF key and don’t lose it.
+                                        You <br /> will need it to restore account.
 									</div>
 									<div className="wif-wrap">
 										<div className="wif">{wif}</div>
@@ -48,10 +51,10 @@ class WelcomeComponent extends React.Component {
 								className="btn-noborder"
 								onClick={(e) => this.props.proceed(e)}
 								content={
-									<React.Fragment>
+									<div className="btn-text">
 										<i className="icon-arrowDown" />
-										<span className="btn-text">Proceed</span>
-									</React.Fragment>
+											Proceed
+									</div>
 								}
 							/>
 						</div>
@@ -59,7 +62,6 @@ class WelcomeComponent extends React.Component {
 				</div>
 			</div>
 		);
-
 	}
 
 }
@@ -67,6 +69,7 @@ class WelcomeComponent extends React.Component {
 
 WelcomeComponent.defaultProps = {
 	wif: '',
+	onChangeIcon: null,
 };
 
 WelcomeComponent.propTypes = {
@@ -74,8 +77,8 @@ WelcomeComponent.propTypes = {
 	name: PropTypes.string.isRequired,
 	icon: PropTypes.number.isRequired,
 	iconColor: PropTypes.string.isRequired,
-	unmount: PropTypes.func.isRequired,
 	proceed: PropTypes.func.isRequired,
+	onChangeIcon: PropTypes.func,
 };
 
-export default WelcomeComponent;
+export default withRouter(WelcomeComponent);

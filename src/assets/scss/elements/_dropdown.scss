@@ -121,6 +121,7 @@
             -webkit-transform: translateZ(0);
             color: #7E9090;
             font-size: 13px;
+            cursor: pointer;
             &:hover {
                 background-color: #2c3a40;
                 .icon {
@@ -155,7 +156,7 @@
                     content: "";
                     display: block;
                     background-color: #ca304e;
-                    margin: 3px 7px 0 -1px;
+                    margin: 2px 7px 0 -1px;
                     transition: background-color $speed;
                 }
                 &:after {
@@ -171,7 +172,7 @@
                     font-size: 10px;
                     letter-spacing: 2px;
                     right: 128px;
-                    top: 8px;
+                    top: 6px;
                 }
                 &.connected {
                     &:before {
@@ -189,11 +190,13 @@
         &-menu {
             width: 350px;
             right: 6px;
-            background-color: #36454a;
+            background-color: #384549;
             border-radius: $angularMin;
             overflow: hidden;
             box-shadow: 0px 0px 21px 0px rgba(#213034, .9);
             font-size: 13px;
+
+
             .default-networks,
             .custom-networks {
                 display: block;
@@ -217,10 +220,22 @@
                             }
                         }
                     }
+
                     &.active {
                         a, a:focus, a:hover {
-                            color:#E4E6E8;
-                        }
+							color:#E4E6E8;
+						}
+						a {
+							.accounts {
+								color: rgba(129, 136, 141, 0.8);
+							}
+							&:hover,
+							&:focus {
+								.accounts {
+									color: rgba(114, 122, 129, 0.8);
+								}	
+							}
+						}
                     }
                     a {
                         display: flex;
@@ -228,15 +243,15 @@
                         padding: 0 12px;
                         justify-content: space-between;
                         height: 38px;
-                        color: #828C94;
                         background-color: transparent;
                         position: relative;
+                        -webkit-font-smoothing: antialiased;
+                        -moz-osx-font-smoothing: grayscale;
                         transition:
                             color $speed,
                             background-color $speed,
                             box-shadow $speed;
 
-                        &:before,
                         &:after {
                             content: "";
                             position: absolute;
@@ -245,27 +260,17 @@
                             height: 1px;
                             background-color: #3d4c50;
                             margin: auto;
-                        }
-
-                        &:before {
-                            top: 0;
-                        }
-                        &:after {
                             bottom: 0;
+
                         }
 
                         &:hover,
                         &:focus {
-                            color:#ADB4BA;
                             text-decoration: none;
-                            background-color: #3F4B51;
                             outline: none;
                             box-shadow:
                                 -2px -1px 3px rgba(0, 0, 0, .05),
                                 2px 1px 3px rgba(0, 0, 0, .05);
-                        }
-                        &:active {
-                            background-color: #394246;
                         }
 
                     }
@@ -274,6 +279,30 @@
                     margin-right: auto;
                     @include cutTxt();
                     max-width: 190px;
+                }
+			}
+			.default-networks {
+                & > li {
+                    a {
+						color: #838C94;
+                        &:focus,
+                        &:hover {
+							color: #828E99;
+                            background-color: #475054;
+                            box-shadow:
+                                -1px -1px 4px rgba(0, 0, 0, .1),
+                                1px 1px 4px rgba(0, 0, 0, .1);
+                            &:after {
+                                background-color: #475054;
+                            }
+                        }
+                        &:active {
+                            background-color: #434d52;
+                            &:after {
+                                background-color: #434d52;
+                            }
+                        }
+                    }
                 }
             }
             .custom-networks {
@@ -284,11 +313,30 @@
                 }
                 & > li {
                     a {
+						color: #838C94;
+						.accounts {
+							color: rgba(#81888D,.8);
+						}
                         &:hover,
                         &:focus {
+							color: #ADB4BA;
+							background-color: #3c464a;
+							.accounts {
+								color: rgba(#727A81,.8);
+							}
                             box-shadow:
                                 -1px -1px 4px rgba(0, 0, 0, .1),
                                 1px 1px 4px rgba(0, 0, 0, .1);
+                            &:after {
+                                background-color: #3c464a;
+                                z-index: 1;
+                            }
+                        }
+                        &:active {
+                            background-color: #394246;
+                            &:after {
+                                background-color: #394246;
+                            }
                         }
                     }
                 }
@@ -296,6 +344,7 @@
                     max-width: 100%;
                 }
             }
+
         }
         &-footer {
             height: 55px;
@@ -303,36 +352,72 @@
             align-items: center;
             padding: 0 20px;
             background-color: rgba(#0e1416,.2);
-            letter-spacing: 2.2px;
+			letter-spacing: 2.2px;
+			
             a {
-                color: #61D3AD;
-                font-size: 11px;
+                color: #59B597;
+				font-size: 10px;
+				font-family: FNBold;
                 text-transform: uppercase;
-
+				transition: color $speed;
+				position: relative;
                 &:hover {
-                    text-decoration: none;
-                }
+					color: #71E4BE;
+				}
+				&:active {
+					color: rgba(#71E4BE,.5);
+				}
+
+				@include hardwareAccel();
+				&:before {
+					content: '';
+					position: absolute;
+					border-radius: $angularMin + 2px;
+					top: -5px;
+					right: -8px;
+					bottom: -5px;
+					left: -8px;
+					border: 2px solid transparent;
+					transition: border-color $speed;
+
+				}
+				&:not(:active) {
+					&:focus {
+						color: #71E4BE;
+						&:before {
+							border: 2px solid rgba(#fff, .15);
+
+						}
+					}
+				}
+
             }
         }
     }
     .accounts {
         display: flex;
-        margin-left: auto;
+		margin-left: auto;
         li {
             font-size: 14px;
             transition: color $speed;
-            letter-spacing: 1px;
             &:not(:last-child) {
                 margin-right: 6px;
             }
 
-            .user-icon-wrap {
-                transition: opacity $speed;
-                opacity: .7;
-                &:hover {
-                    opacity: 1;
-                }
-            }
+			.user-icon-wrap {
+				will-change: transform;
+				transition:
+				transform .2s ease,
+				opacity .2s;
+				&:active {
+					opacity: .7;
+				}
+				&:not(:active) {
+					&:hover {
+						transform: scale(1.03);
+					}
+				}
+			}
         }
     }
 }
@@ -351,7 +436,7 @@
             display: flex;
             justify-content: space-between;
             align-items: center;
-            padding: 0 3px 0 15px;
+            padding: 0px 3px 0 16px;
             height: 40px;
             background-color: transparent;
             border: 0;
@@ -360,6 +445,7 @@
             color: #7E9090;
             font-size: 13px;
             font-family: FNMedium;
+            cursor: pointer;
             &:hover {
                 background-color: #2c3a40;
                 .icon {
@@ -371,9 +457,6 @@
                 color: #495b5f;
                 font-size: 11px;
             }
-            .user-icon-wrap {
-                margin: 1px -1px 0 1px;
-            }
     
         }
         &-menu {
@@ -381,7 +464,7 @@
             margin: 1px 6px 0;
             right: 0;
             box-shadow: 0px 0px 21px 0px rgba(#213034, .9);
-            background-color: #36454a;
+            background-color: #384549;
             border-radius: $angularMin;
             overflow: hidden;
             font-size: 13px;
@@ -423,8 +506,8 @@
                         background-color: transparent;
                         position: relative;
                         transition: color $speed, background-color $speed;
-
-                        &:before,
+                        -webkit-font-smoothing: antialiased;
+                        -moz-osx-font-smoothing: grayscale;
                         &:after {
                             content: "";
                             position: absolute;
@@ -433,25 +516,39 @@
                             height: 1px;
                             background-color: #3d4c50;
                             margin: auto;
-                        }
-
-                        &:before {
-                            top: 0;
-                        }
-                        &:after {
                             bottom: 0;
                         }
-
-                        &:hover,
                         &:focus,
-                        &.active {
-                            text-decoration: none;
-                            color:#ADB4BA;
-                            background-color: #414f53;
-                            text-decoration: none;
-                            outline: none;
+                        &:hover {
+                            background-color: #444F53;
+                            box-shadow:
+                                -1px -1px 4px rgba(0, 0, 0, .1),
+                                1px 1px 4px rgba(0, 0, 0, .1);
+                            &:after {
+                                background-color: #475054;
+                            }
                         }
-                    }
+                        &:active {
+                            background-color: #434d52;
+                            &:after {
+                                background-color: #434d52;
+                            }
+                        }
+					}
+					.user-icon-wrap {
+						will-change: transform;
+						transition:
+						transform .2s ease,
+						opacity .2s;
+						&:active {
+							opacity: .7;
+						}
+						&:not(:active) {
+							&:hover {
+								transform: scale(1.03);
+							}
+						}
+					}
                 }
             }
             .user-name {
@@ -462,6 +559,7 @@
             .user-balance {
                 margin: 2px 0 0 auto;
                 white-space: nowrap;
+                letter-spacing: .2px;
                 &.positive {
                     color: #61D3AD;
                     margin-right: 10px;
@@ -475,27 +573,51 @@
             padding: 0 20px;
             background-color: rgba(#0e1416,.2);
             letter-spacing: 2.2px;
-            font-size: 11px;
+			font-size: 10px;
+			font-family: FNBold;
             text-transform: uppercase;
             
             span {
-                color: #ADB4BA;
+                color: #E4E7E8;
                 margin-right: 6px;
             }
             li {
                 & + span {
-                    color: #828C94;
+                    color: #838C94;
                     margin-left: 6px;
                 }
             }
 
             a {
-                color: #61D3AD;
-
-
-                &:hover {
-                    text-decoration: none;
-                }
+				color: #59B597;
+				position: relative;
+				transition: color $speed;
+				&:hover {
+					color: #71E4BE;
+				}
+				&:active {
+					color: rgba(#71E4BE,.5);
+				}
+				@include hardwareAccel();
+				&:before {
+					content: '';
+					position: absolute;
+					transition: border-color $speed;
+					border: 2px solid transparent;
+					top: -4px;
+					right: -4px;
+					bottom: -4px;
+					left: -6px;
+					border-radius: 5px;
+				}
+				&:not(:active) {
+					&:focus {
+						color: #71E4BE;
+						&:before {
+							border-color: rgba(#fff, .15);;
+						}
+					}
+				}
             }
         }
     }

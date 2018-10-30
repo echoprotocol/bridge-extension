@@ -73,43 +73,6 @@
     }
 }
 
-@mixin onBtnFocus (
-    $angular,
-    $outerBorderWidth,
-    $innerBorderWidth,
-    $color
-    ) {
-    display: inline-block;
-    position: relative;
-
-    @include hardwareAccel();
-
-    &:before {
-        content: '';
-        position: absolute;
-        transition: top $speed,
-                    right $speed /2,
-                    bottom $speed /2,
-                    left $speed;
-        border-radius: $angular + 2px;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-    }
-    &:not(:active) {
-        &:focus {
-            &:before {
-                border: $outerBorderWidth solid $color;
-                top: -($outerBorderWidth + $innerBorderWidth);
-                right: -($outerBorderWidth + $innerBorderWidth);
-                bottom: -($outerBorderWidth + $innerBorderWidth);
-                left: -($outerBorderWidth + $innerBorderWidth);
-            }
-        }
-    }
-}
-
 // Btns
 
 %btnIn {
@@ -141,7 +104,7 @@
                 $angularMax,
                 2px,
                 2px,
-                #4c5c60
+                rgba(#fff, .15)
            );
         }
     }
@@ -152,12 +115,25 @@
 
     &-in-light {
         @extend %btnIn;
+        &.link {
+            &:not(.disabled):not(:active) {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            &:active,
+            &.disabled {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
         &:not(.disabled) {
            @include onBtnFocus(
                 $angularMax,
                 2px,
                 2px,
-                #d0d5d7
+                rgba(#2E3C42,.15)
            );
         }
     }
@@ -167,8 +143,33 @@
         background-color: #344148;
         border-radius: $angularMax;
         border: 1px solid #344148;
-
         color: #16d6aa;
+        &.success {
+            color: #7ad5ab;
+            &:not(.disabled) {
+                @include onBtnFocus (
+                    $angularMax,
+                    2px,
+                    2px,
+                    rgba(#515560,.3)
+                );
+            }
+        }
+        &.error {
+            color: #d56468;
+
+            &:not(.disabled) {
+                &:active {
+                    color: #d56468;
+                }
+                @include onBtnFocus (
+                    $angularMax,
+                    2px,
+                    2px,
+                    rgba(#515560,.3)
+                );
+            }
+        }
         &:not(.disabled) {
             &:hover {
                 border: 1px solid #21292e;
@@ -183,13 +184,26 @@
                 $angularMax,
                 2px,
                 2px,
-                #d0d5d7
+                rgba(#fff,.15)
             );
         }
     }
 
     &-transparent {
         @extend %btn;
+        &.link {
+            &:not(.disabled):not(:active) {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+            &:active,
+            &.disabled {
+                display: flex;
+                align-items: center;
+                justify-content: center;
+            }
+        }
         background-color: transparent;
         color: #535e65;
         border-radius: $angularMax;
@@ -230,33 +244,7 @@
         }
     }
 
-    &-copy {
-        @extend %btn;
-        font-family: FNMedium;
-        background-color: #ffffff;
-        color: #535e65;
-        border-radius: $angularMax;
-        border: 1px solid #c3c7cc;
 
-        width: 200px;
-        z-index: 1;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        position: absolute;
-        height: 25px;
-        top: 0;
-        right: 0;
-        transition: color $speed, background-color $speed;
-        &.compact {
-            .btn-text {
-                letter-spacing: 2.3px;
-                font-size: 11px;
-                margin: 1px 0 0 0;
-            }
-        }
-
-    }
 
     &-noborder {
         @extend %btn;
@@ -285,7 +273,8 @@
         }
 
         i {
-            margin-right: 13px;
+			margin-right: 13px;
+			margin-left: -6px;
         }
 
     }
@@ -379,6 +368,31 @@
         &:focus {
             border-bottom: 1px solid;
         }
+	}
+	&-copy {
+        @extend %btn;
+        font-family: FNMedium;
+        background-color: #ffffff;
+        color: #535e65;
+        border-radius: $angularMax;
+        border: 1px solid #c3c7cc;
+        width: 200px;
+        z-index: 1;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        position: absolute;
+        // height: 25px;
+        top: 0;
+        right: 0;
+        transition: color $speed, background-color $speed;
+        &.compact {
+            .btn-text {
+                letter-spacing: 2.3px;
+                font-size: 11px;
+                margin: 1px 0 0 0;
+            }
+        }
     }
 
 }
@@ -452,20 +466,23 @@
     .btn-in-dark,
     .btn-in-light,
     .btn-transparent,
-    .btn-noborder,
     .btn-inverted {
         min-width: 200px;
         &.compact {
             min-width: 150px;
         }
-    }
+	}
+	.btn-noborder {
+		min-width: 150px;	
+	}
 
  }
 
  .two-btn-wrap {
     display: flex;
 
-    button {
+    button,
+    a {
         &:not(:last-child) {
             margin-right: 12px;
         }
@@ -491,7 +508,8 @@
         position: relative;
         border: 0;
         background-color: transparent;
-        border: 1px solid transparent;
+		border: 1px solid transparent;
+		cursor: pointer;
         transition:
             background-color $speed,
             border $speed;
