@@ -21,7 +21,8 @@
         }
 
         .btn-nav-wrap {
-
+			display: none;
+			
             & + .page-title {
                 margin-right: auto;
                 padding: 0 20px 0 0;
@@ -76,7 +77,8 @@
             }
         }
         .btn-nav {
-            margin: 0 10px 0 -8px;
+			margin: 0 10px 0 -8px;
+
         }
     }
     &:before {
