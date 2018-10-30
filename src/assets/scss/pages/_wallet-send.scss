@@ -26,7 +26,11 @@
 
     .input-wrap {
         position: relative;
-        
+        &.inner-dropdown {
+			input {
+				max-width: 200px;
+			}
+		}
         .input-image {
             position: absolute;
             top: 14px;
