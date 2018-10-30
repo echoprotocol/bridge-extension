@@ -55,8 +55,8 @@ export const initCrypto = () => async (dispatch) => {
 	try {
 		if (!getCrypto().isLocked()) {
 			dispatch(changeCrypto({ isLocked: false }));
-
-			// history.push(INDEX_PATH);
+			await dispatch(loadInfo());
+			history.push(INDEX_PATH);
 		} else {
 			const isFirstTime = await getCrypto().isFirstTime();
 

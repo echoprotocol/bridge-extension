@@ -15,8 +15,6 @@ import FormatHelper from '../helpers/FormatHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import echoService from '../services/echo';
-
 import {
 	ACCOUNT_COLORS,
 	BASE_ICON,
@@ -381,10 +379,8 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
  *  Initialize crypto and connect to blockchain
  */
 export const globalInit = () => async (dispatch) => {
-	await dispatch(initCrypto());
 	await dispatch(connect());
-
-	echoService.getEmitter().on('request', (id, options) => { console.log(id, options); });
+	await dispatch(initCrypto());
 };
 
 /**

@@ -2,6 +2,10 @@ import { CORE_ID } from './GlobalConstants';
 
 export const operationFields = {
 	transfer: {
+		fee: {
+			type: 'asset_object',
+			required: false,
+		},
 		from: {
 			type: 'account_id',
 			required: true,
@@ -20,6 +24,10 @@ export const operationFields = {
 		},
 	},
 	contract: {
+		fee: {
+			type: 'asset_object',
+			required: false,
+		},
 		registrar: {
 			type: 'account_id',
 			required: true,

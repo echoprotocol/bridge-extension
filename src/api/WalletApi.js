@@ -105,11 +105,3 @@ export const getMemoFee = (global, memo) => {
 
 	return optionFee * (byteLength / 1024);
 };
-
-export const sendTransaction = async (signedTransaction, operation, options) => {
-	signedTransaction.add_type_operation(operation, options);
-
-	await signedTransaction.set_required_fees(options.asset_id);
-
-	return signedTransaction.broadcast();
-};

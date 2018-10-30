@@ -126,7 +126,7 @@ class SignDropdown extends React.PureComponent {
 	render() {
 		const { transaction, accounts, loading } = this.props;
 
-		if (!transaction) { return null; }
+		if (!transaction || !accounts) { return null; }
 
 		const options = transaction.get('options');
 

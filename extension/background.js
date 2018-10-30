@@ -71,7 +71,7 @@ const onExternalMessage = (request, sender, sendResponse) => {
 			data: request.data, sender, id, cb: sendResponse,
 		});
 
-		emitter.emit('request', id, request);
+		emitter.emit('request', id, request.data);
 
 		notificationManager.getPopup()
 			.then((popup) => !popup && triggerUi())
@@ -102,7 +102,7 @@ window.getWsLib = () => echojs;
 window.getChainLib = () => chainjs;
 window.getCrypto = () => crypto;
 window.getEmitter = () => emitter;
-window.getList = () => requestQueue.map(({ id, request }) => ({ id, request }));
+window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }));
 
 emitter.on('response', onResponse);
 

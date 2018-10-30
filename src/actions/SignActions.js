@@ -5,8 +5,8 @@ import BN from 'bignumber.js';
 import history from '../history';
 import store from '../store';
 
-import { sendTransaction, getMemoFee } from '../api/WalletApi';
-import { fetchChain } from '../api/ChainApi';
+import { getMemoFee } from '../api/WalletApi';
+import { fetchChain, getChainSubcribe } from '../api/ChainApi';
 
 import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
@@ -57,28 +57,26 @@ const getTransactionFee = async ({ fee, type, memo }) => {
 		amount = new BN(amount).plus(getMemoFee(global, memo));
 	}
 
-	fee = fee || {};
-	const asset = await fetchChain(fee.asset_id || CORE_ID);
-
-	if (asset.get('id') !== CORE_ID) {
+	if (fee.asset.get('id') !== CORE_ID) {
 		const core = await fetchChain(CORE_ID);
 
-		const price = new BN(asset.getIn(['options', 'core_exchange_rate', 'quote', 'amount']))
-			.div(asset.getIn(['options', 'core_exchange_rate', 'base', 'amount']))
-			.times(10 ** (core.get('precision') - asset.get('precision')));
+		const price = new BN(fee.asset.getIn(['options', 'core_exchange_rate', 'quote', 'amount']))
+			.div(fee.asset.getIn(['options', 'core_exchange_rate', 'base', 'amount']))
+			.times(10 ** (core.get('precision') - fee.asset.get('precision')));
 
 		amount = new BN(amount).div(10 ** core.get('precision'));
-		amount = price.times(amount).times(10 ** asset.get('precision'));
+		amount = price.times(amount).times(10 ** fee.asset.get('precision'));
 	}
 
-	return FormatHelper.formatAmount(
-		new BN(amount).integerValue(BN.ROUND_UP).toString(),
-		asset.get('precision'),
-		asset.get('symbol'),
-	);
+	return {
+		amount: new BN(amount).integerValue(BN.ROUND_UP).toString(),
+		asset: fee.asset,
+	};
 };
 
 const setTransaction = ({ id, options }) => async (dispatch) => {
+	options.fee = options.fee || { amount: 0, asset_id: CORE_ID };
+
 	const fetchList = Object.entries(getFetchMap(options.type, options));
 
 	let fetched = await Promise.all(fetchList.map(async ([key, value]) => {
@@ -89,9 +87,9 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 	fetched = fetched.reduce((obj, item) => ({ ...obj, ...item }), {});
 
 	Object.keys(options).forEach((key) => {
-		if (key === 'amount') {
-			options.amount.asset = fetched.asset;
-			delete options.amount.asset_id;
+		if (['amount', 'fee'].includes(key)) {
+			options[key].asset = fetched.asset;
+			delete options[key].asset_id;
 		}
 
 		if (fetched[key]) {
@@ -124,7 +122,7 @@ const removeTransaction = (id) => (dispatch, getState) => {
 	}
 };
 
-emitter.on('request', async (id, options) => {
+const requestHandler = async (id, options) => {
 	const isLocked = store.getState().global.getIn(['crypto', 'isLocked']);
 
 	if (isLocked) {
@@ -148,7 +146,18 @@ emitter.on('request', async (id, options) => {
 		field: 'sign',
 		params: { transactions: transactions.push({ id, options }) },
 	}));
-});
+};
+
+emitter.on('request', requestHandler);
+
+window.onunload = () => {
+	if (getChainSubcribe()) {
+		const { ChainStore } = echoService.getChainLib();
+		ChainStore.unsubscribe(getChainSubcribe());
+	}
+
+	emitter.removeListener('request', requestHandler);
+};
 
 export const loadRequests = () => async (dispatch) => {
 	const transactions = echoService.getRequests().filter(({ id, options }) => {
@@ -203,7 +212,10 @@ export const approveTransaction = (transaction) => async (dispatch, getState) =>
 			);
 		}
 
-		await sendTransaction(tr, type, options);
+		tr.add_type_operation(type, options);
+		await tr.set_required_fees(options.fee.asset_id);
+		await tr.broadcast();
+
 		emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
 	} catch (err) {
 		const error = FormatHelper.formatError(err);

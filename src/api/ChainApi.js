@@ -2,6 +2,8 @@ import echoService from '../services/echo';
 
 let CHAIN_SUBSCRIBE = null;
 
+export const getChainSubcribe = () => CHAIN_SUBSCRIBE;
+
 /**
  * return method name by key type
  * @param {String} key
@@ -124,4 +126,3 @@ export const getAccountRefsOfKey = async (key) => {
 
 	return result;
 };
-
