@@ -1,4 +1,5 @@
 import echoService from '../services/echo';
+import GlobalReducer from '../reducers/GlobalReducer';
 
 let CHAIN_SUBSCRIBE = null;
 
@@ -22,6 +23,34 @@ const getTypeByKey = (key) => {
 	const keyNumber = Number(key);
 	if (!Number.isSafeInteger(keyNumber) || keyNumber < 1) throw new Error('Key should be id or account name or block number.');
 	return 'getBlock';
+};
+
+/**
+ *  @method checkConnection
+ *
+ * 	Call login for check connection
+ *
+ * 	@param {String} url
+ */
+export const checkConnection = (url) => async (dispatch, getState) => {
+	const { Apis, Manager } = echoService.getWsLib();
+	const manager = new Manager({ url, urls: [] });
+	const wsRpc = Apis.instance().ws_rpc;
+
+	try {
+		await manager.checkSingleUrlConnection(wsRpc);
+	} catch (err) {
+		dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
+		return false;
+	}
+
+	const connected = getState().global.get('connected');
+
+	if (!connected) {
+		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
+	}
+
+	return true;
 };
 
 /**
@@ -53,6 +82,7 @@ export const connectToAddress = async (address, subscribeCb) => {
 		}
 
 		await ChainStore.init();
+
 		ChainStore.subscribe(CHAIN_SUBSCRIBE);
 	} catch (e) {
 		CHAIN_SUBSCRIBE = null;
