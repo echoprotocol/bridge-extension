@@ -35,7 +35,6 @@ build_development:
 build_artifacts:
   stage: artifacts
   script:
-    - cd /home/devuser/DevProjects/649.bridge/extension
     - npm run build-dev
   artifacts:
     paths:
