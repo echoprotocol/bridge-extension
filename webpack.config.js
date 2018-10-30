@@ -110,7 +110,7 @@ module.exports = {
 		]),
 		new ZipPlugin({
 			path: path.resolve('build/zip'),
-			filename: 'Echo Bridge.zip',
+			filename: 'echo_bridge.zip',
 		}),
 	],
 	node: {
