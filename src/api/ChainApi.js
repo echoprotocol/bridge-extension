@@ -1,5 +1,7 @@
 import echoService from '../services/echo';
 import GlobalReducer from '../reducers/GlobalReducer';
+import { connect, disconnect } from '../actions/ChainStoreAction';
+import { loadInfo } from '../actions/GlobalActions';
 
 let CHAIN_SUBSCRIBE = null;
 
@@ -40,14 +42,17 @@ export const checkConnection = (url) => async (dispatch, getState) => {
 	try {
 		await manager.checkSingleUrlConnection(wsRpc);
 	} catch (err) {
-		dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
+		await dispatch(disconnect(url));
+		// dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
 		return false;
 	}
 
 	const connected = getState().global.get('connected');
 
 	if (!connected) {
-		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
+		await dispatch(connect());
+		await dispatch(loadInfo());
+		// dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 	}
 
 	return true;
