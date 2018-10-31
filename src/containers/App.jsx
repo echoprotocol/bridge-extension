@@ -11,7 +11,7 @@ import { globalInit } from '../actions/GlobalActions';
 import Navigator from '../components/Navigator';
 
 
-import { PIN_PATHS } from '../constants/RouterConstants';
+import { PIN_PATHS, SIGN_TRANSACTION_PATH } from '../constants/RouterConstants';
 
 class App extends React.Component {
 
@@ -42,8 +42,16 @@ class App extends React.Component {
 					{ this.renderHeader(pathname) }
 					{children}
 				</Sidebar.Pushable>
-				{/* Добавлять класс noBg для incoming-transactions */}
-				{ loading ? <Dimmer active className="noBg" inverted /> : null }
+				{
+					loading ?
+						<Dimmer
+							active
+							className={classnames({
+								noBg: SIGN_TRANSACTION_PATH === pathname,
+							})}
+							inverted
+						/> : null
+				}
 			</div>
 		);
 	}

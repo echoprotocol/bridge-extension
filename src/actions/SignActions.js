@@ -74,9 +74,10 @@ const getTransactionFee = async ({ fee, type, memo }) => {
 };
 
 const setTransaction = ({ id, options }) => async (dispatch) => {
-	options.fee = options.fee || { amount: 0, asset_id: CORE_ID };
+	const transaction = JSON.parse(JSON.stringify(options));
+	transaction.fee = transaction.fee || { amount: 0, asset_id: CORE_ID };
 
-	const fetchList = Object.entries(getFetchMap(options.type, options));
+	const fetchList = Object.entries(getFetchMap(options.type, transaction));
 
 	let fetched = await Promise.all(fetchList.map(async ([key, value]) => {
 		const result = await fetchChain(value);
@@ -85,22 +86,23 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 
 	fetched = fetched.reduce((obj, item) => ({ ...obj, ...item }), {});
 
-	Object.keys(options).forEach((key) => {
+	Object.keys(transaction).forEach((key) => {
 		if (['amount', 'fee'].includes(key)) {
-			options[key].asset = fetched.asset;
-			delete options[key].asset_id;
+			transaction[key].asset = fetched[key];
+			delete transaction[key].asset_id;
+			return;
 		}
 
 		if (fetched[key]) {
-			options[key] = fetched[key];
+			transaction[key] = fetched[key];
 		}
 	});
 
-	options.fee = await getTransactionFee(options);
+	transaction.fee = await getTransactionFee(transaction);
 
 	dispatch(GlobalReducer.actions.setIn({
 		field: 'sign',
-		params: { current: new Map({ id, options }) },
+		params: { current: new Map({ id, options: transaction }) },
 	}));
 
 };
@@ -126,6 +128,13 @@ const requestHandler = async (id, options) => {
 
 	if (isLocked) {
 		emitter.emit('response', 'Unlock required', id, ERROR_STATUS);
+		return;
+	}
+
+	const connected = store.getState().global.get('connected');
+
+	if (!connected) {
+		emitter.emit('response', 'Network error', id, ERROR_STATUS);
 		return;
 	}
 
@@ -158,9 +167,11 @@ window.onunload = () => {
 	emitter.removeListener('request', requestHandler);
 };
 
-export const loadRequests = () => async (dispatch) => {
+export const loadRequests = () => async (dispatch, getState) => {
+	const connected = getState().global.get('connected');
+
 	const transactions = echoService.getRequests().filter(({ id, options }) => {
-		const error = dispatch(validateTransaction(options));
+		const error = connected ? dispatch(validateTransaction(options)) : 'Network error';
 
 		if (error) {
 			emitter.emit('response', error, id, ERROR_STATUS);

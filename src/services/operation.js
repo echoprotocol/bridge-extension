@@ -34,7 +34,7 @@ export const getFetchMap = (type, options) => {
 		}
 
 		if (value.type === 'asset_object') {
-			obj.asset = options[key].asset_id;
+			obj[key] = options[key].asset_id;
 		}
 
 		return obj;
