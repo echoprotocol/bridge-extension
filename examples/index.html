@@ -1,0 +1,50 @@
+<!doctype html>
+<html lang="en">
+<head>
+    <title>Echo Bridge!</title>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.2.1/jquery.min.js"></script>
+</head>
+<body>
+    <h1>Examples</h1>
+    <!-- Accounts (current network) -->
+    <div style="padding-bottom: 15px;">
+        <h4>Accounts</h4>
+        <div id="accounts"></div>
+        <button id="accounts-click">submit</button>
+    </div>
+    <!--  -->
+
+    <!-- Transfer -->
+    <div style="padding-bottom: 10px; border-top: 1px solid #000;">
+        <h4>Transfer</h4>
+        <div style="padding: 5px 0;">
+            <input type="text" id="transfer-fromAddress" name="transfer-fromAddress" placeholder="from">
+            <input type="text" id="transfer-toAddress" name="transfer-toAddress" placeholder="to">
+            <input type="number" id="transfer-amount" name="transfer-amount" placeholder="amount">
+            <button id="transfer-click">submit</button>
+        </div>
+    </div>
+    <!--  -->
+
+    <!-- Contract -->
+    <div style="padding-bottom: 10px; border-top: 1px solid #000;">
+        <h4>Contract</h4>
+        <div style="padding: 5px 0;">
+            <input type="text" id="transfer-bcerts-fromAddress" name="bcerts-fromAddress" placeholder="from">
+            <input type="number" id="transfer-bcerts-amount" name="bcerts-amount" placeholder="amount">
+            <input type="text" id="transfer-bcerts-toAddress" name="bcerts-toAddress" placeholder="to">
+            <button id="transfer-click">submit</button>
+        </div>
+    </div>
+    <!--  -->
+    </body>
+    <script>
+        $(document).ready(function() {
+            $("#create-click").click(function(e) {
+                const password = jQuery('#create-password')[0].value;
+                const address = bcWallet.create(password);
+                console.log(address);
+            });
+        });
+    </script>
+</html>
