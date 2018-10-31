@@ -20,6 +20,11 @@ import FormatHelper from '../helpers/FormatHelper';
 
 let INTERVAL_LOGIN_CALL = null;
 
+/**
+ * @method resetInterval
+ * Reset interval of login calls
+ * @returns {Function}
+ */
 const resetInterval = () => {
 	if (INTERVAL_LOGIN_CALL) {
 		clearInterval(INTERVAL_LOGIN_CALL);

@@ -52,7 +52,6 @@ export const checkConnection = (url) => async (dispatch, getState) => {
 	if (!connected) {
 		await dispatch(connect());
 		await dispatch(loadInfo());
-		// dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 	}
 
 	return true;
