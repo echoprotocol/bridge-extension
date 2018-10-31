@@ -95,6 +95,7 @@ const getAccountList = async () => {
  * @returns {boolean}
  */
 const onMessage = (request, sender, sendResponse) => {
+
 	if (!request.method || !request.id || !request.appId || request.appId !== APP_ID) return false;
 
 	const { id } = request;
@@ -107,7 +108,9 @@ const onMessage = (request, sender, sendResponse) => {
 
 		setBadge();
 
-		emitter.emit('request', id, request.data);
+		try {
+			emitter.emit('request', id, request.data);
+		} catch (e) {}
 
 		notificationManager.getPopup()
 			.then((popup) => !popup && triggerPopup())
