@@ -4,7 +4,11 @@
   "manifest_version": 2,
   "browser_action": {
     "default_popup": "./index.html",
-    "default_title": "Echo Bridge"
+    "default_title": "Echo Bridge",
+    "default_icon": {
+      "16": "images/16.png",
+      "32": "images/32.png"
+    }
   },
   "icons": {
     "16": "images/16.png",
