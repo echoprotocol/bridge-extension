@@ -9,14 +9,14 @@
   "icons": {
     "16": "images/16.png",
     "48": "images/48.png",
+    "96": "images/96.png",
     "128": "images/128.png"
   },
   "version": "1.0",
   "background": {
     "scripts": [
       "background.js"
-    ],
-    "persistent": false
+    ]
   },
   "content_scripts": [
     {
@@ -32,11 +32,6 @@
       "all_frames": true
     }
   ],
-  "externally_connectable": {
-    "ids": [
-      "*"
-    ]
-  },
   "permissions": [
     "storage",
     "clipboardWrite"

@@ -97,10 +97,7 @@
 	}
 	&-menu {
 		.user-icon-wrap {
-			transition:
-			opacity .2s,
-			width .4s,
-			height .4s;
+			transition: opacity .2s ease;
 			opacity: 0.8;
 			&:hover {
 				margin: -1px;

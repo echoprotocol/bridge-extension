@@ -51,9 +51,7 @@ select:-webkit-autofill:focus {
     background: #16d6aa;
 }
 
-:focus {outline:none;}
-::-moz-focus-inner {border:0;}
-
+:focus {outline:none !important;}
 h1, h2, h3, h4, h5 {
     font-family: FNMedium;
 }
