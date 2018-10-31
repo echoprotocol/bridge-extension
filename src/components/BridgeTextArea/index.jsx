@@ -3,6 +3,7 @@ import PropTypes from 'prop-types';
 import Textarea from 'react-textarea-autosize';
 
 import classnames from 'classnames';
+import { Input } from 'semantic-ui-react';
 
 class BridgeTextArea extends React.Component {
 
@@ -25,11 +26,12 @@ class BridgeTextArea extends React.Component {
 
 	onChange(e) {
 		this.setState({ filled: !!e.target.value.trim().length });
+		this.props.onChange(e);
 	}
 
 	render() {
 
-		const { label } = this.props;
+		const { label, value, name } = this.props;
 
 		const {
 			up, filled,
@@ -45,6 +47,8 @@ class BridgeTextArea extends React.Component {
 			>
 				<Textarea
 					rows={1}
+					value={value}
+					name={name}
 					onChange={(e) => this.onChange(e)}
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
@@ -58,10 +62,16 @@ class BridgeTextArea extends React.Component {
 
 BridgeTextArea.propTypes = {
 	label: PropTypes.string,
+	value: PropTypes.string,
+	name: PropTypes.string,
+	onChange: PropTypes.func,
 };
 
 BridgeTextArea.defaultProps = {
 	label: null,
+	value: '',
+	name: '',
+	onChange: null,
 };
 
 export default BridgeTextArea;

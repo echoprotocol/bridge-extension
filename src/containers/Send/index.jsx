@@ -14,6 +14,7 @@ import BridgeTextArea from '../../components/BridgeTextArea';
 import { INDEX_PATH } from '../../constants/RouterConstants';
 import { setFormValue } from '../../actions/FormActions';
 import { FORM_SEND } from '../../constants/FormConstants';
+import ValidateSend from '../../helpers/ValidateSend';
 
 class Send extends React.Component {
 
@@ -29,6 +30,14 @@ class Send extends React.Component {
 			this.props.setFormValue(field, value);
 		}
 	}
+
+	// onAmountChange(e) {
+	//     const field = e.target.name;
+	//     let { value } = e.target;
+	//
+	//
+	//     ValidateSend.amountInput(value);
+	// }
 
 	renderSend() {
 		const codingCurrencyDropdownData = [
@@ -65,7 +74,6 @@ class Send extends React.Component {
 					>
 						<div className="wallet-send-block">
 							<BridgeInput
-								autoFocus
 								name="From"
 								theme="input-light"
 								labelText="From"
@@ -87,7 +95,6 @@ class Send extends React.Component {
 								onChange={(e) => this.onChange(e, true)}
 							/>
 							<BridgeInput
-								autoFocus
 								name="amount"
 								theme="input-light"
 								placeholder="0.000"
@@ -99,11 +106,9 @@ class Send extends React.Component {
 								onChange={(e) => this.onChange(e)}
 							/>
 							<BridgeInput
-								autoFocus
 								name="fee"
 								theme="input-light"
 								placeholder="0.000"
-								// value=""
 								defaultUp
 								labelText="Fee"
 								leftLabel
@@ -112,6 +117,9 @@ class Send extends React.Component {
 								onChange={(e) => this.onChange(e)}
 							/>
 							<BridgeTextArea
+								name="note"
+								value={note.value}
+								onChange={(e) => this.onChange(e)}
 								label="Note (optional)"
 							/>
 							<Button
