@@ -18,13 +18,19 @@ import storage from '../services/storage';
 
 import FormatHelper from '../helpers/FormatHelper';
 
-let INTERVAL_ID = null;
+let INTERVAL_LOGIN_CALL = null;
+
+const resetInterval = () => {
+	if (INTERVAL_LOGIN_CALL) {
+		clearInterval(INTERVAL_LOGIN_CALL);
+	}
+};
 
 /**
  * copy object from ChainStore lib to redux every time when triggered, check connection
  * @returns {Function}
  */
-export const subscribe = () => async (dispatch) => {
+export const subscribe = () => (dispatch) => {
 	const { ChainStore } = echoService.getChainLib();
 	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
 		const value = ChainStore[origin];
@@ -65,7 +71,9 @@ export const connect = () => async (dispatch) => {
 
 		await connectToAddress(network.url, subscribeCb);
 
-		INTERVAL_ID = setInterval((() => {
+		resetInterval();
+
+		INTERVAL_LOGIN_CALL = setInterval((() => {
 			dispatch(checkConnection(network.url));
 		}), LOGIN_INTERVAL);
 
@@ -92,9 +100,7 @@ export const connect = () => async (dispatch) => {
  */
 export const disconnect = (address) => async (dispatch) => {
 	try {
-		if (INTERVAL_ID) {
-			clearInterval(INTERVAL_ID);
-		}
+		resetInterval();
 
 		await disconnectFromAddress(address);
 		dispatch(batchActions([

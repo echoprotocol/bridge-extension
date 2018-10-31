@@ -16,6 +16,10 @@ class Wallet extends React.Component {
 		const { assets, balances } = this.props;
 
 		return balances.toArray().sort((a, b) => {
+			if (!a || !b) {
+				return 0;
+			}
+
 			const assetA = assets.getIn([a.get('asset_type'), 'symbol']);
 			const assetB = assets.getIn([b.get('asset_type'), 'symbol']);
 
