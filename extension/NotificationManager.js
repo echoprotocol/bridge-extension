@@ -17,6 +17,7 @@ class NotificationManager {
 		const creation = extensionizer.windows.create({
 			url: 'index.html',
 			type: 'popup',
+			state: 'normal',
 			height: POPUP_HEIGHT,
 			width: POPUP_WIDTH,
 		}, cb);
@@ -29,7 +30,7 @@ class NotificationManager {
      */
 	closePopup() {
 		this.getPopup()
-			.then((popup) => (popup && extensionizer.windows.remove(popup.id, console.error)));
+			.then((popup) => (popup && extensionizer.windows.remove(popup.id, () => {})));
 	}
 
 	/**

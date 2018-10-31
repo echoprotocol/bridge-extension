@@ -14,6 +14,7 @@ const ee = new EventEmitter();
 
 if (EXTENSION) {
 	require('../assets/images/16.png');
+	require('../assets/images/32.png');
 	require('../assets/images/48.png');
 	require('../assets/images/96.png');
 	require('../assets/images/128.png');

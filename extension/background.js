@@ -73,6 +73,20 @@ const setBadge = () => {
 };
 
 /**
+ * Create result notification
+ * @param title
+ * @param message
+ */
+const createNotification = (title = '', message = '') => {
+	extensionizer.notifications.create('', {
+		iconUrl: 'images/48.png',
+		type: 'basic',
+		message,
+		title,
+	});
+};
+
+/**
  * Get user account if unlocked
  * @returns {Promise.<*>}
  */
@@ -115,7 +129,6 @@ const onMessage = (request, sender, sendResponse) => {
 		notificationManager.getPopup()
 			.then((popup) => !popup && triggerPopup())
 			.catch(triggerPopup);
-
 	} else if (request.method === 'accounts') {
 		getAccountList().then((res) => sendResponse({ id, res }));
 	}
@@ -137,6 +150,7 @@ const onResponse = async (err, id, status) => {
 	requestQueue.splice(requestIndex, 1)[0].cb({ id, status, text: err });
 
 	setBadge();
+	createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
 
 	if (requestQueue.length === 0) closePopup();
 };
