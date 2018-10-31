@@ -21,24 +21,18 @@
 			&:before {
 				content: '';
 				position: absolute;
-				transition: top $speed,
-							right $speed /2,
-							bottom $speed /2,
-							left $speed;
+				transition: border-color $speed;
 				border-radius: $angularMin + 2px;
-				top: 0;
-				right: 0;
-				bottom: 0;
-				left: 5px;
+				border: 2px solid transparent;
+				top: -2px;
+				right: -2px;
+				bottom: -2px;
+				left: 2px;
 			}
 			&:not(:active) {
 				&:focus {
 					&:before {
-						border: 2px solid #ccd2d6;
-						top: -2px;
-						right: -2px;
-						bottom: -2px;
-						left: 2px;
+						border-color: #ccd2d6;
 					}
 				}
 			}

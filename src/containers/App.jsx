@@ -42,7 +42,7 @@ class App extends React.Component {
 					{ this.renderHeader(pathname) }
 					{children}
 				</Sidebar.Pushable>
-				{ loading ? <Dimmer active inverted /> : null }
+				{ !loading ? <Dimmer active inverted /> : null }
 			</div>
 		);
 	}
