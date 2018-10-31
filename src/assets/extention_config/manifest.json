@@ -38,7 +38,8 @@
   ],
   "permissions": [
     "storage",
-    "clipboardWrite"
+    "clipboardWrite",
+    "notifications"
   ],
   "web_accessible_resources": [
     "inpage.js",
