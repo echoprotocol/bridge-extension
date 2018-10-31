@@ -1,7 +1,8 @@
 import echoService from '../services/echo';
-import GlobalReducer from '../reducers/GlobalReducer';
-import { connect, disconnect } from '../actions/ChainStoreAction';
+
+import { connect } from '../actions/ChainStoreAction';
 import { loadInfo } from '../actions/GlobalActions';
+import GlobalReducer from '../reducers/GlobalReducer';
 
 let CHAIN_SUBSCRIBE = null;
 
@@ -37,13 +38,12 @@ const getTypeByKey = (key) => {
 export const checkConnection = (url) => async (dispatch, getState) => {
 	const { Apis, Manager } = echoService.getWsLib();
 	const manager = new Manager({ url, urls: [] });
-	const wsRpc = Apis.instance().ws_rpc;
+	const instance = Apis.instance();
 
 	try {
-		await manager.checkSingleUrlConnection(wsRpc);
+		await manager.checkSingleUrlConnection(instance.ws_rpc);
 	} catch (err) {
-		await dispatch(disconnect(url));
-		// dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
+		dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
 		return false;
 	}
 
@@ -86,7 +86,17 @@ export const connectToAddress = async (address, subscribeCb) => {
 			await instance.init_promise;
 		}
 
-		await ChainStore.init();
+		const start = new Date().getTime();
+
+		await Promise.race([
+			ChainStore.init().then(() => (new Date().getTime() - start)),
+			new Promise((resolve, reject) => {
+				const timeoutId = setTimeout(() => {
+					clearTimeout(timeoutId);
+					reject(new Error('timeout'));
+				}, 10 * 1000);
+			}),
+		]);
 
 		ChainStore.subscribe(CHAIN_SUBSCRIBE);
 	} catch (e) {

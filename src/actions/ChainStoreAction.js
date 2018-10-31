@@ -69,13 +69,13 @@ export const connect = () => async (dispatch) => {
 
 		const subscribeCb = () => dispatch(subscribe());
 
-		await connectToAddress(network.url, subscribeCb);
-
 		resetInterval();
 
 		INTERVAL_LOGIN_CALL = setInterval((() => {
 			dispatch(checkConnection(network.url));
 		}), LOGIN_INTERVAL);
+
+		await connectToAddress(network.url, subscribeCb);
 
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 

@@ -75,11 +75,6 @@ export const NETWORKS = [
 		registrator: 'https://echo-tmp-wallet.pixelplex.io/faucet/registration',
 		url: 'wss://echo-devnet-node.pixelplex.io/ws',
 	},
-    {
-        name: 'testnet',
-        registrator: 'https://echo-tmp-wallet.pixelplex.io/faucet/registration',
-        url: 'wss://echo-devnet-node.pixelplex.io/ws',
-    },
 ];
 
 export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
@@ -98,4 +93,4 @@ export const ICONS_COUNT = 15;
 export const ICON_COLORS_COUNT = 7;
 export const BASE_ICON = 1;
 export const BASE_ICON_COLOR = 'green';
-export const LOGIN_INTERVAL = 1000 * 10;
+export const LOGIN_INTERVAL = 1000 * 30;
