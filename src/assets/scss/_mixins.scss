@@ -32,60 +32,18 @@
     &:before {
         content: '';
         position: absolute;
-        transition: top $speed,
-                    right $speed /2,
-                    bottom $speed /2,
-                    left $speed;
+        transition: border-color $speed;
         border-radius: $angular + 2px;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
+		top: -($outerBorderWidth + $innerBorderWidth);
+		right: -($outerBorderWidth + $innerBorderWidth);
+		bottom: -($outerBorderWidth + $innerBorderWidth);
+		left: -($outerBorderWidth + $innerBorderWidth);
+		border:  $outerBorderWidth solid transparent;
     }
     &:not(:active) {
         &:focus {
             &:before {
-                border: $outerBorderWidth solid $color;
-                top: -($outerBorderWidth + $innerBorderWidth);
-                right: -($outerBorderWidth + $innerBorderWidth);
-                bottom: -($outerBorderWidth + $innerBorderWidth);
-                left: -($outerBorderWidth + $innerBorderWidth);
-            }
-        }
-    }
-}
-
-@mixin onLinkFocus (
-    $angular,
-    $outerBorderWidth,
-    $innerBorderWidth,
-    $color
-    ) {
-    position: relative;
-    
-    @include hardwareAccel();
-    
-    &:before {
-        content: '';
-        position: absolute;
-        transition: top $speed,
-                    right $speed /2,
-                    bottom $speed /2,
-                    left $speed;
-        border-radius: $angular + 2px;
-        top: 0;
-        right: 0;
-        bottom: 0;
-        left: 0;
-    }
-    &:not(:active) {
-        &:focus {
-            &:before {
-                border: $outerBorderWidth solid $color;
-                top: -($outerBorderWidth + $innerBorderWidth);
-                right: -($outerBorderWidth + $innerBorderWidth);
-                bottom: -($outerBorderWidth + $innerBorderWidth);
-                left: -($outerBorderWidth + $innerBorderWidth);
+                border-color: $color;
             }
         }
     }
