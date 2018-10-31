@@ -4,7 +4,7 @@ import BN from 'bignumber.js';
 import history from '../history';
 import store from '../store';
 
-import { getMemoFee } from '../api/WalletApi';
+import { getOperationFee } from '../api/WalletApi';
 import { fetchChain, getChainSubcribe } from '../api/ChainApi';
 
 import echoService from '../services/echo';
@@ -16,10 +16,9 @@ import {
 	APPROVED_STATUS,
 	CANCELED_STATUS,
 	ERROR_STATUS,
-	GLOBAL_ID_0,
 	CORE_ID,
 } from '../constants/GlobalConstants';
-import { operationKeys, operationTypes } from '../constants/OperationConstants';
+import { operationKeys } from '../constants/OperationConstants';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -46,15 +45,9 @@ const validateTransaction = (options) => (dispatch, getState) => {
 	return null;
 };
 
-const getTransactionFee = async ({ fee, type, memo }) => {
-	const global = await fetchChain(GLOBAL_ID_0);
-
-	const { code } = operationTypes[type];
-	let amount = global.getIn(['parameters', 'current_fees', 'parameters', code, 1, 'fee']);
-
-	if (memo) {
-		amount = new BN(amount).plus(getMemoFee(global, memo));
-	}
+const getTransactionFee = async (options) => {
+	const { fee } = options;
+	let amount = await getOperationFee(options.type, formatToSend(options.type, options));
 
 	if (fee.asset.get('id') !== CORE_ID) {
 		const core = await fetchChain(CORE_ID);
