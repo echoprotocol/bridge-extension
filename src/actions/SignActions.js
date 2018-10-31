@@ -88,8 +88,9 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 
 	Object.keys(transaction).forEach((key) => {
 		if (['amount', 'fee'].includes(key)) {
-			transaction[key].asset = fetched.asset;
+			transaction[key].asset = fetched[key];
 			delete transaction[key].asset_id;
+			return;
 		}
 
 		if (fetched[key]) {
