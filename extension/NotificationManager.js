@@ -1,7 +1,6 @@
 import extensionizer from './extensionizer';
 
-const height = 591;
-const width = 362;
+import { POPUP_HEIGHT, POPUP_WIDTH } from '../src/constants/GlobalConstants';
 
 class NotificationManager {
 
@@ -18,8 +17,8 @@ class NotificationManager {
 		const creation = extensionizer.windows.create({
 			url: 'index.html',
 			type: 'popup',
-			width,
-			height,
+			height: POPUP_HEIGHT,
+			width: POPUP_WIDTH,
 		}, cb);
 
 		if (creation && creation.then) creation.then(cb);

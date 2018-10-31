@@ -4,6 +4,7 @@ import chainjs from 'echojs-lib';
 import EventEmitter from 'events';
 
 import Crypto from '../src/services/crypto';
+import storage from '../src/services/storage';
 import extensionizer from './extensionizer';
 import NotificationManager from './NotificationManager';
 
@@ -13,7 +14,6 @@ const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
 
-const storage = extensionizer.storage.local;
 
 const requestQueue = [];
 
@@ -59,20 +59,7 @@ const setBadge = () => {
  * @returns {Promise.<*>}
  */
 const getAccountList = async () => {
-	const currentNetworkPromise = new Promise((resolve) => {
-		storage.get(null, (result) => {
-			const err = extensionizer.runtime.lastError;
-
-			if (err) {
-				return resolve(NETWORKS[0]);
-			}
-
-			return resolve(result.current_network || NETWORKS[0]);
-
-		});
-	});
-
-	const network = await currentNetworkPromise;
+	const network = (await storage.get('current_network')) || NETWORKS[0];
 
 	try {
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
@@ -90,7 +77,6 @@ const getAccountList = async () => {
  * @returns {boolean}
  */
 const onMessage = (request, sender, sendResponse) => {
-
 	if (!request.method || !request.id || !request.appId || request.appId !== APP_ID) return false;
 
 	const { id } = request;
