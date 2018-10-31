@@ -1,6 +1,10 @@
-import { PrivateKey } from 'echojs-lib';
+import { TransactionHelper, Aes, PrivateKey } from 'echojs-lib';
 
 import { lookupAccounts } from './ChainApi';
+
+import { MEMO_FEE_KEYS } from '../constants/GlobalConstants';
+
+import echoService from '../services/echo';
 
 export const validateAccountExist = async (
 	accountName,
@@ -82,4 +86,33 @@ export const createWallet = async (registrator, account, wif) => {
 	if (!response || (response && response.errors)) {
 		throw response.errors.join();
 	}
+};
+
+export const getOperationFee = async (type, transaction) => {
+	const options = JSON.parse(JSON.stringify(transaction));
+
+	if (options.memo) {
+		const nonce = TransactionHelper.unique_nonce_uint64();
+		const pKey = PrivateKey.fromWif(MEMO_FEE_KEYS.WIF);
+
+		const message = Aes.encryptWithChecksum(
+			pKey,
+			MEMO_FEE_KEYS.PUBLIC_MEMO_TO,
+			nonce,
+			Buffer.from(options.memo, 'utf-8'),
+		);
+
+		options.memo = {
+			from: MEMO_FEE_KEYS.PUBLIC_MEMO_FROM,
+			to: MEMO_FEE_KEYS.PUBLIC_MEMO_TO,
+			nonce,
+			message,
+		};
+	}
+
+	const { TransactionBuilder } = await echoService.getChainLib();
+	const tr = new TransactionBuilder();
+	tr.add_type_operation(type, options);
+	await tr.set_required_fees(options.fee.asset_id);
+	return tr.operations[0][1].fee.amount;
 };

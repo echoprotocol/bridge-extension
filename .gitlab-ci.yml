@@ -32,10 +32,10 @@ build_development:
 build_artifacts:
   stage: artifacts
   script:
-    - npm run build-dev
+    - npm run build-ext
   artifacts:
     paths:
-      - dist/inpage.js
+      - build/zip/echo_bridge.zip
   only:
     - development
   environment:

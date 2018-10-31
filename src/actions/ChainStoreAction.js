@@ -11,7 +11,7 @@ import { fetchChain, connectToAddress, disconnectFromAddress, checkConnection } 
 
 import echoService from '../services/echo';
 
-import { NETWORKS, GLOBAL_ID, LOGIN_INTERVAL } from '../constants/GlobalConstants';
+import { NETWORKS, GLOBAL_ID_1, GLOBAL_ID_0, LOGIN_INTERVAL } from '../constants/GlobalConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 
 import storage from '../services/storage';
@@ -84,7 +84,8 @@ export const connect = () => async (dispatch) => {
 
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 
-		await fetchChain(GLOBAL_ID);
+		await fetchChain(GLOBAL_ID_1);
+		await fetchChain(GLOBAL_ID_0);
 	} catch (err) {
 		dispatch(batchActions([
 			GlobalReducer.actions.set({
