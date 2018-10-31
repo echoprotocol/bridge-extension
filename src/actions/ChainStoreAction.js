@@ -7,19 +7,32 @@ import BalanceReducer from '../reducers/BalanceReducer';
 
 import { initAssetsBalances } from './BalanceActions';
 
-import { fetchChain, connectToAddress, disconnectFromAddress } from '../api/ChainApi';
+import { fetchChain, connectToAddress, disconnectFromAddress, checkConnection } from '../api/ChainApi';
 
 import echoService from '../services/echo';
 
-import { NETWORKS, GLOBAL_ID_1, GLOBAL_ID_0 } from '../constants/GlobalConstants';
+import { NETWORKS, GLOBAL_ID_1, GLOBAL_ID_0, LOGIN_INTERVAL } from '../constants/GlobalConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 
 import storage from '../services/storage';
 
 import FormatHelper from '../helpers/FormatHelper';
 
+let INTERVAL_LOGIN_CALL = null;
+
 /**
- * copy object from ChainStore lib to redux every time when triggered
+ * @method resetInterval
+ * Reset interval of login calls
+ * @returns {Function}
+ */
+const resetInterval = () => {
+	if (INTERVAL_LOGIN_CALL) {
+		clearInterval(INTERVAL_LOGIN_CALL);
+	}
+};
+
+/**
+ * copy object from ChainStore lib to redux every time when triggered, check connection
  * @returns {Function}
  */
 export const subscribe = () => (dispatch) => {
@@ -31,7 +44,6 @@ export const subscribe = () => (dispatch) => {
 	});
 
 	dispatch(initAssetsBalances());
-
 };
 
 /**
@@ -62,6 +74,12 @@ export const connect = () => async (dispatch) => {
 
 		const subscribeCb = () => dispatch(subscribe());
 
+		resetInterval();
+
+		INTERVAL_LOGIN_CALL = setInterval((() => {
+			dispatch(checkConnection(network.url));
+		}), LOGIN_INTERVAL);
+
 		await connectToAddress(network.url, subscribeCb);
 
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
@@ -88,6 +106,8 @@ export const connect = () => async (dispatch) => {
  */
 export const disconnect = (address) => async (dispatch) => {
 	try {
+		resetInterval();
+
 		await disconnectFromAddress(address);
 		dispatch(batchActions([
 			BlockchainReducer.actions.disconnect(),
