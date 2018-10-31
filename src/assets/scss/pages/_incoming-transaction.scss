@@ -39,13 +39,17 @@
                 font-family: FNMedium;
                 color: #2C393D;
                 white-space: nowrap;
-                display: flex;
+				display: flex;
+				max-width: 220px;
+				@include cutTxt();
+				max-width: 132px;
+
             }
-            .balance {
-                @include cutTxt();
-                max-width: 132px;
-                margin-right: 5px;
-            }
+            // .balance {
+			// 	@include cutTxt();
+            //     max-width: 132px;
+            //     margin-right: 5px;
+            // }
         }
     }
     &-user {

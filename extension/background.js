@@ -16,7 +16,25 @@ const crypto = new Crypto();
 
 
 const requestQueue = [];
+const { ChainStore } = chainjs;
 
+ChainStore.notifySubscribers = () => {
+	// Dispatch at most only once every x milliseconds
+	if (!ChainStore.dispatched) {
+		ChainStore.dispatched = true;
+		ChainStore.timeout = setTimeout(() => {
+			ChainStore.dispatched = false;
+			ChainStore.subscribers.forEach((callback) => {
+				try {
+					callback();
+				} catch (e) {
+					ChainStore.unsubscribe(callback);
+				}
+
+			});
+		}, ChainStore.dispatchFrequency);
+	}
+};
 /**
  * Create default socket
  */

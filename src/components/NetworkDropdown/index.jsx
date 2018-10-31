@@ -39,6 +39,7 @@ class NetworkDropdown extends React.PureComponent {
 
 	onDeleteNetwork(e, name) {
 		e.stopPropagation();
+		e.preventDefault();
 
 		const { networks } = this.props;
 
