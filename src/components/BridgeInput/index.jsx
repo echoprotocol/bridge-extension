@@ -40,15 +40,18 @@ class BridgeInput extends React.Component {
 	}
 
 	renderHint() {
-		const { hintText, hintClickable } = this.props;
+		const { hintText, hintClickable, beforeExampleText } = this.props;
 
 		return (
 			<div className="message-hint">
 				{
 					hintClickable ?
-						<button onClick={(e) => this.props.onHintClick(e)} className="btn-try">
-							{hintText}
-						</button> : { hintText }
+						<React.Fragment>
+							{beforeExampleText}
+							<button onClick={(e) => this.props.onHintClick(e)} className="btn-try">
+								{hintText}
+							</button>
+						</React.Fragment> : { hintText }
 				}
 			</div>
 		);
@@ -155,6 +158,7 @@ BridgeInput.propTypes = {
 	errorText: PropTypes.string,
 	hintText: PropTypes.string,
 	hintClickable: PropTypes.bool,
+	beforeExampleText: PropTypes.string,
 	descriptionText: PropTypes.string,
 	onChange: PropTypes.func,
 	privacyEye: PropTypes.bool,
@@ -182,6 +186,7 @@ BridgeInput.defaultProps = {
 	errorText: '',
 	hintText: '',
 	hintClickable: false,
+	beforeExampleText: '',
 	descriptionText: '',
 	onChange: null,
 	privacyEye: false,
