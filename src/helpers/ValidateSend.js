@@ -2,16 +2,11 @@ class ValidateSend {
 
 	static amountInput(value, currency) {
 		if (!value.match(/^[0-9]*[.,]?[0-9]*$/)) {
-			dispatch(setFormError(form, 'amount', 'Amount must contain only digits and dot'));
-			return;
+			return { value: null, error: 'Amount must contain only digits and dot' };
 		}
 
 		if (value.replace(',', '.') !== '' && !Math.floor(value.replace(',', '.') * (10 ** currency.precision))) {
-			dispatch(setFormError(
-				form,
-				'amount',
-				`Amount should be more than 0 (${currency.symbol} precision is ${currency.precision} symbols)`,
-			));
+			return { value: null, error: `Amount should be more than 0 (${currency.symbol} precision is ${currency.precision} symbols)` };
 		}
 
 		if (/\.|,/.test(value)) {
@@ -21,8 +16,7 @@ class ValidateSend {
 			value = value ? Number(value).toString() : value;
 		}
 
-		dispatch(setFormError(form, 'fee', null));
-		dispatch(setFormValue(form, name, value));
+		return { value, error: null };
 	}
 
 }

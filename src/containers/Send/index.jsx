@@ -12,11 +12,20 @@ import BridgeTextArea from '../../components/BridgeTextArea';
 
 
 import { INDEX_PATH } from '../../constants/RouterConstants';
-import { setFormValue } from '../../actions/FormActions';
+import { setFormError, setFormValue } from '../../actions/FormActions';
 import { FORM_SEND } from '../../constants/FormConstants';
 import ValidateSend from '../../helpers/ValidateSend';
 
 class Send extends React.Component {
+
+	constructor(props) {
+		super(props);
+
+		this.state = {
+			search: this.getSymbols(),
+		};
+	}
+
 
 	onChange(e, lowerCase) {
 		const field = e.target.name;
@@ -31,30 +40,77 @@ class Send extends React.Component {
 		}
 	}
 
-	// onAmountChange(e) {
-	//     const field = e.target.name;
-	//     let { value } = e.target;
-	//
-	//
-	//     ValidateSend.amountInput(value);
-	// }
+	onAmountChange(e) {
+		const field = e.target.name;
+		const { value } = e.target;
+
+		const asset = { precision: 5, symbol: 'ECHO' };
+
+		const { value: validatedValue, error } = ValidateSend.amountInput(value, asset);
+
+		if (error) {
+			this.props.setFormError(field, error);
+			return false;
+		}
+
+		this.props.setFormValue(field, validatedValue);
+		return true;
+	}
+
+	onSearch(value) {
+		if (value) {
+			this.setState({
+				search: this.getSymbols().filter((symbol) =>
+					symbol.toLowerCase().startsWith(value.toLowerCase())),
+			});
+		} else {
+			this.setState({ search: this.getSymbols() });
+		}
+	}
+
+	getSymbols() {
+		const { balances, assets, account } = this.props;
+
+		const symbolsList = [];
+
+		if (!account) {
+			return symbolsList;
+		}
+
+		balances.forEach((balance) => {
+			if (balance.get('owner') === account.get('id')) {
+				const symbol = assets.getIn([balance.get('asset_type'), 'symbol']);
+
+				if (!symbolsList.includes(symbol)) {
+					symbolsList.push(symbol);
+				}
+			}
+		});
+
+		return symbolsList;
+	}
 
 	renderSend() {
-		const codingCurrencyDropdownData = [
+		const { search } = this.state;
+		const dropdownData = [
 			{
 				id: 0,
 				title: 'Assets',
-				list: ['ECHO', 'Echolabs', 'Myecho'],
+				list: search,
 			},
-			{
-				id: 1,
-				title: 'Tokens',
-				list: ['ECHO', 'EchoTest', 'EchoEcho', 'EchoEcho245'],
-			},
+			// {
+			// 	id: 1,
+			// 	title: 'Tokens',
+			// 	list: ['ECHO', 'EchoTest', 'EchoEcho', 'EchoEcho245'],
+			// },
 		];
 		const {
-			to, amount, fee, note,
+			to, amount, fee, note, account,
 		} = this.props;
+
+		if (!account) {
+			return null;
+		}
 
 		return (
 			<React.Fragment>
@@ -77,11 +133,12 @@ class Send extends React.Component {
 								name="From"
 								theme="input-light"
 								labelText="From"
-								value="Jellyjeda345"
+								value={account.get('name')}
 								defaultUp
 								readOnly
-								userIcon="image-url"
+								userIcon={{ icon: account.get('icon'), color: account.get('iconColor') }}
 								leftLabel
+								disabled
 							/>
 							<BridgeInput
 								autoFocus
@@ -101,9 +158,10 @@ class Send extends React.Component {
 								defaultUp
 								labelText="Amount"
 								leftLabel
-								innerDropdown={codingCurrencyDropdownData}
+								innerDropdown={dropdownData}
 								value={amount.value}
-								onChange={(e) => this.onChange(e)}
+								onChange={(e) => this.onAmountChange(e)}
+								onDropdownSearch={(e) => this.onSearch(e)}
 							/>
 							<BridgeInput
 								name="fee"
@@ -112,9 +170,10 @@ class Send extends React.Component {
 								defaultUp
 								labelText="Fee"
 								leftLabel
-								innerDropdown={codingCurrencyDropdownData}
+								innerDropdown={dropdownData}
 								value={fee.value}
-								onChange={(e) => this.onChange(e)}
+								readOnly
+								disabled
 							/>
 							<BridgeTextArea
 								name="note"
@@ -124,6 +183,7 @@ class Send extends React.Component {
 							/>
 							<Button
 								className="btn-in-light"
+								disabled={(!to.value || !amount.value)}
 								content={<span className="btn-text">Send</span>}
 							/>
 						</div>
@@ -146,21 +206,33 @@ class Send extends React.Component {
 }
 
 Send.propTypes = {
+	account: PropTypes.object,
 	to: PropTypes.object.isRequired,
 	amount: PropTypes.object.isRequired,
 	fee: PropTypes.object.isRequired,
 	note: PropTypes.object.isRequired,
+	balances: PropTypes.object.isRequired,
+	assets: PropTypes.object.isRequired,
 	setFormValue: PropTypes.func.isRequired,
+	setFormError: PropTypes.func.isRequired,
+};
+
+Send.defaultProps = {
+	account: null,
 };
 
 export default connect(
 	(state) => ({
+		account: state.global.get('account'),
 		to: state.form.getIn([FORM_SEND, 'to']),
 		amount: state.form.getIn([FORM_SEND, 'amount']),
 		fee: state.form.getIn([FORM_SEND, 'fee']),
 		note: state.form.getIn([FORM_SEND, 'note']),
+		balances: state.balance.get('balances'),
+		assets: state.balance.get('assets'),
 	}),
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SEND, field, value)),
+		setFormError: (field, value) => dispatch(setFormError(FORM_SEND, field, value)),
 	}),
 )(Send);

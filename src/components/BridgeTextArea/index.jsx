@@ -3,7 +3,6 @@ import PropTypes from 'prop-types';
 import Textarea from 'react-textarea-autosize';
 
 import classnames from 'classnames';
-import { Input } from 'semantic-ui-react';
 
 class BridgeTextArea extends React.Component {
 

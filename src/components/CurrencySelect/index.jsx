@@ -12,6 +12,7 @@ class CurrencySelect extends React.Component {
 		super();
 
 		this.state = {
+			search: '',
 			currentVal: '',
 			opened: false,
 		};
@@ -25,8 +26,25 @@ class CurrencySelect extends React.Component {
 		document.addEventListener('mousedown', this.handleClickOutside);
 	}
 
+	componentDidUpdate(prevProps, prevState) {
+		const { opened } = this.state;
+		const { opened: prevOpened } = prevState;
+
+		if (opened && (opened !== prevOpened)) {
+			this.inputRef.focus();
+		}
+	}
+
 	componentWillUnmount() {
 		document.removeEventListener('mousedown', this.handleClickOutside);
+	}
+
+	onChange(e) {
+		this.setState({
+			search: e.target.value,
+		});
+
+		this.props.onSearch(e.target.value);
 	}
 
 	setMenuRef(node) {
@@ -34,8 +52,13 @@ class CurrencySelect extends React.Component {
 	}
 
 	handleClick(text) {
-		this.setState({ currentVal: text });
-		this.setState({ opened: false });
+		this.setState({
+			currentVal: text,
+			opened: false,
+			search: '',
+		});
+
+		this.props.onSearch();
 	}
 
 	handleClickOutside(event) {
@@ -49,8 +72,7 @@ class CurrencySelect extends React.Component {
 	}
 
 	render() {
-
-		const { currentVal } = this.state;
+		const { currentVal, search } = this.state;
 		const { data } = this.props;
 
 		return (
@@ -69,7 +91,10 @@ class CurrencySelect extends React.Component {
 						<div className="menu-container">
 							<Input
 								placeholder="Type asset or token name"
+								value={search}
 								onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
+								onChange={(e) => this.onChange(e)}
+								ref={(r) => { this.inputRef = r; }}
 							/>
 							<div className="select-container">
 								<div
@@ -90,7 +115,7 @@ class CurrencySelect extends React.Component {
 															elem.list.map((text, i) => (
 																<MenuItem
 																	eventKey={i}
-																	key={Math.random()}
+																	key={text}
 																	onClick={(e) => { this.handleClick(text); e.preventDefault(); }}
 																>
 																	{text}
@@ -115,10 +140,12 @@ class CurrencySelect extends React.Component {
 
 CurrencySelect.propTypes = {
 	data: PropTypes.array,
+	onSearch: PropTypes.func,
 };
 
 CurrencySelect.defaultProps = {
 	data: [],
+	onSearch: null,
 };
 
 export default CurrencySelect;
