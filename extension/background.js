@@ -7,7 +7,7 @@ import Crypto from '../src/services/crypto';
 import extensionizer from './extensionizer';
 import NotificationManager from './NotificationManager';
 
-import { NETWORKS } from '../src/constants/GlobalConstants';
+import { NETWORKS, APP_ID } from '../src/constants/GlobalConstants';
 
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
@@ -60,8 +60,9 @@ const getAccountList = async () => {
 	}
 };
 
-const onExternalMessage = (request, sender, sendResponse) => {
-	if (!request.method || !request.id) return false;
+const onMessage = (request, sender, sendResponse) => {
+
+	if (!request.method || !request.id || !request.appId || request.appId !== APP_ID) return false;
 
 	const { id } = request;
 
@@ -90,10 +91,7 @@ const onResponse = async (err, id, status) => {
 
 	requestQueue.splice(requestIndex, 1)[0].cb({ id, status, text: err });
 
-	notificationManager.getPopup()
-		.then((popup) => {
-			if (requestQueue.length === 0 || !popup) closeUi();
-		});
+	if (requestQueue.length === 0) closeUi();
 };
 
 createSocket();
@@ -106,6 +104,6 @@ window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }
 
 emitter.on('response', onResponse);
 
-extensionizer.runtime.onMessage.addListener(onExternalMessage);
+extensionizer.runtime.onMessage.addListener(onMessage);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });

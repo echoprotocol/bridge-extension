@@ -77,6 +77,8 @@ export const NETWORKS = [
 	},
 ];
 
+export const APP_ID = 'BRIDGE_EXTENSION';
+
 export const APPROVED_STATUS = 'approved';
 export const CANCELED_STATUS = 'canceled';
 export const ERROR_STATUS = 'error';

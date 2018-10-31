@@ -1,12 +1,14 @@
 import echojslib from 'echojs-lib';
 import echojsws from 'echojs-ws';
 
+const { APP_ID } = require('../src/constants/GlobalConstants');
+
 const requestQueue = [];
 
 const onMessage = (event) => {
-	const { id, target } = event.data;
+	const { id, target, appId } = event.data;
 
-	if (!id || target !== 'inpage') return;
+	if (!id || target !== 'inpage' || !appId || appId !== APP_ID) return;
 
 	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
 	if (requestIndex === -1) return;
@@ -14,7 +16,7 @@ const onMessage = (event) => {
 	requestQueue.splice(requestIndex, 1)[0].cb(event);
 };
 
-const confirm = (options) => {
+const sendTransaction = (options) => {
 
 	const id = Date.now();
 	const result = new Promise((resolve, reject) => {
@@ -30,7 +32,7 @@ const confirm = (options) => {
 		};
 		requestQueue.push({ id, cb });
 		window.postMessage({
-			method: 'confirm', data: options, id, target: 'content',
+			method: 'confirm', data: options, id, target: 'content', appId: APP_ID,
 		}, '*');
 
 	});
@@ -53,16 +55,24 @@ const getAccounts = () => {
 		};
 
 		requestQueue.push({ id, cb });
-		window.postMessage({ method: 'accounts', id, target: 'content' }, '*');
+		window.postMessage({
+			method: 'accounts', id, target: 'content', appId: APP_ID,
+		}, '*');
 
 	});
 
 	return result;
 };
 
+const Extension = {
+	getAccounts: () => getAccounts(),
+	sendTransaction: (data) => sendTransaction(data),
+};
 
-window.echojslib = echojslib;
+window.echojslib = {
+	...echojslib,
+	isEchoBridge: true,
+	Extension,
+};
 window.echojsws = echojsws;
-window.getAccounts = () => getAccounts();
-window.confirm = (data) => confirm(data);
 window.addEventListener('message', onMessage, false);

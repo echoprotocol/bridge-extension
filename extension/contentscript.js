@@ -1,6 +1,7 @@
 /* global EXTENSION */
 
 const extensionizer = require('./extensionizer');
+const { APP_ID } = require('../src/constants/GlobalConstants');
 
 function setupInjection() {
 	try {
@@ -22,12 +23,13 @@ EXTENSION && setupInjection();
 
 const onResponse = (res, origin = '*') => {
 	res.target = 'inpage';
+	res.appId = APP_ID;
 	window.postMessage(res, origin);
 };
 
 const onMessage = (event) => {
 	const { data } = event;
-	if (data.target !== 'content') return;
+	if (data.target !== 'content' || !data.appId || data.appId !== APP_ID) return;
 
 	extensionizer.runtime.sendMessage(data, (res) => onResponse(res, event.origin));
 };
