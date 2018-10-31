@@ -129,7 +129,7 @@ const onResponse = async (err, id, status) => {
 	requestQueue.splice(requestIndex, 1)[0].cb({ id, status, text: err });
 
 	setBadge();
-	createNotification('Transaction', status);
+	createNotification('Transaction', `${status} ${err || ''}`);
 
 	if (requestQueue.length === 0) closePopup();
 };
