@@ -97,7 +97,16 @@
             }
 
             .icon-eye {
-                display: block;
+				display: block;
+				color: rgba(#060606, .3);
+				transition: color $speed;
+				&:hover {
+					color: rgba(#060606, .6);
+				}
+				&:active {
+					color: rgba(#060606, .4);
+
+				}
 
             }
         }
@@ -177,7 +186,6 @@
             input {
                 color: #fff !important;
                 -webkit-text-fill-color: #fff !important;
-                // #9ba2a5
                 &::placeholder {
                     color: #fff !important;
                 }
@@ -192,7 +200,11 @@
                     &:after {
                         background-color: $colorError;
                     }
-                }
+				}
+				input {
+					-webkit-text-fill-color: #D94152 !important;
+
+				}
             }
 
             .label {
@@ -263,7 +275,10 @@
         top: 0;
         line-height: 43px;
         font-size: 18px;
-        transition: line-height $speed, font-size $speed, color $speed;
+		transition:
+		line-height $speed,
+		font-size $speed,
+		color $speed;
         font-family: FNMedium;
         letter-spacing: 0;
     }

@@ -6,6 +6,14 @@ import GlobalReducer from '../reducers/GlobalReducer';
 
 let CHAIN_SUBSCRIBE = null;
 
+// TODO to change
+window.onunload = () => {
+	if (CHAIN_SUBSCRIBE) {
+		const { ChainStore } = echoService.getChainLib();
+		ChainStore.unsubscribe(CHAIN_SUBSCRIBE);
+	}
+};
+
 /**
  * return method name by key type
  * @param {String} key

@@ -16,3 +16,35 @@
     -ms-user-select: none;
     user-select: none;
 }
+
+
+@mixin onBtnFocus (
+    $angular,
+    $outerBorderWidth,
+    $innerBorderWidth,
+    $color
+    ) {
+    display: inline-block;
+    position: relative;
+
+    @include hardwareAccel();
+
+    &:before {
+        content: '';
+        position: absolute;
+        transition: border-color $speed;
+        border-radius: $angular + 2px;
+		top: -($outerBorderWidth + $innerBorderWidth);
+		right: -($outerBorderWidth + $innerBorderWidth);
+		bottom: -($outerBorderWidth + $innerBorderWidth);
+		left: -($outerBorderWidth + $innerBorderWidth);
+		border:  $outerBorderWidth solid transparent;
+    }
+    &:not(:active) {
+        &:focus {
+            &:before {
+                border-color: $color;
+            }
+        }
+    }
+}

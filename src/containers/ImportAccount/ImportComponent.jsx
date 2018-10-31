@@ -106,7 +106,7 @@ class ImportComponent extends React.Component {
 						<div className="one-btn-wrap" >
 							<Button
 								disabled={this.isButtonDisabled()}
-								className={classnames('btn-in-dark', { loading })}
+								className={classnames('btn-in-light', { loading })}
 								content={<span className="btn-text">Import</span>}
 								type="submit"
 								onClick={(e) => this.props.importAccount(e)}
