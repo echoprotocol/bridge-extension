@@ -94,3 +94,4 @@ export const ICON_COLORS_COUNT = 7;
 export const BASE_ICON = 1;
 export const BASE_ICON_COLOR = 'green';
 export const LOGIN_INTERVAL = 1000 * 30;
+export const CHAINSTORE_INIT_TIMEOUT = 10 * 1000;

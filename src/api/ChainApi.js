@@ -3,6 +3,7 @@ import echoService from '../services/echo';
 import { connect } from '../actions/ChainStoreAction';
 import { loadInfo } from '../actions/GlobalActions';
 import GlobalReducer from '../reducers/GlobalReducer';
+import { CHAINSTORE_INIT_TIMEOUT } from '../constants/GlobalConstants';
 
 let CHAIN_SUBSCRIBE = null;
 
@@ -101,7 +102,7 @@ export const connectToAddress = async (address, subscribeCb) => {
 				const timeoutId = setTimeout(() => {
 					clearTimeout(timeoutId);
 					reject(new Error('timeout'));
-				}, 10 * 1000);
+				}, CHAINSTORE_INIT_TIMEOUT);
 			}),
 		]);
 
