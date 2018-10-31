@@ -1,4 +1,4 @@
-import { Aes, PrivateKey } from 'echojs-lib';
+import { Aes, PrivateKey, TransactionHelper } from 'echojs-lib';
 import random from 'crypto-random-string';
 import EventEmitter from 'events';
 
@@ -331,6 +331,43 @@ class Crypto extends EventEmitter {
 
 		transaction.add_signer(privateKey);
 		return transaction;
+	}
+
+	/**
+	 *  @method encryptMemo
+	 *
+	 *  Encrypt memo.
+	 *
+	 *  @param {String} networkName
+	 *  @param {String} fromMemoKey
+	 *  @param {String} toMemoKey
+	 *  @param {String} memo
+	 *
+	 *  @return {Object} encryptedMemo
+	 */
+	async encryptMemo(networkName, fromMemoKey, toMemoKey, memo) {
+		privateAES.required();
+
+		const encryptedPrivateKey = await this.getInByNetwork(networkName, fromMemoKey);
+
+		if (!encryptedPrivateKey) {
+			throw new Error('Key not found.');
+		}
+
+		const aes = privateAES.get();
+		const privateKeyBuffer = aes.decryptHexToBuffer(encryptedPrivateKey);
+		const privateKey = PrivateKey.fromBuffer(privateKeyBuffer);
+
+		memo = Buffer.from(memo, 'utf-8');
+
+		const nonce = TransactionHelper.unique_nonce_uint64();
+
+		return {
+			from: fromMemoKey,
+			to: toMemoKey,
+			nonce,
+			message: Aes.encryptWithChecksum(privateKey, toMemoKey, nonce, memo),
+		};
 	}
 
 	/**

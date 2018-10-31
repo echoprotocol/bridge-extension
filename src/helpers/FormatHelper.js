@@ -35,6 +35,10 @@ class FormatHelper {
 		return err instanceof Error ? err.message : err;
 	}
 
+	static capitalize(str) {
+		return `${str[0].toUpperCase()}${str.slice(1)}`;
+	}
+
 }
 
 export default FormatHelper;

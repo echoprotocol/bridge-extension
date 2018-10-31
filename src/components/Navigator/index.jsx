@@ -7,6 +7,7 @@ import Header from '../Header';
 import Navbar from '../Navbar';
 // import BridgeSidebar from '../BridgeSidebar';
 
+import { SIGN_TRANSACTION_PATH } from '../../constants/RouterConstants';
 
 class Navigator extends React.PureComponent {
 
@@ -23,17 +24,16 @@ class Navigator extends React.PureComponent {
 	}
 
 	render() {
-		const { visibleSidebar } = this.props;
+		const { visibleSidebar, pathname } = this.props;
 
 
 		return (
 			<React.Fragment>
 				<FocusTrap active={visibleSidebar} className="trap-wrap">
-					<Header />
+					<Header pathname={pathname} />
 					{/* <BridgeSidebar /> */}
 				</FocusTrap>
-
-				<Navbar />
+				{ pathname !== SIGN_TRANSACTION_PATH ? <Navbar /> : null }
 			</React.Fragment>
 		);
 	}
@@ -41,8 +41,8 @@ class Navigator extends React.PureComponent {
 }
 
 Navigator.propTypes = {
+	pathname: PropTypes.string.isRequired,
 	visibleSidebar: PropTypes.bool.isRequired,
-
 };
 
 export default connect(

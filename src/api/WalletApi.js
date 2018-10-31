@@ -1,4 +1,4 @@
-import { PrivateKey } from 'echojs-lib';
+import { TransactionHelper, Aes, PrivateKey, ops } from 'echojs-lib';
 
 import { lookupAccounts } from './ChainApi';
 
@@ -80,4 +80,28 @@ export const createWallet = async (registrator, account, wif) => {
 	if (!response || (response && response.errors)) {
 		throw response.errors.join();
 	}
+};
+
+export const getMemoFee = (global, memo) => {
+	const nonce = TransactionHelper.unique_nonce_uint64();
+	const pKey = PrivateKey.fromWif('5KGG3tFb5F4h3aiUSKNnKeDcNbL5y1ZVXQXVqpWVMYhW82zBrNb');
+	const memoFromKey = 'ECHO7WBUN97NJfSXbDVDqLDQDKu8FasTb7YBdpbWoJF3RYo6qYY6aX';
+	const memoToKey = 'ECHO7WBUN97NJfSXbDVDqLDQDKu8FasTb7YBdpbWoJF3RYo6qYY6aX';
+
+	const message = Aes.encryptWithChecksum(pKey, memoToKey, nonce, Buffer.from(memo, 'utf-8'));
+
+	const memoObject = {
+		from: memoFromKey,
+		to: memoToKey,
+		nonce,
+		message,
+	};
+
+	const serialized = ops.memo_data.fromObject(memoObject);
+	const stringified = JSON.stringify(ops.memo_data.toHex(serialized));
+	const byteLength = Buffer.byteLength(stringified, 'hex');
+
+	const optionFee = global.getIn(['parameters', 'current_fees', 'parameters', 0, 1, 'price_per_kbyte']);
+
+	return optionFee * (byteLength / 1024);
 };
