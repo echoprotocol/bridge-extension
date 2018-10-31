@@ -1,7 +1,8 @@
 stages:
   - lint
   - build
-  
+  - artifacts
+
 cache:
   paths:
   - node_modules/
@@ -21,6 +22,20 @@ build_development:
     - git pull origin development
     - npm i
     - npm run build-dev
+  only:
+    - development
+  environment:
+    name: development
+  tags:
+    - pp-projects
+
+build_artifacts:
+  stage: artifacts
+  script:
+    - npm run build-dev
+  artifacts:
+    paths:
+      - dist/inpage.js
   only:
     - development
   environment:

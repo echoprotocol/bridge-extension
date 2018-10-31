@@ -131,7 +131,7 @@ class CreatePin extends React.Component {
 				<div className="page-action-wrap pin-screen">
 					<div className="one-btn-wrap" >
 						<Button
-							className={classnames('btn-in-light', { loading })}
+							className={classnames('btn-in-dark', { loading })}
 							content={<span className="btn-text">Create</span>}
 							type="submit"
 							onClick={(e) => this.onSubmit(e)}
