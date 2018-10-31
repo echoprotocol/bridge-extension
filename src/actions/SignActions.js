@@ -131,6 +131,13 @@ const requestHandler = async (id, options) => {
 		return;
 	}
 
+	const connected = store.getState().global.get('connected');
+
+	if (!connected) {
+		emitter.emit('response', 'Network error', id, ERROR_STATUS);
+		return;
+	}
+
 	const error = store.dispatch(validateTransaction(options));
 	if (error) {
 		emitter.emit('response', error, id, ERROR_STATUS);
@@ -160,9 +167,11 @@ window.onunload = () => {
 	emitter.removeListener('request', requestHandler);
 };
 
-export const loadRequests = () => async (dispatch) => {
+export const loadRequests = () => async (dispatch, getState) => {
+	const connected = getState().global.get('connected');
+
 	const transactions = echoService.getRequests().filter(({ id, options }) => {
-		const error = dispatch(validateTransaction(options));
+		const error = connected ? dispatch(validateTransaction(options)) : 'Network error';
 
 		if (error) {
 			emitter.emit('response', error, id, ERROR_STATUS);
