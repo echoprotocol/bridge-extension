@@ -217,9 +217,13 @@ export const approveTransaction = (transaction) => async (dispatch, getState) =>
 
 		tr.add_type_operation(type, options);
 		await tr.set_required_fees(options.fee.asset_id);
-		await tr.broadcast();
 
-		emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
+		await tr.broadcast().then(() => {
+			emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
+		}).catch((err) => {
+			emitter.emit('response', FormatHelper.formatError(err), transaction.get('id'), ERROR_STATUS);
+		});
+
 	} catch (err) {
 		const error = FormatHelper.formatError(err);
 		emitter.emit('response', error, transaction.get('id'), ERROR_STATUS);
