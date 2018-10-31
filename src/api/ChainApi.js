@@ -7,13 +7,7 @@ import { CHAINSTORE_INIT_TIMEOUT } from '../constants/GlobalConstants';
 
 let CHAIN_SUBSCRIBE = null;
 
-// TODO to change
-window.onunload = () => {
-	if (CHAIN_SUBSCRIBE) {
-		const { ChainStore } = echoService.getChainLib();
-		ChainStore.unsubscribe(CHAIN_SUBSCRIBE);
-	}
-};
+export const getChainSubcribe = () => CHAIN_SUBSCRIBE;
 
 /**
  * return method name by key type
@@ -160,6 +154,20 @@ export const lookupAccounts = async (accountName, limit) => {
 	const instance = Apis.instance();
 
 	const result = await instance.dbApi().exec('lookup_accounts', [accountName, limit]);
+
+	return result;
+};
+
+/**
+ * lookup account
+ * @param {String} accountName
+ * @param {Number} limit
+ * @returns {Object}
+ */
+export const getAccountRefsOfKey = async (key) => {
+	const { ChainStore } = echoService.getChainLib();
+
+	const result = await ChainStore.FetchChain('getAccountRefsOfKey', key);
 
 	return result;
 };
