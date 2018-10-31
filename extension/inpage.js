@@ -5,6 +5,10 @@ const { APP_ID } = require('../src/constants/GlobalConstants');
 
 const requestQueue = [];
 
+/**
+ * On content script message
+ * @param event
+ */
 const onMessage = (event) => {
 	const { id, target, appId } = event.data;
 
@@ -16,6 +20,11 @@ const onMessage = (event) => {
 	requestQueue.splice(requestIndex, 1)[0].cb(event);
 };
 
+/**
+ * Send custom transaction
+ * @param options
+ * @returns {Promise}
+ */
 const sendTransaction = (options) => {
 
 	const id = Date.now();
@@ -41,6 +50,10 @@ const sendTransaction = (options) => {
 
 };
 
+/**
+ * Get user account if unlocked
+ * @returns {Promise}
+ */
 const getAccounts = () => {
 	const id = Date.now();
 	const result = new Promise((resolve, reject) => {

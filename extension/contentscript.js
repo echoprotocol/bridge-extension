@@ -3,6 +3,9 @@
 const extensionizer = require('./extensionizer');
 const { APP_ID } = require('../src/constants/GlobalConstants');
 
+/**
+ * inpage script injection to web page
+ */
 function setupInjection() {
 	try {
 		const scriptTag = document.createElement('script');
@@ -21,12 +24,21 @@ function setupInjection() {
 
 EXTENSION && setupInjection();
 
+/**
+ * On background response
+ * @param res
+ * @param origin
+ */
 const onResponse = (res, origin = '*') => {
 	res.target = 'inpage';
 	res.appId = APP_ID;
 	window.postMessage(res, origin);
 };
 
+/**
+ * On Inpage message
+ * @param event
+ */
 const onMessage = (event) => {
 	const { data } = event;
 	if (data.target !== 'content' || !data.appId || data.appId !== APP_ID) return;

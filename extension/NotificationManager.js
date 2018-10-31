@@ -5,6 +5,9 @@ const width = 362;
 
 class NotificationManager {
 
+	/**
+	 * Create popup
+     */
 	showPopup() {
 		const cb = (popup) => { this.popupId = popup.id; };
 
@@ -23,8 +26,7 @@ class NotificationManager {
 	}
 
 	/**
-     * Closes a MetaMask notification if it window exists.
-     *
+	 * close notification popup
      */
 	closePopup() {
 		this.getPopup()
@@ -32,12 +34,8 @@ class NotificationManager {
 	}
 
 	/**
-     * Checks all open MetaMask windows, and returns the first one it finds that is a notification window (i.e. has the
-     * type 'popup')
-     *
-     * @private
-     * @param {Function} cb A node style callback that to whcih the found notification window will be passed.
-     *
+	 * Get current popup
+     * @returns {Promise.<*>}
      */
 	async getPopup() {
 		try {
@@ -49,11 +47,8 @@ class NotificationManager {
 	}
 
 	/**
-     * Returns all open MetaMask windows.
-     *
-     * @private
-     * @param {Function} cb A node style callback that to which the windows will be passed.
-     *
+	 * Get all windows
+     * @returns {Promise}
      */
 	getWindows() {
 		return new Promise((resolve, reject) => {
@@ -67,6 +62,11 @@ class NotificationManager {
 		});
 	}
 
+	/**
+	 * Check is our popup exist
+     * @param windows
+     * @returns {null}
+     */
 	getPopupIn(windows) {
 		return windows ? windows.find((win) =>
 			(win && win.type === 'popup' && win.id === this.popupId)) : null;

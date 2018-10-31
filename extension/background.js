@@ -17,6 +17,9 @@ const storage = extensionizer.storage.local;
 
 const requestQueue = [];
 
+/**
+ * Create default socket
+ */
 const createSocket = () => {
 	echojs.Apis.setAutoReconnect(false);
 
@@ -27,15 +30,34 @@ const createSocket = () => {
 		.then(() => {});
 };
 
-const triggerUi = () => {
+/**
+ * trigger popup
+ */
+const triggerPopup = () => {
 	notificationManager.showPopup();
 
 };
 
-const closeUi = () => {
+/**
+ * close popup
+ */
+const closePopup = () => {
 	notificationManager.closePopup();
 };
 
+/**
+ * Set count of requests
+ */
+const setBadge = () => {
+	const { length } = requestQueue;
+	const text = length === 0 ? 'BETA' : (length > 9 ? '9+' : length.toString());
+	extensionizer.browserAction.setBadgeText({ text });
+};
+
+/**
+ * Get user account if unlocked
+ * @returns {Promise.<*>}
+ */
 const getAccountList = async () => {
 	const currentNetworkPromise = new Promise((resolve) => {
 		storage.get(null, (result) => {
@@ -60,6 +82,13 @@ const getAccountList = async () => {
 	}
 };
 
+/**
+ * On content script request
+ * @param request
+ * @param sender
+ * @param sendResponse
+ * @returns {boolean}
+ */
 const onMessage = (request, sender, sendResponse) => {
 
 	if (!request.method || !request.id || !request.appId || request.appId !== APP_ID) return false;
@@ -72,11 +101,13 @@ const onMessage = (request, sender, sendResponse) => {
 			data: request.data, sender, id, cb: sendResponse,
 		});
 
+		setBadge();
+
 		emitter.emit('request', id, request.data);
 
 		notificationManager.getPopup()
-			.then((popup) => !popup && triggerUi())
-			.catch(triggerUi);
+			.then((popup) => !popup && triggerPopup())
+			.catch(triggerPopup);
 
 	} else if (request.method === 'accounts') {
 		getAccountList().then((res) => sendResponse({ id, res }));
@@ -85,13 +116,22 @@ const onMessage = (request, sender, sendResponse) => {
 	return true;
 };
 
+/**
+ * On extension emitter response
+ * @param err
+ * @param id
+ * @param status
+ * @returns {Promise.<void>}
+ */
 const onResponse = async (err, id, status) => {
 	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
 	if (requestIndex === -1) return;
 
 	requestQueue.splice(requestIndex, 1)[0].cb({ id, status, text: err });
 
-	if (requestQueue.length === 0) closeUi();
+	setBadge();
+
+	if (requestQueue.length === 0) closePopup();
 };
 
 createSocket();
