@@ -48,11 +48,13 @@ export const validateAccountExist = async (
 export const validateImportAccountExist = async (
 	accountName,
 	limit = 50,
+	networkName,
 ) => {
 	const result = await lookupAccounts(accountName, limit);
 
 	if (!result.find((i) => i[0] === accountName)) {
-		return 'Account not found';
+
+		return `This account does not exist on ${networkName}`;
 	}
 	return null;
 };

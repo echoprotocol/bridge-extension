@@ -61,7 +61,8 @@ class CreateComponent extends React.Component {
 								theme="input-light"
 								labelText="Account name"
 								errorText={error}
-								hintText={example ? `You can try ${example}` : null}
+								hintText={example}
+								beforeExampleText="You can try"
 								hintClickable
 								descriptionText="Unique name will be used to make transaction"
 								value={name}

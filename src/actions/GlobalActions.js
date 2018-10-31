@@ -353,6 +353,8 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 		}
 
 		dispatch(set('networks', networks));
+
+		history.push(CREATE_ACCOUNT_PATH);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
