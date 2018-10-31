@@ -77,7 +77,7 @@ const getAccounts = () => {
 	return result;
 };
 
-const Extension = {
+const extension = {
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
 };
@@ -85,7 +85,7 @@ const Extension = {
 window.echojslib = {
 	...echojslib,
 	isEchoBridge: true,
-	Extension,
+	extension,
 };
 window.echojsws = echojsws;
 window.addEventListener('message', onMessage, false);
