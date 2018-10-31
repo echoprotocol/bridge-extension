@@ -2,6 +2,8 @@ import { TransactionHelper, Aes, PrivateKey, ops } from 'echojs-lib';
 
 import { lookupAccounts } from './ChainApi';
 
+import { MEMO_FEE_KEYS } from '../constants/GlobalConstants';
+
 export const validateAccountExist = async (
 	accountName,
 	requestsCount = 0,
@@ -84,15 +86,13 @@ export const createWallet = async (registrator, account, wif) => {
 
 export const getMemoFee = (global, memo) => {
 	const nonce = TransactionHelper.unique_nonce_uint64();
-	const pKey = PrivateKey.fromWif('5KGG3tFb5F4h3aiUSKNnKeDcNbL5y1ZVXQXVqpWVMYhW82zBrNb');
-	const memoFromKey = 'ECHO7WBUN97NJfSXbDVDqLDQDKu8FasTb7YBdpbWoJF3RYo6qYY6aX';
-	const memoToKey = 'ECHO7WBUN97NJfSXbDVDqLDQDKu8FasTb7YBdpbWoJF3RYo6qYY6aX';
+	const pKey = PrivateKey.fromWif(MEMO_FEE_KEYS.WIF);
 
-	const message = Aes.encryptWithChecksum(pKey, memoToKey, nonce, Buffer.from(memo, 'utf-8'));
+	const message = Aes.encryptWithChecksum(pKey, MEMO_FEE_KEYS.PUBLIC_MEMO_TO, nonce, Buffer.from(memo, 'utf-8'));
 
 	const memoObject = {
-		from: memoFromKey,
-		to: memoToKey,
+		from: MEMO_FEE_KEYS.PUBLIC_MEMO_FROM,
+		to: MEMO_FEE_KEYS.PUBLIC_MEMO_TO,
 		nonce,
 		message,
 	};

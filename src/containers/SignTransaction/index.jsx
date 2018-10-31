@@ -106,7 +106,7 @@ class SignTransaction extends React.Component {
 						/>
 						<Button
 							type="button"
-							className={classnames('btn-in-light', { loading })}
+							className="btn-in-light"
 							content={<span className="btn-text">Reject</span>}
 							onClick={(e) => this.onCancel(e)}
 							disabled={loading}
