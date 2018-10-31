@@ -20,9 +20,13 @@
         <div style="padding: 5px 0;">
             <input type="text" id="transfer-fromAddress" name="transfer-fromAddress" placeholder="from">
             <input type="text" id="transfer-toAddress" name="transfer-toAddress" placeholder="to">
-            <input type="number" id="transfer-amount" name="transfer-amount" placeholder="amount">
+            <input type="number" id="transfer-amount-value" name="transfer-amount-value" placeholder="amount">
+            <input type="text" id="transfer-amount-asset" name="transfer-amount-asset" placeholder="amount asset id">
+            <input type="text" id="transfer-fee-asset" name="transfer-fee-asset" placeholder="fee asset id">
+            <input type="text" id="transfer-memo" name="transfer-memo" placeholder="memo">
             <button id="transfer-click">submit</button>
         </div>
+        <div id="transfer-info"></div>
     </div>
     <!--  -->
 
@@ -30,20 +34,92 @@
     <div style="padding-bottom: 10px; border-top: 1px solid #000;">
         <h4>Contract</h4>
         <div style="padding: 5px 0;">
-            <input type="text" id="transfer-bcerts-fromAddress" name="bcerts-fromAddress" placeholder="from">
-            <input type="number" id="transfer-bcerts-amount" name="bcerts-amount" placeholder="amount">
-            <input type="text" id="transfer-bcerts-toAddress" name="bcerts-toAddress" placeholder="to">
-            <button id="transfer-click">submit</button>
+            <div>
+                <input type="text" id="contract-registrar" name="contract-registrar" placeholder="registrar">
+                <input type="text" id="contract-receiver" name="contract-receiver" placeholder="receiver">
+                <input type="number" id="contract-value" name="contract-value" placeholder="value">
+                <input type="text" id="contract-asset" name="contract-asset" placeholder="asset id">
+                <input type="text" id="contract-fee-asset" name="contract-fee-asset" placeholder="fee asset id">
+            </div>
+            <div style="padding: 5px 0;">
+                <textarea id="contract-code" name="contract-code" placeholder="code" style="width: 600px; height: 150px;"></textarea>
+            </div>
+            <button id="contract-click">submit</button>
         </div>
+        <div id="contract-info"></div>
     </div>
     <!--  -->
     </body>
     <script>
         $(document).ready(function() {
-            $("#create-click").click(function(e) {
-                const password = jQuery('#create-password')[0].value;
-                const address = bcWallet.create(password);
-                console.log(address);
+            $("#accounts-click").click(function(e) {
+                window.echojslib.extension.getAccounts().then((result) => {
+                    jQuery('#accounts').html(`<p>RESULT: ${JSON.stringify(result)}</p>`);
+                }).catch((err) => {
+                    jQuery('#accounts').html(`<p>ERROR: ${JSON.stringify(err)}</p>`);
+                });
+            });
+
+            $("#transfer-click").click(function(e) {
+                const transaction = {
+                    type: 'transfer',
+                    from: jQuery('#transfer-fromAddress')[0].value,
+                	amount: {
+                        amount: jQuery('#transfer-amount-value')[0].value,
+                        asset_id: jQuery('#transfer-amount-asset')[0].value,
+                    },
+                	to: jQuery('#transfer-toAddress')[0].value,
+                };
+
+                if (jQuery('#transfer-memo')[0].value) {
+                    transaction.memo = jQuery('#transfer-memo')[0].value;
+                }
+
+                if (jQuery('#transfer-fee-asset')[0].value) {
+                    transaction.fee = {
+                        amount: 0,
+                        asset_id: jQuery('#transfer-fee-asset')[0].value,
+                    };
+                }
+
+                window.echojslib.extension.sendTransaction(transaction).then((result) => {
+                    jQuery('#transfer-info').html(`<p>RESULT: ${JSON.stringify(result)}</p>`);
+                }).catch((err) => {
+                    jQuery('#transfer-info').html(`<p>ERROR: ${JSON.stringify(err)}</p>`);
+                });
+            });
+
+            $("#contract-click").click(function(e) {
+                const transaction = {
+                    type: 'contract',
+                    registrar: jQuery('#contract-registrar')[0].value,
+                	code: jQuery('#contract-code')[0].value,
+                };
+
+                if (jQuery('#contract-receiver')[0].value) {
+                    transaction.receiver = jQuery('#contract-receiver')[0].value;
+                }
+
+                if (jQuery('#contract-value')[0].value) {
+                    transaction.value = jQuery('#contract-value')[0].value;
+                }
+
+                if (jQuery('#contract-asset')[0].value) {
+                    transaction.asset_id = jQuery('#contract-asset')[0].value;
+                }
+
+                if (jQuery('#contract-fee-asset')[0].value) {
+                    transaction.fee = {
+                        amount: 0,
+                        asset_id: jQuery('#contract-fee-asset')[0].value,
+                    };
+                }
+
+                window.echojslib.extension.sendTransaction(transaction).then((result) => {
+                    jQuery('#contract-info').html(`<p>RESULT: ${JSON.stringify(result)}</p>`);
+                }).catch((err) => {
+                    jQuery('#contract-info').html(`<p>ERROR: ${JSON.stringify(err)}</p>`);
+                });
             });
         });
     </script>
