@@ -21,7 +21,7 @@ const extractSass = new ExtractTextPlugin({
 });
 const { version } = require('./package.json');
 
-const publicPath = process.env.EXTENSION ? './' : '/';
+const publicPath = process.env.EXTENSION ? './' : '';
 const pathToPack = process.env.EXTENSION ? path.resolve('build/src') : path.resolve('dist');
 const pathsToClean = process.env.EXTENSION ? ['build'] : ['dist'];
 
