@@ -4,12 +4,15 @@ const path = require('path');
 const ExtractTextPlugin = require('extract-text-webpack-plugin');
 const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
+const ZipPlugin = require('zip-webpack-plugin');
+const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
 
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 	template: `${__dirname}/src/assets/index.html`,
 	filename: 'index.html',
 	inject: 'body',
+	chunks: ['app'],
 });
 
 const extractSass = new ExtractTextPlugin({
@@ -17,6 +20,10 @@ const extractSass = new ExtractTextPlugin({
 	disable: process.env.NODE_ENV === 'local',
 });
 const { version } = require('./package.json');
+
+const publicPath = process.env.EXTENSION ? './' : '/';
+const pathToPack = process.env.EXTENSION ? path.resolve('build/src') : path.resolve('dist');
+const pathsToClean = process.env.EXTENSION ? ['build'] : ['dist'];
 
 module.exports = {
 	entry: {
@@ -26,8 +33,8 @@ module.exports = {
 		background: path.resolve('extension/background.js'),
 	},
 	output: {
-		publicPath: process.env.EXTENSION ? './' : '/',
-		path: path.resolve('dist'),
+		publicPath,
+		path: pathToPack,
 		filename: '[name].js',
 		pathinfo: process.env.NODE_ENV === 'local',
 		sourceMapFilename: '[name].js.map',
@@ -89,12 +96,21 @@ module.exports = {
 		extensions: ['.js', '.jsx', '.json'],
 	},
 	plugins: [
-		new CleanWebpackPlugin(['dist']),
+		new CleanWebpackPlugin(pathsToClean),
 		HTMLWebpackPluginConfig,
 		extractSass,
 		new webpack.DefinePlugin({
 			NODE_ENV: JSON.stringify(process.env.NODE_ENV),
 			EXTENSION: !!process.env.EXTENSION,
+		}),
+		new CopyWebpackPlugin([
+			{
+				from: 'src/assets/extention_config/manifest.json'
+			},
+		]),
+		new ZipPlugin({
+			path: path.resolve('build/zip'),
+			filename: 'echo_bridge.zip',
 		}),
 	],
 	node: {

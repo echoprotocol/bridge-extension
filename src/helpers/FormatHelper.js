@@ -1,3 +1,5 @@
+import _ from 'lodash';
+
 class FormatHelper {
 
 	static toFixed(value, precision) {
@@ -32,7 +34,11 @@ class FormatHelper {
 	}
 
 	static formatError(err) {
-		return err instanceof Error ? err.message : err;
+		return err instanceof Error || (_.isObject(err) && err.message) ? err.message : err;
+	}
+
+	static capitalize(str) {
+		return `${str[0].toUpperCase()}${str.slice(1)}`;
 	}
 
 }

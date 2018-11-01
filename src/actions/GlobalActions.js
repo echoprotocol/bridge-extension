@@ -8,6 +8,7 @@ import history from '../history';
 import { setFormError, toggleLoading } from './FormActions';
 import { disconnect, connect } from './ChainStoreAction';
 import { initAssetsBalances, removeBalances } from './BalanceActions';
+import { loadRequests } from './SignActions';
 
 import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
 import FormatHelper from '../helpers/FormatHelper';
@@ -234,15 +235,13 @@ export const loadInfo = () => async (dispatch, getState) => {
 
 	if (accounts && accounts.length) {
 		await dispatch(initAccount(accounts.find((account) => account.active)));
-
-		if (getState().global.getIn(['crypto', 'goBack'])) {
-			history.goBack();
-		} else {
-			history.push(INDEX_PATH);
-		}
+		const path = getState().global.getIn(['crypto', 'goTo']) || INDEX_PATH;
+		history.push(path);
 	} else {
 		history.push(CREATE_ACCOUNT_PATH);
 	}
+
+	dispatch(loadRequests());
 };
 
 /**
@@ -353,6 +352,8 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 		}
 
 		dispatch(set('networks', networks));
+
+		history.push(CREATE_ACCOUNT_PATH);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
@@ -380,8 +381,8 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
  *  Initialize crypto and connect to blockchain
  */
 export const globalInit = () => async (dispatch) => {
-	await dispatch(initCrypto());
 	await dispatch(connect());
+	await dispatch(initCrypto());
 };
 
 /**

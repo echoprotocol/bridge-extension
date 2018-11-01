@@ -1,17 +1,16 @@
 {
   "name": "echo-bridge",
   "description": "Echo Bridge",
-  "version": "0.1.0",
+  "version": "1.0.0",
   "scripts": {
     "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8081",
     "build": "cross-env NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
     "build-ext": "cross-env EXTENSION=TRUE NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
-    "postbuild-ext": "npm run copy-manifest",
     "build-dev": "cross-env NODE_ENV=development webpack --progress --display-error-details --colors --mode production",
     "build-stage": "cross-env NODE_ENV=stage webpack --progress --display-error-details --colors --mode production",
     "lint": "$(npm bin)/eslint 'src/**/*.jsx' 'src/**/*.js'",
     "lint-win": "cross-env eslint 'src/**/*.jsx' 'src/**/*.js' --fix",
-    "copy-manifest": "copyfiles -f src/assets/extention_config/manifest.json dist/"
+    "copy-manifest": "copyfiles -f src/assets/extention_config/manifest.json build/src"
   },
   "dependencies": {
     "autoprefixer": "^8.1.0",
@@ -65,6 +64,7 @@
     "babel-preset-stage-0": "^6.24.1",
     "babel-preset-stage-2": "^6.24.1",
     "clean-webpack-plugin": "^0.1.18",
+    "copy-webpack-plugin": "^4.5.4",
     "copyfiles": "^2.1.0",
     "cross-env": "^5.1.4",
     "css-loader": "^0.28.10",
@@ -84,6 +84,7 @@
     "webpack": "^4.20.2",
     "webpack-cli": "^3.1.1",
     "webpack-dev-middleware": "^3.4.0",
-    "webpack-dev-server": "^3.1.9"
+    "webpack-dev-server": "^3.1.9",
+    "zip-webpack-plugin": "^3.0.0"
   }
 }

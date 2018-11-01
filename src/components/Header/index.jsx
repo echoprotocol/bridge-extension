@@ -4,12 +4,24 @@ import PropTypes from 'prop-types';
 
 import UserDropdown from '../UserDropdown';
 import NetworkDropdown from '../NetworkDropdown';
+import SignDropdown from '../SignDropdown';
+
+import { SIGN_TRANSACTION_PATH } from '../../constants/RouterConstants';
+
 import { sidebarToggle } from '../../actions/GlobalActions';
 
 class Header extends React.PureComponent {
 
 	render() {
-		const { accounts } = this.props;
+		const { accounts, pathname } = this.props;
+
+		if (pathname === SIGN_TRANSACTION_PATH) {
+			return (
+				<header className="header">
+					<SignDropdown />
+				</header>
+			);
+		}
 
 		return (
 			<header
@@ -29,6 +41,7 @@ class Header extends React.PureComponent {
 
 Header.propTypes = {
 	accounts: PropTypes.object,
+	pathname: PropTypes.string.isRequired,
 	sidebarToggle: PropTypes.func.isRequired,
 };
 

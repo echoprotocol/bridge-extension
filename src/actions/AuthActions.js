@@ -1,4 +1,4 @@
-import { PrivateKey, ChainStore } from 'echojs-lib';
+import { PrivateKey } from 'echojs-lib';
 
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 import FormatHelper from '../helpers/FormatHelper';
@@ -15,7 +15,7 @@ import {
 	createWallet,
 	validateImportAccountExist,
 } from '../api/WalletApi';
-import { fetchChain } from '../api/ChainApi';
+import { fetchChain, getAccountRefsOfKey } from '../api/ChainApi';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -109,7 +109,8 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	const nameError = ValidateAccountHelper.validateAccountName(name);
 	const addedError = dispatch(isAccountAdded(name)) ? 'Account already added' : null;
-	const existError = await validateImportAccountExist(name, true);
+
+	const existError = await validateImportAccountExist(name, true, networkName);
 
 	if (nameError || addedError || existError) {
 		const error = nameError || addedError || existError;
@@ -172,7 +173,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		if (getCrypto().isWIF(password)) {
 			const active = PrivateKey.fromWif(password).toPublicKey().toString();
 
-			const [accountId] = await ChainStore.FetchChain('getAccountRefsOfKey', active);
+			const [accountId] = await getAccountRefsOfKey(active);
 
 			if (!accountId) {
 				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid WIF'));
