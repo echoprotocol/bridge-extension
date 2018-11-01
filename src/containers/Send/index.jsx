@@ -14,7 +14,8 @@ import BridgeTextArea from '../../components/BridgeTextArea';
 import { INDEX_PATH } from '../../constants/RouterConstants';
 import { setFormError, setFormValue } from '../../actions/FormActions';
 import { FORM_SEND } from '../../constants/FormConstants';
-import ValidateSend from '../../helpers/ValidateSend';
+import ValidateSendHelper from '../../helpers/ValidateSendHelper';
+import { send } from '../../actions/BalanceActions';
 
 class Send extends React.Component {
 
@@ -46,7 +47,7 @@ class Send extends React.Component {
 
 		const asset = { precision: 5, symbol: 'ECHO' };
 
-		const { value: validatedValue, error } = ValidateSend.amountInput(value, asset);
+		const { value: validatedValue, error } = ValidateSendHelper.amountInput(value, asset);
 
 		if (error) {
 			this.props.setFormError(field, error);
@@ -66,6 +67,10 @@ class Send extends React.Component {
 		} else {
 			this.setState({ search: this.getSymbols() });
 		}
+	}
+
+	onSend() {
+		this.props.send();
 	}
 
 	getSymbols() {
@@ -174,6 +179,7 @@ class Send extends React.Component {
 								value={fee.value}
 								readOnly
 								disabled
+								onDropdownSearch={(e) => this.onSearch(e)}
 							/>
 							<BridgeTextArea
 								name="note"
@@ -185,6 +191,7 @@ class Send extends React.Component {
 								className="btn-in-light"
 								disabled={(!to.value || !amount.value)}
 								content={<span className="btn-text">Send</span>}
+								onClick={() => this.onSend()}
 							/>
 						</div>
 					</CustomScroll>
@@ -215,6 +222,7 @@ Send.propTypes = {
 	assets: PropTypes.object.isRequired,
 	setFormValue: PropTypes.func.isRequired,
 	setFormError: PropTypes.func.isRequired,
+	send: PropTypes.func.isRequired,
 };
 
 Send.defaultProps = {
@@ -234,5 +242,6 @@ export default connect(
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SEND, field, value)),
 		setFormError: (field, value) => dispatch(setFormError(FORM_SEND, field, value)),
+		send: () => dispatch(send()),
 	}),
 )(Send);

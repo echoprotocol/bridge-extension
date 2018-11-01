@@ -1,4 +1,6 @@
-class ValidateSend {
+import BN from 'bignumber.js';
+
+class ValidateSendHelper {
 
 	static amountInput(value, currency) {
 		if (!value.match(/^[0-9]*[.,]?[0-9]*$/)) {
@@ -19,6 +21,24 @@ class ValidateSend {
 		return { value, error: null };
 	}
 
+	static validateAmount(value, { symbol, precision, balance }) {
+		if (!Math.floor(value * (10 ** precision))) {
+			return `Amount should be more than 0 (${symbol} precision is ${precision} symbols)`;
+		}
+
+		const amount = new BN(value).times(10 ** precision);
+
+		if (!amount.isInteger()) {
+			return `${symbol} precision is ${precision} symbols`;
+		}
+
+		if (new BN(value).times(10 ** precision).gt(balance)) {
+			return 'Insufficient funds';
+		}
+
+		return null;
+	}
+
 }
 
-export default ValidateSend;
+export default ValidateSendHelper;

@@ -1,6 +1,9 @@
 import BalanceReducer from '../reducers/BalanceReducer';
 
 import { fetchChain } from '../api/ChainApi';
+import { FORM_SEND } from '../constants/FormConstants';
+import { setFormError } from './FormActions';
+import ValidateSendHelper from '../helpers/ValidateSendHelper';
 
 /**
  *  @method initAssetsBalances
@@ -89,4 +92,30 @@ export const removeBalances = (accountId) => (dispatch, getState) => {
 		balances,
 		assets,
 	}));
+};
+
+export const send = () => (dispatch, getState) => {
+	const form = getState().form.get(FORM_SEND);
+
+	const amount = Number(form.get('amount').value).toString();
+
+	const to = form.get('to');
+	const fee = form.get('fee');
+	const note = form.get('note');
+
+	if (to.error || form.get('amount').error || fee.error || note.error) {
+		return;
+	}
+
+	if (!to.value) {
+		dispatch(setFormError(FORM_SEND, 'to', 'Account name should not be empty'));
+		return;
+	}
+
+	const amountError = ValidateSendHelper.validateAmount(amount, fee);
+
+	if (amountError) {
+		dispatch(setFormError(FORM_SEND, 'amount', amountError));
+
+	}
 };
