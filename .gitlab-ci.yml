@@ -38,6 +38,7 @@ build_artifacts:
       - build/zip/echo_bridge.zip
   only:
     - development
+    - stage
   environment:
     name: development
   tags:
