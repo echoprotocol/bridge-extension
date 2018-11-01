@@ -61,8 +61,8 @@ class Send extends React.Component {
 	onSearch(value) {
 		if (value) {
 			this.setState({
-				search: this.getSymbols().filter((symbol) =>
-					symbol.toLowerCase().startsWith(value.toLowerCase())),
+				search: this.getSymbols().filter(({ text }) =>
+					text.toLowerCase().startsWith(value.toLowerCase())),
 			});
 		} else {
 			this.setState({ search: this.getSymbols() });
@@ -87,7 +87,7 @@ class Send extends React.Component {
 				const symbol = assets.getIn([balance.get('asset_type'), 'symbol']);
 
 				if (!symbolsList.includes(symbol)) {
-					symbolsList.push(symbol);
+					symbolsList.push({ text: symbol, value: balance.get('id') });
 				}
 			}
 		});
@@ -163,7 +163,7 @@ class Send extends React.Component {
 								defaultUp
 								labelText="Amount"
 								leftLabel
-								innerDropdown={dropdownData}
+								innerDropdown={{ dropdownData, path: { form: FORM_SEND, field: 'selectedBalance' } }}
 								value={amount.value}
 								onChange={(e) => this.onAmountChange(e)}
 								onDropdownSearch={(e) => this.onSearch(e)}
@@ -175,7 +175,7 @@ class Send extends React.Component {
 								defaultUp
 								labelText="Fee"
 								leftLabel
-								innerDropdown={dropdownData}
+								innerDropdown={{ dropdownData }}
 								value={fee.value}
 								readOnly
 								disabled
@@ -242,6 +242,6 @@ export default connect(
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SEND, field, value)),
 		setFormError: (field, value) => dispatch(setFormError(FORM_SEND, field, value)),
-		send: () => dispatch(send()),
+		send: (balance) => dispatch(send(balance)),
 	}),
 )(Send);

@@ -3,8 +3,10 @@ import PropTypes from 'prop-types';
 import { Input } from 'semantic-ui-react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 import CustomScroll from 'react-custom-scroll';
+import { connect } from 'react-redux';
 
 import CustomMenu from './CustomMenu';
+import { setValue } from '../../actions/FormActions';
 
 class CurrencySelect extends React.Component {
 
@@ -23,6 +25,12 @@ class CurrencySelect extends React.Component {
 	}
 
 	componentDidMount() {
+		const { path, data } = this.props;
+
+		if (path) {
+			this.props.setValue(path.form, path.field, data[0].list[0].value);
+		}
+
 		document.addEventListener('mousedown', this.handleClickOutside);
 	}
 
@@ -51,7 +59,7 @@ class CurrencySelect extends React.Component {
 		this.menuRef = node;
 	}
 
-	handleClick(text) {
+	handleClick(text, value) {
 		this.setState({
 			currentVal: text,
 			opened: false,
@@ -59,6 +67,12 @@ class CurrencySelect extends React.Component {
 		});
 
 		this.props.onSearch();
+
+		const { path } = this.props;
+
+		if (path) {
+			this.props.setValue(path.form, path.field, value);
+		}
 	}
 
 	handleClickOutside(event) {
@@ -112,11 +126,14 @@ class CurrencySelect extends React.Component {
 													<div className="title">{elem.title}</div>
 													<ul>
 														{
-															elem.list.map((text, i) => (
+															elem.list.map(({ text, value }, i) => (
 																<MenuItem
 																	eventKey={i}
 																	key={text}
-																	onClick={(e) => { this.handleClick(text); e.preventDefault(); }}
+																	onClick={(e) => {
+																		this.handleClick(text, value);
+																		e.preventDefault();
+																	}}
 																>
 																	{text}
 																</MenuItem>
@@ -139,13 +156,21 @@ class CurrencySelect extends React.Component {
 }
 
 CurrencySelect.propTypes = {
+	path: PropTypes.object,
 	data: PropTypes.array,
 	onSearch: PropTypes.func,
+	setValue: PropTypes.func.isRequired,
 };
 
 CurrencySelect.defaultProps = {
+	path: null,
 	data: [],
 	onSearch: null,
 };
 
-export default CurrencySelect;
+export default connect(
+	() => ({}),
+	(dispatch) => ({
+		setValue: (form, field, value) => dispatch(setValue(form, field, value)),
+	}),
+)(CurrencySelect);

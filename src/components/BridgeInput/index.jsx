@@ -130,7 +130,8 @@ class BridgeInput extends React.Component {
 						(innerDropdown) &&
 						(
 							<CurrencySelect
-								data={innerDropdown}
+								data={innerDropdown.dropdownData}
+								path={innerDropdown.path}
 								onSearch={(search) => this.props.onDropdownSearch(search)}
 							/>
 						)
@@ -170,7 +171,7 @@ BridgeInput.propTypes = {
 	descriptionText: PropTypes.string,
 	onChange: PropTypes.func,
 	privacyEye: PropTypes.bool,
-	innerDropdown: PropTypes.array,
+	innerDropdown: PropTypes.object,
 	userIcon: PropTypes.object,
 	onHintClick: PropTypes.func,
 	onKeyDown: PropTypes.func,

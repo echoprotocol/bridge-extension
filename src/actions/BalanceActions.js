@@ -112,7 +112,17 @@ export const send = () => (dispatch, getState) => {
 		return;
 	}
 
-	const amountError = ValidateSendHelper.validateAmount(amount, fee);
+	const selectedBalance = getState().form.getIn([FORM_SEND, 'selectedBalance']);
+	const balances = getState().balance.get('balances');
+	const assets = getState().balance.get('assets');
+
+	const balance = {
+		symbol: assets.getIn([balances.getIn([selectedBalance, 'asset_type']), 'symbol']),
+		precision: assets.getIn([balances.getIn([selectedBalance, 'asset_type']), 'precision']),
+		balance: balances.getIn([selectedBalance, 'balance']),
+	};
+
+	const amountError = ValidateSendHelper.validateAmount(amount, balance);
 
 	if (amountError) {
 		dispatch(setFormError(FORM_SEND, 'amount', amountError));
