@@ -339,7 +339,7 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 	networks = networks.filter((i) => i.name !== network.name);
 
 	try {
-		await storage.set('custom_networks', networks);
+		await storage.set('custom_networks', networks.toJS());
 
 		const currentNetworkName = getState().global.getIn(['network', 'name']);
 
