@@ -5,17 +5,19 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import BridgeInput from '../../components/BridgeInput';
-import BridgeTextArea from '../../components/BridgeTextArea';
 // import ErrorTransaction from './ErrorTransaction';
 // import SuccessTransaction from './SuccessTransaction';
 
+import { send } from '../../actions/BalanceActions';
+import { setFormError, setFormValue } from '../../actions/FormActions';
 
 import { INDEX_PATH } from '../../constants/RouterConstants';
-import { setFormError, setFormValue } from '../../actions/FormActions';
 import { FORM_SEND } from '../../constants/FormConstants';
+
+import BridgeInput from '../../components/BridgeInput';
+import BridgeTextArea from '../../components/BridgeTextArea';
+
 import ValidateSendHelper from '../../helpers/ValidateSendHelper';
-import { send } from '../../actions/BalanceActions';
 
 class Send extends React.Component {
 

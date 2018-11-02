@@ -1,9 +1,14 @@
+import BN from 'bignumber.js';
+
 import BalanceReducer from '../reducers/BalanceReducer';
 
 import { fetchChain } from '../api/ChainApi';
 import { FORM_SEND } from '../constants/FormConstants';
-import { setFormError } from './FormActions';
+import { setFormError, toggleLoading } from './FormActions';
 import ValidateSendHelper from '../helpers/ValidateSendHelper';
+import { getTransactionFee } from './SignActions';
+import { CORE_ID } from '../constants/GlobalConstants';
+import echoService from '../services/echo';
 
 /**
  *  @method initAssetsBalances
@@ -94,22 +99,30 @@ export const removeBalances = (accountId) => (dispatch, getState) => {
 	}));
 };
 
-export const send = () => (dispatch, getState) => {
+const checkFeePool = (echo, asset, fee) => {
+	if (echo.id === asset.id) { return true; }
+
+	let feePool = new BN(asset.dynamic.fee_pool).div(10 ** echo.precision);
+
+	const { quote, base } = asset.options.core_exchange_rate;
+	const precision = echo.precision - asset.precision;
+	const price = new BN(quote.amount).div(base.amount).times(10 ** precision);
+	feePool = price.times(feePool).times(10 ** asset.precision);
+
+	return feePool.gt(fee);
+};
+
+export const send = () => async (dispatch, getState) => {
 	const form = getState().form.get(FORM_SEND);
 
 	const amount = Number(form.get('amount').value).toString();
 
 	const to = form.get('to');
-	const fee = form.get('fee');
+	let fee = form.get('fee');
 	const note = form.get('note');
 
 	if (to.error || form.get('amount').error || fee.error || note.error) {
-		return;
-	}
-
-	if (!to.value) {
-		dispatch(setFormError(FORM_SEND, 'to', 'Account name should not be empty'));
-		return;
+		return false;
 	}
 
 	const selectedBalance = getState().form.getIn([FORM_SEND, 'selectedBalance']);
@@ -126,6 +139,65 @@ export const send = () => (dispatch, getState) => {
 
 	if (amountError) {
 		dispatch(setFormError(FORM_SEND, 'amount', amountError));
-
 	}
+
+	const fromAccount = await fetchChain(getState().global.getIn(['account', 'name']));
+	const toAccount = await fetchChain(to.value);
+
+	const options = {
+		amount: {
+			amount,
+			asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
+		},
+		fee: {
+			amount: fee.value || 0,
+			asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
+		},
+		from: fromAccount,
+		to: toAccount,
+		type: 'transfer',
+	};
+
+	if (!fee.value) {
+		fee = await getTransactionFee(options);
+	}
+
+	if (!checkFeePool(assets.get(CORE_ID).toJS(), options.fee.asset.toJS(), fee.amount)) {
+		dispatch(setFormError(
+			FORM_SEND,
+			'fee',
+			`${options.fee.asset.get('symbol')} fee pool balance is less than fee amount`,
+		));
+		return false;
+	}
+
+	if (options.amount.asset.get('id') === options.fee.asset.get('id')) {
+		const total = new BN(amount).times(10 ** options.amount.asset.get('precision')).plus(fee.amount);
+
+		if (total.gt(balances.getIn([selectedBalance, 'balance']))) {
+			dispatch(setFormError(FORM_SEND, 'fee', 'Insufficient funds for fee'));
+			return false;
+		}
+	} else {
+		const feeBalance = balances.find((val) => val.get('asset_type') === options.fee.asset.get('id')).get('balance');
+
+		if (new BN(fee.value).gt(feeBalance)) {
+			dispatch(setFormError(FORM_SEND, 'fee', 'Insufficient funds for fee'));
+			return false;
+		}
+	}
+
+	dispatch(toggleLoading(FORM_SEND, 'loading', true));
+
+	const { TransactionBuilder } = await echoService.getChainLib();
+	const tr = new TransactionBuilder();
+
+	// tr.add_type_operation('transfer', transactionOptions);
+
+	await tr.set_required_fees(options.asset_id);
+	// tr.add_signer(privateKey);
+
+	await tr.broadcast();
+
+	return true;
 };

@@ -45,7 +45,7 @@ const validateTransaction = (options) => (dispatch, getState) => {
 	return null;
 };
 
-const getTransactionFee = async (options) => {
+export const getTransactionFee = async (options) => {
 	const { fee } = options;
 	let amount = await getOperationFee(options.type, formatToSend(options.type, options));
 
