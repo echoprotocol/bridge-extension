@@ -2,13 +2,18 @@ import BN from 'bignumber.js';
 
 import BalanceReducer from '../reducers/BalanceReducer';
 
-import { fetchChain } from '../api/ChainApi';
+import { fetchChain, lookupAccounts } from '../api/ChainApi';
 import { FORM_SEND } from '../constants/FormConstants';
-import { setFormError, toggleLoading } from './FormActions';
+import { setFormError, setValue } from './FormActions';
 import ValidateSendHelper from '../helpers/ValidateSendHelper';
 import { getTransactionFee } from './SignActions';
 import { CORE_ID } from '../constants/GlobalConstants';
 import echoService from '../services/echo';
+import { formatToSend } from '../services/operation';
+import FormatHelper from '../helpers/FormatHelper';
+import GlobalReducer from '../reducers/GlobalReducer';
+import history from '../history';
+import { ERROR_SEND_PATH, SUCCESS_SEND_PATH } from '../constants/RouterConstants';
 
 /**
  *  @method initAssetsBalances
@@ -99,33 +104,55 @@ export const removeBalances = (accountId) => (dispatch, getState) => {
 	}));
 };
 
-const checkFeePool = (echo, asset, fee) => {
-	if (echo.id === asset.id) { return true; }
+const checkFeePool = (coreAsset, asset, fee) => {
+	if (coreAsset.get('id') === asset.get('id')) { return true; }
 
-	let feePool = new BN(asset.dynamic.fee_pool).div(10 ** echo.precision);
+	let feePool = new BN(asset.getIn(['dynamic', 'fee_pool'])).div(10 ** coreAsset.get('precision'));
 
-	const { quote, base } = asset.options.core_exchange_rate;
-	const precision = echo.precision - asset.precision;
-	const price = new BN(quote.amount).div(base.amount).times(10 ** precision);
-	feePool = price.times(feePool).times(10 ** asset.precision);
+	const base = asset.getIn(['options', 'core_exchange_rate', 'base']);
+	const quote = asset.getIn(['options', 'core_exchange_rate', 'quote']);
+	const precision = coreAsset.get('precision') - asset.get('precision');
+	const price = new BN(quote.get('amount')).div(base.get('amount')).times(10 ** precision);
+	feePool = price.times(feePool).times(10 ** asset.get('precision'));
 
 	return feePool.gt(fee);
 };
 
+export const checkAccount = (fromAccount, toAccount, limit = 50) => async (dispatch) => {
+	try {
+		if (fromAccount === toAccount) {
+			dispatch(setFormError(FORM_SEND, 'to', 'You can not send funds to yourself'));
+			return null;
+		}
+
+		const result = await lookupAccounts(toAccount, limit);
+
+		if (!result.find((i) => i[0] === toAccount)) {
+			dispatch(setFormError(FORM_SEND, 'to', 'Account is not found'));
+		}
+
+		return null;
+	} catch (err) {
+		return err;
+	}
+};
+
 export const send = () => async (dispatch, getState) => {
+
 	const form = getState().form.get(FORM_SEND);
 
 	const amount = Number(form.get('amount').value).toString();
 
 	const to = form.get('to');
-	let fee = form.get('fee');
-	const note = form.get('note');
+	const fee = form.get('fee');
+	const memo = form.get('memo');
 
-	if (to.error || form.get('amount').error || fee.error || note.error) {
+	if (to.error || form.get('amount').error || fee.error || memo.error) {
 		return false;
 	}
 
 	const selectedBalance = getState().form.getIn([FORM_SEND, 'selectedBalance']);
+	const selectedFeeBalance = getState().form.getIn([FORM_SEND, 'selectedFeeBalance']);
 	const balances = getState().balance.get('balances');
 	const assets = getState().balance.get('assets');
 
@@ -139,10 +166,17 @@ export const send = () => async (dispatch, getState) => {
 
 	if (amountError) {
 		dispatch(setFormError(FORM_SEND, 'amount', amountError));
+		return false;
 	}
 
 	const fromAccount = await fetchChain(getState().global.getIn(['account', 'name']));
 	const toAccount = await fetchChain(to.value);
+
+	const checkAccountError = await dispatch(checkAccount(fromAccount, toAccount));
+
+	if (checkAccountError) {
+		dispatch(setValue(FORM_SEND, 'error', FormatHelper.formatError(checkAccountError)));
+	}
 
 	const options = {
 		amount: {
@@ -151,7 +185,7 @@ export const send = () => async (dispatch, getState) => {
 		},
 		fee: {
 			amount: fee.value || 0,
-			asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
+			asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
 		},
 		from: fromAccount,
 		to: toAccount,
@@ -159,10 +193,10 @@ export const send = () => async (dispatch, getState) => {
 	};
 
 	if (!fee.value) {
-		fee = await getTransactionFee(options);
+		options.fee = await getTransactionFee(options);
 	}
 
-	if (!checkFeePool(assets.get(CORE_ID).toJS(), options.fee.asset.toJS(), fee.amount)) {
+	if (!checkFeePool(assets.get(CORE_ID), options.fee.asset, options.fee.amount)) {
 		dispatch(setFormError(
 			FORM_SEND,
 			'fee',
@@ -172,7 +206,7 @@ export const send = () => async (dispatch, getState) => {
 	}
 
 	if (options.amount.asset.get('id') === options.fee.asset.get('id')) {
-		const total = new BN(amount).times(10 ** options.amount.asset.get('precision')).plus(fee.amount);
+		const total = new BN(amount).times(10 ** options.amount.asset.get('precision')).plus(options.fee.amount);
 
 		if (total.gt(balances.getIn([selectedBalance, 'balance']))) {
 			dispatch(setFormError(FORM_SEND, 'fee', 'Insufficient funds for fee'));
@@ -187,17 +221,46 @@ export const send = () => async (dispatch, getState) => {
 		}
 	}
 
-	dispatch(toggleLoading(FORM_SEND, 'loading', true));
+	try {
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
-	const { TransactionBuilder } = await echoService.getChainLib();
-	const tr = new TransactionBuilder();
+		const transactionOptions = formatToSend('transfer', options);
 
-	// tr.add_type_operation('transfer', transactionOptions);
+		const publicKey = fromAccount.getIn(['active', 'key_auths', '0', '0']);
 
-	await tr.set_required_fees(options.asset_id);
-	// tr.add_signer(privateKey);
+		const networkName = getState().global.getIn(['network', 'name']);
 
-	await tr.broadcast();
+		const { TransactionBuilder } = await echoService.getChainLib();
+		let tr = new TransactionBuilder();
+		tr = await echoService.getCrypto().sign(networkName, tr, publicKey);
+
+		if (memo.value) {
+
+			transactionOptions.memo = await echoService.getCrypto().encryptMemo(
+				networkName,
+				fromAccount.getIn(['options', 'memo_key']),
+				toAccount.getIn(['options', 'memo_key']),
+				memo.value,
+			);
+		}
+
+		transactionOptions.amount.amount *= (10 ** options.amount.asset.get('precision'));
+
+		tr.add_type_operation('transfer', transactionOptions);
+		await tr.set_required_fees(transactionOptions.fee.asset_id);
+
+		await tr.broadcast();
+
+		history.push(SUCCESS_SEND_PATH);
+	} catch (err) {
+		dispatch(setValue(FORM_SEND, 'error', FormatHelper.formatError(err)));
+
+		history.push(ERROR_SEND_PATH);
+
+		return false;
+	} finally {
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	}
 
 	return true;
 };

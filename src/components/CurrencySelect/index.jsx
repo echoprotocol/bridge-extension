@@ -97,6 +97,7 @@ class CurrencySelect extends React.Component {
 					pullRight
 					onToggle={() => this.toggleDropdown()}
 					open={this.state.opened}
+					disabled={data[0].list.length === 1}
 				>
 					<Dropdown.Toggle onClick={() => this.toggleDropdown()}>
 						<span className="val">{(currentVal) || 'ECHO'}</span>

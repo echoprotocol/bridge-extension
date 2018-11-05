@@ -1,6 +1,7 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { Button } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
+import { INDEX_PATH } from '../../constants/RouterConstants';
 
 class SuccessTransaction extends React.PureComponent {
 
@@ -18,6 +19,7 @@ class SuccessTransaction extends React.PureComponent {
 						<Button
 							className="btn-inverted success"
 							content={<span className="btn-text">Proceed</span>}
+							onClick={() => this.props.history.push(INDEX_PATH)}
 						/>
 					</div>
 				</div>
@@ -27,8 +29,8 @@ class SuccessTransaction extends React.PureComponent {
 
 }
 
+SuccessTransaction.propTypes = {
+	history: PropTypes.object.isRequired,
+};
 
-export default connect(
-	() => ({}),
-	() => ({}),
-)(SuccessTransaction);
+export default SuccessTransaction;

@@ -59,7 +59,8 @@ const DEFAULT_FORM_FIELDS = {
 			value: '',
 			error: null,
 		},
-		note: {
+		selectedFeeBalance: null,
+		memo: {
 			value: '',
 			error: null,
 		},

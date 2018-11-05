@@ -1,6 +1,8 @@
 import React from 'react';
-import { connect } from 'react-redux';
 import { Button } from 'semantic-ui-react';
+import PropTypes from 'prop-types';
+
+import { SEND_PATH } from '../../constants/RouterConstants';
 
 class ErrorTransaction extends React.PureComponent {
 
@@ -18,6 +20,7 @@ class ErrorTransaction extends React.PureComponent {
 						<Button
 							className="btn-inverted error"
 							content={<span className="btn-text">Return</span>}
+							onClick={() => this.props.history.push(SEND_PATH)}
 						/>
 					</div>
 				</div>
@@ -27,8 +30,8 @@ class ErrorTransaction extends React.PureComponent {
 
 }
 
+ErrorTransaction.propTypes = {
+	history: PropTypes.object.isRequired,
+};
 
-export default connect(
-	() => ({}),
-	() => ({}),
-)(ErrorTransaction);
+export default ErrorTransaction;

@@ -4,12 +4,13 @@ import CustomScroll from 'react-custom-scroll';
 import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
 // import ErrorTransaction from './ErrorTransaction';
 // import SuccessTransaction from './SuccessTransaction';
 
 import { send } from '../../actions/BalanceActions';
-import { setFormError, setFormValue } from '../../actions/FormActions';
+import { clearForm, setFormError, setFormValue } from '../../actions/FormActions';
 
 import { INDEX_PATH } from '../../constants/RouterConstants';
 import { FORM_SEND } from '../../constants/FormConstants';
@@ -29,6 +30,9 @@ class Send extends React.Component {
 		};
 	}
 
+	componentWillUnmount() {
+		this.props.clearForm();
+	}
 
 	onChange(e, lowerCase) {
 		const field = e.target.name;
@@ -44,12 +48,18 @@ class Send extends React.Component {
 	}
 
 	onAmountChange(e) {
+		const { selectedBalance, balances, assets } = this.props;
+
 		const field = e.target.name;
 		const { value } = e.target;
 
-		const asset = { precision: 5, symbol: 'ECHO' };
+		const asset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
 
-		const { value: validatedValue, error } = ValidateSendHelper.amountInput(value, asset);
+		const { value: validatedValue, error } =
+			ValidateSendHelper.amountInput(value, {
+				precision: asset.get('precision'),
+				symbol: asset.get('symbol'),
+			});
 
 		if (error) {
 			this.props.setFormError(field, error);
@@ -112,7 +122,7 @@ class Send extends React.Component {
 			// },
 		];
 		const {
-			to, amount, fee, note, account,
+			to, amount, fee, memo, account, loading,
 		} = this.props;
 
 		if (!account) {
@@ -157,11 +167,13 @@ class Send extends React.Component {
 								leftLabel
 								value={to.value}
 								onChange={(e) => this.onChange(e, true)}
+								error={!!to.error}
+								errorText={to.error}
 							/>
 							<BridgeInput
 								name="amount"
 								theme="input-light"
-								placeholder="0.000"
+								placeholder="0"
 								defaultUp
 								labelText="Amount"
 								leftLabel
@@ -169,28 +181,31 @@ class Send extends React.Component {
 								value={amount.value}
 								onChange={(e) => this.onAmountChange(e)}
 								onDropdownSearch={(e) => this.onSearch(e)}
+								error={!!amount.error}
+								errorText={amount.error}
 							/>
 							<BridgeInput
 								name="fee"
 								theme="input-light"
-								placeholder="0.000"
+								placeholder="0"
 								defaultUp
 								labelText="Fee"
 								leftLabel
-								innerDropdown={{ dropdownData }}
+								innerDropdown={{ dropdownData, path: { form: FORM_SEND, field: 'selectedFeeBalance' } }}
 								value={fee.value}
-								readOnly
 								disabled
 								onDropdownSearch={(e) => this.onSearch(e)}
 							/>
 							<BridgeTextArea
-								name="note"
-								value={note.value}
+								name="memo"
+								value={memo.value}
 								onChange={(e) => this.onChange(e)}
 								label="Note (optional)"
+								error={!!memo.error}
+								errorText={memo.error}
 							/>
 							<Button
-								className="btn-in-light"
+								className={classnames('btn-in-light', { loading })}
 								disabled={(!to.value || !amount.value)}
 								content={<span className="btn-text">Send</span>}
 								onClick={() => this.onSend()}
@@ -205,9 +220,6 @@ class Send extends React.Component {
 	render() {
 		return (
 			this.renderSend()
-		// Для отображения ErrorTransaction и SuccessTransaction - убрать блок return и Navbar !!!
-			// <ErrorTransaction />
-		// <SuccessTransaction />
 		);
 
 	}
@@ -215,20 +227,25 @@ class Send extends React.Component {
 }
 
 Send.propTypes = {
+	loading: PropTypes.bool,
 	account: PropTypes.object,
 	to: PropTypes.object.isRequired,
 	amount: PropTypes.object.isRequired,
 	fee: PropTypes.object.isRequired,
-	note: PropTypes.object.isRequired,
+	memo: PropTypes.object.isRequired,
 	balances: PropTypes.object.isRequired,
 	assets: PropTypes.object.isRequired,
+	selectedBalance: PropTypes.string,
 	setFormValue: PropTypes.func.isRequired,
 	setFormError: PropTypes.func.isRequired,
 	send: PropTypes.func.isRequired,
+	clearForm: PropTypes.func.isRequired,
 };
 
 Send.defaultProps = {
 	account: null,
+	loading: false,
+	selectedBalance: null,
 };
 
 export default connect(
@@ -237,13 +254,16 @@ export default connect(
 		to: state.form.getIn([FORM_SEND, 'to']),
 		amount: state.form.getIn([FORM_SEND, 'amount']),
 		fee: state.form.getIn([FORM_SEND, 'fee']),
-		note: state.form.getIn([FORM_SEND, 'note']),
+		memo: state.form.getIn([FORM_SEND, 'memo']),
+		selectedBalance: state.form.getIn([FORM_SEND, 'selectedBalance']),
 		balances: state.balance.get('balances'),
 		assets: state.balance.get('assets'),
+		loading: state.global.get('loading'),
 	}),
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SEND, field, value)),
 		setFormError: (field, value) => dispatch(setFormError(FORM_SEND, field, value)),
 		send: (balance) => dispatch(send(balance)),
+		clearForm: () => dispatch(clearForm(FORM_SEND)),
 	}),
 )(Send);
