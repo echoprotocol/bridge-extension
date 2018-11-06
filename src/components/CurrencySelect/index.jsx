@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 
 import CustomMenu from './CustomMenu';
 import { setValue } from '../../actions/FormActions';
+import { KEY_CODE_TAB } from '../../constants/GlobalConstants';
 
 class CurrencySelect extends React.Component {
 
@@ -55,6 +56,14 @@ class CurrencySelect extends React.Component {
 		this.props.onSearch(e.target.value);
 	}
 
+	onKeyDown(e) {
+		const code = e.keyCode || e.which;
+
+		if (KEY_CODE_TAB === code) {
+			this.toggleDropdown();
+		}
+	}
+
 	setMenuRef(node) {
 		this.menuRef = node;
 	}
@@ -82,12 +91,19 @@ class CurrencySelect extends React.Component {
 	}
 
 	toggleDropdown() {
-		this.setState({ opened: !this.state.opened });
+		this.props.onSearch();
+
+		this.setState({
+			opened: !this.state.opened,
+			search: '',
+		});
 	}
 
 	render() {
-		const { currentVal, search } = this.state;
+		const { currentVal, search, opened } = this.state;
 		const { data } = this.props;
+
+		const searchList = data.reduce((result, value) => result.concat(value.list), []);
 
 		return (
 			<div ref={this.setMenuRef}>
@@ -97,10 +113,10 @@ class CurrencySelect extends React.Component {
 					pullRight
 					onToggle={() => this.toggleDropdown()}
 					open={this.state.opened}
-					disabled={data[0].list.length === 1}
+					disabled={searchList.length === 1 && !opened}
 				>
 					<Dropdown.Toggle onClick={() => this.toggleDropdown()}>
-						<span className="val">{(currentVal) || 'ECHO'}</span>
+						<span className="val">{currentVal && searchList.find((val) => val.text === currentVal) ? currentVal : 'ECHO'}</span>
 					</Dropdown.Toggle>
 					<CustomMenu bsRole="menu">
 						<div className="menu-container">
@@ -108,6 +124,7 @@ class CurrencySelect extends React.Component {
 								placeholder="Type asset or token name"
 								value={search}
 								onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
+								onKeyDown={(e) => this.onKeyDown(e)}
 								onChange={(e) => this.onChange(e)}
 								ref={(r) => { this.inputRef = r; }}
 							/>

@@ -2,23 +2,35 @@ import BN from 'bignumber.js';
 
 class ValidateSendHelper {
 
-	static amountInput(value, currency) {
-		if (!value.match(/^[0-9]*[.,]?[0-9]*$/)) {
-			return { value: null, error: 'Amount must contain only digits and dot' };
-		}
+	static amountInput(value, asset) {
+		const result = { value: null, error: '' };
 
-		if (value.replace(',', '.') !== '' && !Math.floor(value.replace(',', '.') * (10 ** currency.precision))) {
-			return { value: null, error: `Amount should be more than 0 (${currency.symbol} precision is ${currency.precision} symbols)` };
+		if (!value.match(/^[0-9]*[.,]?[0-9]*$/)) {
+			result.error = 'Amount must contain only digits and dot';
+			return result;
 		}
 
 		if (/\.|,/.test(value)) {
 			const [intPath, doublePath] = value.split(/\.|,/);
-			value = `${intPath ? Number(intPath) : ''}.${doublePath || ''}`;
-		} else {
-			value = value ? Number(value).toString() : value;
-		}
 
-		return { value, error: null };
+			if (doublePath.toString().length === asset.precision && !Math.floor(value.replace(',', '.') * (10 ** asset.precision))) {
+				result.error = `Amount should be more than 0 (${asset.symbol} precision is ${asset.precision} symbols)`;
+
+				return result;
+			}
+
+			if (doublePath.toString().length > asset.precision) {
+				result.error = `${asset.symbol} precision is ${asset.precision}`;
+
+				return result;
+			}
+
+			result.value = `${intPath ? Number(intPath) : ''}.${doublePath || ''}`;
+		}
+		result.value = value ? Number(value).toString() : value;
+
+
+		return result;
 	}
 
 	static validateAmount(value, { symbol, precision, balance }) {

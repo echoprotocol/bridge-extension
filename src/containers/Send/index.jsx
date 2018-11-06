@@ -5,11 +5,12 @@ import { Link } from 'react-router-dom';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import _ from 'lodash';
 
 // import ErrorTransaction from './ErrorTransaction';
 // import SuccessTransaction from './SuccessTransaction';
 
-import { send } from '../../actions/BalanceActions';
+import { send, setFeeFormValue } from '../../actions/BalanceActions';
 import { clearForm, setFormError, setFormValue } from '../../actions/FormActions';
 
 import { INDEX_PATH } from '../../constants/RouterConstants';
@@ -27,7 +28,32 @@ class Send extends React.Component {
 
 		this.state = {
 			search: this.getSymbols(),
+			timeout: null,
 		};
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if (_.isEqual(this.props, nextProps)) { return; }
+
+		if (this.state.timeout) {
+			clearTimeout(this.state.timeout);
+		}
+
+		this.setState({
+			search: this.getSymbols(),
+		});
+
+		const { to, amount } = nextProps;
+
+		if (to.value && amount.value) {
+			this.setState({
+				timeout: setTimeout(() => {
+					this.props.setFeeFormValue();
+				}, 300),
+			});
+		} else {
+			this.props.setFormValue('fee', '');
+		}
 	}
 
 	componentWillUnmount() {
@@ -74,7 +100,7 @@ class Send extends React.Component {
 		if (value) {
 			this.setState({
 				search: this.getSymbols().filter(({ text }) =>
-					text.toLowerCase().startsWith(value.toLowerCase())),
+					text.toLowerCase().includes(value.toLowerCase())),
 			});
 		} else {
 			this.setState({ search: this.getSymbols() });
@@ -107,8 +133,12 @@ class Send extends React.Component {
 		return symbolsList;
 	}
 
-	renderSend() {
+	render() {
 		const { search } = this.state;
+		const {
+			to, amount, fee, memo, account, loading,
+		} = this.props;
+
 		const dropdownData = [
 			{
 				id: 0,
@@ -121,9 +151,6 @@ class Send extends React.Component {
 			// 	list: ['ECHO', 'EchoTest', 'EchoEcho', 'EchoEcho245'],
 			// },
 		];
-		const {
-			to, amount, fee, memo, account, loading,
-		} = this.props;
 
 		if (!account) {
 			return null;
@@ -180,7 +207,7 @@ class Send extends React.Component {
 								innerDropdown={{ dropdownData, path: { form: FORM_SEND, field: 'selectedBalance' } }}
 								value={amount.value}
 								onChange={(e) => this.onAmountChange(e)}
-								onDropdownSearch={(e) => this.onSearch(e)}
+								onDropdownSearch={(searchText) => this.onSearch(searchText)}
 								error={!!amount.error}
 								errorText={amount.error}
 							/>
@@ -192,9 +219,9 @@ class Send extends React.Component {
 								labelText="Fee"
 								leftLabel
 								innerDropdown={{ dropdownData, path: { form: FORM_SEND, field: 'selectedFeeBalance' } }}
-								value={fee.value}
+								value={fee.value.toString()}
 								disabled
-								onDropdownSearch={(e) => this.onSearch(e)}
+								onDropdownSearch={(searchText) => this.onSearch(searchText)}
 							/>
 							<BridgeTextArea
 								name="memo"
@@ -217,13 +244,6 @@ class Send extends React.Component {
 		);
 	}
 
-	render() {
-		return (
-			this.renderSend()
-		);
-
-	}
-
 }
 
 Send.propTypes = {
@@ -240,6 +260,7 @@ Send.propTypes = {
 	setFormError: PropTypes.func.isRequired,
 	send: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
+	setFeeFormValue: PropTypes.func.isRequired,
 };
 
 Send.defaultProps = {
@@ -256,6 +277,7 @@ export default connect(
 		fee: state.form.getIn([FORM_SEND, 'fee']),
 		memo: state.form.getIn([FORM_SEND, 'memo']),
 		selectedBalance: state.form.getIn([FORM_SEND, 'selectedBalance']),
+		selectedFeeBalance: state.form.getIn([FORM_SEND, 'selectedFeeBalance']),
 		balances: state.balance.get('balances'),
 		assets: state.balance.get('assets'),
 		loading: state.global.get('loading'),
@@ -263,6 +285,7 @@ export default connect(
 	(dispatch) => ({
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SEND, field, value)),
 		setFormError: (field, value) => dispatch(setFormError(FORM_SEND, field, value)),
+		setFeeFormValue: () => dispatch(setFeeFormValue()),
 		send: (balance) => dispatch(send(balance)),
 		clearForm: () => dispatch(clearForm(FORM_SEND)),
 	}),

@@ -132,7 +132,7 @@ class BridgeInput extends React.Component {
 							<CurrencySelect
 								data={innerDropdown.dropdownData}
 								path={innerDropdown.path}
-								onSearch={(search) => this.props.onDropdownSearch(search)}
+								onSearch={(search, assetFee) => this.props.onDropdownSearch(search, assetFee)}
 							/>
 						)
 					}

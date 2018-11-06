@@ -1,19 +1,24 @@
 import BN from 'bignumber.js';
 
-import BalanceReducer from '../reducers/BalanceReducer';
+import { setFormError, setValue, setFormValue } from './FormActions';
+import { getTransactionFee } from './SignActions';
 
 import { fetchChain, lookupAccounts } from '../api/ChainApi';
+
 import { FORM_SEND } from '../constants/FormConstants';
-import { setFormError, setValue } from './FormActions';
-import ValidateSendHelper from '../helpers/ValidateSendHelper';
-import { getTransactionFee } from './SignActions';
 import { CORE_ID } from '../constants/GlobalConstants';
+import { ERROR_SEND_PATH, SUCCESS_SEND_PATH } from '../constants/RouterConstants';
+
 import echoService from '../services/echo';
 import { formatToSend } from '../services/operation';
+
 import FormatHelper from '../helpers/FormatHelper';
+import ValidateSendHelper from '../helpers/ValidateSendHelper';
+
+import BalanceReducer from '../reducers/BalanceReducer';
 import GlobalReducer from '../reducers/GlobalReducer';
+
 import history from '../history';
-import { ERROR_SEND_PATH, SUCCESS_SEND_PATH } from '../constants/RouterConstants';
 
 /**
  *  @method initAssetsBalances
@@ -122,19 +127,72 @@ export const checkAccount = (fromAccount, toAccount, limit = 50) => async (dispa
 	try {
 		if (fromAccount === toAccount) {
 			dispatch(setFormError(FORM_SEND, 'to', 'You can not send funds to yourself'));
-			return null;
+			return false;
 		}
 
 		const result = await lookupAccounts(toAccount, limit);
 
 		if (!result.find((i) => i[0] === toAccount)) {
 			dispatch(setFormError(FORM_SEND, 'to', 'Account is not found'));
+			return false;
 		}
-
-		return null;
 	} catch (err) {
-		return err;
+		dispatch(setValue(FORM_SEND, 'error', FormatHelper.formatError(err)));
+
+		history.push(ERROR_SEND_PATH);
+
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+
+		return false;
 	}
+
+	return true;
+};
+
+export const setFeeFormValue = () => async (dispatch, getState) => {
+	const form = getState().form.get(FORM_SEND);
+
+	const to = form.get('to');
+
+	const result = await lookupAccounts(to.value, 50);
+
+	if (!result.find((i) => i[0] === to.value)) {
+		return false;
+	}
+
+	const amount = Number(form.get('amount').value).toString();
+	const memo = form.get('memo');
+	const selectedBalance = getState().form.getIn([FORM_SEND, 'selectedBalance']);
+	const selectedFeeBalance = getState().form.getIn([FORM_SEND, 'selectedFeeBalance']);
+	const balances = getState().balance.get('balances');
+	const assets = getState().balance.get('assets');
+	const fromAccount = await fetchChain(getState().global.getIn(['account', 'name']));
+	const toAccount = await fetchChain(to.value);
+
+	const options = {
+		amount: {
+			amount,
+			asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
+		},
+		fee: {
+			amount: 0,
+			asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+		},
+		from: fromAccount,
+		to: toAccount,
+		memo: memo.value,
+		type: 'transfer',
+	};
+
+	if (!options.amount.asset || !options.fee.asset || !options.from) {
+		return false;
+	}
+
+	const resultFee = await getTransactionFee(options);
+
+	dispatch(setFormValue(FORM_SEND, 'fee', resultFee.amount / (10 ** options.fee.asset.get('precision'))));
+
+	return true;
 };
 
 export const send = () => async (dispatch, getState) => {
@@ -169,14 +227,20 @@ export const send = () => async (dispatch, getState) => {
 		return false;
 	}
 
-	const fromAccount = await fetchChain(getState().global.getIn(['account', 'name']));
-	const toAccount = await fetchChain(to.value);
+	const activeUserName = getState().global.getIn(['account', 'name']);
 
-	const checkAccountError = await dispatch(checkAccount(fromAccount, toAccount));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
-	if (checkAccountError) {
-		dispatch(setValue(FORM_SEND, 'error', FormatHelper.formatError(checkAccountError)));
+	const isAccount = await dispatch(checkAccount(activeUserName, to.value));
+
+	if (!isAccount) {
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+
+		return false;
 	}
+
+	const fromAccount = await fetchChain(activeUserName);
+	const toAccount = await fetchChain(to.value);
 
 	const options = {
 		amount: {
@@ -189,6 +253,7 @@ export const send = () => async (dispatch, getState) => {
 		},
 		from: fromAccount,
 		to: toAccount,
+		memo: memo.value,
 		type: 'transfer',
 	};
 
@@ -222,8 +287,6 @@ export const send = () => async (dispatch, getState) => {
 	}
 
 	try {
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
-
 		const transactionOptions = formatToSend('transfer', options);
 
 		const publicKey = fromAccount.getIn(['active', 'key_auths', '0', '0']);
