@@ -313,7 +313,7 @@ export const addNetwork = () => async (dispatch, getState) => {
 		if (nameError || addressError || registratorError) { return null; }
 
 		networks = networks.push(network);
-		await storage.set('custom_networks', networks.toJS());
+		await storage.set('custom_networks', networks.toJSON());
 		dispatch(set('networks', networks));
 
 		await dispatch(changeNetwork(network));
@@ -339,7 +339,7 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 	networks = networks.filter((i) => i.name !== network.name);
 
 	try {
-		await storage.set('custom_networks', networks);
+		await storage.set('custom_networks', networks.toJSON());
 
 		const currentNetworkName = getState().global.getIn(['network', 'name']);
 

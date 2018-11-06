@@ -17,6 +17,7 @@ import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
 import GlobalReducer from '../../reducers/GlobalReducer';
 
 import UserIcon from '../UserIcon';
+import { checkConnection } from '../../api/ChainApi';
 
 class NetworkDropdown extends React.PureComponent {
 
@@ -49,7 +50,7 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	onChangeNetwork(name) {
-		const { network, networks } = this.props;
+		const { network, networks, connected } = this.props;
 
 		if (!network) {
 			return false;
@@ -58,6 +59,9 @@ class NetworkDropdown extends React.PureComponent {
 		const currentNetworkName = network.get('name');
 
 		if (currentNetworkName === name) {
+			if (!connected) {
+				this.props.tryToConnect(network.get('url'));
+			}
 			this.closeDropDown();
 			return false;
 		}
@@ -74,19 +78,22 @@ class NetworkDropdown extends React.PureComponent {
 	onSwitchAccount(e, accountName, network) {
 		e.stopPropagation();
 		e.preventDefault();
-		const { network: activeNetwork } = this.props;
-
-		const { account } = this.props;
+		const { network: activeNetwork, account, connected } = this.props;
 
 		if (!account || !activeNetwork) {
 			return false;
 		}
 
 		if (activeNetwork.get('name') === network.name) {
+			if (!connected) {
+				this.props.tryToConnect(activeNetwork.get('url'));
+			}
+
 			if (account.get('name') === accountName) {
 				this.closeDropDown();
 				return null;
 			}
+
 			this.props.switchAccount(accountName);
 
 			this.closeDropDown();
@@ -272,6 +279,7 @@ NetworkDropdown.propTypes = {
 	setGlobalLoad: PropTypes.func.isRequired,
 	switchAccountNetwork: PropTypes.func.isRequired,
 	switchAccount: PropTypes.func.isRequired,
+	tryToConnect: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
 	connected: PropTypes.bool,
 };
@@ -295,6 +303,7 @@ export default withRouter(connect(
 		setGlobalLoad: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
 		switchAccountNetwork: (name, network) => dispatch(switchAccountNetwork(name, network)),
 		switchAccount: (name) => dispatch(switchAccount(name)),
+		tryToConnect: (url) => dispatch(checkConnection(url)),
 	}),
 )(NetworkDropdown));
 
