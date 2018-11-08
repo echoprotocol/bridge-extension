@@ -50,6 +50,7 @@
             // overflow: hidden;
             // text-overflow: ellipsis;
             // text-align: left;
+            color: #434c53;
         }
     }
 
@@ -128,6 +129,12 @@
                                 box-shadow: 0 0 6px rgba(0, 0, 0, 0.05);
                                 background: #fafbfc;
                                 color: #394248;
+                            }
+
+                            &:active {
+                                box-shadow: none;
+                                background-color: #e7e9ea;
+                                color: #b0b5b9;
                             }
                         }
                     }

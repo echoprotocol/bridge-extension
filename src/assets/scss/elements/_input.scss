@@ -120,7 +120,7 @@
 
     }
 
-    &.up {
+    &.up, &.filled {
         cursor: text;
 
         input {
@@ -290,7 +290,7 @@
 		font-size $speed,
 		color $speed;
         font-family: FNMedium;
-        letter-spacing: 0;
+        letter-spacing: 0.025em;
     }
 
     // BORDER
@@ -471,5 +471,5 @@
 }
 
 input[type="password" i] {
-    letter-spacing: -5px !important;
+    // letter-spacing: -5px !important;
 }

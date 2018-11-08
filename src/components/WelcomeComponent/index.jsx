@@ -28,7 +28,7 @@ class WelcomeComponent extends React.Component {
 					<div className="page">
 						<div className="hi-text">
 							<div>{name},</div>
-							<span>welcome to Bridge!</span>
+							<span>Welcome to Bridge!</span>
 						</div>
 						{
 							wif ?
