@@ -13,6 +13,7 @@
 }
 
 .input {
+    cursor: pointer;
     text-align: center;
     position: relative;
     height: 48px;
@@ -20,6 +21,8 @@
     align-items: flex-end;
     letter-spacing: 1px;
     margin-right: -1px;
+
+
     &.readOnly {
         pointer-events: none;
     }
@@ -118,6 +121,13 @@
 
     }
 
+    &.up {
+        cursor: text;
+
+        input {
+            cursor: text;
+        }
+    }
 
     &.error {
         input {
@@ -305,6 +315,7 @@
     }
 
     input {
+        cursor: pointer;
         @extend %input;
         height: 42px;
 
