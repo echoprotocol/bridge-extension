@@ -13,7 +13,6 @@
 }
 
 .input {
-    cursor: pointer;
     text-align: center;
     position: relative;
     height: 48px;
@@ -279,6 +278,7 @@
     }
 
     .label {
+        cursor: default;
         right: 0;
         left: 0;
         position: absolute;
