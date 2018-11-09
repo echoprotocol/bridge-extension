@@ -5,7 +5,7 @@ import history from '../history';
 import store from '../store';
 
 import { getOperationFee } from '../api/WalletApi';
-import { fetchChain, getChainSubcribe } from '../api/ChainApi';
+import { fetchChain, getChainSubcribe, lookupAccounts } from '../api/ChainApi';
 
 import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
@@ -27,7 +27,21 @@ const emitter = echoService.getEmitter();
 // TODO REMOVE!!!!
 // window.emitter = emitter;
 
-const validateTransaction = (options) => (dispatch, getState) => {
+const checkTransactionAccount = async (options) => {
+	try {
+		const toAccountResult = await lookupAccounts(options.to, 50);
+
+		if (!toAccountResult.find((i) => i[0] === options.to)) {
+			return 'Account \'to\' not found';
+		}
+	} catch (err) {
+		return FormatHelper.formatError(err);
+	}
+
+	return null;
+};
+
+const validateTransaction = (options) => async (dispatch, getState) => {
 	const error = validateOperation(options);
 
 	if (error) {
@@ -38,9 +52,35 @@ const validateTransaction = (options) => (dispatch, getState) => {
 	const accounts = getState().global.getIn(['accounts', networkName]);
 	const account = options[operationKeys[options.type]];
 
-	if (!accounts.find((a) => [a.id, a.name].includes(account))) {
+	const accountResult = accounts.find((a) => [a.id, a.name].includes(account));
+
+	if (!accountResult) {
 		return 'Account not found';
 	}
+
+	// const accountError = await checkTransactionAccount(options);
+	//
+	// if (accountError) {
+	// 	return accountError;
+	// }
+
+	// const balances = getState().balance.get('balances');
+	//
+	// const balance = balances.find((val) =>
+	// 	val.get('owner') === accountResult.id && val.get('asset_type') === options.amount.asset_id);
+	//
+	// if (!balance) {
+	// 	return 'Amount asset id not found';
+	// }
+	//
+	// if (options.amount.asset_id !== options.fee.asset_id) {
+	// 	const feeBalance = balances.find((val) =>
+	// 		val.get('owner') === accountResult.id && val.get('asset_type') === options.fee.asset_id);
+	//
+	// 	if (!feeBalance) {
+	// 		return 'Fee asset id not found';
+	// 	}
+	// }
 
 	return null;
 };
@@ -66,18 +106,41 @@ const getTransactionFee = async (options) => {
 	};
 };
 
+const getFetchedObjects = async (fetchList, id) => {
+	try {
+		return Promise.all(fetchList.map(async ([key, value]) => {
+			const result = await fetchChain(value);
+			return { [key]: result };
+		}));
+	} catch (err) {
+		const error = FormatHelper.formatError(err);
+		emitter.emit('response', error, id, ERROR_STATUS);
+
+		return null;
+	}
+};
+
 const setTransaction = ({ id, options }) => async (dispatch) => {
 	const transaction = JSON.parse(JSON.stringify(options));
 	transaction.fee = transaction.fee || { amount: 0, asset_id: CORE_ID };
 
 	const fetchList = Object.entries(getFetchMap(options.type, transaction));
 
-	let fetched = await Promise.all(fetchList.map(async ([key, value]) => {
-		const result = await fetchChain(value);
-		return { [key]: result };
-	}));
+	let fetched = await getFetchedObjects(fetchList, id);
+
+	if (!fetched) {
+		return;
+	}
 
 	fetched = fetched.reduce((obj, item) => ({ ...obj, ...item }), {});
+
+	const arrTemp = [];
+	Object.entries(fetched).forEach(([key, value]) => { if (!value) { arrTemp.push(key); } });
+
+	// if (arrTemp.length) {
+	// 	emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+	// 	return;
+	// }
 
 	Object.keys(transaction).forEach((key) => {
 		if (['amount', 'fee'].includes(key)) {
@@ -131,7 +194,7 @@ const requestHandler = async (id, options) => {
 		return;
 	}
 
-	const error = store.dispatch(validateTransaction(options));
+	const error = await store.dispatch(validateTransaction(options));
 	if (error) {
 		emitter.emit('response', error, id, ERROR_STATUS);
 		return;
@@ -163,8 +226,8 @@ window.onunload = () => {
 export const loadRequests = () => async (dispatch, getState) => {
 	const connected = getState().global.get('connected');
 
-	const transactions = echoService.getRequests().filter(({ id, options }) => {
-		const error = connected ? dispatch(validateTransaction(options)) : 'Network error';
+	const transactions = echoService.getRequests().filter(async ({ id, options }) => {
+		const error = connected ? await dispatch(validateTransaction(options)) : 'Network error';
 
 		if (error) {
 			emitter.emit('response', error, id, ERROR_STATUS);

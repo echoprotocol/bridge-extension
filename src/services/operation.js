@@ -82,7 +82,11 @@ export const formatToSend = (type, options) => {
 
 		switch (value.type) {
 			case 'account_id':
-				obj[key] = options[key].get('id');
+				if (typeof options[key].get === 'function') {
+					obj[key] = options[key].get('id');
+					break;
+				}
+				obj[key] = options[key];
 				break;
 			case 'asset_id':
 				obj[key] = options[key].get('id');
