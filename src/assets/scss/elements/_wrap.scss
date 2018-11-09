@@ -18,7 +18,10 @@
     }
     &.dark {
         // background-color: $colorBgDark;
-        background-color: #394247;
+        
+        // background-color: #394247;
+        
+        background-color: #324045; // Цвет брал так: загружал картинку через pixelperfect и брал с неё цвет
 
         input:-webkit-autofill,
         input:-webkit-autofill:hover, 

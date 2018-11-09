@@ -8,7 +8,7 @@ import BridgeInput from '../../components/BridgeInput';
 
 import { FORM_CREATE_PIN } from '../../constants/FormConstants';
 import { MIN_PIN_LENGTH } from '../../constants/ValidationConstants';
-import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants';
+import { KEY_CODE_ENTER } from '../../constants/GlobalConstants';
 
 import { unlockCrypto } from '../../actions/CryptoActions';
 import { setValue, clearForm } from '../../actions/FormActions';
@@ -70,7 +70,8 @@ class CreatePin extends React.Component {
 
 		const { keyCode } = e;
 
-		if ([KEY_CODE_ENTER, KEY_CODE_SPACE].includes(keyCode)) {
+
+		if ([KEY_CODE_ENTER].includes(keyCode)) {
 			e.preventDefault();
 			this.onSubmit(pin);
 		}

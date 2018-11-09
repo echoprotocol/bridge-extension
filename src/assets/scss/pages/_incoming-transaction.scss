@@ -93,10 +93,16 @@
             margin-top: 11px;
             font-size: 17px;
             color: #97ACAD;
+            transition: color $speed, opacity $speed;
             &:hover,
             &:focus {
-                color: #fff;
-            } 
+                color: #bbd1d2;
+            }
+
+            &:active {
+                color: #bad0d1;
+                opacity: 0.5;
+            }
         }
     }
     

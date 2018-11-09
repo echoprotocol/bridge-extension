@@ -23,7 +23,25 @@
 
 
     &.readOnly {
-        pointer-events: none;
+        // pointer-events: none;
+
+        &:hover {
+            &:after {
+                background-color: #c8cfd2 !important;
+            }
+        }
+
+        &.up {
+            &:before {
+                background-color: transparent !important;
+            }
+            &:after {
+                background-color: #c8cfd2 !important;
+            }
+        }
+        label {
+            cursor: text;
+        }
     }
 
     &.with-image {

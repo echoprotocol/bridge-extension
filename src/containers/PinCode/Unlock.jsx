@@ -9,7 +9,7 @@ import BridgeInput from '../../components/BridgeInput';
 
 import { FORM_UNLOCK } from '../../constants/FormConstants';
 import { WIPE_PIN_PATH } from '../../constants/RouterConstants';
-import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants';
+import { KEY_CODE_ENTER } from '../../constants/GlobalConstants';
 
 import { unlockCrypto } from '../../actions/CryptoActions';
 import { setValue, clearForm } from '../../actions/FormActions';
@@ -54,7 +54,7 @@ class Unlock extends React.Component {
 
 		const { keyCode } = e;
 
-		if ([KEY_CODE_ENTER, KEY_CODE_SPACE].includes(keyCode)) {
+		if ([KEY_CODE_ENTER].includes(keyCode)) {
 			e.preventDefault();
 			this.onSubmit(pin);
 		}
