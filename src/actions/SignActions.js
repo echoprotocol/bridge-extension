@@ -11,6 +11,8 @@ import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
 
 import FormatHelper from '../helpers/FormatHelper';
+import ValidateTransactionHelper from '../helpers/ValidateTransactionHelper';
+
 import { INDEX_PATH, NOT_RETURNED_PATHS } from '../constants/RouterConstants';
 import {
 	APPROVED_STATUS,
@@ -18,7 +20,7 @@ import {
 	ERROR_STATUS,
 	CORE_ID,
 } from '../constants/GlobalConstants';
-import { operationKeys } from '../constants/OperationConstants';
+import { operationFields, operationKeys, operationTypes } from '../constants/OperationConstants';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -27,11 +29,11 @@ const emitter = echoService.getEmitter();
 // TODO REMOVE!!!!
 // window.emitter = emitter;
 
-const checkTransactionAccount = async (options) => {
+const checkTransactionAccount = async (toAccount) => {
 	try {
-		const toAccountResult = await lookupAccounts(options.to, 50);
+		const toAccountResult = await lookupAccounts(toAccount, 50);
 
-		if (!toAccountResult.find((i) => i[0] === options.to)) {
+		if (!toAccountResult.find((i) => i[0] === toAccount)) {
 			return 'Account \'to\' not found';
 		}
 	} catch (err) {
@@ -58,29 +60,100 @@ const validateTransaction = (options) => async (dispatch, getState) => {
 		return 'Account not found';
 	}
 
-	// const accountError = await checkTransactionAccount(options);
+	// if (options.value) {
 	//
-	// if (accountError) {
-	// 	return accountError;
 	// }
 
-	// const balances = getState().balance.get('balances');
-	//
-	// const balance = balances.find((val) =>
-	// 	val.get('owner') === accountResult.id && val.get('asset_type') === options.amount.asset_id);
-	//
-	// if (!balance) {
-	// 	return 'Amount asset id not found';
-	// }
-	//
-	// if (options.amount.asset_id !== options.fee.asset_id) {
-	// 	const feeBalance = balances.find((val) =>
-	// 		val.get('owner') === accountResult.id && val.get('asset_type') === options.fee.asset_id);
-	//
-	// 	if (!feeBalance) {
-	// 		return 'Fee asset id not found';
-	// 	}
-	// }
+	if (options.to) {
+		const accountError = await checkTransactionAccount(options.to);
+
+		if (accountError) {
+			return accountError;
+		}
+	}
+
+	if (options.receiver) {
+		const contractIdError = ValidateTransactionHelper.validateContractId(options.receiver);
+
+		if (contractIdError) {
+			return contractIdError;
+		}
+	}
+
+	const balances = getState().balance.get('balances');
+
+	let valueAssetId = '';
+	if (options.type === operationTypes.contract.name.toLowerCase()) {
+		valueAssetId = options.asset_id;
+	} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
+		valueAssetId = options.amount.asset_id;
+	}
+
+	if (valueAssetId) {
+		const balance = balances.find((val) =>
+			val.get('owner') === accountResult.id && val.get('asset_type') === valueAssetId);
+
+		if (!balance) {
+			return 'Amount asset id not found';
+		}
+	}
+
+	if (operationFields[options.type].fee.required || options.fee) {
+		if (valueAssetId !== options.fee.asset_id) {
+			const feeBalance = balances.find((val) =>
+				val.get('owner') === accountResult.id && val.get('asset_type') === options.fee.asset_id);
+
+			if (!feeBalance) {
+				return 'Fee asset id not found';
+			}
+		}
+	}
+
+	if (options.code) {
+		const codeError = ValidateTransactionHelper.validateCode(options.code);
+
+		if (codeError) {
+			return codeError;
+		}
+	}
+
+	return null;
+};
+
+const checkTransactionFee = (options, transaction) => (dispatch, getState) => {
+	let valueAssetId = '';
+
+	if (options.type === operationTypes.contract.name.toLowerCase()) {
+		valueAssetId = transaction.asset_id;
+	} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
+		valueAssetId = transaction.amount.asset;
+	}
+
+	if (!valueAssetId) {
+		return null;
+	}
+
+	const balances = getState().balance.get('balances');
+	const accountId = getState().global.getIn(['account', 'id']);
+
+	if (!accountId) {
+		return 'Account not available';
+	}
+
+	const balance = balances
+		.find((val) => val.get('owner') === accountId && val.get('asset_type') === transaction.fee.asset.get('id'))
+		.get('balance');
+
+	if (valueAssetId.get('id') === transaction.fee.asset.get('id')) {
+		const total = new BN(options.value).times(10 ** valueAssetId.get('precision')).plus(transaction.fee.amount);
+
+		if (total.gt(balance)) {
+			return 'Insufficient funds for fee';
+		}
+	} else if (new BN(transaction.fee.amount).gt(balance)) {
+		return 'Insufficient funds for fee';
+
+	}
 
 	return null;
 };
@@ -137,10 +210,10 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 	const arrTemp = [];
 	Object.entries(fetched).forEach(([key, value]) => { if (!value) { arrTemp.push(key); } });
 
-	// if (arrTemp.length) {
-	// 	emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
-	// 	return;
-	// }
+	if (arrTemp.length) {
+		emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+		return;
+	}
 
 	Object.keys(transaction).forEach((key) => {
 		if (['amount', 'fee'].includes(key)) {
@@ -155,6 +228,13 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 	});
 
 	transaction.fee = await getTransactionFee(transaction);
+
+	const errorFee = dispatch(checkTransactionFee(options, transaction));
+
+	if (errorFee) {
+		emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+		return;
+	}
 
 	dispatch(GlobalReducer.actions.setIn({
 		field: 'sign',

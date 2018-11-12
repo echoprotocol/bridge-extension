@@ -1,16 +1,6 @@
 import BN from 'bignumber.js';
-import echoService from '../services/echo';
 
 class ValidateTransactionHelper {
-
-	static validateAddress(value) {
-		const { ChainValidation } = echoService.getChainLib();
-		return ChainValidation.is_object_id(value) ? null : 'value should be in object id format';
-	}
-
-	static validateAssetId() {
-
-	}
 
 	static validateContractId(id) {
 		id = id.split('.');
@@ -22,15 +12,15 @@ class ValidateTransactionHelper {
 
 	static validateCode(code) {
 		if (!code) {
-			return 'field should be not empty';
+			return 'Field should be not empty';
 		}
 
 		if (!/^[0-9a-fA-F]+$/.test(code)) {
-			return 'field should be hex string';
+			return 'Field should be hex string';
 		}
 
 		if (code.length % 2 !== 0) {
-			return 'code should include an even count of symbol';
+			return 'Code should include an even count of symbol';
 		}
 
 		return null;
@@ -52,6 +42,38 @@ class ValidateTransactionHelper {
 
 		return null;
 	}
+
+	static validateAmount(value, asset) {
+		const result = { value: null, error: '' };
+
+		if (!value.match(/^[0-9]*[.,]?[0-9]*$/)) {
+			result.error = 'Amount must contain only digits and dot';
+			return result;
+		}
+
+		if (/\.|,/.test(value)) {
+			const [intPath, doublePath] = value.split(/\.|,/);
+
+			if (doublePath.toString().length === asset.precision && !Math.floor(value.replace(',', '.') * (10 ** asset.precision))) {
+				result.error = `Amount should be more than 0 (${asset.symbol} precision is ${asset.precision} symbols)`;
+
+				return result;
+			}
+
+			if (doublePath.toString().length > asset.precision) {
+				result.error = `${asset.symbol} precision is ${asset.precision}`;
+
+				return result;
+			}
+
+			result.value = `${intPath ? Number(intPath) : ''}.${doublePath || ''}`;
+		}
+		result.value = value ? Number(value).toString() : value;
+
+
+		return result;
+	}
+
 
 }
 
