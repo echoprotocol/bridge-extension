@@ -2,7 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Dropdown } from 'react-bootstrap';
 import CustomScroll from 'react-custom-scroll';
-import { KEY_CODE_TAB, KEY_CODE_SPACE, KEY_CODE_ENTER } from '../../constants/GlobalConstants';
+import { KEY_CODE_SPACE, KEY_CODE_ENTER, KEY_CODE_TAB } from '../../constants/GlobalConstants';
 
 import CustomMenu from './CustomMenu';
 
@@ -19,14 +19,17 @@ class CurrencySelect extends React.Component {
 		this.setMenuRef = this.setMenuRef.bind(this);
 
 		this.handleClickOutside = this.handleClickOutside.bind(this);
+		this.tabListener = this.tabListener.bind(this);
 	}
 
 	componentDidMount() {
 		document.addEventListener('mousedown', this.handleClickOutside);
+		document.addEventListener('keyup', this.tabListener);
 	}
 
 	componentWillUnmount() {
 		document.removeEventListener('mousedown', this.handleClickOutside);
+		document.removeEventListener('keyup', this.tabListener);
 	}
 
 	onItemKeyPress(e, text) {
@@ -42,12 +45,24 @@ class CurrencySelect extends React.Component {
 		this.menuRef = node;
 	}
 
+	// Обработчик закрытия дропдауна с помощьб табуляции
+
+	tabListener(e) {
+		const code = e.keyCode || e.which;
+
+		if ([KEY_CODE_TAB].includes(code)) {
+			e.preventDefault();
+
+			if ((document.activeElement !== (this.searchInput)) && (document.activeElement.className !== 'dropdown-list-item')) {
+				this.setState({ opened: false });
+			}
+		}
+	}
 
 	handleClick(text) {
 		this.setState({ currentVal: text });
 		this.setState({ opened: false });
 	}
-
 
 	handleClickOutside(event) {
 		if (this.menuRef && (!this.menuRef.contains(event.target))) {
@@ -70,10 +85,9 @@ class CurrencySelect extends React.Component {
 					id="currency-select"
 					className="currency-select"
 					pullRight
-					// onToggle={() => this.toggleDropdown()}
 					onToggle={() => true} // TAB close fix
 					open={this.state.opened}
-					onKeyPress={() => { console.log('key press'); }}
+					onKeyUp={(e) => { this.tabListener(e); }}
 				>
 					<Dropdown.Toggle
 						onClick={() => this.toggleDropdown()}
@@ -119,6 +133,7 @@ class CurrencySelect extends React.Component {
 																<li key={Math.random()}>
 																	<a
 																		href=""
+																		className="dropdown-list-item"
 																		tabIndex={0}
 																		onClick={(e) => { this.handleClick(text); e.preventDefault(); }}
 																		onKeyPress={
