@@ -60,10 +60,6 @@ const validateTransaction = (options) => async (dispatch, getState) => {
 		return 'Account not found';
 	}
 
-	// if (options.value) {
-	//
-	// }
-
 	if (options.to) {
 		const accountError = await checkTransactionAccount(options.to);
 
@@ -106,6 +102,16 @@ const validateTransaction = (options) => async (dispatch, getState) => {
 			if (!feeBalance) {
 				return 'Fee asset id not found';
 			}
+		}
+	}
+
+	const amountValue = options.value || options.amount.amount;
+
+	if (amountValue) {
+		const amountError = ValidateTransactionHelper.validateAmount(amountValue);
+
+		if (amountError) {
+			return amountError;
 		}
 	}
 
@@ -226,6 +232,12 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 			transaction[key] = fetched[key];
 		}
 	});
+
+	if (transaction.amount) {
+		transaction.amount.amount = parseInt(transaction.amount.amount, 10);
+	} else if (transaction.value) {
+		transaction.value = parseInt(transaction.value, 10);
+	}
 
 	transaction.fee = await getTransactionFee(transaction);
 

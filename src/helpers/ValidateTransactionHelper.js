@@ -43,35 +43,16 @@ class ValidateTransactionHelper {
 		return null;
 	}
 
-	static validateAmount(value, asset) {
-		const result = { value: null, error: '' };
-
+	static validateAmount(value) {
 		if (!value.match(/^[0-9]*[.,]?[0-9]*$/)) {
-			result.error = 'Amount must contain only digits and dot';
-			return result;
+			return 'Amount must contain only digits and dot';
 		}
 
-		if (/\.|,/.test(value)) {
-			const [intPath, doublePath] = value.split(/\.|,/);
-
-			if (doublePath.toString().length === asset.precision && !Math.floor(value.replace(',', '.') * (10 ** asset.precision))) {
-				result.error = `Amount should be more than 0 (${asset.symbol} precision is ${asset.precision} symbols)`;
-
-				return result;
-			}
-
-			if (doublePath.toString().length > asset.precision) {
-				result.error = `${asset.symbol} precision is ${asset.precision}`;
-
-				return result;
-			}
-
-			result.value = `${intPath ? Number(intPath) : ''}.${doublePath || ''}`;
+		if (!Number.isInteger(parseFloat(value))) {
+			return 'Amount must be integer';
 		}
-		result.value = value ? Number(value).toString() : value;
 
-
-		return result;
+		return null;
 	}
 
 

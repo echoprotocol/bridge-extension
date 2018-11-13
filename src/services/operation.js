@@ -14,7 +14,16 @@ export const validateOperation = (options) => {
 	}
 
 	const notDefind = Object.entries(operation)
-		.find(([key, value]) => (!options[key] && value.required));
+		.find(([key, value]) => {
+			if (!options[key] && value.required) {
+				return true;
+			}
+
+			if (options[key] && value.hasProperties) {
+				return value.hasProperties.find((propKey) => (!options[key][propKey] && value.required));
+			}
+			return false;
+		});
 
 	if (notDefind) {
 		return `Field "${notDefind[0]}" is required`;
