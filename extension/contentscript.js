@@ -43,7 +43,15 @@ const onMessage = (event) => {
 	const { data } = event;
 	if (data.target !== 'content' || !data.appId || data.appId !== APP_ID) return;
 
-	extensionizer.runtime.sendMessage(data, (res) => onResponse(res, event.origin));
+	try {
+		extensionizer.runtime.sendMessage(data, (res) => onResponse(res, event.origin));
+	} catch (err) {
+		if (err.message.match(/Invocation of form runtime\.connect/) && err.message.match(/doesn't match definition runtime\.connect/)) {
+			console.error('Connection to background error, please refresh the page', err);
+		} else {
+			console.error('Unexpected error occurred', err);
+		}
+	}
 };
 
 window.addEventListener('message', onMessage, false);
