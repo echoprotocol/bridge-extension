@@ -2,6 +2,13 @@ import FormatHelper from '../helpers/FormatHelper';
 
 import { operationFields } from '../constants/OperationConstants';
 
+/**
+ *  @method validateOperation
+ *
+ *  Validate operation type and field full
+ *
+ *  @param {Object} options
+ */
 export const validateOperation = (options) => {
 	if (!options.type) {
 		return 'Operation type is required';
@@ -13,7 +20,7 @@ export const validateOperation = (options) => {
 		return 'Operation not found';
 	}
 
-	const notDefind = Object.entries(operation)
+	const notDefined = Object.entries(operation)
 		.find(([key, value]) => {
 			if (!options[key] && value.required) {
 				return true;
@@ -25,13 +32,21 @@ export const validateOperation = (options) => {
 			return false;
 		});
 
-	if (notDefind) {
-		return `Field "${notDefind[0]}" is required`;
+	if (notDefined) {
+		return `Field "${notDefined[0]}" is required`;
 	}
 
 	return null;
 };
 
+/**
+ *  @method getFetchMap
+ *
+ *  Get map for fetch objects
+ *
+ *  @param {String} type
+ *  @param {Object} options
+ */
 export const getFetchMap = (type, options) => {
 	const operation = operationFields[type];
 
@@ -50,6 +65,14 @@ export const getFetchMap = (type, options) => {
 	}, {});
 };
 
+/**
+ *  @method formatToShow
+ *
+ *  Formatting data to display in the extension
+ *
+ *  @param {String} type
+ *  @param {Object} options
+ */
 export const formatToShow = (type, options) => {
 	const operation = operationFields[type];
 
@@ -80,6 +103,14 @@ export const formatToShow = (type, options) => {
 	}, { ...options });
 };
 
+/**
+ *  @method formatToSend
+ *
+ *  Formatting data for broadcast
+ *
+ *  @param {String} type
+ *  @param {Object} options
+ */
 export const formatToSend = (type, options) => {
 	const operation = operationFields[type];
 

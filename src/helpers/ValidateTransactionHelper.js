@@ -52,9 +52,23 @@ class ValidateTransactionHelper {
 			return 'Amount must be integer';
 		}
 
+		if (Number.MAX_SAFE_INTEGER < value) {
+			return 'Amount overflow';
+		}
+
 		return null;
 	}
 
+	static validateAssetId(assetId, balances, account) {
+		const balance = balances.find((val) =>
+			val.get('owner') === account.id && val.get('asset_type') === assetId);
+
+		if (!balance) {
+			return true;
+		}
+
+		return null;
+	}
 
 }
 

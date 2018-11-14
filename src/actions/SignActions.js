@@ -19,19 +19,24 @@ import {
 	CANCELED_STATUS,
 	ERROR_STATUS,
 	CORE_ID,
+	ACCOUNTS_LOOKUP_LIMIT,
 } from '../constants/GlobalConstants';
-import { operationFields, operationKeys, operationTypes } from '../constants/OperationConstants';
+import { operationKeys, operationTypes } from '../constants/OperationConstants';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
 const emitter = echoService.getEmitter();
 
-// TODO REMOVE!!!!
-// window.emitter = emitter;
-
+/**
+ *  @method checkTransactionAccount
+ *
+ * 	Is account-receiver exists
+ *
+ * 	@param {String} toAccount
+ */
 const checkTransactionAccount = async (toAccount) => {
 	try {
-		const toAccountResult = await lookupAccounts(toAccount, 50);
+		const toAccountResult = await lookupAccounts(toAccount, ACCOUNTS_LOOKUP_LIMIT);
 
 		if (!toAccountResult.find((i) => i[0] === toAccount)) {
 			return 'Account \'to\' not found';
@@ -43,23 +48,20 @@ const checkTransactionAccount = async (toAccount) => {
 	return null;
 };
 
-const validateTransaction = (options) => async (dispatch, getState) => {
-	const error = validateOperation(options);
-
-	if (error) {
-		return error;
-	}
-
-	const networkName = getState().global.getIn(['network', 'name']);
-	const accounts = getState().global.getIn(['accounts', networkName]);
-	const account = options[operationKeys[options.type]];
-
-	const accountResult = accounts.find((a) => [a.id, a.name].includes(account));
-
-	if (!accountResult) {
-		return 'Account not found';
-	}
-
+/**
+ *  @method validateTransfer
+ *
+ * 	Validate transfer operation fields
+ *
+ * 	@param {Object} options
+ * 	@param {Object} options.amount - Amount and asset id
+ * 	@param {Object} options.fee - Amount and asset id
+ * 	@param {String} options.from
+ * 	@param {String} options.to
+ * 	@param {String} options.type
+ * 	@param {Object} account
+ */
+const validateTransfer = (options, account) => async (dispatch, getState) => {
 	if (options.to) {
 		const accountError = await checkTransactionAccount(options.to);
 
@@ -68,6 +70,59 @@ const validateTransaction = (options) => async (dispatch, getState) => {
 		}
 	}
 
+	const balances = getState().balance.get('balances');
+
+	const amountIdError = ValidateTransactionHelper.validateAssetId(
+		options.amount.asset_id,
+		balances,
+		account,
+	);
+
+	if (amountIdError) {
+		return 'Amount asset id not found';
+	}
+
+	if (options.fee) {
+		if (options.amount.asset_id !== options.fee.asset_id) {
+			const feeIdError = ValidateTransactionHelper.validateAssetId(
+				options.fee.asset_id,
+				balances,
+				account,
+			);
+
+			if (feeIdError) {
+				return 'Fee asset id not found';
+			}
+		}
+	}
+
+	if (options.amount.amount) {
+		const amountError = ValidateTransactionHelper.validateAmount(options.amount.amount);
+
+		if (amountError) {
+			return amountError;
+		}
+	}
+
+	return null;
+};
+
+/**
+ *  @method validateContract
+ *
+ * 	Validate contract operation fields
+ *
+ * 	@param {Object} options
+ * 	@param {String} options.asset_id
+ * 	@param {String} options.code
+ * 	@param {Object} options.fee - Fee and asset id
+ * 	@param {String} options.receiver
+ * 	@param {String} options.registrar
+ * 	@param {String} options.type
+ * 	@param {String} options.value
+ * 	@param {Object} account
+ */
+const validateContract = (options, account) => (dispatch, getState) => {
 	if (options.receiver) {
 		const contractIdError = ValidateTransactionHelper.validateContractId(options.receiver);
 
@@ -78,37 +133,34 @@ const validateTransaction = (options) => async (dispatch, getState) => {
 
 	const balances = getState().balance.get('balances');
 
-	let valueAssetId = '';
-	if (options.type === operationTypes.contract.name.toLowerCase()) {
-		valueAssetId = options.asset_id;
-	} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
-		valueAssetId = options.amount.asset_id;
-	}
+	if (options.asset_id) {
+		const amountIdError = ValidateTransactionHelper.validateAssetId(
+			options.asset_id,
+			balances,
+			account,
+		);
 
-	if (valueAssetId) {
-		const balance = balances.find((val) =>
-			val.get('owner') === accountResult.id && val.get('asset_type') === valueAssetId);
-
-		if (!balance) {
+		if (amountIdError) {
 			return 'Amount asset id not found';
 		}
 	}
 
-	if (operationFields[options.type].fee.required || options.fee) {
-		if (valueAssetId !== options.fee.asset_id) {
-			const feeBalance = balances.find((val) =>
-				val.get('owner') === accountResult.id && val.get('asset_type') === options.fee.asset_id);
+	if (options.fee) {
+		if (options.asset_id !== options.fee.asset_id) {
+			const feeIdError = ValidateTransactionHelper.validateAssetId(
+				options.fee.asset_id,
+				balances,
+				account,
+			);
 
-			if (!feeBalance) {
+			if (feeIdError) {
 				return 'Fee asset id not found';
 			}
 		}
 	}
 
-	const amountValue = options.value || options.amount.amount;
-
-	if (amountValue) {
-		const amountError = ValidateTransactionHelper.validateAmount(amountValue);
+	if (options.value) {
+		const amountError = ValidateTransactionHelper.validateAmount(options.value);
 
 		if (amountError) {
 			return amountError;
@@ -126,6 +178,52 @@ const validateTransaction = (options) => async (dispatch, getState) => {
 	return null;
 };
 
+/**
+ *  @method validateTransaction
+ *
+ * 	Validate transaction operation
+ *
+ * 	@param {Object} options
+ */
+const validateTransaction = (options) => async (dispatch, getState) => {
+	let error = validateOperation(options);
+
+	if (error) {
+		return error;
+	}
+
+	const networkName = getState().global.getIn(['network', 'name']);
+	const accounts = getState().global.getIn(['accounts', networkName]);
+	const account = options[operationKeys[options.type]];
+
+	const accountResult = accounts.find((a) => [a.id, a.name].includes(account));
+
+	if (!accountResult) {
+		return 'Account not found';
+	}
+
+	switch (options.type) {
+		case operationTypes.transfer.name.toLowerCase():
+			error = await dispatch(validateTransfer(options, accountResult));
+			break;
+		case operationTypes.contract.name.toLowerCase():
+			error = dispatch(validateContract(options, accountResult));
+			break;
+		default:
+			return 'Operation type not found';
+	}
+
+	return error;
+};
+
+/**
+ *  @method checkTransactionFee
+ *
+ * 	Validate operation fee
+ *
+ * 	@param {Object} options
+ * 	@param {Object} transaction
+ */
 const checkTransactionFee = (options, transaction) => (dispatch, getState) => {
 	let valueAssetId = '';
 
@@ -164,6 +262,13 @@ const checkTransactionFee = (options, transaction) => (dispatch, getState) => {
 	return null;
 };
 
+/**
+ *  @method getTransactionFee
+ *
+ * 	Get operation fee
+ *
+ * 	@param {Object} options
+ */
 const getTransactionFee = async (options) => {
 	const { fee } = options;
 	let amount = await getOperationFee(options.type, formatToSend(options.type, options));
@@ -185,6 +290,14 @@ const getTransactionFee = async (options) => {
 	};
 };
 
+/**
+ *  @method getFetchedObjects
+ *
+ * 	Get fetched objects
+ *
+ * 	@param {Array} fetchList
+ * 	@param {String} id
+ */
 const getFetchedObjects = async (fetchList, id) => {
 	try {
 		return Promise.all(fetchList.map(async ([key, value]) => {
@@ -199,6 +312,14 @@ const getFetchedObjects = async (fetchList, id) => {
 	}
 };
 
+/**
+ *  @method setTransaction
+ *
+ * 	Set transaction data to redux store
+ *
+ * 	@param {String} id
+ * 	@param {Object} options
+ */
 const setTransaction = ({ id, options }) => async (dispatch) => {
 	const transaction = JSON.parse(JSON.stringify(options));
 	transaction.fee = transaction.fee || { amount: 0, asset_id: CORE_ID };
@@ -208,7 +329,7 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 	let fetched = await getFetchedObjects(fetchList, id);
 
 	if (!fetched) {
-		return;
+		return null;
 	}
 
 	fetched = fetched.reduce((obj, item) => ({ ...obj, ...item }), {});
@@ -218,19 +339,21 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 
 	if (arrTemp.length) {
 		emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
-		return;
+		return null;
 	}
 
 	Object.keys(transaction).forEach((key) => {
 		if (['amount', 'fee'].includes(key)) {
 			transaction[key].asset = fetched[key];
 			delete transaction[key].asset_id;
-			return;
+			return null;
 		}
 
 		if (fetched[key]) {
 			transaction[key] = fetched[key];
 		}
+
+		return null;
 	});
 
 	if (transaction.amount) {
@@ -245,7 +368,7 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 
 	if (errorFee) {
 		emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
-		return;
+		return null;
 	}
 
 	dispatch(GlobalReducer.actions.setIn({
@@ -253,8 +376,16 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 		params: { current: new Map({ id, options: transaction }) },
 	}));
 
+	return null;
 };
 
+/**
+ *  @method removeTransaction
+ *
+ * 	Remove transaction data from redux store
+ *
+ * 	@param {String} id
+ */
 const removeTransaction = (id) => (dispatch, getState) => {
 	const sign = getState().global.get('sign');
 	const transactions = sign.get('transactions').filter((tr) => tr.id !== id);
@@ -271,25 +402,33 @@ const removeTransaction = (id) => (dispatch, getState) => {
 	}
 };
 
+/**
+ *  @method requestHandler
+ *
+ * 	Incoming transaction requests handling
+ *
+ * 	@param {String} id
+ * 	@param {Object} options
+ */
 const requestHandler = async (id, options) => {
 	const isLocked = store.getState().global.getIn(['crypto', 'isLocked']);
 
 	if (isLocked) {
 		emitter.emit('response', 'Unlock required', id, ERROR_STATUS);
-		return;
+		return null;
 	}
 
 	const connected = store.getState().global.get('connected');
 
 	if (!connected) {
 		emitter.emit('response', 'Network error', id, ERROR_STATUS);
-		return;
+		return null;
 	}
 
 	const error = await store.dispatch(validateTransaction(options));
 	if (error) {
 		emitter.emit('response', error, id, ERROR_STATUS);
-		return;
+		return null;
 	}
 
 	const transactions = store.getState().global.getIn(['sign', 'transactions']);
@@ -302,6 +441,8 @@ const requestHandler = async (id, options) => {
 		field: 'sign',
 		params: { transactions: transactions.push({ id, options }) },
 	}));
+
+	return null;
 };
 
 emitter.on('request', requestHandler);
@@ -315,6 +456,11 @@ window.onunload = () => {
 	emitter.removeListener('request', requestHandler);
 };
 
+/**
+ *  @method loadRequests
+ *
+ * 	Load transactions data from query to redux store
+ */
 export const loadRequests = () => async (dispatch, getState) => {
 	const connected = getState().global.get('connected');
 
@@ -328,7 +474,7 @@ export const loadRequests = () => async (dispatch, getState) => {
 		return !error;
 	});
 
-	if (!transactions.length) { return; }
+	if (!transactions.length) { return null; }
 
 	const { pathname } = history.location;
 
@@ -341,9 +487,17 @@ export const loadRequests = () => async (dispatch, getState) => {
 	}));
 
 	await dispatch(setTransaction(transactions[0]));
+
+	return null;
 };
 
-
+/**
+ *  @method approveTransaction
+ *
+ * 	Approve transaction
+ *
+ * 	@param {Object} transaction
+ */
 export const approveTransaction = (transaction) => async (dispatch, getState) => {
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
@@ -388,12 +542,26 @@ export const approveTransaction = (transaction) => async (dispatch, getState) =>
 	}
 };
 
+/**
+ *  @method cancelTransaction
+ *
+ * 	Cancel transaction
+ *
+ * 	@param {String} id
+ */
 export const cancelTransaction = (id) => (dispatch) => {
 	emitter.emit('response', null, id, CANCELED_STATUS);
 
 	dispatch(removeTransaction(id));
 };
 
+/**
+ *  @method switchTransactionAccount
+ *
+ * 	Switch account when extension waits for decision-making
+ *
+ * 	@param {String} name
+ */
 export const switchTransactionAccount = (name) => async (dispatch, getState) => {
 	const account = await fetchChain(name);
 	const transaction = getState().global.getIn(['sign', 'current']);
