@@ -26,7 +26,7 @@ import {
 import {
 	CREATE_ACCOUNT_PATH,
 	SUCCESS_ADD_NETWORK_PATH,
-	INDEX_PATH,
+	INDEX_PATH, WALLET_PATH,
 } from '../constants/RouterConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
@@ -203,6 +203,8 @@ export const switchAccount = (name) => async (dispatch, getState) => {
 		dispatch(set('accounts', accounts));
 
 		dispatch(initAccount(accounts.get(networkName).find((i) => i.active)));
+
+		history.push(WALLET_PATH);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
