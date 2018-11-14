@@ -166,20 +166,20 @@ const privateAES = new AesStorage();
 class Crypto extends EventEmitter {
 
 	/**
-     *  @method startLoading
+     *  @method pauseLockTimeout
      *
      *  Pause lock timeout when you need to perform an operation
      */
-	startLoading() {
+	pauseLockTimeout() {
 		privateAES.pauseTimeout();
 	}
 
 	/**
-     *  @method endLoading
+     *  @method resumeLockTimeout
      *
      *  Resume lock timeout
      */
-	endLoading() {
+	resumeLockTimeout() {
 		privateAES.resumeTimeout();
 	}
 
