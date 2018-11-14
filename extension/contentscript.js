@@ -47,7 +47,7 @@ const onMessage = (event) => {
 		extensionizer.runtime.sendMessage(data, (res) => onResponse(res, event.origin));
 	} catch (err) {
 		if (err.message.match(/Invocation of form runtime\.connect/) && err.message.match(/doesn't match definition runtime\.connect/)) {
-			console.error('Connection to background error, please refresh the page', err);
+			console.error('Connection to background error, please reload the page', err);
 		} else {
 			console.error('Unexpected error occurred', err);
 		}
