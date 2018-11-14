@@ -6,7 +6,7 @@ import { getTransactionFee } from './SignActions';
 import { fetchChain, lookupAccounts } from '../api/ChainApi';
 
 import { FORM_SEND } from '../constants/FormConstants';
-import { CORE_ID } from '../constants/GlobalConstants';
+import { BROADCAST_TIMEOUT, CORE_ID } from '../constants/GlobalConstants';
 import { ERROR_SEND_PATH, SUCCESS_SEND_PATH } from '../constants/RouterConstants';
 
 import echoService from '../services/echo';
@@ -195,6 +195,40 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 	return true;
 };
 
+const broadcastTransaction = (
+	options,
+	fromAccount,
+	toAccount,
+	memo,
+) => async (dispatch, getState) => {
+	const transactionOptions = formatToSend('transfer', options);
+
+	const publicKey = fromAccount.getIn(['active', 'key_auths', '0', '0']);
+
+	const networkName = getState().global.getIn(['network', 'name']);
+
+	const { TransactionBuilder } = await echoService.getChainLib();
+	let tr = new TransactionBuilder();
+	tr = await echoService.getCrypto().sign(networkName, tr, publicKey);
+
+	if (memo.value) {
+
+		transactionOptions.memo = await echoService.getCrypto().encryptMemo(
+			networkName,
+			fromAccount.getIn(['options', 'memo_key']),
+			toAccount.getIn(['options', 'memo_key']),
+			memo.value,
+		);
+	}
+
+	transactionOptions.amount.amount *= (10 ** options.amount.asset.get('precision'));
+
+	tr.add_type_operation('transfer', transactionOptions);
+	await tr.set_required_fees(transactionOptions.fee.asset_id);
+
+	return tr.broadcast();
+};
+
 export const send = () => async (dispatch, getState) => {
 
 	const form = getState().form.get(FORM_SEND);
@@ -287,32 +321,22 @@ export const send = () => async (dispatch, getState) => {
 	}
 
 	try {
-		const transactionOptions = formatToSend('transfer', options);
+		const start = new Date().getTime();
 
-		const publicKey = fromAccount.getIn(['active', 'key_auths', '0', '0']);
-
-		const networkName = getState().global.getIn(['network', 'name']);
-
-		const { TransactionBuilder } = await echoService.getChainLib();
-		let tr = new TransactionBuilder();
-		tr = await echoService.getCrypto().sign(networkName, tr, publicKey);
-
-		if (memo.value) {
-
-			transactionOptions.memo = await echoService.getCrypto().encryptMemo(
-				networkName,
-				fromAccount.getIn(['options', 'memo_key']),
-				toAccount.getIn(['options', 'memo_key']),
-				memo.value,
-			);
-		}
-
-		transactionOptions.amount.amount *= (10 ** options.amount.asset.get('precision'));
-
-		tr.add_type_operation('transfer', transactionOptions);
-		await tr.set_required_fees(transactionOptions.fee.asset_id);
-
-		await tr.broadcast();
+		await Promise.race([
+			dispatch(broadcastTransaction(
+				options,
+				fromAccount,
+				toAccount,
+				memo,
+			)).then(() => (new Date().getTime() - start)),
+			new Promise((resolve, reject) => {
+				const timeoutId = setTimeout(() => {
+					clearTimeout(timeoutId);
+					reject(new Error('timeout broadcast'));
+				}, BROADCAST_TIMEOUT);
+			}),
+		]);
 
 		history.push(SUCCESS_SEND_PATH);
 	} catch (err) {
