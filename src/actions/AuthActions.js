@@ -62,6 +62,8 @@ export const createAccount = (name) => async (dispatch, getState) => {
 	}
 
 	try {
+		getCrypto().pauseLockTimeout();
+
 		const registrator = getState().global.getIn(['network', 'registrator']);
 		const networkName = getState().global.getIn(['network', 'name']);
 
@@ -90,6 +92,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		return null;
 	} finally {
 		dispatch(toggleLoading(FORM_SIGN_UP, false));
+		getCrypto().resumeLockTimeout();
 	}
 
 };
@@ -166,6 +169,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 	}
 
 	try {
+		getCrypto().pauseLockTimeout();
 		dispatch(toggleLoading(FORM_SIGN_IN, true));
 
 		let success = true;
@@ -212,5 +216,6 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		return false;
 	} finally {
 		dispatch(toggleLoading(FORM_SIGN_IN, false));
+		getCrypto().resumeLockTimeout();
 	}
 };
