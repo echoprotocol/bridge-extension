@@ -17,6 +17,7 @@ import {
 	CANCELED_STATUS,
 	ERROR_STATUS,
 	CORE_ID,
+	REMOVED_STATUS,
 } from '../constants/GlobalConstants';
 import { operationKeys } from '../constants/OperationConstants';
 
@@ -190,6 +191,8 @@ export const loadRequests = () => async (dispatch, getState) => {
 
 
 export const approveTransaction = (transaction) => async (dispatch, getState) => {
+	emitter.emit('response', null, transaction.get('id'), REMOVED_STATUS);
+
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	const networkName = getState().global.getIn(['network', 'name']);

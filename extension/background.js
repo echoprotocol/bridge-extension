@@ -8,7 +8,7 @@ import storage from '../src/services/storage';
 import extensionizer from './extensionizer';
 import NotificationManager from './NotificationManager';
 
-import { NETWORKS, APP_ID } from '../src/constants/GlobalConstants';
+import { NETWORKS, APP_ID, APPROVED_STATUS, REMOVED_STATUS } from '../src/constants/GlobalConstants';
 
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
@@ -144,15 +144,22 @@ const onMessage = (request, sender, sendResponse) => {
  * @returns {Promise.<void>}
  */
 const onResponse = async (err, id, status) => {
-	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
-	if (requestIndex === -1) return;
+	if (status !== APPROVED_STATUS) {
+		const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
+		if (requestIndex === -1) return null;
 
-	requestQueue.splice(requestIndex, 1)[0].cb({ id, status, text: err });
+		requestQueue.splice(requestIndex, 1)[0].cb({ id, status, text: err });
 
-	setBadge();
-	createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
+		setBadge();
+	}
 
-	if (requestQueue.length === 0) closePopup();
+	if (status !== REMOVED_STATUS) {
+		createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
+
+		if (requestQueue.length === 0) closePopup();
+	}
+
+	return null;
 };
 
 createSocket();
