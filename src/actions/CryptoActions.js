@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import history from '../history';
 
 import storage from '../services/storage';
@@ -34,7 +35,9 @@ const lockCrypto = () => (dispatch) => {
 	dispatch(GlobalReducer.actions.lock({
 		goTo: history.location.pathname,
 	}));
-	history.push(UNLOCK_PATH);
+	try {
+		history.push(UNLOCK_PATH);
+	} catch (e) {}
 };
 
 /**
