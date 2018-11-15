@@ -11,13 +11,14 @@ import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
 
 import FormatHelper from '../helpers/FormatHelper';
-import { ERROR_SEND_PATH, INDEX_PATH, NOT_RETURNED_PATHS, SUCCESS_SEND_PATH } from '../constants/RouterConstants';
+import { ERROR_SEND_PATH, NOT_RETURNED_PATHS, SUCCESS_SEND_PATH } from '../constants/RouterConstants';
 import {
 	APPROVED_STATUS,
 	CANCELED_STATUS,
 	ERROR_STATUS,
 	CORE_ID,
 	BROADCAST_LIMIT,
+	CLOSE_STATUS,
 } from '../constants/GlobalConstants';
 import { operationKeys } from '../constants/OperationConstants';
 
@@ -110,8 +111,10 @@ export const removeTransaction = (id, path) => (dispatch, getState) => {
 		params: { transactions, current: null },
 	}));
 
-	if (!transactions.size && path) {
-		history.push(path);
+	if (!transactions.size) {
+		if (path) {
+			history.push(path);
+		}
 	} else {
 		dispatch(setTransaction(transactions.get(0)));
 	}
@@ -217,13 +220,14 @@ const sendTransaction = (transaction) => async (dispatch, getState) => {
 	await tr.set_required_fees(options.fee.asset_id);
 
 	return tr.broadcast().then(() => {
+		emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
 	}).catch((err) => {
 		emitter.emit('response', FormatHelper.formatError(err), transaction.get('id'), ERROR_STATUS);
 	});
 };
 
-export const successTransaction = (id) => {
-	emitter.emit('response', null, id, APPROVED_STATUS);
+export const closePopup = () => {
+	emitter.emit('response', null, null, CLOSE_STATUS);
 };
 
 export const approveTransaction = (transaction) => async (dispatch) => {
@@ -256,7 +260,7 @@ export const approveTransaction = (transaction) => async (dispatch) => {
 export const cancelTransaction = (id) => (dispatch) => {
 	emitter.emit('response', null, id, CANCELED_STATUS);
 
-	dispatch(removeTransaction(id));
+	dispatch(removeTransaction(id, ERROR_SEND_PATH));
 };
 
 export const switchTransactionAccount = (name) => async (dispatch, getState) => {

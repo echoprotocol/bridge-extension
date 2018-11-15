@@ -84,6 +84,7 @@ export const POPUP_HEIGHT = 591;
 
 export const APPROVED_STATUS = 'approved';
 export const CANCELED_STATUS = 'canceled';
+export const CLOSE_STATUS = 'close';
 export const ERROR_STATUS = 'error';
 
 export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
