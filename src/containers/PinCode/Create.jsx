@@ -70,7 +70,7 @@ class CreatePin extends React.Component {
 
 		const { keyCode } = e;
 
-		if ([KEY_CODE_ENTER, KEY_CODE_SPACE].includes(keyCode)) {
+		if ([KEY_CODE_ENTER].includes(keyCode)) {
 			e.preventDefault();
 			this.onSubmit(pin);
 		}
