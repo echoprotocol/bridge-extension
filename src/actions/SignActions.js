@@ -11,7 +11,7 @@ import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
 
 import FormatHelper from '../helpers/FormatHelper';
-import { INDEX_PATH, NOT_RETURNED_PATHS } from '../constants/RouterConstants';
+import { ERROR_SEND_PATH, INDEX_PATH, NOT_RETURNED_PATHS, SUCCESS_SEND_PATH } from '../constants/RouterConstants';
 import {
 	APPROVED_STATUS,
 	CANCELED_STATUS,
@@ -101,7 +101,7 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 
 };
 
-const removeTransaction = (id) => (dispatch, getState) => {
+export const removeTransaction = (id, path) => (dispatch, getState) => {
 	const sign = getState().global.get('sign');
 	const transactions = sign.get('transactions').filter((tr) => tr.id !== id);
 
@@ -110,8 +110,8 @@ const removeTransaction = (id) => (dispatch, getState) => {
 		params: { transactions, current: null },
 	}));
 
-	if (!transactions.size) {
-		history.push(sign.get('goTo') || INDEX_PATH);
+	if (!transactions.size && path) {
+		history.push(path);
 	} else {
 		dispatch(setTransaction(transactions.get(0)));
 	}
@@ -217,14 +217,19 @@ const sendTransaction = (transaction) => async (dispatch, getState) => {
 	await tr.set_required_fees(options.fee.asset_id);
 
 	return tr.broadcast().then(() => {
-		emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
 	}).catch((err) => {
 		emitter.emit('response', FormatHelper.formatError(err), transaction.get('id'), ERROR_STATUS);
 	});
 };
 
+export const successTransaction = (id) => {
+	emitter.emit('response', null, id, APPROVED_STATUS);
+};
+
 export const approveTransaction = (transaction) => async (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
+
+	let path = SUCCESS_SEND_PATH;
 
 	try {
 		const start = new Date().getTime();
@@ -241,8 +246,9 @@ export const approveTransaction = (transaction) => async (dispatch) => {
 	} catch (err) {
 		const error = FormatHelper.formatError(err);
 		emitter.emit('response', error, transaction.get('id'), ERROR_STATUS);
+		path = ERROR_SEND_PATH;
 	} finally {
-		dispatch(removeTransaction(transaction.get('id')));
+		dispatch(removeTransaction(transaction.get('id'), path));
 		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };

@@ -18,6 +18,8 @@ export const RECEIVE_PATH = '/receive';
 export const TRANSACTIONS_PATH = '/transactions';
 
 export const SEND_PATH = '/send';
+export const SUCCESS_SEND_PATH = '/send/success';
+export const ERROR_SEND_PATH = '/send/error';
 
 export const BACKUP_PATH = '/backup';
 
@@ -36,3 +38,5 @@ export const NOT_RETURNED_PATHS = PIN_PATHS.concat([
 	IMPORT_SUCCESS_PATH,
 	SIGN_TRANSACTION_PATH,
 ]);
+
+export const HIDE_NAVBAR_PATHS = [SUCCESS_SEND_PATH, ERROR_SEND_PATH];

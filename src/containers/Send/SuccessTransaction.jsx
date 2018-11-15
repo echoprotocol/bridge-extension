@@ -1,8 +1,17 @@
 import React from 'react';
 import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Button } from 'semantic-ui-react';
 
+import { INDEX_PATH } from '../../constants/RouterConstants';
+import { successTransaction } from '../../actions/SignActions';
+
 class SuccessTransaction extends React.PureComponent {
+
+	onClick() {
+		this.props.remove(this.props.transaction.get('id'));
+		this.props.history.push(INDEX_PATH);
+	}
 
 	render() {
 		return (
@@ -18,6 +27,7 @@ class SuccessTransaction extends React.PureComponent {
 						<Button
 							className="btn-inverted success"
 							content={<span className="btn-text">Proceed</span>}
+							onClick={() => this.onClick()}
 						/>
 					</div>
 				</div>
@@ -27,8 +37,21 @@ class SuccessTransaction extends React.PureComponent {
 
 }
 
+SuccessTransaction.propTypes = {
+	transaction: PropTypes.any,
+	history: PropTypes.object.isRequired,
+	remove: PropTypes.func.isRequired,
+};
+
+SuccessTransaction.defaultProps = {
+	transaction: null,
+};
 
 export default connect(
-	() => ({}),
-	() => ({}),
+	(state) => ({
+		transaction: state.global.getIn(['sign', 'current']),
+	}),
+	(dispatch) => ({
+		remove: (transaction) => dispatch(successTransaction(transaction)),
+	}),
 )(SuccessTransaction);
