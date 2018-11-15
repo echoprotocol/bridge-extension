@@ -83,7 +83,7 @@ export const formatToShow = (type, options) => {
 
 		switch (value.type) {
 			case 'account_id':
-				obj[key] = options[key].get('name');
+				obj[key] = options[key].get('name') || options[key].get('id');
 				break;
 			case 'asset_id':
 				obj[key] = options[key].get('symbol');

@@ -20,6 +20,7 @@ import {
 	ERROR_STATUS,
 	CORE_ID,
 	ACCOUNTS_LOOKUP_LIMIT,
+	BROADCAST_LIMIT,
 } from '../constants/GlobalConstants';
 import { operationKeys, operationTypes } from '../constants/OperationConstants';
 
@@ -492,47 +493,68 @@ export const loadRequests = () => async (dispatch, getState) => {
 };
 
 /**
+ *  @method sendTransaction
+ *
+ * 	Send transaction
+ *
+ * 	@param {Object} transaction
+ */
+const sendTransaction = (transaction) => async (dispatch, getState) => {
+	const networkName = getState().global.getIn(['network', 'name']);
+
+	const { type, memo } = transaction.get('options');
+	const account = transaction.get('options')[operationKeys[type]];
+	const options = formatToSend(type, transaction.get('options'));
+
+	const publicKey = account.getIn(['active', 'key_auths', '0', '0']);
+
+	const { TransactionBuilder } = await echoService.getChainLib();
+	let tr = new TransactionBuilder();
+	tr = await echoService.getCrypto().sign(networkName, tr, publicKey);
+
+	if (memo) {
+		const { to } = transaction.get('options');
+
+		options.memo = await echoService.getCrypto().encryptMemo(
+			networkName,
+			account.getIn(['options', 'memo_key']),
+			to.getIn(['options', 'memo_key']),
+			memo,
+		);
+	}
+
+	tr.add_type_operation(type, options);
+	await tr.set_required_fees(options.fee.asset_id);
+
+	return tr.broadcast().then(() => {
+		emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
+	}).catch((err) => {
+		emitter.emit('response', FormatHelper.formatError(err), transaction.get('id'), ERROR_STATUS);
+	});
+};
+
+/**
  *  @method approveTransaction
  *
  * 	Approve transaction
  *
  * 	@param {Object} transaction
  */
-export const approveTransaction = (transaction) => async (dispatch, getState) => {
+export const approveTransaction = (transaction) => async (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
-	const networkName = getState().global.getIn(['network', 'name']);
-
 	try {
-		const { type, memo } = transaction.get('options');
-		const account = transaction.get('options')[operationKeys[type]];
-		const options = formatToSend(type, transaction.get('options'));
+		const start = new Date().getTime();
 
-		const publicKey = account.getIn(['active', 'key_auths', '0', '0']);
-		const { TransactionBuilder } = await echoService.getChainLib();
-		let tr = new TransactionBuilder();
-		tr = await echoService.getCrypto().sign(networkName, tr, publicKey);
-
-		if (memo) {
-			const { to } = transaction.get('options');
-
-			options.memo = await echoService.getCrypto().encryptMemo(
-				networkName,
-				account.getIn(['options', 'memo_key']),
-				to.getIn(['options', 'memo_key']),
-				memo,
-			);
-		}
-
-		tr.add_type_operation(type, options);
-		await tr.set_required_fees(options.fee.asset_id);
-
-		await tr.broadcast().then(() => {
-			emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
-		}).catch((err) => {
-			emitter.emit('response', FormatHelper.formatError(err), transaction.get('id'), ERROR_STATUS);
-		});
-
+		await Promise.race([
+			dispatch(sendTransaction(transaction)).then(() => (new Date().getTime() - start)),
+			new Promise((resolve, reject) => {
+				const timeoutId = setTimeout(() => {
+					clearTimeout(timeoutId);
+					reject(new Error('Send transaction timeout'));
+				}, BROADCAST_LIMIT);
+			}),
+		]);
 	} catch (err) {
 		const error = FormatHelper.formatError(err);
 		emitter.emit('response', error, transaction.get('id'), ERROR_STATUS);
