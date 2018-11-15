@@ -20,6 +20,7 @@
     align-items: flex-end;
     letter-spacing: 1px;
     margin-right: -1px;
+
     &.readOnly {
         pointer-events: none;
     }
@@ -118,6 +119,13 @@
 
     }
 
+    &.up, &.filled {
+        cursor: text;
+
+        input {
+            cursor: text;
+        }
+    }
 
     &.error {
         input {
@@ -269,6 +277,7 @@
     }
 
     .label {
+        cursor: default;
         right: 0;
         left: 0;
         position: absolute;
@@ -305,6 +314,7 @@
     }
 
     input {
+        cursor: pointer;
         @extend %input;
         height: 42px;
 
