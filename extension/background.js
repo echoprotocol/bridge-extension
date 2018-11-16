@@ -8,7 +8,13 @@ import storage from '../src/services/storage';
 import extensionizer from './extensionizer';
 import NotificationManager from './NotificationManager';
 
-import { NETWORKS, APP_ID, APPROVED_STATUS, REMOVED_STATUS } from '../src/constants/GlobalConstants';
+import {
+	NETWORKS,
+	APP_ID,
+	CLOSE_STATUS,
+	OPEN_STATUS,
+	CANCELED_STATUS,
+} from '../src/constants/GlobalConstants';
 
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
@@ -16,6 +22,7 @@ const crypto = new Crypto();
 
 
 const requestQueue = [];
+let lastTransaction = null;
 const { ChainStore } = chainjs;
 
 ChainStore.notifySubscribers = () => {
@@ -137,6 +144,27 @@ const onMessage = (request, sender, sendResponse) => {
 };
 
 /**
+ * @method removeTransaction
+ *
+ * Remove element from transactions query
+ *
+ * @param err
+ * @param id
+ * @param status
+ * @returns null
+ */
+const removeTransaction = (err, id) => {
+	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
+	if (requestIndex === -1) return null;
+
+	lastTransaction = requestQueue.splice(requestIndex, 1);
+
+	setBadge();
+
+	return null;
+};
+
+/**
  * On extension emitter response
  * @param err
  * @param id
@@ -144,20 +172,27 @@ const onMessage = (request, sender, sendResponse) => {
  * @returns {Promise.<void>}
  */
 const onResponse = async (err, id, status) => {
-	if (status !== APPROVED_STATUS) {
-		const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
-		if (requestIndex === -1) return null;
+	if ([CLOSE_STATUS, OPEN_STATUS].includes(status)) {
+		if (CLOSE_STATUS === status && requestQueue.length === 1) {
+			closePopup();
+		}
 
-		requestQueue.splice(requestIndex, 1)[0].cb({ id, status, text: err });
+		removeTransaction(err, id);
 
-		setBadge();
+		return null;
 	}
 
-	if (status !== REMOVED_STATUS) {
-		createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
-
-		if (requestQueue.length === 0) closePopup();
+	if (status === CANCELED_STATUS) {
+		removeTransaction(err, id);
 	}
+
+	if (lastTransaction[0]) {
+		lastTransaction[0].cb({ id, status, text: err });
+	}
+
+	createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
+
+	if (requestQueue.length === 0) closePopup();
 
 	return null;
 };

@@ -17,13 +17,16 @@ import {
 	CANCELED_STATUS,
 	ERROR_STATUS,
 	CORE_ID,
-	REMOVED_STATUS,
+	CLOSE_STATUS,
+	OPEN_STATUS,
+	POPUP_WINDOW_TYPE,
 } from '../constants/GlobalConstants';
 import { operationKeys } from '../constants/OperationConstants';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
 const emitter = echoService.getEmitter();
+let WINDOW_TYPE = null;
 
 // TODO REMOVE!!!!
 // window.emitter = emitter;
@@ -189,9 +192,8 @@ export const loadRequests = () => async (dispatch, getState) => {
 	await dispatch(setTransaction(transactions[0]));
 };
 
-
 export const approveTransaction = (transaction) => async (dispatch, getState) => {
-	emitter.emit('response', null, transaction.get('id'), REMOVED_STATUS);
+	emitter.emit('response', null, transaction.get('id'), WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
 
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
@@ -259,4 +261,8 @@ export const switchTransactionAccount = (name) => async (dispatch, getState) => 
 			}),
 		},
 	}));
+};
+
+export const setWindowType = (type) => {
+	WINDOW_TYPE = type;
 };
