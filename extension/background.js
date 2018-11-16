@@ -197,6 +197,16 @@ const onResponse = async (err, id, status) => {
 	return null;
 };
 
+const onFirstInstall = (details) => {
+	if (details.reason === 'install') {
+		createNotification('Bridge', 'Extension is now installed. Restart your work pages, please.');
+	} else if (details.reason === 'update') {
+		const thisVersion = extensionizer.runtime.getManifest().version;
+
+		createNotification('Bridge', `Extension is now updated to ${thisVersion}. Restart your work pages, please.`);
+	}
+};
+
 createSocket();
 
 window.getWsLib = () => echojs;
@@ -208,5 +218,7 @@ window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }
 emitter.on('response', onResponse);
 
 extensionizer.runtime.onMessage.addListener(onMessage);
+
+extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });

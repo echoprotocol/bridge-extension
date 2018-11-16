@@ -109,6 +109,7 @@ export const POPUP_WINDOW_TYPE = 'popup';
 
 export const LOGIN_INTERVAL = 1000 * 30;
 export const CHAINSTORE_INIT_TIMEOUT = 10 * 1000;
+export const BROADCAST_LIMIT = 20 * 1000;
 
 export const MEMO_FEE_KEYS = {
 	WIF: '5KGG3tFb5F4h3aiUSKNnKeDcNbL5y1ZVXQXVqpWVMYhW82zBrNb',
