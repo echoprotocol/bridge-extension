@@ -538,6 +538,22 @@ const sendTransaction = (transaction) => async (dispatch, getState) => {
 };
 
 /**
+ *  @method windowRequestHandler
+ *
+ * 	Transaction operations handler (between windows)
+ *
+ * 	@param {String} id
+ * 	@param {String} windowType
+ */
+const windowRequestHandler = async (id, windowType) => {
+	if (WINDOW_TYPE !== windowType) {
+		store.dispatch(removeTransaction(id));
+	}
+};
+
+emitter.on('windowRequest', windowRequestHandler);
+
+/**
  *  @method approveTransaction
  *
  * 	Approve transaction
@@ -546,6 +562,8 @@ const sendTransaction = (transaction) => async (dispatch, getState) => {
  */
 export const approveTransaction = (transaction) => async (dispatch) => {
 	emitter.emit('response', null, transaction.get('id'), WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
+
+	emitter.emit('windowRequest', transaction.get('id'), WINDOW_TYPE);
 
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
@@ -579,6 +597,8 @@ export const approveTransaction = (transaction) => async (dispatch) => {
  */
 export const cancelTransaction = (id) => (dispatch) => {
 	emitter.emit('response', null, id, CANCELED_STATUS);
+
+	emitter.emit('windowRequest', id, WINDOW_TYPE);
 
 	dispatch(removeTransaction(id));
 };

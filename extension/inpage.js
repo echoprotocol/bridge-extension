@@ -1,6 +1,5 @@
 import echojslib from 'echojs-lib';
 import echojsws from 'echojs-ws';
-import { CLOSE_STATUS, OPEN_STATUS } from '../src/constants/GlobalConstants';
 
 const { APP_ID } = require('../src/constants/GlobalConstants');
 
