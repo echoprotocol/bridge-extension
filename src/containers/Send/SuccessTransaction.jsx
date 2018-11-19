@@ -2,14 +2,13 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Button } from 'semantic-ui-react';
 
-import { INDEX_PATH } from '../../constants/RouterConstants';
 import { closePopup } from '../../actions/SignActions';
 
 class SuccessTransaction extends React.PureComponent {
 
 	onClick() {
 		closePopup();
-		this.props.history.push(INDEX_PATH);
+		this.props.history.goBack();
 	}
 
 	render() {

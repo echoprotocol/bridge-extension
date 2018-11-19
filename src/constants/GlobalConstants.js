@@ -100,6 +100,7 @@ export const GLOBAL_ID_0 = '2.0.0';
 export const GLOBAL_ID_1 = '2.1.0';
 export const KEY_CODE_ENTER = 13;
 export const KEY_CODE_SPACE = 32;
+export const ACCOUNTS_LOOKUP_LIMIT = 50;
 export const ICONS_COUNT = 15;
 export const ICON_COLORS_COUNT = 7;
 export const BASE_ICON = 1;
