@@ -30,9 +30,15 @@ EXTENSION && setupInjection();
  * @param origin
  */
 const onResponse = (res, origin = '*') => {
+	if (!res) {
+		return null;
+	}
+
 	res.target = 'inpage';
 	res.appId = APP_ID;
 	window.postMessage(res, origin);
+
+	return null;
 };
 
 /**

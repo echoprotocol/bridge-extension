@@ -1,6 +1,7 @@
 import extensionizer from './extensionizer';
 
 import { POPUP_HEIGHT, POPUP_WIDTH } from '../src/constants/GlobalConstants';
+import { POPUP_PATH } from '../src/constants/RouterConstants';
 
 class NotificationManager {
 
@@ -15,7 +16,7 @@ class NotificationManager {
 
 		// create new notification popup
 		const creation = extensionizer.windows.create({
-			url: 'index.html',
+			url: POPUP_PATH,
 			type: 'popup',
 			state: 'normal',
 			height: POPUP_HEIGHT,

@@ -19,6 +19,9 @@ import {
 	CANCELED_STATUS,
 	ERROR_STATUS,
 	CORE_ID,
+	CLOSE_STATUS,
+	OPEN_STATUS,
+	POPUP_WINDOW_TYPE,
 	ACCOUNTS_LOOKUP_LIMIT,
 	BROADCAST_LIMIT,
 } from '../constants/GlobalConstants';
@@ -27,6 +30,7 @@ import { operationKeys, operationTypes } from '../constants/OperationConstants';
 import GlobalReducer from '../reducers/GlobalReducer';
 
 const emitter = echoService.getEmitter();
+let WINDOW_TYPE = null;
 
 /**
  *  @method checkTransactionAccount
@@ -534,6 +538,22 @@ const sendTransaction = (transaction) => async (dispatch, getState) => {
 };
 
 /**
+ *  @method windowRequestHandler
+ *
+ * 	Transaction operations handler (between windows)
+ *
+ * 	@param {String} id
+ * 	@param {String} windowType
+ */
+const windowRequestHandler = async (id, windowType) => {
+	if (WINDOW_TYPE !== windowType) {
+		store.dispatch(removeTransaction(id));
+	}
+};
+
+emitter.on('windowRequest', windowRequestHandler);
+
+/**
  *  @method approveTransaction
  *
  * 	Approve transaction
@@ -541,6 +561,10 @@ const sendTransaction = (transaction) => async (dispatch, getState) => {
  * 	@param {Object} transaction
  */
 export const approveTransaction = (transaction) => async (dispatch) => {
+	emitter.emit('response', null, transaction.get('id'), WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
+
+	emitter.emit('windowRequest', transaction.get('id'), WINDOW_TYPE);
+
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	try {
@@ -574,6 +598,8 @@ export const approveTransaction = (transaction) => async (dispatch) => {
 export const cancelTransaction = (id) => (dispatch) => {
 	emitter.emit('response', null, id, CANCELED_STATUS);
 
+	emitter.emit('windowRequest', id, WINDOW_TYPE);
+
 	dispatch(removeTransaction(id));
 };
 
@@ -601,4 +627,8 @@ export const switchTransactionAccount = (name) => async (dispatch, getState) => 
 			}),
 		},
 	}));
+};
+
+export const setWindowType = (type) => {
+	WINDOW_TYPE = type;
 };
