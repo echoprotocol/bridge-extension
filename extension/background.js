@@ -8,7 +8,15 @@ import storage from '../src/services/storage';
 import extensionizer from './extensionizer';
 import NotificationManager from './NotificationManager';
 
-import { NETWORKS, APP_ID, CLOSE_STATUS, CANCELED_STATUS } from '../src/constants/GlobalConstants';
+import {
+	NETWORKS,
+	APP_ID,
+	CLOSE_STATUS,
+	OPEN_STATUS,
+	CANCELED_STATUS,
+	ERROR_STATUS,
+	COMPLETE_STATUS, DISCONNECT_STATUS,
+} from '../src/constants/GlobalConstants';
 
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
@@ -16,6 +24,7 @@ const crypto = new Crypto();
 
 
 const requestQueue = [];
+let lastTransaction = null;
 const { ChainStore } = chainjs;
 
 ChainStore.notifySubscribers = () => {
@@ -137,6 +146,26 @@ const onMessage = (request, sender, sendResponse) => {
 };
 
 /**
+ * @method removeTransaction
+ *
+ * Remove element from transactions query
+ *
+ * @param err
+ * @param id
+ * @returns null
+ */
+const removeTransaction = (err, id) => {
+	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
+	if (requestIndex === -1) return null;
+
+	lastTransaction = requestQueue.splice(requestIndex, 1);
+
+	setBadge();
+
+	return null;
+};
+
+/**
  * On extension emitter response
  * @param err
  * @param id
@@ -144,18 +173,32 @@ const onMessage = (request, sender, sendResponse) => {
  * @returns {Promise.<void>}
  */
 const onResponse = async (err, id, status) => {
-	if ([CLOSE_STATUS, CANCELED_STATUS].includes(status) && requestQueue.length === 0) {
-		closePopup();
+	if ([CLOSE_STATUS, OPEN_STATUS].includes(status)) {
+		if (CLOSE_STATUS === status && requestQueue.length === 1) {
+			closePopup();
+		}
+
+		removeTransaction(err, id);
+
 		return null;
 	}
 
-	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
-	if (requestIndex === -1) return null;
+	if ([CANCELED_STATUS, ERROR_STATUS].includes(status)) {
+		removeTransaction(err, id);
+	}
 
-	requestQueue.splice(requestIndex, 1)[0].cb({ id, status, text: err });
+	if (lastTransaction[0]) {
+		lastTransaction[0].cb({ id, status, text: err });
+	}
 
-	setBadge();
-	createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
+	if (COMPLETE_STATUS !== status) {
+		createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
+	}
+
+	if (
+		(requestQueue.length === 0 && COMPLETE_STATUS === status)
+		|| DISCONNECT_STATUS === status
+	) closePopup();
 
 	return null;
 };

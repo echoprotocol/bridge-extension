@@ -11,22 +11,35 @@ import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
 
 import FormatHelper from '../helpers/FormatHelper';
-import { ERROR_SEND_PATH, INDEX_PATH, NOT_RETURNED_PATHS, SUCCESS_SEND_PATH } from '../constants/RouterConstants';
+import {
+	ERROR_SEND_PATH,
+	INDEX_PATH,
+	NETWORK_ERROR_SEND_PATH,
+	NOT_RETURNED_PATHS,
+	SUCCESS_SEND_PATH,
+} from '../constants/RouterConstants';
 import ValidateTransactionHelper from '../helpers/ValidateTransactionHelper';
 import {
 	APPROVED_STATUS,
 	CANCELED_STATUS,
 	ERROR_STATUS,
 	CORE_ID,
+	CLOSE_STATUS,
+	OPEN_STATUS,
+	POPUP_WINDOW_TYPE,
 	ACCOUNTS_LOOKUP_LIMIT,
 	BROADCAST_LIMIT,
-	CLOSE_STATUS,
+	COMPLETE_STATUS,
 } from '../constants/GlobalConstants';
 import { operationKeys, operationTypes } from '../constants/OperationConstants';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
 const emitter = echoService.getEmitter();
+
+export const globals = {
+	WINDOW_TYPE: null,
+};
 
 /**
  *  @method checkTransactionAccount
@@ -380,14 +393,19 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 	return null;
 };
 
+export const closePopup = (status) => {
+	emitter.emit('response', null, null, status || COMPLETE_STATUS);
+};
+
 /**
  *  @method removeTransaction
  *
  * 	Remove transaction data from redux store
  *
  * 	@param {String} id
+ * 	@param {Boolean} isClose
  */
-export const removeTransaction = (id, path) => (dispatch, getState) => {
+export const removeTransaction = (id, isClose) => (dispatch, getState) => {
 	const sign = getState().global.get('sign');
 	const transactions = sign.get('transactions').filter((tr) => tr.id !== id);
 
@@ -396,14 +414,11 @@ export const removeTransaction = (id, path) => (dispatch, getState) => {
 		params: { transactions, current: null },
 	}));
 
-	if (!transactions.size) {
+	if (!transactions.size && isClose) {
+		closePopup();
 		history.push(INDEX_PATH);
-	} else {
+	} else if (transactions.size) {
 		dispatch(setTransaction(transactions.get(0)));
-	}
-
-	if (path) {
-		history.push(path);
 	}
 };
 
@@ -452,12 +467,29 @@ const requestHandler = async (id, options) => {
 
 emitter.on('request', requestHandler);
 
+/**
+ *  @method windowRequestHandler
+ *
+ * 	Transaction operations handler (between windows)
+ *
+ * 	@param {*} value - id(Number) or transaction(Object) with fetched values
+ * 	@param {String} windowType
+ */
+const windowRequestHandler = async (value, windowType) => {
+	if (globals.WINDOW_TYPE !== windowType) {
+		store.dispatch(removeTransaction(value));
+	}
+};
+
+emitter.on('windowRequest', windowRequestHandler);
+
 window.onunload = () => {
 	if (getChainSubcribe()) {
 		const { ChainStore } = echoService.getChainLib();
 		ChainStore.unsubscribe(getChainSubcribe());
 	}
 
+	emitter.removeListener('windowRequest', windowRequestHandler);
 	emitter.removeListener('request', requestHandler);
 };
 
@@ -534,11 +566,8 @@ const sendTransaction = (transaction) => async (dispatch, getState) => {
 		emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
 	}).catch((err) => {
 		emitter.emit('response', FormatHelper.formatError(err), transaction.get('id'), ERROR_STATUS);
+		return err;
 	});
-};
-
-export const closePopup = () => {
-	emitter.emit('response', null, null, CLOSE_STATUS);
 };
 
 /**
@@ -549,6 +578,10 @@ export const closePopup = () => {
  * 	@param {Object} transaction
  */
 export const approveTransaction = (transaction) => async (dispatch) => {
+	emitter.emit('response', null, transaction.get('id'), globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
+
+	emitter.emit('windowRequest', transaction.get('id'), globals.WINDOW_TYPE);
+
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	let path = SUCCESS_SEND_PATH;
@@ -557,7 +590,12 @@ export const approveTransaction = (transaction) => async (dispatch) => {
 		const start = new Date().getTime();
 
 		await Promise.race([
-			dispatch(sendTransaction(transaction)).then(() => (new Date().getTime() - start)),
+			dispatch(sendTransaction(transaction)).then((err) => {
+				if (err) {
+					path = ERROR_SEND_PATH;
+				}
+				return new Date().getTime() - start;
+			}),
 			new Promise((resolve, reject) => {
 				const timeoutId = setTimeout(() => {
 					clearTimeout(timeoutId);
@@ -568,9 +606,10 @@ export const approveTransaction = (transaction) => async (dispatch) => {
 	} catch (err) {
 		const error = FormatHelper.formatError(err);
 		emitter.emit('response', error, transaction.get('id'), ERROR_STATUS);
-		path = ERROR_SEND_PATH;
+		path = NETWORK_ERROR_SEND_PATH;
 	} finally {
-		dispatch(removeTransaction(transaction.get('id'), path));
+		dispatch(removeTransaction(transaction.get('id')));
+		history.push(path);
 		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
@@ -585,7 +624,9 @@ export const approveTransaction = (transaction) => async (dispatch) => {
 export const cancelTransaction = (id) => (dispatch) => {
 	emitter.emit('response', null, id, CANCELED_STATUS);
 
-	dispatch(removeTransaction(id));
+	emitter.emit('windowRequest', id, globals.WINDOW_TYPE);
+
+	dispatch(removeTransaction(id, true));
 };
 
 /**
@@ -612,4 +653,8 @@ export const switchTransactionAccount = (name) => async (dispatch, getState) => 
 			}),
 		},
 	}));
+};
+
+export const setWindowType = (type) => {
+	globals.WINDOW_TYPE = type;
 };

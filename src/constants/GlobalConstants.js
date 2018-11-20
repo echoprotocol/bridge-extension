@@ -85,7 +85,10 @@ export const POPUP_HEIGHT = 591;
 export const APPROVED_STATUS = 'approved';
 export const CANCELED_STATUS = 'canceled';
 export const CLOSE_STATUS = 'close';
+export const OPEN_STATUS = 'open';
+export const COMPLETE_STATUS = 'complete';
 export const ERROR_STATUS = 'error';
+export const DISCONNECT_STATUS = 'disconnect';
 
 export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
 
@@ -105,6 +108,7 @@ export const ICONS_COUNT = 15;
 export const ICON_COLORS_COUNT = 7;
 export const BASE_ICON = 1;
 export const BASE_ICON_COLOR = 'green';
+export const POPUP_WINDOW_TYPE = 'popup';
 
 export const LOGIN_INTERVAL = 1000 * 30;
 export const CHAINSTORE_INIT_TIMEOUT = 10 * 1000;

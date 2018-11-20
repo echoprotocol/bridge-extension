@@ -6,7 +6,12 @@ import UserDropdown from '../UserDropdown';
 import NetworkDropdown from '../NetworkDropdown';
 import SignDropdown from '../SignDropdown';
 
-import { SIGN_TRANSACTION_PATH } from '../../constants/RouterConstants';
+import {
+	EMPTY_PATH,
+	ERROR_SEND_PATH,
+	SIGN_TRANSACTION_PATH,
+	SUCCESS_SEND_PATH,
+} from '../../constants/RouterConstants';
 
 import { sidebarToggle } from '../../actions/GlobalActions';
 
@@ -15,7 +20,9 @@ class Header extends React.PureComponent {
 	render() {
 		const { accounts, pathname } = this.props;
 
-		if (pathname === SIGN_TRANSACTION_PATH) {
+		if (
+			[SIGN_TRANSACTION_PATH, SUCCESS_SEND_PATH, ERROR_SEND_PATH, EMPTY_PATH].includes(pathname)
+		) {
 			return (
 				<header className="header">
 					<SignDropdown />

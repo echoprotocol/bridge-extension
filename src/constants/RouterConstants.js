@@ -20,12 +20,17 @@ export const TRANSACTIONS_PATH = '/transactions';
 export const SEND_PATH = '/send';
 export const SUCCESS_SEND_PATH = '/send/success';
 export const ERROR_SEND_PATH = '/send/error';
+export const NETWORK_ERROR_SEND_PATH = '/send/error?network=1';
 
 export const BACKUP_PATH = '/backup';
 
 export const WATCH_TOKEN_PATH = '/tokens/watch';
 
 export const SIGN_TRANSACTION_PATH = '/transaction/sign';
+
+export const POPUP_PATH = 'index.html?windowType=popup';
+
+export const EMPTY_PATH = '/';
 
 export const INDEX_PATH = WALLET_PATH;
 
