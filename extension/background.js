@@ -60,8 +60,8 @@ const createSocket = () => {
 /**
  * trigger popup
  */
-const triggerPopup = () => {
-	notificationManager.showPopup();
+const triggerPopup = (cb2) => {
+	notificationManager.showPopup(cb2);
 
 };
 
@@ -131,12 +131,40 @@ const onMessage = (request, sender, sendResponse) => {
 
 		setBadge();
 
-		try {
-			emitter.emit('request', id, request.data);
-		} catch (e) {}
+
+        emitter.once('Loaded', () => {
+
+            try {
+                console.log('reQUEST emit2', new Date());
+                emitter.emit('request', id, request.data);
+            } catch (e) {
+                console.log('ERR', e);
+            }
+        });
 
 		notificationManager.getPopup()
-			.then((popup) => !popup && triggerPopup())
+			.then((popup) => {
+
+                emitter.once('Loaded', () => {
+
+                    try {
+                        console.log('reQUEST emit222222', new Date());
+                        emitter.emit('request', id, request.data);
+                    } catch (e) {
+                        console.log('ERR22222', e);
+                    }
+                });
+
+				if (!popup) {
+					triggerPopup(() => {
+
+
+					});
+				}
+
+				console.log('reQUEST emit1', new Date());
+
+			})
 			.catch(triggerPopup);
 	} else if (request.method === 'accounts') {
 		getAccountList().then((res) => sendResponse({ id, res }));
@@ -144,7 +172,9 @@ const onMessage = (request, sender, sendResponse) => {
 
 	return true;
 };
-
+emitter.on('Loaded', (data) => {
+	console.log('ADAT', data);
+});
 /**
  * @method removeTransaction
  *

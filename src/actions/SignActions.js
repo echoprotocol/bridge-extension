@@ -431,6 +431,7 @@ export const removeTransaction = (id, isClose) => (dispatch, getState) => {
  * 	@param {Object} options
  */
 const requestHandler = async (id, options) => {
+	console.log(1);
 	const isLocked = store.getState().global.getIn(['crypto', 'isLocked']);
 
 	if (isLocked) {
@@ -464,8 +465,12 @@ const requestHandler = async (id, options) => {
 
 	return null;
 };
-
+console.log('reQUEST', new Date());
 emitter.on('request', requestHandler);
+
+window.onload = function () {
+    emitter.emit('Loaded', {test: 1});
+}
 
 /**
  *  @method windowRequestHandler
