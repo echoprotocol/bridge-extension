@@ -13,6 +13,7 @@
     "copy-manifest": "copyfiles -f src/assets/extention_config/manifest.json build/src"
   },
   "dependencies": {
+    "EventEmitter": "^1.0.0",
     "autoprefixer": "^8.1.0",
     "babel-runtime": "^6.26.0",
     "bignumber.js": "^7.2.1",
@@ -21,7 +22,6 @@
     "crypto-random-string": "^1.0.0",
     "echojs-lib": "^0.1.6",
     "echojs-ws": "^0.1.10",
-    "events": "^3.0.0",
     "file-loader": "^1.1.11",
     "focus-trap-react": "^4.0.1",
     "history": "^4.7.2",

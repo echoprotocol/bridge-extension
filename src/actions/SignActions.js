@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import { Map, List } from 'immutable';
 import BN from 'bignumber.js';
 
@@ -320,7 +321,10 @@ const getFetchedObjects = async (fetchList, id) => {
 		}));
 	} catch (err) {
 		const error = FormatHelper.formatError(err);
-		emitter.emit('response', error, id, ERROR_STATUS);
+		try {
+			emitter.emit('response', error, id, ERROR_STATUS);
+		} catch (e) {}
+
 
 		return null;
 	}
@@ -352,7 +356,12 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 	Object.entries(fetched).forEach(([key, value]) => { if (!value) { arrTemp.push(key); } });
 
 	if (arrTemp.length) {
-		emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+		try {
+			emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+		} catch (e) {
+
+		}
+
 		return null;
 	}
 
@@ -381,7 +390,12 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 	const errorFee = dispatch(checkTransactionFee(options, transaction));
 
 	if (errorFee) {
-		emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+		try {
+			emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+		} catch (e) {
+
+		}
+
 		return null;
 	}
 
@@ -394,7 +408,10 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 };
 
 export const closePopup = (status) => {
-	emitter.emit('response', null, null, status || COMPLETE_STATUS);
+	try {
+		emitter.emit('response', null, null, status || COMPLETE_STATUS);
+	} catch (e) {}
+
 };
 
 /**
@@ -431,7 +448,6 @@ export const removeTransaction = (id, isClose) => (dispatch, getState) => {
  * 	@param {Object} options
  */
 const requestHandler = async (id, options) => {
-	console.log(1);
 	const isLocked = store.getState().global.getIn(['crypto', 'isLocked']);
 
 	if (isLocked) {
@@ -465,12 +481,12 @@ const requestHandler = async (id, options) => {
 
 	return null;
 };
-console.log('reQUEST', new Date());
+
 emitter.on('request', requestHandler);
 
-window.onload = function () {
-    emitter.emit('Loaded', {test: 1});
-}
+window.onload = () => {
+	emitter.emit('Loaded', { isLoaded: 1 });
+};
 
 /**
  *  @method windowRequestHandler
@@ -510,7 +526,12 @@ export const loadRequests = () => async (dispatch, getState) => {
 		const error = connected ? await dispatch(validateTransaction(options)) : 'Network error';
 
 		if (error) {
-			emitter.emit('response', error, id, ERROR_STATUS);
+			try {
+				emitter.emit('response', error, id, ERROR_STATUS);
+			} catch (e) {
+
+			}
+
 		}
 
 		return !error;
@@ -583,9 +604,14 @@ const sendTransaction = (transaction) => async (dispatch, getState) => {
  * 	@param {Object} transaction
  */
 export const approveTransaction = (transaction) => async (dispatch) => {
-	emitter.emit('response', null, transaction.get('id'), globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
+	try {
+		emitter.emit('response', null, transaction.get('id'), globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
 
-	emitter.emit('windowRequest', transaction.get('id'), globals.WINDOW_TYPE);
+		emitter.emit('windowRequest', transaction.get('id'), globals.WINDOW_TYPE);
+	} catch (e) {
+		return null;
+	}
+
 
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
@@ -610,13 +636,21 @@ export const approveTransaction = (transaction) => async (dispatch) => {
 		]);
 	} catch (err) {
 		const error = FormatHelper.formatError(err);
-		emitter.emit('response', error, transaction.get('id'), ERROR_STATUS);
-		path = NETWORK_ERROR_SEND_PATH;
+
+		try {
+			emitter.emit('response', error, transaction.get('id'), ERROR_STATUS);
+			path = NETWORK_ERROR_SEND_PATH;
+		} catch (e) {
+			return null;
+		}
+
+
 	} finally {
 		dispatch(removeTransaction(transaction.get('id')));
 		history.push(path);
 		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
+	return null;
 };
 
 /**
@@ -627,11 +661,19 @@ export const approveTransaction = (transaction) => async (dispatch) => {
  * 	@param {String} id
  */
 export const cancelTransaction = (id) => (dispatch) => {
-	emitter.emit('response', null, id, CANCELED_STATUS);
 
-	emitter.emit('windowRequest', id, globals.WINDOW_TYPE);
+	try {
+		emitter.emit('response', null, id, CANCELED_STATUS);
 
-	dispatch(removeTransaction(id, true));
+		emitter.emit('windowRequest', id, globals.WINDOW_TYPE);
+
+		dispatch(removeTransaction(id, true));
+	} catch (e) {
+		return null;
+	}
+
+	return null;
+
 };
 
 /**

@@ -8,10 +8,9 @@ class NotificationManager {
 	/**
 	 * Create popup
      */
-	showPopup(cb2) {
+	showPopup() {
 		const cb = (popup) => {
 			this.popupId = popup.id;
-            cb2();
 		};
 
 		// top params offset from top

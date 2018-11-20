@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import echojs from 'echojs-ws';
 import chainjs from 'echojs-lib';
-import EventEmitter from 'events';
+import EventEmitter from '../libs/CustomEmitter';
 
 import Crypto from '../src/services/crypto';
 import storage from '../src/services/storage';
@@ -21,7 +21,6 @@ import {
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
-
 
 const requestQueue = [];
 let lastTransaction = null;
@@ -60,8 +59,8 @@ const createSocket = () => {
 /**
  * trigger popup
  */
-const triggerPopup = (cb2) => {
-	notificationManager.showPopup(cb2);
+const triggerPopup = () => {
+	notificationManager.showPopup();
 
 };
 
@@ -131,39 +130,17 @@ const onMessage = (request, sender, sendResponse) => {
 
 		setBadge();
 
-
-        emitter.once('Loaded', () => {
-
-            try {
-                console.log('reQUEST emit2', new Date());
-                emitter.emit('request', id, request.data);
-            } catch (e) {
-                console.log('ERR', e);
-            }
-        });
+		emitter.on('Loaded', () => {
+			try {
+				emitter.emit('request', id, request.data);
+			} catch (e) {}
+		});
 
 		notificationManager.getPopup()
 			.then((popup) => {
-
-                emitter.once('Loaded', () => {
-
-                    try {
-                        console.log('reQUEST emit222222', new Date());
-                        emitter.emit('request', id, request.data);
-                    } catch (e) {
-                        console.log('ERR22222', e);
-                    }
-                });
-
 				if (!popup) {
-					triggerPopup(() => {
-
-
-					});
+					triggerPopup();
 				}
-
-				console.log('reQUEST emit1', new Date());
-
 			})
 			.catch(triggerPopup);
 	} else if (request.method === 'accounts') {
@@ -172,9 +149,7 @@ const onMessage = (request, sender, sendResponse) => {
 
 	return true;
 };
-emitter.on('Loaded', (data) => {
-	console.log('ADAT', data);
-});
+
 /**
  * @method removeTransaction
  *
@@ -203,6 +178,7 @@ const removeTransaction = (err, id) => {
  * @returns {Promise.<void>}
  */
 const onResponse = async (err, id, status) => {
+	console.log(err, id, status);
 	if ([CLOSE_STATUS, OPEN_STATUS].includes(status)) {
 		if (CLOSE_STATUS === status && requestQueue.length === 1) {
 			closePopup();
