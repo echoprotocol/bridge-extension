@@ -20,6 +20,8 @@ import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
+import ErrorTransaction from '../Send/ErrorTransaction';
+
 class SignTransaction extends React.Component {
 
 	componentDidMount() {
@@ -37,9 +39,19 @@ class SignTransaction extends React.Component {
 	}
 
 	render() {
-		const { transaction, accounts, loading } = this.props;
+		const {
+			transaction, accounts, loading, history, location,
+		} = this.props;
 
-		if (!transaction) { return null; }
+		if (!transaction) {
+			return (
+				<ErrorTransaction
+					history={history}
+					location={location}
+					isReturn={false}
+				/>
+			);
+		}
 
 		const options = transaction.get('options');
 
@@ -130,6 +142,7 @@ SignTransaction.propTypes = {
 	transaction: PropTypes.any,
 	accounts: PropTypes.object,
 	history: PropTypes.object.isRequired,
+	location: PropTypes.object.isRequired,
 	approve: PropTypes.func.isRequired,
 	cancel: PropTypes.func.isRequired,
 };
