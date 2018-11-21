@@ -1,7 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import echojs from 'echojs-ws';
 import chainjs from 'echojs-lib';
-import EventEmitter from '../libs/CustomEmitter';
+import EventEmitter from '../libs/CustomAwaitEmitter';
 
 import Crypto from '../src/services/crypto';
 import storage from '../src/services/storage';
@@ -15,7 +15,8 @@ import {
 	OPEN_STATUS,
 	CANCELED_STATUS,
 	ERROR_STATUS,
-	COMPLETE_STATUS, DISCONNECT_STATUS,
+	COMPLETE_STATUS,
+	DISCONNECT_STATUS,
 } from '../src/constants/GlobalConstants';
 
 const notificationManager = new NotificationManager();
@@ -130,16 +131,20 @@ const onMessage = (request, sender, sendResponse) => {
 
 		setBadge();
 
-		emitter.on('Loaded', () => {
-			try {
-				emitter.emit('request', id, request.data);
-			} catch (e) {}
-		});
-
 		notificationManager.getPopup()
 			.then((popup) => {
 				if (!popup) {
 					triggerPopup();
+
+					emitter.once('Loaded', () => {
+						try {
+							emitter.emit('request', id, request.data);
+						} catch (e) {}
+					});
+				} else {
+					try {
+						emitter.emit('request', id, request.data);
+					} catch (e) {}
 				}
 			})
 			.catch(triggerPopup);
@@ -177,8 +182,8 @@ const removeTransaction = (err, id) => {
  * @param status
  * @returns {Promise.<void>}
  */
-const onResponse = async (err, id, status) => {
-	console.log(err, id, status);
+const onResponse = (err, id, status) => {
+	console.log('ONRESPONCE_11111', err, id, status);
 	if ([CLOSE_STATUS, OPEN_STATUS].includes(status)) {
 		if (CLOSE_STATUS === status && requestQueue.length === 1) {
 			closePopup();

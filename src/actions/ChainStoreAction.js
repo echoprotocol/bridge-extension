@@ -50,7 +50,7 @@ export const subscribe = () => (dispatch) => {
  * connect socket current network
  * @returns {Function}
  */
-export const connect = () => async (dispatch) => {
+export const connect = (isRecreate) => async (dispatch) => {
 	dispatch(batchActions([
 		GlobalReducer.actions.set({ field: 'loading', value: true }),
 		GlobalReducer.actions.set({ field: 'connected', value: false }),
@@ -80,7 +80,7 @@ export const connect = () => async (dispatch) => {
 			dispatch(checkConnection(network.url));
 		}), LOGIN_INTERVAL);
 
-		await connectToAddress(network.url, subscribeCb);
+		await connectToAddress(network.url, subscribeCb, isRecreate);
 
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 

@@ -15,18 +15,20 @@ import {
 import { formatToShow } from '../../services/operation';
 
 import { operationKeys, operationTypes } from '../../constants/OperationConstants';
-import { INDEX_PATH } from '../../constants/RouterConstants';
+import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
-import ErrorTransaction from '../Send/ErrorTransaction';
-
 class SignTransaction extends React.Component {
 
 	componentDidMount() {
-		if (!this.props.transaction && globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
-			this.props.history.push(INDEX_PATH);
+		if (!this.props.transaction) {
+			if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
+				this.props.history.push(INDEX_PATH);
+			} else {
+				this.props.history.push(NETWORK_ERROR_SEND_PATH);
+			}
 		}
 	}
 
@@ -40,17 +42,11 @@ class SignTransaction extends React.Component {
 
 	render() {
 		const {
-			transaction, accounts, loading, history, location,
+			transaction, accounts, loading,
 		} = this.props;
 
 		if (!transaction) {
-			return (
-				<ErrorTransaction
-					history={history}
-					location={location}
-					isReturn={false}
-				/>
-			);
+			return null;
 		}
 
 		const options = transaction.get('options');
@@ -139,10 +135,10 @@ class SignTransaction extends React.Component {
 
 SignTransaction.propTypes = {
 	loading: PropTypes.bool,
+	connected: PropTypes.bool.isRequired,
 	transaction: PropTypes.any,
 	accounts: PropTypes.object,
 	history: PropTypes.object.isRequired,
-	location: PropTypes.object.isRequired,
 	approve: PropTypes.func.isRequired,
 	cancel: PropTypes.func.isRequired,
 };
@@ -161,6 +157,7 @@ export default connect(
 			'accounts',
 			state.global.getIn(['network', 'name']),
 		]),
+		connected: state.global.get('connected'),
 	}),
 	(dispatch) => ({
 		approve: (transaction) => dispatch(approveTransaction(transaction)),

@@ -3,7 +3,7 @@ import echoService from '../services/echo';
 import { connect } from '../actions/ChainStoreAction';
 import { loadInfo } from '../actions/GlobalActions';
 import GlobalReducer from '../reducers/GlobalReducer';
-import { CHAINSTORE_INIT_TIMEOUT } from '../constants/GlobalConstants';
+import {CHAINSTORE_INIT_TIMEOUT, WS_CLOSE_TIMEOUT} from '../constants/GlobalConstants';
 
 let CHAIN_SUBSCRIBE = null;
 
@@ -64,8 +64,9 @@ export const checkConnection = (url) => async (dispatch, getState) => {
  * connect socket to address
  * @param {String} address
  * @param {Function} subscribeCb
+ * @param {Boolean} isRecreate
  */
-export const connectToAddress = async (address, subscribeCb) => {
+export const connectToAddress = async (address, subscribeCb, isRecreate) => {
 	const { Apis } = echoService.getWsLib();
 	const { ChainStore } = echoService.getChainLib();
 	CHAIN_SUBSCRIBE = subscribeCb;
@@ -73,8 +74,18 @@ export const connectToAddress = async (address, subscribeCb) => {
 	try {
 		let instance = Apis.instance();
 
-		if (instance.url !== address) {
-			await Apis.close();
+		if (instance.url !== address || isRecreate) {
+			const start = new Date().getTime();
+
+			await Promise.race([
+				Apis.close().then(() => (new Date().getTime() - start)),
+				new Promise((resolve, reject) => {
+					const timeoutId = setTimeout(() => {
+						clearTimeout(timeoutId);
+						reject(new Error('timeout close'));
+					}, WS_CLOSE_TIMEOUT);
+				}),
+			]);
 
 			Apis.setAutoReconnect(false);
 
@@ -95,7 +106,7 @@ export const connectToAddress = async (address, subscribeCb) => {
 			new Promise((resolve, reject) => {
 				const timeoutId = setTimeout(() => {
 					clearTimeout(timeoutId);
-					reject(new Error('timeout'));
+					reject(new Error('timeout chainstore'));
 				}, CHAINSTORE_INIT_TIMEOUT);
 			}),
 		]);

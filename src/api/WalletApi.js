@@ -2,9 +2,15 @@ import { TransactionHelper, Aes, PrivateKey } from 'echojs-lib';
 
 import { lookupAccounts } from './ChainApi';
 
-import { MEMO_FEE_KEYS } from '../constants/GlobalConstants';
+import {
+	BROADCAST_LIMIT,
+	CHAINSTORE_INIT_TIMEOUT,
+	MEMO_FEE_KEYS,
+	SET_TR_FEE_TIMEOUT,
+} from '../constants/GlobalConstants';
 
 import echoService from '../services/echo';
+import { ERROR_SEND_PATH } from '../constants/RouterConstants';
 
 export const validateAccountExist = async (
 	accountName,
@@ -113,6 +119,18 @@ export const getOperationFee = async (type, transaction) => {
 	const { TransactionBuilder } = await echoService.getChainLib();
 	const tr = new TransactionBuilder();
 	tr.add_type_operation(type, options);
-	await tr.set_required_fees(options.fee.asset_id);
+
+	const start = new Date().getTime();
+
+	await Promise.race([
+		tr.set_required_fees(options.fee.asset_id).then(() => (new Date().getTime() - start)),
+		new Promise((resolve, reject) => {
+			const timeoutId = setTimeout(() => {
+				clearTimeout(timeoutId);
+				reject(new Error('Timeout set required fees'));
+			}, SET_TR_FEE_TIMEOUT);
+		}),
+	]);
+
 	return tr.operations[0][1].fee.amount;
 };

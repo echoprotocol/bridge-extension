@@ -385,7 +385,11 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 		transaction.value = parseInt(transaction.value, 10);
 	}
 
-	transaction.fee = await getTransactionFee(transaction);
+	try {
+		transaction.fee = await getTransactionFee(transaction);
+	} catch (err) {
+		return err;
+	}
 
 	const errorFee = dispatch(checkTransactionFee(options, transaction));
 
@@ -448,6 +452,8 @@ export const removeTransaction = (id, isClose) => (dispatch, getState) => {
  * 	@param {Object} options
  */
 const requestHandler = async (id, options) => {
+	console.log(111, globals.WINDOW_TYPE, id, options);
+
 	const isLocked = store.getState().global.getIn(['crypto', 'isLocked']);
 
 	if (isLocked) {
@@ -484,10 +490,6 @@ const requestHandler = async (id, options) => {
 
 emitter.on('request', requestHandler);
 
-window.onload = () => {
-	emitter.emit('Loaded', { isLoaded: 1 });
-};
-
 /**
  *  @method windowRequestHandler
  *
@@ -520,6 +522,7 @@ window.onunload = () => {
  * 	Load transactions data from query to redux store
  */
 export const loadRequests = () => async (dispatch, getState) => {
+	console.log(222, globals.WINDOW_TYPE);
 	const connected = getState().global.get('connected');
 
 	const transactions = echoService.getRequests().filter(async ({ id, options }) => {
@@ -528,16 +531,17 @@ export const loadRequests = () => async (dispatch, getState) => {
 		if (error) {
 			try {
 				emitter.emit('response', error, id, ERROR_STATUS);
-			} catch (e) {
-
-			}
+			} catch (e) {}
 
 		}
 
 		return !error;
 	});
 
-	if (!transactions.length) { return null; }
+	if (!transactions.length) {
+		closePopup();
+		return null;
+	}
 
 	const { pathname } = history.location;
 
@@ -550,6 +554,12 @@ export const loadRequests = () => async (dispatch, getState) => {
 	}));
 
 	await dispatch(setTransaction(transactions[0]));
+
+	if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
+		try {
+			emitter.emit('Loaded', { winType: globals.WINDOW_TYPE });
+		} catch (e) {}
+	}
 
 	return null;
 };
@@ -640,6 +650,7 @@ export const approveTransaction = (transaction) => async (dispatch) => {
 		try {
 			emitter.emit('response', error, transaction.get('id'), ERROR_STATUS);
 			path = NETWORK_ERROR_SEND_PATH;
+			dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
 		} catch (e) {
 			return null;
 		}

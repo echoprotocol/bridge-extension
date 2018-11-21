@@ -6,7 +6,12 @@ import echoService from '../services/echo';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { CREATE_PIN_PATH, UNLOCK_PATH, INDEX_PATH, SIGN_TRANSACTION_PATH } from '../constants/RouterConstants';
+import {
+	CREATE_PIN_PATH,
+	UNLOCK_PATH,
+	INDEX_PATH,
+	SIGN_TRANSACTION_PATH,
+} from '../constants/RouterConstants';
 import { NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
 
 import { setValue } from './FormActions';
