@@ -11,10 +11,13 @@ import './assets/loader';
 import history from './history';
 import store from './store';
 
+import { POPUP_HEIGHT, POPUP_WIDTH, POPUP_WINDOW_TYPE } from './constants/GlobalConstants';
+
 import { setWindowType } from './actions/SignActions';
 
-import { POPUP_WINDOW_TYPE } from './constants/GlobalConstants';
-
+if (window.innerWidth !== window.outerWidth || window.innerHeight !== window.outerHeight) {
+	window.resizeBy(POPUP_WIDTH - window.innerWidth, POPUP_HEIGHT - window.innerHeight);
+}
 
 const { windowType } = query.parse(window.location.search);
 
