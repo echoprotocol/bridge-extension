@@ -52,7 +52,7 @@ class SignTransaction extends React.Component {
 					{
 						account ?
 							<div className="wallet-info">
-								Wallet
+								<div className="title">Wallet</div>
 								<div className="incoming-transaction-user">
 									<UserIcon
 										avatar={`ava${account.icon}`}
