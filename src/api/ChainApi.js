@@ -3,7 +3,7 @@ import echoService from '../services/echo';
 import { connect } from '../actions/ChainStoreAction';
 import { loadInfo } from '../actions/GlobalActions';
 import GlobalReducer from '../reducers/GlobalReducer';
-import {CHAINSTORE_INIT_TIMEOUT, WS_CLOSE_TIMEOUT} from '../constants/GlobalConstants';
+import { CHAINSTORE_INIT_TIMEOUT, WS_CLOSE_TIMEOUT } from '../constants/GlobalConstants';
 
 let CHAIN_SUBSCRIBE = null;
 

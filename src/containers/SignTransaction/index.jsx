@@ -135,7 +135,6 @@ class SignTransaction extends React.Component {
 
 SignTransaction.propTypes = {
 	loading: PropTypes.bool,
-	connected: PropTypes.bool.isRequired,
 	transaction: PropTypes.any,
 	accounts: PropTypes.object,
 	history: PropTypes.object.isRequired,
@@ -157,7 +156,6 @@ export default connect(
 			'accounts',
 			state.global.getIn(['network', 'name']),
 		]),
-		connected: state.global.get('connected'),
 	}),
 	(dispatch) => ({
 		approve: (transaction) => dispatch(approveTransaction(transaction)),

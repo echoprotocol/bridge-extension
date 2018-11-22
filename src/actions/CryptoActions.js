@@ -101,6 +101,9 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 		await getCrypto().unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
 		await dispatch(loadInfo());
+		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
+			history.push(SIGN_TRANSACTION_PATH);
+		}
 		return true;
 	} catch (err) {
 		dispatch(setValue(form, 'error', FormatHelper.formatError(err)));

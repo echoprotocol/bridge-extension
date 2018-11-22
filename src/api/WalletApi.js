@@ -3,14 +3,11 @@ import { TransactionHelper, Aes, PrivateKey } from 'echojs-lib';
 import { lookupAccounts } from './ChainApi';
 
 import {
-	BROADCAST_LIMIT,
-	CHAINSTORE_INIT_TIMEOUT,
 	MEMO_FEE_KEYS,
 	SET_TR_FEE_TIMEOUT,
 } from '../constants/GlobalConstants';
 
 import echoService from '../services/echo';
-import { ERROR_SEND_PATH } from '../constants/RouterConstants';
 
 export const validateAccountExist = async (
 	accountName,

@@ -452,7 +452,6 @@ export const removeTransaction = (id, isClose) => (dispatch, getState) => {
  * 	@param {Object} options
  */
 const requestHandler = async (id, options) => {
-	console.log(111, globals.WINDOW_TYPE, id, options);
 
 	const isLocked = store.getState().global.getIn(['crypto', 'isLocked']);
 
@@ -470,7 +469,7 @@ const requestHandler = async (id, options) => {
 
 	const error = await store.dispatch(validateTransaction(options));
 	if (error) {
-		emitter.emit('response', error, id, ERROR_STATUS);
+		emitter.emit('response', `${error}1`, id, ERROR_STATUS);
 		return null;
 	}
 
@@ -522,7 +521,6 @@ window.onunload = () => {
  * 	Load transactions data from query to redux store
  */
 export const loadRequests = () => async (dispatch, getState) => {
-	console.log(222, globals.WINDOW_TYPE);
 	const connected = getState().global.get('connected');
 
 	const transactions = echoService.getRequests().filter(async ({ id, options }) => {
@@ -530,7 +528,7 @@ export const loadRequests = () => async (dispatch, getState) => {
 
 		if (error) {
 			try {
-				emitter.emit('response', error, id, ERROR_STATUS);
+				emitter.emit('response', `${error}2`, id, ERROR_STATUS);
 			} catch (e) {}
 
 		}
@@ -539,7 +537,6 @@ export const loadRequests = () => async (dispatch, getState) => {
 	});
 
 	if (!transactions.length) {
-		closePopup();
 		return null;
 	}
 
@@ -557,7 +554,7 @@ export const loadRequests = () => async (dispatch, getState) => {
 
 	if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
 		try {
-			emitter.emit('Loaded', { winType: globals.WINDOW_TYPE });
+			// emitter.emit('Loaded', { winType: globals.WINDOW_TYPE });
 		} catch (e) {}
 	}
 

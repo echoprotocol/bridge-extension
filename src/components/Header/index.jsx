@@ -19,7 +19,6 @@ class Header extends React.PureComponent {
 
 	render() {
 		const { accounts, pathname } = this.props;
-		console.log(pathname);
 
 		if (
 			[SIGN_TRANSACTION_PATH, SUCCESS_SEND_PATH, ERROR_SEND_PATH, EMPTY_PATH].includes(pathname)

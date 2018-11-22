@@ -130,21 +130,19 @@ const onMessage = (request, sender, sendResponse) => {
 		});
 
 		setBadge();
-
+		try {
+			emitter.emit('request', id, request.data);
+		} catch (e) {}
 		notificationManager.getPopup()
 			.then((popup) => {
 				if (!popup) {
 					triggerPopup();
 
-					emitter.once('Loaded', () => {
-						try {
-							emitter.emit('request', id, request.data);
-						} catch (e) {}
-					});
-				} else {
-					try {
-						emitter.emit('request', id, request.data);
-					} catch (e) {}
+					// emitter.once('Loaded', () => {
+					// 	try {
+					// 		emitter.emit('request', id, request.data);
+					// 	} catch (e) {}
+					// });
 				}
 			})
 			.catch(triggerPopup);
@@ -183,7 +181,6 @@ const removeTransaction = (err, id) => {
  * @returns {Promise.<void>}
  */
 const onResponse = (err, id, status) => {
-	console.log('ONRESPONCE_11111', err, id, status);
 	if ([CLOSE_STATUS, OPEN_STATUS].includes(status)) {
 		if (CLOSE_STATUS === status && requestQueue.length === 1) {
 			closePopup();
@@ -207,7 +204,7 @@ const onResponse = (err, id, status) => {
 	}
 
 	if (
-		(requestQueue.length === 0 && COMPLETE_STATUS === status)
+		(requestQueue.length === 0 && [COMPLETE_STATUS, ERROR_STATUS].includes(status))
 		|| DISCONNECT_STATUS === status
 	) closePopup();
 
