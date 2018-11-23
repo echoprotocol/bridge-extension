@@ -81,6 +81,8 @@ function removeListener(type, nullOrFn) {
 	if (typeof nullOrFn === 'function') {
 		let index,
 			found = false;
+		if (listeners[1]) {
+		}
 		while ((index = listeners.indexOf(nullOrFn)) >= 0) {
 			listeners.splice(index, 1);
 			this._events[type].splice(index, 1);
@@ -117,9 +119,7 @@ async function emit(type, ...args) {
 				}
 			}
 		}
-		onceListeners.forEach((event) => {
-			return this.removeListener(type, event);
-		});
+		onceListeners.forEach((event) => this.removeListener(type, event));
 
 		return true;
 	}

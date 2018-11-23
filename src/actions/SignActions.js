@@ -13,15 +13,12 @@ import { validateOperation, getFetchMap, formatToSend } from '../services/operat
 
 import FormatHelper from '../helpers/FormatHelper';
 import {
-	ERROR_SEND_PATH,
 	INDEX_PATH,
 	NETWORK_ERROR_SEND_PATH,
 	NOT_RETURNED_PATHS,
-	SUCCESS_SEND_PATH,
 } from '../constants/RouterConstants';
 import ValidateTransactionHelper from '../helpers/ValidateTransactionHelper';
 import {
-	APPROVED_STATUS,
 	CANCELED_STATUS,
 	ERROR_STATUS,
 	CORE_ID,
@@ -29,7 +26,6 @@ import {
 	OPEN_STATUS,
 	POPUP_WINDOW_TYPE,
 	ACCOUNTS_LOOKUP_LIMIT,
-	BROADCAST_LIMIT,
 	COMPLETE_STATUS,
 } from '../constants/GlobalConstants';
 import { operationKeys, operationTypes } from '../constants/OperationConstants';
@@ -40,6 +36,7 @@ const emitter = echoService.getEmitter();
 
 export const globals = {
 	WINDOW_TYPE: null,
+	IS_LOADING: false,
 };
 
 /**
@@ -411,6 +408,13 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 	return null;
 };
 
+/**
+ *  @method closePopup
+ *
+ * 	Close popup incoming transaction
+ *
+ * 	@param {String} status
+ */
 export const closePopup = (status) => {
 	try {
 		emitter.emit('response', null, null, status || COMPLETE_STATUS);
@@ -494,12 +498,12 @@ emitter.on('request', requestHandler);
  *
  * 	Transaction operations handler (between windows)
  *
- * 	@param {*} value - id(Number) or transaction(Object) with fetched values
+ * 	@param {Number} id
  * 	@param {String} windowType
  */
-const windowRequestHandler = async (value, windowType) => {
+const windowRequestHandler = async (id, windowType) => {
 	if (globals.WINDOW_TYPE !== windowType) {
-		store.dispatch(removeTransaction(value));
+		store.dispatch(removeTransaction(id));
 	}
 };
 
@@ -511,8 +515,8 @@ window.onunload = () => {
 		ChainStore.unsubscribe(getChainSubcribe());
 	}
 
-	emitter.removeListener('windowRequest', windowRequestHandler);
-	emitter.removeListener('request', requestHandler);
+	emitter.removeListener('windowRequest');
+	emitter.removeListener('request');
 };
 
 /**
@@ -552,55 +556,7 @@ export const loadRequests = () => async (dispatch, getState) => {
 
 	await dispatch(setTransaction(transactions[0]));
 
-	if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
-		try {
-			// emitter.emit('Loaded', { winType: globals.WINDOW_TYPE });
-		} catch (e) {}
-	}
-
 	return null;
-};
-
-/**
- *  @method sendTransaction
- *
- * 	Send transaction
- *
- * 	@param {Object} transaction
- */
-const sendTransaction = (transaction) => async (dispatch, getState) => {
-	const networkName = getState().global.getIn(['network', 'name']);
-
-	const { type, memo } = transaction.get('options');
-	const account = transaction.get('options')[operationKeys[type]];
-	const options = formatToSend(type, transaction.get('options'));
-
-	const publicKey = account.getIn(['active', 'key_auths', '0', '0']);
-
-	const { TransactionBuilder } = await echoService.getChainLib();
-	let tr = new TransactionBuilder();
-	tr = await echoService.getCrypto().sign(networkName, tr, publicKey);
-
-	if (memo) {
-		const { to } = transaction.get('options');
-
-		options.memo = await echoService.getCrypto().encryptMemo(
-			networkName,
-			account.getIn(['options', 'memo_key']),
-			to.getIn(['options', 'memo_key']),
-			memo,
-		);
-	}
-
-	tr.add_type_operation(type, options);
-	await tr.set_required_fees(options.fee.asset_id);
-
-	return tr.broadcast().then(() => {
-		emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
-	}).catch((err) => {
-		emitter.emit('response', FormatHelper.formatError(err), transaction.get('id'), ERROR_STATUS);
-		return err;
-	});
 };
 
 /**
@@ -610,7 +566,7 @@ const sendTransaction = (transaction) => async (dispatch, getState) => {
  *
  * 	@param {Object} transaction
  */
-export const approveTransaction = (transaction) => async (dispatch) => {
+export const approveTransaction = (transaction) => async (dispatch, getState) => {
 	try {
 		emitter.emit('response', null, transaction.get('id'), globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
 
@@ -619,47 +575,51 @@ export const approveTransaction = (transaction) => async (dispatch) => {
 		return null;
 	}
 
+	const networkName = getState().global.getIn(['network', 'name']);
 
+	globals.IS_LOADING = true;
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
-	let path = SUCCESS_SEND_PATH;
+	const balances = getState().balance.get('balances');
+	const accountId = getState().global.getIn(['account', 'id']);
 
-	try {
-		const start = new Date().getTime();
-
-		await Promise.race([
-			dispatch(sendTransaction(transaction)).then((err) => {
-				if (err) {
-					path = ERROR_SEND_PATH;
-				}
-				return new Date().getTime() - start;
-			}),
-			new Promise((resolve, reject) => {
-				const timeoutId = setTimeout(() => {
-					clearTimeout(timeoutId);
-					reject(new Error('Send transaction timeout'));
-				}, BROADCAST_LIMIT);
-			}),
-		]);
-	} catch (err) {
-		const error = FormatHelper.formatError(err);
-
-		try {
-			emitter.emit('response', error, transaction.get('id'), ERROR_STATUS);
-			path = NETWORK_ERROR_SEND_PATH;
-			dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
-		} catch (e) {
-			return null;
-		}
-
-
-	} finally {
-		dispatch(removeTransaction(transaction.get('id')));
-		history.push(path);
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	if (!accountId) {
+		return 'Account not available';
 	}
+
+	const balance = balances
+		.find((val) => val.get('owner') === accountId && val.get('asset_type') === transaction.get('options').fee.asset.get('id'))
+		.get('balance');
+
+	emitter.emit('trRequest', transaction.get('id'), networkName, balance);
+
 	return null;
 };
+
+/**
+ *  @method requestHandler
+ *
+ * 	On transaction broadcast result emitter response
+ *
+ * 	@param {String} status
+ * 	@param {Object} id
+ * 	@param {Object} path
+ */
+const trResponseHandler = (status, id, path) => {
+	if (status === ERROR_STATUS) {
+		path = NETWORK_ERROR_SEND_PATH;
+
+		store.dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
+	}
+
+	store.dispatch(removeTransaction(id));
+
+	history.push(path);
+
+	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+};
+
+emitter.on('trResponse', trResponseHandler);
 
 /**
  *  @method cancelTransaction
