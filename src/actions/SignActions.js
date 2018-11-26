@@ -473,7 +473,7 @@ const requestHandler = async (id, options) => {
 
 	const error = await store.dispatch(validateTransaction(options));
 	if (error) {
-		emitter.emit('response', `${error}1`, id, ERROR_STATUS);
+		emitter.emit('response', `${error}`, id, ERROR_STATUS);
 		return null;
 	}
 
@@ -526,19 +526,23 @@ window.onunload = () => {
  */
 export const loadRequests = () => async (dispatch, getState) => {
 	const connected = getState().global.get('connected');
+	const requests = echoService.getRequests();
 
-	const transactions = echoService.getRequests().filter(async ({ id, options }) => {
-		const error = connected ? await dispatch(validateTransaction(options)) : 'Network error';
+	const transactionIds = await Promise.all(requests.map(async ({ id, options }) => {
+		const err = connected ? (await dispatch(validateTransaction(options))) : 'Network error';
 
-		if (error) {
+		if (err) {
 			try {
-				emitter.emit('response', `${error}2`, id, ERROR_STATUS);
+				emitter.emit('response', `${err}`, id, ERROR_STATUS);
 			} catch (e) {}
 
+			return id;
 		}
 
-		return !error;
-	});
+		return null;
+	}));
+
+	const transactions = requests.filter(({ id }) => !transactionIds.includes(id));
 
 	if (!transactions.length) {
 		return null;
@@ -629,7 +633,6 @@ emitter.on('trResponse', trResponseHandler);
  * 	@param {String} id
  */
 export const cancelTransaction = (id) => (dispatch) => {
-
 	try {
 		emitter.emit('response', null, id, CANCELED_STATUS);
 
