@@ -236,11 +236,13 @@ const validateTransaction = (options) => async (dispatch, getState) => {
  * 	@param {Object} options
  * 	@param {Object} transaction
  */
-const checkTransactionFee = (options, transaction) => (dispatch, getState) => {
+const checkTransactionFee = (options, transaction) => async (dispatch, getState) => {
 	let valueAssetId = '';
 
-	if (options.type === operationTypes.contract.name.toLowerCase()) {
-		valueAssetId = transaction.asset_id;
+	if (options.type === operationTypes.contract.name.toLowerCase() && transaction.value) {
+		const core = await fetchChain(CORE_ID);
+
+		valueAssetId = transaction.asset_id || core;
 	} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
 		valueAssetId = transaction.amount.asset;
 	}
@@ -261,7 +263,20 @@ const checkTransactionFee = (options, transaction) => (dispatch, getState) => {
 		.get('balance');
 
 	if (valueAssetId.get('id') === transaction.fee.asset.get('id')) {
-		const total = new BN(options.value).times(10 ** valueAssetId.get('precision')).plus(transaction.fee.amount);
+		let value = '';
+
+		if (options.type === operationTypes.contract.name.toLowerCase()) {
+			({ value } = transaction);
+		} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
+			value = transaction.amount.amount;
+		}
+
+
+		if (!value) {
+			return null;
+		}
+
+		const total = new BN(value).plus(transaction.fee.amount);
 
 		if (total.gt(balance)) {
 			return 'Insufficient funds for fee';
@@ -388,7 +403,14 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 		return err;
 	}
 
-	const errorFee = dispatch(checkTransactionFee(options, transaction));
+	const errorFee = await dispatch(checkTransactionFee(options, transaction));
+
+	if (transaction.value) {
+		const core = await fetchChain(CORE_ID);
+
+		transaction.value = transaction.asset_id ? transaction.value / (10 ** transaction.asset_id.get('precision')) :
+			transaction.value / (10 ** core.get('precision'));
+	}
 
 	if (errorFee) {
 		try {

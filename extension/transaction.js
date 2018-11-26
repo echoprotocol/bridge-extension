@@ -4,7 +4,6 @@ import { Aes, PrivateKey, TransactionHelper } from 'echojs-lib';
 import echoService from '../src/services/echo';
 
 import { CORE_ID, MEMO_FEE_KEYS, SET_TR_FEE_TIMEOUT } from '../src/constants/GlobalConstants';
-import { operationTypes } from '../src/constants/OperationConstants';
 
 import { formatToSend, getFetchMap } from '../src/services/operation';
 
@@ -90,33 +89,6 @@ export const trFetchChain = async (key) => {
 	}
 };
 
-const checkTransactionFee = (options, transaction, balance) => {
-	let valueAssetId = '';
-
-	if (options.type === operationTypes.contract.name.toLowerCase()) {
-		valueAssetId = transaction.asset_id;
-	} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
-		valueAssetId = transaction.amount.asset;
-	}
-
-	if (!valueAssetId) {
-		return null;
-	}
-
-	if (valueAssetId.get('id') === transaction.fee.asset.get('id')) {
-		const total = new BN(options.value).times(10 ** valueAssetId.get('precision')).plus(transaction.fee.amount);
-
-		if (total.gt(balance)) {
-			return 'Insufficient funds for fee';
-		}
-	} else if (new BN(transaction.fee.amount).gt(balance)) {
-		return 'Insufficient funds for fee';
-
-	}
-
-	return null;
-};
-
 /**
  *  @method getTransactionFee
  *
@@ -156,7 +128,7 @@ const getFetchedObjects = async (fetchList) => {
 	}
 };
 
-const getTransaction = async ({ id, options, balance }) => {
+const getTransaction = async ({ id, options }) => {
 	const transaction = JSON.parse(JSON.stringify(options));
 	transaction.fee = transaction.fee || { amount: 0, asset_id: CORE_ID };
 
@@ -202,13 +174,6 @@ const getTransaction = async ({ id, options, balance }) => {
 		transaction.fee = await getTransactionFee(transaction);
 	} catch (err) {
 		return err;
-	}
-
-	const errorFee = checkTransactionFee(options, transaction, balance);
-
-	if (errorFee) {
-
-		return null;
 	}
 
 	return transaction;
