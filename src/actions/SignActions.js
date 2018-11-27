@@ -617,7 +617,7 @@ export const approveTransaction = (transaction) => async (dispatch, getState) =>
 		.find((val) => val.get('owner') === accountId && val.get('asset_type') === transaction.get('options').fee.asset.get('id'))
 		.get('balance');
 
-	emitter.emit('trRequest', transaction.get('id'), networkName, balance);
+	emitter.emit('trRequest', transaction.get('id'), networkName, balance, globals.WINDOW_TYPE);
 
 	return null;
 };
@@ -630,8 +630,9 @@ export const approveTransaction = (transaction) => async (dispatch, getState) =>
  * 	@param {String} status
  * 	@param {Object} id
  * 	@param {Object} path
+ * 	@param {String} windowType
  */
-const trResponseHandler = (status, id, path) => {
+const trResponseHandler = (status, id, path, windowType) => {
 	if (status === ERROR_STATUS) {
 		path = NETWORK_ERROR_SEND_PATH;
 
@@ -640,7 +641,9 @@ const trResponseHandler = (status, id, path) => {
 
 	store.dispatch(removeTransaction(id));
 
-	history.push(path);
+	if (windowType === globals.WINDOW_TYPE && path) {
+		history.push(path);
+	}
 
 	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 };

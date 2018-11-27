@@ -15,6 +15,7 @@
             &:last-child {
                 &.page-title {
                     margin: auto;
+                    padding: 0 0px 0 13px;
                 }
             }
 
@@ -34,7 +35,7 @@
         .page-title {
             font-family: FNBook;
             color: #FFFFFF;
-            font-size: 19px;
+            font-size: 20px;
             letter-spacing: 1px;
             & + .link-nav {
                 margin-left: auto;

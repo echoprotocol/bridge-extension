@@ -286,6 +286,13 @@
                             box-shadow:
                                 -2px -1px 3px rgba(0, 0, 0, .05),
                                 2px 1px 3px rgba(0, 0, 0, .05);
+                                
+                            .title {
+                                color: #adb3b9;
+                            }
+                            .accounts {
+                                color: #adb3b9;
+                            }    
                         }
 
                     }
@@ -294,6 +301,8 @@
                     margin-right: auto;
                     @include cutTxt();
                     max-width: 190px;
+                    color: #838b93;
+                    transition: color $speed;
                 }
 			}
 			.default-networks {
@@ -337,7 +346,7 @@
 							color: #ADB4BA;
 							background-color: #3c464a;
 							.accounts {
-								color: rgba(#727A81,.8);
+                                // color: rgba(#727A81,.8);
 							}
                             box-shadow:
                                 -1px -1px 4px rgba(0, 0, 0, .1),
@@ -411,7 +420,8 @@
     }
     .accounts {
         display: flex;
-		margin-left: auto;
+        margin-left: auto;
+        transition: color $speed;
         li {
             font-size: 14px;
             transition: color $speed;

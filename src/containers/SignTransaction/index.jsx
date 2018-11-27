@@ -58,13 +58,18 @@ class SignTransaction extends React.Component {
 		return (
 			<div className="incoming-transaction-wrap">
 				<div className="incoming-transaction-bg">
+					<button
+						onClick={(e) => this.onCancel(e)}
+						className="button ui icon-closeSmall btn-icon"
+						disabled={loading}
+					/>
 					<div className="title">New unsigned transaction</div>
 				</div>
 				<div className="incoming-transaction-page">
 					{
 						account ?
 							<div className="wallet-info">
-								Wallet
+								<div className="title">Wallet</div>
 								<div className="incoming-transaction-user">
 									<UserIcon
 										avatar={`ava${account.icon}`}
@@ -112,14 +117,14 @@ class SignTransaction extends React.Component {
 					<div className="two-btn-wrap" >
 						<Button
 							type="button"
-							className={classnames('btn-transparent', { loading })}
+							className={classnames('btn-in-light', { loading })}
 							content={<span className="btn-text">Approve</span>}
 							onClick={(e) => this.onApprove(e)}
 							disabled={loading}
 						/>
 						<Button
 							type="button"
-							className="btn-in-light"
+							className="btn-transparent"
 							content={<span className="btn-text">Reject</span>}
 							onClick={(e) => this.onCancel(e)}
 							disabled={loading}

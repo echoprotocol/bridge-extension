@@ -2,8 +2,26 @@
     width: 100%;
     .rcs-outer-container {
         overflow: hidden;
+        position: relative;
+
         .rcs-positioning {
-            position: relative;
+            position: absolute;
+            top: 0;
+            width: 9px;
+            right: 0;
+            height: 100%;
+
+            &:hover {
+                .rcs-inner-handle {
+                    background-color: #415151;
+                }
+            }
+
+            &:active {
+                .rcs-inner-handle {
+                    background-color: #657272;
+                }
+            }
         }
         &:hover {
             .rcs-custom-scrollbar {
@@ -45,9 +63,10 @@
     .rcs-custom-scrollbar {
         position: absolute;
         height: 100%;
-        width: 6px;
+        width: 4px;
         right: 3px;
-        opacity: 0;
+        // opacity: 0;
+        opacity: 1;
         z-index: 99;
         transition: opacity 0.4s ease-out;
         padding: 6px 0;
@@ -67,7 +86,8 @@
     .rcs-inner-handle {
         height: calc(100% - 12px);
         margin-top: 6px;
-        background-color: rgba(#b8bfc0, .9);
+        background-color: #b8bfc0;
         border-radius: 1px;
+        transition: opacity .3s ease-out, background-color .3s ease-out;
     }
 }

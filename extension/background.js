@@ -279,7 +279,7 @@ const sendTransaction = async (transaction, networkName) => {
  * 	@param {String} networkName
  * 	@param {Number} balance
  */
-const onTransaction = async (id, networkName, balance) => {
+const onTransaction = async (id, networkName, balance, windowType) => {
 	const currentTransactionCb = lastTransaction.cb;
 	const { popupId } = notificationManager;
 
@@ -313,12 +313,12 @@ const onTransaction = async (id, networkName, balance) => {
 
 		createNotification('Transaction', `${ERROR_STATUS} ${FormatHelper.formatError(err).toLowerCase()}`);
 
-		if (popupId !== NotificationManager.popupId) {
-			return null;
-		}
-
 		try {
-			emitter.emit('trResponse', ERROR_STATUS, id, path);
+			if (popupId !== notificationManager.popupId) {
+				emitter.emit('trResponse', ERROR_STATUS, id, null, windowType);
+			} else {
+				emitter.emit('trResponse', ERROR_STATUS, id, path, windowType);
+			}
 		} catch (e) {}
 
 		return null;
@@ -328,12 +328,12 @@ const onTransaction = async (id, networkName, balance) => {
 
 	createNotification('Transaction', `${APPROVED_STATUS}`);
 
-	if (popupId !== notificationManager.popupId) {
-		return null;
-	}
-
 	try {
-		emitter.emit('trResponse', APPROVED_STATUS, id, path);
+		if (popupId !== notificationManager.popupId) {
+			emitter.emit('trResponse', APPROVED_STATUS, id, null, windowType);
+		} else {
+			emitter.emit('trResponse', APPROVED_STATUS, id, path, windowType);
+		}
 	} catch (e) {}
 
 	return null;

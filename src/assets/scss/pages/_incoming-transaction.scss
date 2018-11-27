@@ -1,15 +1,21 @@
 .incoming-transaction {
     &-wrap {
         .wallet-info {
-            height: 62px;
+            min-height: 62px;
             background-color: #dfe3e7;
             display: flex;
             align-items: center;
             justify-content: space-between;
-            padding: 0 20px;
+            padding: 10px 20px;
             color: #90999A;
             font-family: FNBook;
             font-size: 14px;
+
+            > .title {
+                flex-shrink: 0;
+                margin-right: 30px;
+            }
+
             .name {
                 font-size: 16px;
                 color: #2D3A3D;
@@ -93,10 +99,16 @@
             margin-top: 11px;
             font-size: 17px;
             color: #97ACAD;
+            transition: color $speed, opacity $speed;
             &:hover,
             &:focus {
-                color: #fff;
-            } 
+                color: #bbd1d2;
+            }
+
+            &:active {
+                color: #bad0d1;
+                opacity: 0.5;
+            }
         }
     }
     

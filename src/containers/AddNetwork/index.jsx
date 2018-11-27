@@ -143,7 +143,7 @@ class AddNetwork extends React.Component {
 				<div className="page-action-wrap">
 					<div className="one-btn-wrap" >
 						<Button
-							content={<span className="btn-text">ADD</span>}
+							content={<span className="btn-text">Create network</span>}
 							disabled={this.isButtonDisabled()}
 							className={classnames('btn-in-light', { disabled: loading })}
 							type="submit"

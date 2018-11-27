@@ -64,7 +64,7 @@ class CreateComponent extends React.Component {
 								hintText={example}
 								beforeExampleText="You can try"
 								hintClickable
-								descriptionText="Unique name will be used to make transaction"
+								descriptionText="Unique name will be used to make transactions"
 								value={name}
 								onChange={(e) => this.onChangeName(e)}
 								onHintClick={() => this.props.changeName(example)}
