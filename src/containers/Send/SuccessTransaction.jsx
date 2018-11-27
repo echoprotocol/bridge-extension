@@ -1,8 +1,15 @@
 import React from 'react';
-import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 import { Button } from 'semantic-ui-react';
 
+import { closePopup } from '../../actions/SignActions';
+
 class SuccessTransaction extends React.PureComponent {
+
+	onClick() {
+		closePopup();
+		this.props.history.goBack();
+	}
 
 	render() {
 		return (
@@ -18,6 +25,7 @@ class SuccessTransaction extends React.PureComponent {
 						<Button
 							className="btn-inverted success"
 							content={<span className="btn-text">Proceed</span>}
+							onClick={() => this.onClick()}
 						/>
 					</div>
 				</div>
@@ -27,8 +35,8 @@ class SuccessTransaction extends React.PureComponent {
 
 }
 
+SuccessTransaction.propTypes = {
+	history: PropTypes.object.isRequired,
+};
 
-export default connect(
-	() => ({}),
-	() => ({}),
-)(SuccessTransaction);
+export default SuccessTransaction;

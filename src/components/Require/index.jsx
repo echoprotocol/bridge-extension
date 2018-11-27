@@ -8,6 +8,9 @@ import {
 	CREATE_ACCOUNT_PATH,
 	UNLOCK_PATH,
 	SIGN_TRANSACTION_PATH,
+	SUCCESS_SEND_PATH,
+	ERROR_SEND_PATH,
+	NETWORK_ERROR_SEND_PATH,
 } from '../../constants/RouterConstants';
 
 export function required(Component) {
@@ -36,7 +39,11 @@ export function required(Component) {
 				return;
 			}
 
-			if (isSign && pathname !== SIGN_TRANSACTION_PATH) {
+			if (
+				isSign
+				&& pathname !== SIGN_TRANSACTION_PATH
+				&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH].includes(pathname)
+			) {
 				this.props.history.push(SIGN_TRANSACTION_PATH);
 			}
 		}
@@ -49,7 +56,11 @@ export function required(Component) {
 				return null;
 			}
 
-			if (isSign && pathname !== SIGN_TRANSACTION_PATH) {
+			if (
+				isSign
+				&& pathname !== SIGN_TRANSACTION_PATH
+                && ![SUCCESS_SEND_PATH, ERROR_SEND_PATH].includes(pathname)
+			) {
 				return null;
 			}
 

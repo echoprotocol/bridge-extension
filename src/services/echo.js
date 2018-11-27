@@ -3,7 +3,7 @@
 
 import echojs from 'echojs-ws';
 import chainlib from 'echojs-lib';
-import EventEmitter from 'events';
+import EventEmitter from '../../libs/CustomAwaitEmitter';
 
 import Crypto from '../services/crypto';
 import extension from '../../extension/extensionizer';

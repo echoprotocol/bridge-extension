@@ -7,6 +7,7 @@ import { connect } from 'react-redux';
 import { sidebarToggle } from '../../actions/GlobalActions';
 
 import { HEADER_TITLE } from '../../constants/GlobalConstants';
+import { HIDE_NAVBAR_PATHS } from '../../constants/RouterConstants';
 
 class Navbar extends React.PureComponent {
 
@@ -24,13 +25,11 @@ class Navbar extends React.PureComponent {
 	}
 
 	render() {
+		const { pathname } = this.props.locationRouter;
 		const { title, link } = this.renderTitle();
 
 		return (
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		// НУЖНО СКРЫВАТЬ НАВБАР, ПОСЛЕ ОТПРАВКИ ТРАНЗАКЦИИ НА СТРАНИЦАХ
-		// ErrorTransactions и SuccessTransactions
-		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+			!HIDE_NAVBAR_PATHS.includes(pathname) &&
 			<div className="navbar">
 				<ul>
 					<li className="btn-nav-wrap" >

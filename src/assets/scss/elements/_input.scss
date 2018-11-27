@@ -21,7 +21,6 @@
     letter-spacing: 1px;
     margin-right: -1px;
 
-
     &.readOnly {
         // pointer-events: none;
 
@@ -54,7 +53,7 @@
             margin-top: 24px;
         }
     }
-    
+
     &.left {
         text-align: left;
 
@@ -66,7 +65,7 @@
 
     &.left-label {
         text-align: left;
-        
+
         input,
         .input-wrap {
             text-align: left;
@@ -340,12 +339,12 @@
         &::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
             color: rgba(61, 75, 82, 0.4);
         }
-        
+
         &:-ms-input-placeholder { /* Internet Explorer 10-11 */
             color: rgba(61, 75, 82, 0.4);
-        
+
         }
-        
+
         &::-ms-input-placeholder { /* Microsoft Edge */
             color: rgba(61, 75, 82, 0.4);
         }
@@ -387,7 +386,7 @@
         min-height: 31px;
 
         font-family: FNMedium;
-        letter-spacing: 1.8px;    
+        letter-spacing: 1.8px;
         font-size: 18px;
         line-height: 26px;
 
@@ -400,7 +399,7 @@
             font-family: FNMedium;
         }
     }
-    
+
     textarea:focus + .label {
         font-size: 14px;
         top: -12px;
@@ -443,7 +442,7 @@
         height: 1px;
         transition: background-color 0.3s;
     }
-    
+
 }
 
 // message

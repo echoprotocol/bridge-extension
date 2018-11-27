@@ -16,7 +16,7 @@ import {
 	SEND_PATH,
 	BACKUP_PATH,
 	WATCH_TOKEN_PATH,
-	SIGN_TRANSACTION_PATH,
+	SIGN_TRANSACTION_PATH, SUCCESS_SEND_PATH, ERROR_SEND_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -29,6 +29,8 @@ import Wallet from './containers/Wallet';
 import Receive from './containers/Receive';
 import Transactions from './containers/Transactions';
 import Send from './containers/Send';
+import SuccessTransaction from './containers/Send/SuccessTransaction';
+import ErrorTransaction from './containers/Send/ErrorTransaction';
 import Backup from './containers/Backup';
 import WatchToken from './containers/WatchToken';
 import SignTransaction from './containers/SignTransaction';
@@ -49,12 +51,14 @@ export default class Routes extends React.Component {
 
 					<Route exact path={SIGN_TRANSACTION_PATH} component={required(SignTransaction)} />
 
-					<Route exact path={ADD_NETWORK_PATH} component={required(AddNetwork)} />
-					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={required(SuccessAddNetwork)} />
+					<Route exact path={ADD_NETWORK_PATH} component={AddNetwork} />
+					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={SuccessAddNetwork} />
 					<Route exact path={WALLET_PATH} component={required(Wallet)} />
 					<Route exact path={RECEIVE_PATH} component={required(Receive)} />
 					<Route exact path={TRANSACTIONS_PATH} component={required(Transactions)} />
 					<Route exact path={SEND_PATH} component={required(Send)} />
+					<Route exact path={SUCCESS_SEND_PATH} component={required(SuccessTransaction)} />
+					<Route exact path={ERROR_SEND_PATH} component={required(ErrorTransaction)} />
 					<Route exact path={BACKUP_PATH} component={required(Backup)} />
 					<Route exact path={WATCH_TOKEN_PATH} component={required(WatchToken)} />
 

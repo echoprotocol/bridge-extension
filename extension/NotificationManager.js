@@ -1,6 +1,7 @@
 import extensionizer from './extensionizer';
 
 import { POPUP_HEIGHT, POPUP_WIDTH } from '../src/constants/GlobalConstants';
+import { POPUP_PATH } from '../src/constants/RouterConstants';
 
 class NotificationManager {
 
@@ -8,21 +9,25 @@ class NotificationManager {
 	 * Create popup
      */
 	showPopup() {
-		const cb = (popup) => { this.popupId = popup.id; };
+		const cb = (popup) => {
+			this.popupId = popup.id;
+		};
 
 		// top params offset from top
 		// left params offset from left
 
 		// create new notification popup
 		const creation = extensionizer.windows.create({
-			url: 'index.html',
+			url: POPUP_PATH,
 			type: 'popup',
 			state: 'normal',
 			height: POPUP_HEIGHT,
 			width: POPUP_WIDTH,
 		}, cb);
 
-		if (creation && creation.then) creation.then(cb);
+		if (creation && creation.then) {
+			creation.then(cb);
+		}
 	}
 
 	/**

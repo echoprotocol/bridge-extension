@@ -9,7 +9,13 @@ import CustomScroll from 'react-custom-scroll';
 import { withRouter } from 'react-router';
 import classnames from 'classnames';
 
-import { changeNetwork, deleteNetwork, switchAccountNetwork, switchAccount } from '../../actions/GlobalActions';
+import {
+	changeNetwork,
+	deleteNetwork,
+	switchAccountNetwork,
+	switchAccount,
+	globalInit,
+} from '../../actions/GlobalActions';
 
 import { NETWORKS } from '../../constants/GlobalConstants';
 import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
@@ -17,7 +23,7 @@ import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
 import GlobalReducer from '../../reducers/GlobalReducer';
 
 import UserIcon from '../UserIcon';
-import { checkConnection } from '../../api/ChainApi';
+
 
 class NetworkDropdown extends React.PureComponent {
 
@@ -60,7 +66,7 @@ class NetworkDropdown extends React.PureComponent {
 
 		if (currentNetworkName === name) {
 			if (!connected) {
-				this.props.tryToConnect(network.get('url'));
+				this.props.tryToConnect(true);
 			}
 			this.closeDropDown();
 			return false;
@@ -86,7 +92,7 @@ class NetworkDropdown extends React.PureComponent {
 
 		if (activeNetwork.get('name') === network.name) {
 			if (!connected) {
-				this.props.tryToConnect(activeNetwork.get('url'));
+				this.props.tryToConnect(true);
 			}
 
 			if (account.get('name') === accountName) {
@@ -303,7 +309,7 @@ export default withRouter(connect(
 		setGlobalLoad: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
 		switchAccountNetwork: (name, network) => dispatch(switchAccountNetwork(name, network)),
 		switchAccount: (name) => dispatch(switchAccount(name)),
-		tryToConnect: (url) => dispatch(checkConnection(url)),
+		tryToConnect: (isRecreate) => dispatch(globalInit(isRecreate)),
 	}),
 )(NetworkDropdown));
 
