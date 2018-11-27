@@ -58,7 +58,11 @@ class SignTransaction extends React.Component {
 		return (
 			<div className="incoming-transaction-wrap">
 				<div className="incoming-transaction-bg">
-					<button className="button ui icon-closeSmall btn-icon" />
+					<button
+						onClick={(e) => this.onCancel(e)}
+						className="button ui icon-closeSmall btn-icon"
+						disabled={loading}
+					/>
 					<div className="title">New unsigned transaction</div>
 				</div>
 				<div className="incoming-transaction-page">
