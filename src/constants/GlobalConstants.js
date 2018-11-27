@@ -84,6 +84,8 @@ export const POPUP_HEIGHT = 591;
 
 export const APPROVED_STATUS = 'approved';
 export const CANCELED_STATUS = 'canceled';
+export const CLOSE_STATUS = 'close';
+export const OPEN_STATUS = 'open';
 export const ERROR_STATUS = 'error';
 
 export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
@@ -100,14 +102,17 @@ export const GLOBAL_ID_1 = '2.1.0';
 export const KEY_CODE_ENTER = 13;
 export const KEY_CODE_SPACE = 32;
 export const KEY_CODE_TAB = 9;
+export const ACCOUNTS_LOOKUP_LIMIT = 50;
 export const ICONS_COUNT = 15;
 export const ICON_COLORS_COUNT = 7;
 export const BASE_ICON = 1;
 export const BASE_ICON_COLOR = 'green';
+export const POPUP_WINDOW_TYPE = 'popup';
 
 export const LOGIN_INTERVAL = 1000 * 30;
 export const CHAINSTORE_INIT_TIMEOUT = 10 * 1000;
 export const BROADCAST_TIMEOUT = 20 * 1000;
+export const BROADCAST_LIMIT = 20 * 1000;
 
 export const MEMO_FEE_KEYS = {
 	WIF: '5KGG3tFb5F4h3aiUSKNnKeDcNbL5y1ZVXQXVqpWVMYhW82zBrNb',

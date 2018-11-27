@@ -15,6 +15,9 @@ class AesStorage {
 	 */
 	constructor() {
 		this.aes = null;
+		this.startTimeout = null;
+		this.timerId = null;
+		this.remaining = null;
 		this.TIMEOUT = TIMEOUT;
 		this.emitter = () => {};
 	}
@@ -58,7 +61,33 @@ class AesStorage {
 	 *
 	 */
 	timeout() {
-		setTimeout(() => { this.clear(); }, this.TIMEOUT);
+		this.startTimeout = new Date();
+		clearTimeout(this.timerId);
+		this.timerId = setTimeout(() => { this.clear(); }, this.TIMEOUT);
+		this.remaining = this.TIMEOUT;
+	}
+
+	/**
+     *  @method pauseTimeout
+     *
+     *  Pause timeout
+     *
+     */
+	pauseTimeout() {
+		clearTimeout(this.timerId);
+		this.remaining -= new Date() - this.startTimeout;
+	}
+
+	/**
+     *  @method resumeTimeout
+     *
+     *  Resume timeout
+     *
+     */
+	resumeTimeout() {
+		this.startTimeout = new Date();
+		clearTimeout(this.timerId);
+		this.timerId = setTimeout(() => { this.clear(); }, this.remaining);
 	}
 
 	/**
@@ -135,6 +164,24 @@ class AesStorage {
 const privateAES = new AesStorage();
 
 class Crypto extends EventEmitter {
+
+	/**
+     *  @method pauseLockTimeout
+     *
+     *  Pause lock timeout when you need to perform an operation
+     */
+	pauseLockTimeout() {
+		privateAES.pauseTimeout();
+	}
+
+	/**
+     *  @method resumeLockTimeout
+     *
+     *  Resume lock timeout
+     */
+	resumeLockTimeout() {
+		privateAES.resumeTimeout();
+	}
 
 	/**
 	 *  @method isFirstTime

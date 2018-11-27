@@ -5,6 +5,7 @@ export const operationFields = {
 		fee: {
 			type: 'asset_object',
 			required: false,
+			hasProperties: ['amount', 'asset_id'],
 		},
 		from: {
 			type: 'account_id',
@@ -17,6 +18,7 @@ export const operationFields = {
 		amount: {
 			type: 'asset_object',
 			required: true,
+			hasProperties: ['amount', 'asset_id'],
 		},
 		memo: {
 			type: 'string',
@@ -27,6 +29,7 @@ export const operationFields = {
 		fee: {
 			type: 'asset_object',
 			required: false,
+			hasProperties: ['amount', 'asset_id'],
 		},
 		registrar: {
 			type: 'account_id',

@@ -8,7 +8,13 @@ import storage from '../src/services/storage';
 import extensionizer from './extensionizer';
 import NotificationManager from './NotificationManager';
 
-import { NETWORKS, APP_ID } from '../src/constants/GlobalConstants';
+import {
+	NETWORKS,
+	APP_ID,
+	CLOSE_STATUS,
+	OPEN_STATUS,
+	CANCELED_STATUS,
+} from '../src/constants/GlobalConstants';
 
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
@@ -16,6 +22,7 @@ const crypto = new Crypto();
 
 
 const requestQueue = [];
+let lastTransaction = null;
 const { ChainStore } = chainjs;
 
 ChainStore.notifySubscribers = () => {
@@ -137,6 +144,27 @@ const onMessage = (request, sender, sendResponse) => {
 };
 
 /**
+ * @method removeTransaction
+ *
+ * Remove element from transactions query
+ *
+ * @param err
+ * @param id
+ * @param status
+ * @returns null
+ */
+const removeTransaction = (err, id) => {
+	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
+	if (requestIndex === -1) return null;
+
+	lastTransaction = requestQueue.splice(requestIndex, 1);
+
+	setBadge();
+
+	return null;
+};
+
+/**
  * On extension emitter response
  * @param err
  * @param id
@@ -144,15 +172,39 @@ const onMessage = (request, sender, sendResponse) => {
  * @returns {Promise.<void>}
  */
 const onResponse = async (err, id, status) => {
-	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
-	if (requestIndex === -1) return;
+	if ([CLOSE_STATUS, OPEN_STATUS].includes(status)) {
+		if (CLOSE_STATUS === status && requestQueue.length === 1) {
+			closePopup();
+		}
 
-	requestQueue.splice(requestIndex, 1)[0].cb({ id, status, text: err });
+		removeTransaction(err, id);
 
-	setBadge();
+		return null;
+	}
+
+	if (status === CANCELED_STATUS) {
+		removeTransaction(err, id);
+	}
+
+	if (lastTransaction[0]) {
+		lastTransaction[0].cb({ id, status, text: err });
+	}
+
 	createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
 
 	if (requestQueue.length === 0) closePopup();
+
+	return null;
+};
+
+const onFirstInstall = (details) => {
+	if (details.reason === 'install') {
+		createNotification('Bridge', 'Extension is now installed. Restart your work pages, please.');
+	} else if (details.reason === 'update') {
+		const thisVersion = extensionizer.runtime.getManifest().version;
+
+		createNotification('Bridge', `Extension is now updated to ${thisVersion}. Restart your work pages, please.`);
+	}
 };
 
 createSocket();
@@ -166,5 +218,7 @@ window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }
 emitter.on('response', onResponse);
 
 extensionizer.runtime.onMessage.addListener(onMessage);
+
+extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });
