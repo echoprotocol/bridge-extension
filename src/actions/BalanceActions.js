@@ -333,7 +333,9 @@ export const send = () => async (dispatch, getState) => {
  * 	@param {String} path
  */
 const sendHandler = (path) => {
-	history.push(path);
+	if (store.getState().global.get('loading')) {
+		history.push(path);
+	}
 
 	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 };
