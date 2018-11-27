@@ -44,7 +44,7 @@ class ValidateTransactionHelper {
 	}
 
 	static validateAmount(value) {
-		if (!value.match(/^[0-9]*[.,]?[0-9]*$/)) {
+		if (!value.toString().match(/^[0-9]*[.,]?[0-9]*$/)) {
 			return 'Amount must contain only digits and dot';
 		}
 
