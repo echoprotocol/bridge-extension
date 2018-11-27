@@ -6,11 +6,17 @@ import echoService from '../services/echo';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
-import { CREATE_PIN_PATH, UNLOCK_PATH, INDEX_PATH } from '../constants/RouterConstants';
-import { NETWORKS } from '../constants/GlobalConstants';
+import {
+	CREATE_PIN_PATH,
+	UNLOCK_PATH,
+	INDEX_PATH,
+	SIGN_TRANSACTION_PATH,
+} from '../constants/RouterConstants';
+import { NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
 
 import { setValue } from './FormActions';
 import { loadInfo } from './GlobalActions';
+import { globals } from './SignActions';
 
 import FormatHelper from '../helpers/FormatHelper';
 import ValidatePinHelper from '../helpers/ValidatePinHelper';
@@ -59,7 +65,7 @@ export const initCrypto = () => async (dispatch) => {
 		if (!getCrypto().isLocked()) {
 			dispatch(changeCrypto({ isLocked: false }));
 			await dispatch(loadInfo());
-			history.push(INDEX_PATH);
+			history.push(globals.WINDOW_TYPE === POPUP_WINDOW_TYPE ? SIGN_TRANSACTION_PATH : INDEX_PATH);
 		} else {
 			const isFirstTime = await getCrypto().isFirstTime();
 
@@ -95,6 +101,9 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 		await getCrypto().unlock(pin);
 		dispatch(changeCrypto({ isLocked: false }));
 		await dispatch(loadInfo());
+		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
+			history.push(SIGN_TRANSACTION_PATH);
+		}
 		return true;
 	} catch (err) {
 		dispatch(setValue(form, 'error', FormatHelper.formatError(err)));

@@ -1,3 +1,4 @@
+/* eslint-disable no-empty */
 import { Map, List } from 'immutable';
 import BN from 'bignumber.js';
 
@@ -11,11 +12,13 @@ import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
 
 import FormatHelper from '../helpers/FormatHelper';
-import ValidateTransactionHelper from '../helpers/ValidateTransactionHelper';
-
-import { INDEX_PATH, NOT_RETURNED_PATHS } from '../constants/RouterConstants';
 import {
-	APPROVED_STATUS,
+	INDEX_PATH,
+	NETWORK_ERROR_SEND_PATH,
+	NOT_RETURNED_PATHS,
+} from '../constants/RouterConstants';
+import ValidateTransactionHelper from '../helpers/ValidateTransactionHelper';
+import {
 	CANCELED_STATUS,
 	ERROR_STATUS,
 	CORE_ID,
@@ -23,14 +26,18 @@ import {
 	OPEN_STATUS,
 	POPUP_WINDOW_TYPE,
 	ACCOUNTS_LOOKUP_LIMIT,
-	BROADCAST_LIMIT,
+	COMPLETE_STATUS,
 } from '../constants/GlobalConstants';
 import { operationKeys, operationTypes } from '../constants/OperationConstants';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
 const emitter = echoService.getEmitter();
-let WINDOW_TYPE = null;
+
+export const globals = {
+	WINDOW_TYPE: null,
+	IS_LOADING: false,
+};
 
 /**
  *  @method checkTransactionAccount
@@ -229,11 +236,13 @@ const validateTransaction = (options) => async (dispatch, getState) => {
  * 	@param {Object} options
  * 	@param {Object} transaction
  */
-const checkTransactionFee = (options, transaction) => (dispatch, getState) => {
+const checkTransactionFee = (options, transaction) => async (dispatch, getState) => {
 	let valueAssetId = '';
 
-	if (options.type === operationTypes.contract.name.toLowerCase()) {
-		valueAssetId = transaction.asset_id;
+	if (options.type === operationTypes.contract.name.toLowerCase() && transaction.value) {
+		const core = await fetchChain(CORE_ID);
+
+		valueAssetId = transaction.asset_id || core;
 	} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
 		valueAssetId = transaction.amount.asset;
 	}
@@ -254,7 +263,20 @@ const checkTransactionFee = (options, transaction) => (dispatch, getState) => {
 		.get('balance');
 
 	if (valueAssetId.get('id') === transaction.fee.asset.get('id')) {
-		const total = new BN(options.value).times(10 ** valueAssetId.get('precision')).plus(transaction.fee.amount);
+		let value = '';
+
+		if (options.type === operationTypes.contract.name.toLowerCase()) {
+			({ value } = transaction);
+		} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
+			value = transaction.amount.amount;
+		}
+
+
+		if (!value) {
+			return null;
+		}
+
+		const total = new BN(value).plus(transaction.fee.amount);
 
 		if (total.gt(balance)) {
 			return 'Insufficient funds for fee';
@@ -311,7 +333,10 @@ const getFetchedObjects = async (fetchList, id) => {
 		}));
 	} catch (err) {
 		const error = FormatHelper.formatError(err);
-		emitter.emit('response', error, id, ERROR_STATUS);
+		try {
+			emitter.emit('response', error, id, ERROR_STATUS);
+		} catch (e) {}
+
 
 		return null;
 	}
@@ -343,7 +368,12 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 	Object.entries(fetched).forEach(([key, value]) => { if (!value) { arrTemp.push(key); } });
 
 	if (arrTemp.length) {
-		emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+		try {
+			emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+		} catch (e) {
+
+		}
+
 		return null;
 	}
 
@@ -367,12 +397,28 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 		transaction.value = parseInt(transaction.value, 10);
 	}
 
-	transaction.fee = await getTransactionFee(transaction);
+	try {
+		transaction.fee = await getTransactionFee(transaction);
+	} catch (err) {
+		return err;
+	}
 
-	const errorFee = dispatch(checkTransactionFee(options, transaction));
+	const errorFee = await dispatch(checkTransactionFee(options, transaction));
+
+	if (transaction.value) {
+		const core = await fetchChain(CORE_ID);
+
+		transaction.value = transaction.asset_id ? transaction.value / (10 ** transaction.asset_id.get('precision')) :
+			transaction.value / (10 ** core.get('precision'));
+	}
 
 	if (errorFee) {
-		emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+		try {
+			emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
+		} catch (e) {
+
+		}
+
 		return null;
 	}
 
@@ -385,13 +431,28 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 };
 
 /**
+ *  @method closePopup
+ *
+ * 	Close popup incoming transaction
+ *
+ * 	@param {String} status
+ */
+export const closePopup = (status) => {
+	try {
+		emitter.emit('response', null, null, status || COMPLETE_STATUS);
+	} catch (e) {}
+
+};
+
+/**
  *  @method removeTransaction
  *
  * 	Remove transaction data from redux store
  *
  * 	@param {String} id
+ * 	@param {Boolean} isClose
  */
-const removeTransaction = (id) => (dispatch, getState) => {
+export const removeTransaction = (id, isClose) => (dispatch, getState) => {
 	const sign = getState().global.get('sign');
 	const transactions = sign.get('transactions').filter((tr) => tr.id !== id);
 
@@ -400,9 +461,10 @@ const removeTransaction = (id) => (dispatch, getState) => {
 		params: { transactions, current: null },
 	}));
 
-	if (!transactions.size) {
-		history.push(sign.get('goTo') || INDEX_PATH);
-	} else {
+	if (!transactions.size && isClose) {
+		closePopup();
+		history.push(INDEX_PATH);
+	} else if (transactions.size) {
 		dispatch(setTransaction(transactions.get(0)));
 	}
 };
@@ -416,6 +478,7 @@ const removeTransaction = (id) => (dispatch, getState) => {
  * 	@param {Object} options
  */
 const requestHandler = async (id, options) => {
+
 	const isLocked = store.getState().global.getIn(['crypto', 'isLocked']);
 
 	if (isLocked) {
@@ -432,7 +495,7 @@ const requestHandler = async (id, options) => {
 
 	const error = await store.dispatch(validateTransaction(options));
 	if (error) {
-		emitter.emit('response', error, id, ERROR_STATUS);
+		emitter.emit('response', `${error}`, id, ERROR_STATUS);
 		return null;
 	}
 
@@ -452,13 +515,30 @@ const requestHandler = async (id, options) => {
 
 emitter.on('request', requestHandler);
 
+/**
+ *  @method windowRequestHandler
+ *
+ * 	Transaction operations handler (between windows)
+ *
+ * 	@param {Number} id
+ * 	@param {String} windowType
+ */
+const windowRequestHandler = async (id, windowType) => {
+	if (globals.WINDOW_TYPE !== windowType) {
+		store.dispatch(removeTransaction(id));
+	}
+};
+
+emitter.on('windowRequest', windowRequestHandler);
+
 window.onunload = () => {
 	if (getChainSubcribe()) {
 		const { ChainStore } = echoService.getChainLib();
 		ChainStore.unsubscribe(getChainSubcribe());
 	}
 
-	emitter.removeListener('request', requestHandler);
+	emitter.removeListener('windowRequest');
+	emitter.removeListener('request');
 };
 
 /**
@@ -468,18 +548,27 @@ window.onunload = () => {
  */
 export const loadRequests = () => async (dispatch, getState) => {
 	const connected = getState().global.get('connected');
+	const requests = echoService.getRequests();
 
-	const transactions = echoService.getRequests().filter(async ({ id, options }) => {
-		const error = connected ? await dispatch(validateTransaction(options)) : 'Network error';
+	const transactionIds = await Promise.all(requests.map(async ({ id, options }) => {
+		const err = connected ? (await dispatch(validateTransaction(options))) : 'Network error';
 
-		if (error) {
-			emitter.emit('response', error, id, ERROR_STATUS);
+		if (err) {
+			try {
+				emitter.emit('response', `${err}`, id, ERROR_STATUS);
+			} catch (e) {}
+
+			return id;
 		}
 
-		return !error;
-	});
+		return null;
+	}));
 
-	if (!transactions.length) { return null; }
+	const transactions = requests.filter(({ id }) => !transactionIds.includes(id));
+
+	if (!transactions.length) {
+		return null;
+	}
 
 	const { pathname } = history.location;
 
@@ -497,96 +586,69 @@ export const loadRequests = () => async (dispatch, getState) => {
 };
 
 /**
- *  @method sendTransaction
- *
- * 	Send transaction
- *
- * 	@param {Object} transaction
- */
-const sendTransaction = (transaction) => async (dispatch, getState) => {
-	const networkName = getState().global.getIn(['network', 'name']);
-
-	const { type, memo } = transaction.get('options');
-	const account = transaction.get('options')[operationKeys[type]];
-	const options = formatToSend(type, transaction.get('options'));
-
-	const publicKey = account.getIn(['active', 'key_auths', '0', '0']);
-
-	const { TransactionBuilder } = await echoService.getChainLib();
-	let tr = new TransactionBuilder();
-	tr = await echoService.getCrypto().sign(networkName, tr, publicKey);
-
-	if (memo) {
-		const { to } = transaction.get('options');
-
-		options.memo = await echoService.getCrypto().encryptMemo(
-			networkName,
-			account.getIn(['options', 'memo_key']),
-			to.getIn(['options', 'memo_key']),
-			memo,
-		);
-	}
-
-	tr.add_type_operation(type, options);
-	await tr.set_required_fees(options.fee.asset_id);
-
-	return tr.broadcast().then(() => {
-		emitter.emit('response', null, transaction.get('id'), APPROVED_STATUS);
-	}).catch((err) => {
-		emitter.emit('response', FormatHelper.formatError(err), transaction.get('id'), ERROR_STATUS);
-	});
-};
-
-/**
- *  @method windowRequestHandler
- *
- * 	Transaction operations handler (between windows)
- *
- * 	@param {String} id
- * 	@param {String} windowType
- */
-const windowRequestHandler = async (id, windowType) => {
-	if (WINDOW_TYPE !== windowType) {
-		store.dispatch(removeTransaction(id));
-	}
-};
-
-emitter.on('windowRequest', windowRequestHandler);
-
-/**
  *  @method approveTransaction
  *
  * 	Approve transaction
  *
  * 	@param {Object} transaction
  */
-export const approveTransaction = (transaction) => async (dispatch) => {
-	emitter.emit('response', null, transaction.get('id'), WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
+export const approveTransaction = (transaction) => async (dispatch, getState) => {
+	try {
+		emitter.emit('response', null, transaction.get('id'), globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
 
-	emitter.emit('windowRequest', transaction.get('id'), WINDOW_TYPE);
+		emitter.emit('windowRequest', transaction.get('id'), globals.WINDOW_TYPE);
+	} catch (e) {
+		return null;
+	}
 
+	const networkName = getState().global.getIn(['network', 'name']);
+
+	globals.IS_LOADING = true;
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
-	try {
-		const start = new Date().getTime();
+	const balances = getState().balance.get('balances');
+	const accountId = getState().global.getIn(['account', 'id']);
 
-		await Promise.race([
-			dispatch(sendTransaction(transaction)).then(() => (new Date().getTime() - start)),
-			new Promise((resolve, reject) => {
-				const timeoutId = setTimeout(() => {
-					clearTimeout(timeoutId);
-					reject(new Error('Send transaction timeout'));
-				}, BROADCAST_LIMIT);
-			}),
-		]);
-	} catch (err) {
-		const error = FormatHelper.formatError(err);
-		emitter.emit('response', error, transaction.get('id'), ERROR_STATUS);
-	} finally {
-		dispatch(removeTransaction(transaction.get('id')));
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	if (!accountId) {
+		return 'Account not available';
 	}
+
+	const balance = balances
+		.find((val) => val.get('owner') === accountId && val.get('asset_type') === transaction.get('options').fee.asset.get('id'))
+		.get('balance');
+
+	emitter.emit('trRequest', transaction.get('id'), networkName, balance, globals.WINDOW_TYPE);
+
+	return null;
 };
+
+/**
+ *  @method requestHandler
+ *
+ * 	On transaction broadcast result emitter response
+ *
+ * 	@param {String} status
+ * 	@param {Object} id
+ * 	@param {Object} path
+ * 	@param {String} windowType
+ */
+const trResponseHandler = (status, id, path, windowType) => {
+	if (status === ERROR_STATUS) {
+		path = NETWORK_ERROR_SEND_PATH;
+
+		store.dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
+	}
+
+	store.dispatch(removeTransaction(id));
+
+	if (windowType === globals.WINDOW_TYPE && path) {
+		history.push(path);
+	}
+
+	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+};
+
+emitter.on('trResponse', trResponseHandler);
 
 /**
  *  @method cancelTransaction
@@ -596,11 +658,18 @@ export const approveTransaction = (transaction) => async (dispatch) => {
  * 	@param {String} id
  */
 export const cancelTransaction = (id) => (dispatch) => {
-	emitter.emit('response', null, id, CANCELED_STATUS);
+	try {
+		emitter.emit('response', null, id, CANCELED_STATUS);
 
-	emitter.emit('windowRequest', id, WINDOW_TYPE);
+		emitter.emit('windowRequest', id, globals.WINDOW_TYPE);
 
-	dispatch(removeTransaction(id));
+		dispatch(removeTransaction(id, true));
+	} catch (e) {
+		return null;
+	}
+
+	return null;
+
 };
 
 /**
@@ -630,5 +699,5 @@ export const switchTransactionAccount = (name) => async (dispatch, getState) => 
 };
 
 export const setWindowType = (type) => {
-	WINDOW_TYPE = type;
+	globals.WINDOW_TYPE = type;
 };

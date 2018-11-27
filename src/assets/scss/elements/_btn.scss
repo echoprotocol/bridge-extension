@@ -314,11 +314,18 @@
             background-color: #3a4a4e;
             color: #fff;
         }
+        &:active {
+            &:before {
+                opacity: 0.3;
+            }
+        }
+
         &:before {
             content: $icon-exit;
             font-size: 20px;
             margin: 1px -1px 0 0;
             display: block;
+            transition: opacity $speed;
         }
     }
 
@@ -337,10 +344,16 @@
         cursor: pointer;
         &:hover {
             background-color: #363f42;
+
+            &:before {
+                opacity: 1;
+            }
         }
         &:before {
             display: block;
-            margin: 2px -1px 0 0;
+            margin: 1px -1px 0 0;
+            opacity: 0.6;
+            transition: opacity $speed;
         }
     }
     &-icon {

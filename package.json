@@ -1,7 +1,7 @@
 {
   "name": "echo-bridge",
   "description": "Echo Bridge",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "scripts": {
     "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8081",
     "build": "cross-env NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
@@ -13,7 +13,9 @@
     "copy-manifest": "copyfiles -f src/assets/extention_config/manifest.json build/src"
   },
   "dependencies": {
+    "EventEmitter": "^1.0.0",
     "autoprefixer": "^8.1.0",
+    "await-event-emitter": "^1.2.0",
     "babel-runtime": "^6.26.0",
     "bignumber.js": "^7.2.1",
     "classnames": "^2.2.6",
@@ -27,6 +29,7 @@
     "history": "^4.7.2",
     "immutable": "^3.8.2",
     "intl": "^1.2.5",
+    "is-promise": "^2.1.0",
     "lodash": "^4.17.11",
     "prop-types": "^15.6.1",
     "query-string": "^6.2.0",

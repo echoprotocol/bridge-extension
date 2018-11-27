@@ -6,11 +6,10 @@ import { getTransactionFee } from './SignActions';
 import { fetchChain, lookupAccounts } from '../api/ChainApi';
 
 import { FORM_SEND } from '../constants/FormConstants';
-import { BROADCAST_TIMEOUT, CORE_ID } from '../constants/GlobalConstants';
-import { ERROR_SEND_PATH, SUCCESS_SEND_PATH } from '../constants/RouterConstants';
+import { CORE_ID } from '../constants/GlobalConstants';
+import { ERROR_SEND_PATH } from '../constants/RouterConstants';
 
 import echoService from '../services/echo';
-import { formatToSend } from '../services/operation';
 
 import FormatHelper from '../helpers/FormatHelper';
 import ValidateSendHelper from '../helpers/ValidateSendHelper';
@@ -19,6 +18,9 @@ import BalanceReducer from '../reducers/BalanceReducer';
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import history from '../history';
+import store from '../store';
+
+const emitter = echoService.getEmitter();
 
 /**
  *  @method initAssetsBalances
@@ -109,6 +111,15 @@ export const removeBalances = (accountId) => (dispatch, getState) => {
 	}));
 };
 
+/**
+ *  @method checkFeePool
+ *
+ * 	Remove balances and assets by deleted user's id
+ *
+ * 	@param {Object} coreAsset
+ * 	@param {Object} asset
+ * 	@param {Number} fee
+ */
 const checkFeePool = (coreAsset, asset, fee) => {
 	if (coreAsset.get('id') === asset.get('id')) { return true; }
 
@@ -123,6 +134,15 @@ const checkFeePool = (coreAsset, asset, fee) => {
 	return feePool.gt(fee);
 };
 
+/**
+ *  @method checkAccount
+ *
+ * 	Look up accounts
+ *
+ * 	@param {String} fromAccount
+ * 	@param {String} toAccount
+ * 	@param {Number} limit
+ */
 export const checkAccount = (fromAccount, toAccount, limit = 50) => async (dispatch) => {
 	try {
 		if (fromAccount === toAccount) {
@@ -149,6 +169,11 @@ export const checkAccount = (fromAccount, toAccount, limit = 50) => async (dispa
 	return true;
 };
 
+/**
+ *  @method setFeeFormValue
+ *
+ * 	Set fee depending on the amount value and memo
+ */
 export const setFeeFormValue = () => async (dispatch, getState) => {
 	const form = getState().form.get(FORM_SEND);
 
@@ -195,40 +220,11 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 	return true;
 };
 
-const broadcastTransaction = (
-	options,
-	fromAccount,
-	toAccount,
-	memo,
-) => async (dispatch, getState) => {
-	const transactionOptions = formatToSend('transfer', options);
-
-	const publicKey = fromAccount.getIn(['active', 'key_auths', '0', '0']);
-
-	const networkName = getState().global.getIn(['network', 'name']);
-
-	const { TransactionBuilder } = await echoService.getChainLib();
-	let tr = new TransactionBuilder();
-	tr = await echoService.getCrypto().sign(networkName, tr, publicKey);
-
-	if (memo.value) {
-
-		transactionOptions.memo = await echoService.getCrypto().encryptMemo(
-			networkName,
-			fromAccount.getIn(['options', 'memo_key']),
-			toAccount.getIn(['options', 'memo_key']),
-			memo.value,
-		);
-	}
-
-	transactionOptions.amount.amount *= (10 ** options.amount.asset.get('precision'));
-
-	tr.add_type_operation('transfer', transactionOptions);
-	await tr.set_required_fees(transactionOptions.fee.asset_id);
-
-	return tr.broadcast();
-};
-
+/**
+ *  @method send
+ *
+ * 	Transfer transaction
+ */
 export const send = () => async (dispatch, getState) => {
 
 	const form = getState().form.get(FORM_SEND);
@@ -320,34 +316,26 @@ export const send = () => async (dispatch, getState) => {
 		}
 	}
 
-	try {
-		const start = new Date().getTime();
+	options.amount.amount *= (10 ** options.amount.asset.get('precision'));
 
-		await Promise.race([
-			dispatch(broadcastTransaction(
-				options,
-				fromAccount,
-				toAccount,
-				memo,
-			)).then(() => (new Date().getTime() - start)),
-			new Promise((resolve, reject) => {
-				const timeoutId = setTimeout(() => {
-					clearTimeout(timeoutId);
-					reject(new Error('timeout broadcast'));
-				}, BROADCAST_TIMEOUT);
-			}),
-		]);
+	const activeNetworkName = getState().global.getIn(['network', 'name']);
 
-		history.push(SUCCESS_SEND_PATH);
-	} catch (err) {
-		dispatch(setValue(FORM_SEND, 'error', FormatHelper.formatError(err)));
-
-		history.push(ERROR_SEND_PATH);
-
-		return false;
-	} finally {
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
-	}
+	emitter.emit('sendRequest', options, activeNetworkName);
 
 	return true;
 };
+
+/**
+ *  @method sendHandler
+ *
+ * 	On send broadcast result emitter response
+ *
+ * 	@param {String} path
+ */
+const sendHandler = (path) => {
+	history.push(path);
+
+	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+};
+
+emitter.on('sendResponse', sendHandler);

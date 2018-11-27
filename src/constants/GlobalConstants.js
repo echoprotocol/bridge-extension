@@ -8,6 +8,7 @@ import {
 	RECEIVE_PATH,
 	SEND_PATH,
 	BACKUP_PATH,
+	ADD_NETWORK_PATH,
 	SUCCESS_ADD_NETWORK_PATH,
 	WATCH_TOKEN_PATH,
 } from './RouterConstants';
@@ -56,11 +57,11 @@ export const HEADER_TITLE = [
 		path: IMPORT_SUCCESS_PATH,
 	},
 	{
-		path: WALLET_PATH,
-		title: 'Wallet',
+		path: SUCCESS_ADD_NETWORK_PATH,
+		title: 'Add Network',
 	},
 	{
-		path: SUCCESS_ADD_NETWORK_PATH,
+		path: ADD_NETWORK_PATH,
 		title: 'Add Network',
 	},
 	{
@@ -86,7 +87,9 @@ export const APPROVED_STATUS = 'approved';
 export const CANCELED_STATUS = 'canceled';
 export const CLOSE_STATUS = 'close';
 export const OPEN_STATUS = 'open';
+export const COMPLETE_STATUS = 'complete';
 export const ERROR_STATUS = 'error';
+export const DISCONNECT_STATUS = 'disconnect';
 
 export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
 
@@ -113,6 +116,8 @@ export const LOGIN_INTERVAL = 1000 * 30;
 export const CHAINSTORE_INIT_TIMEOUT = 10 * 1000;
 export const BROADCAST_TIMEOUT = 20 * 1000;
 export const BROADCAST_LIMIT = 20 * 1000;
+export const SET_TR_FEE_TIMEOUT = 1000;
+export const WS_CLOSE_TIMEOUT = 3000;
 
 export const MEMO_FEE_KEYS = {
 	WIF: '5KGG3tFb5F4h3aiUSKNnKeDcNbL5y1ZVXQXVqpWVMYhW82zBrNb',

@@ -9,7 +9,9 @@ class NotificationManager {
 	 * Create popup
      */
 	showPopup() {
-		const cb = (popup) => { this.popupId = popup.id; };
+		const cb = (popup) => {
+			this.popupId = popup.id;
+		};
 
 		// top params offset from top
 		// left params offset from left
@@ -23,7 +25,9 @@ class NotificationManager {
 			width: POPUP_WIDTH,
 		}, cb);
 
-		if (creation && creation.then) creation.then(cb);
+		if (creation && creation.then) {
+			creation.then(cb);
+		}
 	}
 
 	/**

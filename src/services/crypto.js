@@ -1,6 +1,6 @@
 import { Aes, PrivateKey, TransactionHelper } from 'echojs-lib';
 import random from 'crypto-random-string';
-import EventEmitter from 'events';
+import EventEmitter from '../../libs/CustomAwaitEmitter';
 
 import storage from './storage';
 

@@ -1,5 +1,6 @@
 body {
     font-family: FNMedium;
+    overflow: hidden;
 }
 
 ul {
@@ -14,7 +15,7 @@ a {
 
 
 input:-webkit-autofill,
-input:-webkit-autofill:hover, 
+input:-webkit-autofill:hover,
 input:-webkit-autofill:focus
 textarea:-webkit-autofill,
 textarea:-webkit-autofill:hover
@@ -23,12 +24,12 @@ select:-webkit-autofill,
 select:-webkit-autofill:hover,
 select:-webkit-autofill:focus {
   -webkit-text-fill-color: #3d4b52;
-  -webkit-box-shadow: 0 0 0px 1000px #ebeef0 inset, 0 1px 0px 0 #3d4b52; // 
+  -webkit-box-shadow: 0 0 0px 1000px #ebeef0 inset, 0 1px 0px 0 #3d4b52; //
   transition: background-color 5000s ease-in-out 0s;
 }
 .dark {
     input:-webkit-autofill,
-    input:-webkit-autofill:hover, 
+    input:-webkit-autofill:hover,
     input:-webkit-autofill:focus
     textarea:-webkit-autofill,
     textarea:-webkit-autofill:hover
@@ -37,17 +38,17 @@ select:-webkit-autofill:focus {
     select:-webkit-autofill:hover,
     select:-webkit-autofill:focus {
         -webkit-text-fill-color: #3d4b52;
-        -webkit-box-shadow: 0 0 0px 1000px #2b3d42 inset, 0 1px 0px 0 #ebeef0; // 
+        -webkit-box-shadow: 0 0 0px 1000px #2b3d42 inset, 0 1px 0px 0 #ebeef0; //
         transition: background-color 5000s ease-in-out 0s;
     }
 }
 ::-moz-selection { /* Code for Firefox */
-    color: #324046; 
+    color: #324046;
     background: #16d6aa;
 }
 
 ::selection {
-    color: #324046; 
+    color: #324046;
     background: #16d6aa;
 }
 

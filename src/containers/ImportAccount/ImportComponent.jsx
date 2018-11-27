@@ -71,7 +71,10 @@ class ImportComponent extends React.Component {
 				<div className="page-wrap">
 
 					<div className="page">
-						<div className="icon-pageAccount" />
+						<div className="icon-pageAccount">
+							<span className="path1" />
+							<span className="path2" />
+						</div>
 						<div className="two-input-wrap">
 							<BridgeInput
 								error={!!nameError}

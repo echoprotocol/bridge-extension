@@ -5,13 +5,18 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 
 import UserIcon from '../../components/UserIcon';
+
 import {
 	approveTransaction,
 	cancelTransaction,
+	globals,
 } from '../../actions/SignActions';
+
 import { formatToShow } from '../../services/operation';
+
 import { operationKeys, operationTypes } from '../../constants/OperationConstants';
-import { INDEX_PATH } from '../../constants/RouterConstants';
+import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
+import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
@@ -19,7 +24,11 @@ class SignTransaction extends React.Component {
 
 	componentDidMount() {
 		if (!this.props.transaction) {
-			this.props.history.push(INDEX_PATH);
+			if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
+				this.props.history.push(INDEX_PATH);
+			} else {
+				this.props.history.push(NETWORK_ERROR_SEND_PATH);
+			}
 		}
 	}
 
@@ -32,9 +41,13 @@ class SignTransaction extends React.Component {
 	}
 
 	render() {
-		const { transaction, accounts, loading } = this.props;
+		const {
+			transaction, accounts, loading,
+		} = this.props;
 
-		if (!transaction) { return null; }
+		if (!transaction) {
+			return null;
+		}
 
 		const options = transaction.get('options');
 
@@ -45,13 +58,18 @@ class SignTransaction extends React.Component {
 		return (
 			<div className="incoming-transaction-wrap">
 				<div className="incoming-transaction-bg">
+					<button
+						onClick={(e) => this.onCancel(e)}
+						className="button ui icon-closeSmall btn-icon"
+						disabled={loading}
+					/>
 					<div className="title">New unsigned transaction</div>
 				</div>
 				<div className="incoming-transaction-page">
 					{
 						account ?
 							<div className="wallet-info">
-								Wallet
+								<div className="title">Wallet</div>
 								<div className="incoming-transaction-user">
 									<UserIcon
 										avatar={`ava${account.icon}`}
@@ -99,14 +117,14 @@ class SignTransaction extends React.Component {
 					<div className="two-btn-wrap" >
 						<Button
 							type="button"
-							className={classnames('btn-transparent', { loading })}
+							className={classnames('btn-in-light', { loading })}
 							content={<span className="btn-text">Approve</span>}
 							onClick={(e) => this.onApprove(e)}
 							disabled={loading}
 						/>
 						<Button
 							type="button"
-							className="btn-in-light"
+							className="btn-transparent"
 							content={<span className="btn-text">Reject</span>}
 							onClick={(e) => this.onCancel(e)}
 							disabled={loading}
