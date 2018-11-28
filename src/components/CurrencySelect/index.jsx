@@ -86,7 +86,9 @@ class CurrencySelect extends React.Component {
 
 	handleClickOutside(event) {
 		if (this.menuRef && (!this.menuRef.contains(event.target))) {
-			this.setState({ opened: false });
+			this.setState({ opened: false, search: '' });
+
+			this.props.onSearch();
 		}
 	}
 
