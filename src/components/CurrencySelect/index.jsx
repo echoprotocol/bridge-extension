@@ -115,7 +115,7 @@ class CurrencySelect extends React.Component {
 					open={this.state.opened}
 					disabled={searchList.length === 1 && !opened}
 				>
-					<Dropdown.Toggle onClick={() => this.toggleDropdown()}>
+					<Dropdown.Toggle onClick={() => this.toggleDropdown()} noCaret={searchList.length === 1}>
 						<span className="val">{currentVal && searchList.find((val) => val.text === currentVal) ? currentVal : 'ECHO'}</span>
 					</Dropdown.Toggle>
 					<CustomMenu bsRole="menu">

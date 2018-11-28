@@ -114,7 +114,6 @@ export const POPUP_WINDOW_TYPE = 'popup';
 
 export const LOGIN_INTERVAL = 1000 * 30;
 export const CHAINSTORE_INIT_TIMEOUT = 10 * 1000;
-export const BROADCAST_TIMEOUT = 20 * 1000;
 export const BROADCAST_LIMIT = 20 * 1000;
 export const SET_TR_FEE_TIMEOUT = 1000;
 export const WS_CLOSE_TIMEOUT = 3000;

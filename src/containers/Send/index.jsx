@@ -7,14 +7,12 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import _ from 'lodash';
 
-// import ErrorTransaction from './ErrorTransaction';
-// import SuccessTransaction from './SuccessTransaction';
-
 import { send, setFeeFormValue } from '../../actions/BalanceActions';
 import { clearForm, setFormError, setFormValue } from '../../actions/FormActions';
 
 import { INDEX_PATH } from '../../constants/RouterConstants';
 import { FORM_SEND } from '../../constants/FormConstants';
+import { KEY_CODE_ENTER } from '../../constants/GlobalConstants';
 
 import BridgeInput from '../../components/BridgeInput';
 import BridgeTextArea from '../../components/BridgeTextArea';
@@ -111,6 +109,16 @@ class Send extends React.Component {
 		this.props.send();
 	}
 
+	onKeyPress(e) {
+		const { to, amount } = this.props;
+
+		const code = e.keyCode || e.which;
+
+		if (KEY_CODE_ENTER === code && to.value && amount.value) {
+			this.props.send();
+		}
+	}
+
 	getSymbols() {
 		const { balances, assets, account } = this.props;
 
@@ -196,6 +204,7 @@ class Send extends React.Component {
 								onChange={(e) => this.onChange(e, true)}
 								error={!!to.error}
 								errorText={to.error}
+								onKeyPress={(e) => this.onKeyPress(e)}
 							/>
 							<BridgeInput
 								name="amount"
@@ -210,6 +219,7 @@ class Send extends React.Component {
 								onDropdownSearch={(searchText) => this.onSearch(searchText)}
 								error={!!amount.error}
 								errorText={amount.error}
+								onKeyPress={(e) => this.onKeyPress(e)}
 							/>
 							<BridgeInput
 								name="fee"
@@ -236,6 +246,7 @@ class Send extends React.Component {
 								disabled={(!to.value || !amount.value)}
 								content={<span className="btn-text">Send</span>}
 								onClick={() => this.onSend()}
+								type="submit"
 							/>
 						</div>
 					</CustomScroll>

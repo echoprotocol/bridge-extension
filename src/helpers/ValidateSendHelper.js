@@ -27,7 +27,7 @@ class ValidateSendHelper {
 
 			result.value = `${intPath ? Number(intPath) : ''}.${doublePath || ''}`;
 		}
-		result.value = value ? Number(value).toString() : value;
+		result.value = value ? value.toString() : value;
 
 
 		return result;
