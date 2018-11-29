@@ -67,14 +67,6 @@ class CurrencySelect extends React.Component {
 		this.props.onSearch(e.target.value);
 	}
 
-	onKeyDown(e) {
-		const code = e.keyCode || e.which;
-
-		if (KEY_CODE_TAB === code) {
-			this.toggleDropdown();
-		}
-	}
-
 	setMenuRef(node) {
 		this.menuRef = node;
 	}
@@ -94,7 +86,6 @@ class CurrencySelect extends React.Component {
 			this.props.setValue(path.form, path.field, value);
 		}
 	}
-	// Обработчик закрытия дропдауна с помощьб табуляции
 
 	tabListener(e) {
 		const code = e.keyCode || e.which;
@@ -110,9 +101,7 @@ class CurrencySelect extends React.Component {
 
 	handleClickOutside(event) {
 		if (this.menuRef && (!this.menuRef.contains(event.target))) {
-			this.setState({ opened: false, search: '' });
-
-			this.props.onSearch();
+			this.setState({ opened: false });
 		}
 	}
 
@@ -147,16 +136,6 @@ class CurrencySelect extends React.Component {
 					</Dropdown.Toggle>
 					<CustomMenu bsRole="menu">
 						<div className="menu-container">
-							{/* <Input
-								placeholder="Type asset or token name"
-								value={search}
-								onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
-								onKeyDown={(e) => this.onKeyDown(e)}
-								onChange={(e) => this.onChange(e)}
-								ref={(r) => { this.inputRef = r; }}
-								focus
-								tabIndex={0}
-							/> */}
 							<div className="ui input">
 								<input
 									value={search}
@@ -164,7 +143,6 @@ class CurrencySelect extends React.Component {
 									tabIndex={0}
 									placeholder="Type asset or token name"
 									onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
-									onKeyDown={(e) => this.onKeyDown(e)}
 									onChange={(e) => this.onChange(e)}
 									ref={(node) => { this.searchInput = node; }}
 								/>
