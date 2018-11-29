@@ -470,6 +470,31 @@ export const removeTransaction = (id, isClose) => (dispatch, getState) => {
 };
 
 /**
+ *  @method removeTransaction
+ *
+ * 	Remove transaction data from redux store
+ *
+ * 	@param {String} id
+ * 	@param {Boolean} isClose
+ */
+export const removeTransactionWindow = (id, isClose) => async (dispatch, getState) => {
+	const sign = getState().global.get('sign');
+	const transactions = sign.get('transactions').filter((tr) => tr.id !== id);
+
+	if (!transactions.size && isClose) {
+		closePopup();
+		history.push(INDEX_PATH);
+	} else if (transactions.size) {
+		await dispatch(setTransaction(transactions.get(0)));
+	}
+
+	dispatch(GlobalReducer.actions.setIn({
+		field: 'sign',
+		params: { transactions },
+	}));
+};
+
+/**
  *  @method requestHandler
  *
  * 	Incoming transaction requests handling
@@ -525,11 +550,41 @@ emitter.on('request', requestHandler);
  */
 const windowRequestHandler = async (id, windowType) => {
 	if (globals.WINDOW_TYPE !== windowType) {
-		store.dispatch(removeTransaction(id));
+		store.dispatch(removeTransactionWindow(id));
 	}
 };
 
 emitter.on('windowRequest', windowRequestHandler);
+
+/**
+ *  @method requestHandler
+ *
+ * 	On transaction broadcast result emitter response
+ *
+ * 	@param {String} status
+ * 	@param {Object} id
+ * 	@param {Object} path
+ * 	@param {String} windowType
+ */
+const trResponseHandler = (status, id, path, windowType) => {
+	if (status === ERROR_STATUS) {
+		path = NETWORK_ERROR_SEND_PATH;
+
+		store.dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
+	}
+
+	if (windowType === globals.WINDOW_TYPE) {
+		store.dispatch(removeTransaction(id));
+
+		if (path) {
+			history.push(path);
+		}
+
+		store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	}
+};
+
+emitter.on('trResponse', trResponseHandler);
 
 window.onunload = () => {
 	if (getChainSubcribe()) {
@@ -537,8 +592,9 @@ window.onunload = () => {
 		ChainStore.unsubscribe(getChainSubcribe());
 	}
 
-	emitter.removeListener('windowRequest');
-	emitter.removeListener('request');
+	emitter.removeListener('request', requestHandler);
+	emitter.removeListener('windowRequest', windowRequestHandler);
+	emitter.removeListener('trResponse', trResponseHandler);
 };
 
 /**
@@ -621,34 +677,6 @@ export const approveTransaction = (transaction) => async (dispatch, getState) =>
 
 	return null;
 };
-
-/**
- *  @method requestHandler
- *
- * 	On transaction broadcast result emitter response
- *
- * 	@param {String} status
- * 	@param {Object} id
- * 	@param {Object} path
- * 	@param {String} windowType
- */
-const trResponseHandler = (status, id, path, windowType) => {
-	if (status === ERROR_STATUS) {
-		path = NETWORK_ERROR_SEND_PATH;
-
-		store.dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
-	}
-
-	store.dispatch(removeTransaction(id));
-
-	if (windowType === globals.WINDOW_TYPE && path) {
-		history.push(path);
-	}
-
-	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
-};
-
-emitter.on('trResponse', trResponseHandler);
 
 /**
  *  @method cancelTransaction
