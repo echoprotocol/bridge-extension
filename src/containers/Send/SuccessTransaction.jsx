@@ -21,7 +21,6 @@ class SuccessTransaction extends React.PureComponent {
 	}
 
 	render() {
-		console.log(this.props.transaction);
 		return (
 			<div className="transaction-status-wrap success">
 				<div className="transaction-status-body">
