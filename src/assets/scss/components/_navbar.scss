@@ -22,8 +22,8 @@
         }
 
         .btn-nav-wrap {
-			display: none;
-			
+			display: flex;
+
             & + .page-title {
                 margin-right: auto;
                 padding: 0 20px 0 0;
@@ -91,6 +91,6 @@
         content: "";
         background-color: rgba(#85daa7, .03);
         height: 1px;
-        
+
     }
 }
