@@ -3,6 +3,9 @@
 import React from 'react';
 import { Accordion } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
+import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 class Transactions extends React.Component {
 
@@ -10,6 +13,9 @@ class Transactions extends React.Component {
 		super();
 		this.state = { activeIndex: null };
 		this.handleClick = this.handleClick.bind(this);
+	}
+
+	componentDidMount() {
 	}
 
 	handleClick(e, titleProps) {
@@ -22,6 +28,7 @@ class Transactions extends React.Component {
 	}
 
 	render() {
+		console.log(this.props.history);
 		const { activeIndex } = this.state;
 
 		// CODING
@@ -172,4 +179,17 @@ class Transactions extends React.Component {
 
 }
 
-export default Transactions;
+Transactions.propTypes = {
+	history: PropTypes.array,
+};
+
+Transactions.defaultProps = {
+	history: null,
+};
+
+export default withRouter(connect(
+	(state) => ({
+		history: state.global.get('formattedHistory'),
+	}),
+	() => ({}),
+)(Transactions));

@@ -28,6 +28,8 @@ const DEFAULT_FIELDS = Map({
 		transactions: new List([]),
 		goTo: null,
 	}),
+	history: new List([]),
+	formattedHistory: null,
 });
 
 export default createModule({
