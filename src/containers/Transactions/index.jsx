@@ -28,92 +28,97 @@ class Transactions extends React.Component {
 	}
 
 	render() {
-		console.log(this.props.history);
+		const { history } = this.props;
+
+		if (!history) {
+			return null;
+		}
+
 		const { activeIndex } = this.state;
 
 		// CODING
-		const codingTransactions = [
-			{
-				id: 0,
-				transaction: {
-					type: 'Contract',
-					typeName: 'Contract created',
-					date: '01 Oct, 11:35',
-					value: '-230.000',
-					currency: 'ECHO',
-				},
-				content: {
-					receiver: 'HomerSimpson435',
-					fee: '0.000000034',
-					feeCurrency: 'ECHO',
-					note: "Hey, that's the second part. The next transaction is about to come",
-				},
-			},
-			{
-				id: 1,
-				transaction: {
-					type: 'Recieved',
-					typeName: 'Recieved',
-					date: '23 Oct, 11:35',
-					value: '+ 0.000231234892',
-					currency: 'RLY',
-				},
-				content: {
-					receiver: 'HomerSimpson435',
-					fee: '0.000000034',
-					feeCurrency: 'RLY',
-					note: "Hey, that's the second part. The next transaction is about to come",
-				},
-			},
-			{
-				id: 2,
-				transaction: {
-					type: 'Transaction',
-					typeName: 'Transaction',
-					date: '23 Oct, 11:35',
-					value: '+ 0.000231234892',
-					currency: 'ZSHC',
-				},
-				content: {
-					receiver: 'HomerSimpson435',
-					fee: '0.000000034',
-					feeCurrency: 'ZSHC',
-					note: "Hey, that's the second part. The next transaction is about to come",
-				},
-			},
-			{
-				id: 3,
-				transaction: {
-					type: 'Sent',
-					typeName: 'Sent',
-					date: '23 Oct, 11:35',
-					value: '+ 0.000231234892',
-					currency: 'RLY',
-				},
-				content: {
-					receiver: 'HomerSimpson435',
-					fee: '0.000000034',
-					feeCurrency: 'RLY',
-					note: "Hey, that's the second part. The next transaction is about to come",
-				},
-			},
-			{
-				id: 4,
-				transaction: {
-					type: 'Account',
-					typeName: 'Account created',
-					date: '23 Oct, 11:35',
-					value: '- 0.000',
-					currency: 'ECHO',
-				},
-				content: {
-					receiver: 'HomerSimpson435',
-					fee: '0.000000034',
-					feeCurrency: 'ECHO',
-					note: "Hey, that's the second part. The next transaction is about to come",
-				},
-			},
-		];
+		// const codingTransactions = [
+		// 	{
+		// 		id: 0,
+		// 		transaction: {
+		// 			type: 'Contract',
+		// 			typeName: 'Contract created',
+		// 			date: '01 Oct, 11:35',
+		// 			value: '-230.000',
+		// 			currency: 'ECHO',
+		// 		},
+		// 		content: {
+		// 			receiver: 'HomerSimpson435',
+		// 			fee: '0.000000034',
+		// 			feeCurrency: 'ECHO',
+		// 			note: "Hey, that's the second part. The next transaction is about to come",
+		// 		},
+		// 	},
+		// 	{
+		// 		id: 1,
+		// 		transaction: {
+		// 			type: 'Recieved',
+		// 			typeName: 'Recieved',
+		// 			date: '23 Oct, 11:35',
+		// 			value: '+ 0.000231234892',
+		// 			currency: 'RLY',
+		// 		},
+		// 		content: {
+		// 			receiver: 'HomerSimpson435',
+		// 			fee: '0.000000034',
+		// 			feeCurrency: 'RLY',
+		// 			note: "Hey, that's the second part. The next transaction is about to come",
+		// 		},
+		// 	},
+		// 	{
+		// 		id: 2,
+		// 		transaction: {
+		// 			type: 'Transaction',
+		// 			typeName: 'Transaction',
+		// 			date: '23 Oct, 11:35',
+		// 			value: '+ 0.000231234892',
+		// 			currency: 'ZSHC',
+		// 		},
+		// 		content: {
+		// 			receiver: 'HomerSimpson435',
+		// 			fee: '0.000000034',
+		// 			feeCurrency: 'ZSHC',
+		// 			note: "Hey, that's the second part. The next transaction is about to come",
+		// 		},
+		// 	},
+		// 	{
+		// 		id: 3,
+		// 		transaction: {
+		// 			type: 'Sent',
+		// 			typeName: 'Sent',
+		// 			date: '23 Oct, 11:35',
+		// 			value: '+ 0.000231234892',
+		// 			currency: 'RLY',
+		// 		},
+		// 		content: {
+		// 			receiver: 'HomerSimpson435',
+		// 			fee: '0.000000034',
+		// 			feeCurrency: 'RLY',
+		// 			note: "Hey, that's the second part. The next transaction is about to come",
+		// 		},
+		// 	},
+		// 	{
+		// 		id: 4,
+		// 		transaction: {
+		// 			type: 'Account',
+		// 			typeName: 'Account created',
+		// 			date: '23 Oct, 11:35',
+		// 			value: '- 0.000',
+		// 			currency: 'ECHO',
+		// 		},
+		// 		content: {
+		// 			receiver: 'HomerSimpson435',
+		// 			fee: '0.000000034',
+		// 			feeCurrency: 'ECHO',
+		// 			note: "Hey, that's the second part. The next transaction is about to come",
+		// 		},
+		// 	},
+		// ];
 
 		return (
 			<React.Fragment>
@@ -125,7 +130,7 @@ class Transactions extends React.Component {
 						<div className="transactions-wrapper">
 							<Accordion>
 								{
-									codingTransactions.map((elem) =>
+									history.map((elem) =>
 										(
 											<React.Fragment key={elem.id}>
 												<Accordion.Title

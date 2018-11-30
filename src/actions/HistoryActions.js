@@ -1,3 +1,5 @@
+import moment from 'moment';
+
 import { fetchChain } from '../api/ChainApi';
 
 import GlobalReducer from '../reducers/GlobalReducer';
@@ -20,18 +22,13 @@ const formatOperation = async (data, index) => {
 		id: index,
 		transaction: {
 			type: name,
-			typeName: 'Contract created',
-			date: '01 Oct, 11:35',
-			value: {},
-			currency: 'ECHO',
+			typeName: name,
+			date: moment.utc(block.timestamp).local().format('DD MMM, hh:mm'),
 		},
 		content: {
-			receiver: 'HomerSimpson435',
 			fee: FormatHelper.formatAmount(operation.getIn(['fee', 'amount']), feeAsset.get('precision')),
 			feeCurrency: feeAsset.get('symbol'),
-			note: "Hey, that's the second part. The next transaction is about to come",
 		},
-		timestamp: block.timestamp,
 	};
 
 	if (options.subject) {
@@ -39,36 +36,30 @@ const formatOperation = async (data, index) => {
 			const request = operation.get(options.subject[0]);
 			const response = await fetchChain(request);
 
-			result.receiver = response.get(options.subject[1]);
+			result.content.receiver = response.get(options.subject[1]);
 		} else {
-			result.receiver = operation.get(options.subject[0]);
+			result.content.receiver = operation.get(options.subject[0]);
 		}
 	}
 
 	if (options.value) {
-		result.value = {
-			...result.value,
-			amount: operation.getIn(options.value.split('.')),
-		};
+		result.transaction.value = operation.getIn(options.value.split('.'));
 	}
 
 	if (options.asset) {
 		const request = operation.getIn(options.asset.split('.'));
 		const response = await fetchChain(request);
 
-		result.value = {
-			...result.value,
-			precision: response.get('precision'),
-			symbol: response.get('symbol'),
-		};
+		result.transaction.value = FormatHelper.formatAmount(result.transaction.value, response.get('precision'));
+		result.transaction.currency = response.get('symbol');
 	}
 
 	if (type === 47) {
-		result.receiver = data.getIn(['result', '1']);
+		result.content.receiver = data.getIn(['result', '1']);
 	}
 
 	if (type === 0 && operation.get('memo') && operation.getIn(['memo', 'message'])) {
-		result.note = operation.get('memo');
+		result.content.note = operation.get('memo');
 	}
 
 	return result;

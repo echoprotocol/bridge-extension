@@ -17,7 +17,7 @@ import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 import storage from '../services/storage';
 
 import FormatHelper from '../helpers/FormatHelper';
-import updateHistory from './TransactionActions';
+import updateHistory from './HistoryActions';
 
 let INTERVAL_LOGIN_CALL = null;
 
