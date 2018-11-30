@@ -31,10 +31,10 @@ const sendTransaction = (options) => {
 	const result = new Promise((resolve, reject) => {
 		const cb = ({ data }) => {
 
-			const { status, text } = data;
+			const { status, text, resultBroadcast } = data;
 
 			if (status === 'approved') {
-				resolve({ status });
+				resolve({ status, resultBroadcast });
 			} else {
 				reject(text || status);
 			}

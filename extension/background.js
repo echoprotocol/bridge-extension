@@ -267,7 +267,7 @@ const sendTransaction = async (transaction, networkName) => {
 	tr.add_type_operation(type, options);
 	await tr.set_required_fees(options.fee.asset_id);
 
-	await tr.broadcast();
+	return tr.broadcast();
 };
 
 /**
@@ -286,12 +286,15 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 	const transaction = await getTransaction({ id, options: lastTransaction.data, balance });
 
 	let path = SUCCESS_SEND_PATH;
+	let resultBroadcast = null;
 
 	try {
 		const start = new Date().getTime();
 
 		await Promise.race([
-			sendTransaction(transaction, networkName).then((err) => {
+			sendTransaction(transaction, networkName).then((result) => {
+				resultBroadcast = result;
+			}).catch((err) => {
 				if (err) {
 					path = ERROR_SEND_PATH;
 				}
@@ -309,6 +312,7 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 			id,
 			status: ERROR_STATUS,
 			text: FormatHelper.formatError(err),
+			resultBroadcast,
 		});
 
 		createNotification('Transaction', `${ERROR_STATUS} ${FormatHelper.formatError(err).toLowerCase()}`);
@@ -324,7 +328,12 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 		return null;
 	}
 
-	currentTransactionCb({ id, status: APPROVED_STATUS, text: null });
+	currentTransactionCb({
+		id,
+		status: APPROVED_STATUS,
+		text: null,
+		resultBroadcast,
+	});
 
 	createNotification('Transaction', `${APPROVED_STATUS}`);
 
