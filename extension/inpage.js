@@ -1,7 +1,7 @@
 import echojslib from 'echojs-lib';
 import echojsws from 'echojs-ws';
 
-const { APP_ID } = require('../src/constants/GlobalConstants');
+import { APP_ID } from '../src/constants/GlobalConstants';
 
 const requestQueue = [];
 
@@ -31,10 +31,10 @@ const sendTransaction = (options) => {
 	const result = new Promise((resolve, reject) => {
 		const cb = ({ data }) => {
 
-			const { status, text } = data;
+			const { status, text, resultBroadcast } = data;
 
 			if (status === 'approved') {
-				resolve({ status });
+				resolve({ status, resultBroadcast });
 			} else {
 				reject(text || status);
 			}
