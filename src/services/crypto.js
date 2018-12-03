@@ -418,6 +418,43 @@ class Crypto extends EventEmitter {
 	}
 
 	/**
+     *  @method decryptMemo
+     *
+     *  Decrypt memo
+     *
+     *  @param {String} networkName
+     *  @param {Object} memo
+     *
+     *  @return {Object} decryptedMemo
+     */
+	async decryptMemo(networkName, memo) {
+		privateAES.required();
+
+		const encryptedPrivateKey = await this.getInByNetwork(networkName, memo.get('from'));
+
+		if (!encryptedPrivateKey) {
+			throw new Error('Key not found.');
+		}
+
+		const aes = privateAES.get();
+		const privateKeyBuffer = aes.decryptHexToBuffer(encryptedPrivateKey);
+		const privateKey = PrivateKey.fromBuffer(privateKeyBuffer);
+
+		const publicKey = privateKey.toPublicKey().toString();
+
+		if (publicKey !== memo.get('from') && publicKey !== memo.get('to')) {
+			return null;
+		}
+
+		return Aes.decryptWithChecksum(
+			privateKey,
+			publicKey === memo.get('from') ? memo.get('to') : memo.get('from'),
+			memo.get('nonce'),
+			memo.get('message'),
+		).toString('utf-8');
+	}
+
+	/**
 	 *  @method removePrivateKey
 	 *
 	 *  Remove encrypted private key by public key.

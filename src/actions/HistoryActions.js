@@ -7,8 +7,11 @@ import GlobalReducer from '../reducers/GlobalReducer';
 import operations from '../constants/TransactionConstants';
 
 import FormatHelper from '../helpers/FormatHelper';
+import { CORE_SYMBOL } from '../constants/GlobalConstants';
 
-const formatOperation = async (data, index) => {
+import echoService from '../services/echo';
+
+const formatOperation = (data, index) => async (dispatch, getState) => {
 	const type = data.getIn(['op', '0']);
 	const operation = data.getIn(['op', '1']);
 
@@ -24,6 +27,8 @@ const formatOperation = async (data, index) => {
 			type: name,
 			typeName: name,
 			date: moment.utc(block.timestamp).local().format('DD MMM, hh:mm'),
+			value: 0,
+			currency: CORE_SYMBOL,
 		},
 		content: {
 			fee: FormatHelper.formatAmount(operation.getIn(['fee', 'amount']), feeAsset.get('precision')),
@@ -59,7 +64,11 @@ const formatOperation = async (data, index) => {
 	}
 
 	if (type === 0 && operation.get('memo') && operation.getIn(['memo', 'message'])) {
-		result.content.note = operation.get('memo');
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		const note = await echoService.getCrypto().decryptMemo(networkName, operation.get('memo'));
+
+		result.content.note = note;
 	}
 
 	return result;
@@ -69,7 +78,7 @@ const formatHistory = (activity) => async (dispatch) => {
 	if (!activity.size) { return; }
 
 	try {
-		let rows = activity.map((row, i) => formatOperation(row, i));
+		let rows = activity.map((row, i) => dispatch(formatOperation(row, i)));
 		rows = await Promise.all(rows);
 		dispatch(GlobalReducer.actions.set({ field: 'formattedHistory', value: rows }));
 	} catch (err) {
@@ -90,11 +99,11 @@ const updateHistory = () => async (dispatch, getState) => {
 	}
 
 	const stateHistory = getState().global.get('history');
-	const history = (await fetchChain(accountName)).get('history');
+	const historyAccount = (await fetchChain(accountName)).get('history');
 
-	if (stateHistory !== history) {
-		dispatch(GlobalReducer.actions.set({ field: 'history', value: history }));
-		dispatch(formatHistory(history));
+	if (stateHistory !== historyAccount) {
+		dispatch(GlobalReducer.actions.set({ field: 'history', value: historyAccount }));
+		dispatch(formatHistory(historyAccount));
 	}
 
 	return true;
