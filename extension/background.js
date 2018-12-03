@@ -278,6 +278,7 @@ const sendTransaction = async (transaction, networkName) => {
  * 	@param {Number} id
  * 	@param {String} networkName
  * 	@param {Number} balance
+ * 	@param {String} windowType
  */
 const onTransaction = async (id, networkName, balance, windowType) => {
 	const currentTransactionCb = lastTransaction.cb;
