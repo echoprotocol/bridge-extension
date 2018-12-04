@@ -30,7 +30,9 @@ class BridgeTextArea extends React.Component {
 
 	render() {
 
-		const { label, value, name } = this.props;
+		const {
+			label, value, name, disabled,
+		} = this.props;
 
 		const {
 			up, filled,
@@ -51,6 +53,7 @@ class BridgeTextArea extends React.Component {
 					onChange={(e) => this.onChange(e)}
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
+					disabled={disabled}
 				/>
 				<span className="label">{label}</span>
 			</div>
@@ -64,6 +67,7 @@ BridgeTextArea.propTypes = {
 	value: PropTypes.string,
 	name: PropTypes.string,
 	onChange: PropTypes.func,
+	disabled: PropTypes.bool,
 };
 
 BridgeTextArea.defaultProps = {
@@ -71,6 +75,7 @@ BridgeTextArea.defaultProps = {
 	value: '',
 	name: '',
 	onChange: null,
+	disabled: false,
 };
 
 export default BridgeTextArea;

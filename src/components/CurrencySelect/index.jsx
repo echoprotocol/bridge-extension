@@ -3,6 +3,8 @@ import PropTypes from 'prop-types';
 import { Dropdown } from 'react-bootstrap';
 import CustomScroll from 'react-custom-scroll';
 import { connect } from 'react-redux';
+import _ from 'lodash';
+
 import { KEY_CODE_SPACE, KEY_CODE_ENTER, KEY_CODE_TAB } from '../../constants/GlobalConstants';
 
 import CustomMenu from './CustomMenu';
@@ -10,11 +12,12 @@ import { setValue } from '../../actions/FormActions';
 
 class CurrencySelect extends React.Component {
 
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 
 		this.state = {
 			search: '',
+			searchList: this.getSymbols(),
 			currentVal: '',
 			opened: false,
 		};
@@ -26,14 +29,23 @@ class CurrencySelect extends React.Component {
 	}
 
 	componentDidMount() {
-		const { path, data } = this.props;
+		const { path } = this.props;
+		const { searchList } = this.state;
 
 		if (path) {
-			this.props.setValue(path.form, path.field, data[0].list[0].value);
+			this.props.setValue(path.form, path.field, searchList[0].value);
 		}
 
 		document.addEventListener('mousedown', this.handleClickOutside);
 		document.addEventListener('keyup', this.tabListener);
+	}
+
+	componentWillReceiveProps(nextProps) {
+		if (_.isEqual(this.props, nextProps)) { return; }
+
+		this.setState({
+			searchList: this.getSymbols(),
+		});
 	}
 
 	componentDidUpdate(prevProps, prevState) {
@@ -59,16 +71,53 @@ class CurrencySelect extends React.Component {
 		}
 	}
 
+	onSearch(value) {
+		if (value) {
+			this.setState({
+				searchList: this.getSymbols().filter(({ text }) =>
+					text.toLowerCase().includes(value.toLowerCase())),
+			});
+		} else {
+			this.setState({ searchList: this.getSymbols() });
+		}
+	}
+
 	onChange(e) {
 		this.setState({
 			search: e.target.value,
 		});
 
-		this.props.onSearch(e.target.value);
+		this.onSearch(e.target.value);
 	}
 
 	setMenuRef(node) {
 		this.menuRef = node;
+	}
+
+	getSymbols() {
+		if (!this.props) {
+			return null;
+		}
+
+		const { balances, assets, account } = this.props.data;
+
+		const symbolsList = [];
+
+		if (!account) {
+			return symbolsList;
+		}
+
+		balances.forEach((balance) => {
+			if (balance.get('owner') === account.get('id')) {
+				const symbol = assets.getIn([balance.get('asset_type'), 'symbol']);
+
+				if (!symbolsList.includes(symbol)) {
+					symbolsList.push({ text: symbol, value: balance.get('id') });
+				}
+			}
+		});
+
+		return symbolsList;
 	}
 
 	handleClick(text, value) {
@@ -78,7 +127,7 @@ class CurrencySelect extends React.Component {
 			search: '',
 		});
 
-		this.props.onSearch();
+		this.onSearch();
 
 		const { path } = this.props;
 
@@ -101,12 +150,15 @@ class CurrencySelect extends React.Component {
 
 	handleClickOutside(event) {
 		if (this.menuRef && (!this.menuRef.contains(event.target))) {
-			this.setState({ opened: false });
+			this.setState({
+				opened: false,
+				searchList: this.getSymbols(),
+			});
 		}
 	}
 
 	toggleDropdown() {
-		this.props.onSearch();
+		this.onSearch();
 
 		this.setState({
 			opened: !this.state.opened,
@@ -115,10 +167,28 @@ class CurrencySelect extends React.Component {
 	}
 
 	render() {
-		const { currentVal, search, opened } = this.state;
-		const { data } = this.props;
+		const {
+			currentVal, search, opened, searchList,
+		} = this.state;
 
-		const searchList = data.reduce((result, value) => result.concat(value.list), []);
+		if (!searchList) {
+			return null;
+		}
+
+		const dropdownData = [
+			{
+				id: 0,
+				title: 'Assets',
+				list: searchList,
+			},
+			// {
+			// 	id: 1,
+			// 	title: 'Tokens',
+			// 	list: ['ECHO', 'EchoTest', 'EchoEcho', 'EchoEcho245'],
+			// },
+		];
+
+		const resultList = dropdownData.reduce((result, value) => result.concat(value.list), []);
 
 		return (
 			<div ref={this.setMenuRef}>
@@ -129,10 +199,13 @@ class CurrencySelect extends React.Component {
 					onToggle={() => true} // TAB close fix
 					open={this.state.opened}
 					onKeyUp={(e) => { this.tabListener(e); }}
-					disabled={searchList.length === 1 && !opened}
+					disabled={resultList.length === 1 && !opened}
 				>
-					<Dropdown.Toggle onClick={() => this.toggleDropdown()} noCaret={searchList.length === 1}>
-						<span className="val">{currentVal && searchList.find((val) => val.text === currentVal) ? currentVal : 'ECHO'}</span>
+					<Dropdown.Toggle
+						onClick={() => this.toggleDropdown()}
+						noCaret={resultList.length === 1 && !opened}
+					>
+						<span className="val">{currentVal && resultList.find((val) => val.text === currentVal) ? currentVal : 'ECHO'}</span>
 					</Dropdown.Toggle>
 					<CustomMenu bsRole="menu">
 						<div className="menu-container">
@@ -150,14 +223,14 @@ class CurrencySelect extends React.Component {
 							<div className="select-container">
 								<div
 									className="user-scroll"
-									style={{ height: '118px' }}
+									style={{ height: resultList.length > 3 ? 118 : '' }}
 								>
 									<CustomScroll
 										flex="1"
 										heightRelativeToParent="calc(100%)"
 									>
 										{
-											data.map((elem) => (
+											dropdownData.map((elem) => (
 												<div
 													key={elem.id}
 													className="select-item"
@@ -204,15 +277,13 @@ class CurrencySelect extends React.Component {
 
 CurrencySelect.propTypes = {
 	path: PropTypes.object,
-	data: PropTypes.array,
-	onSearch: PropTypes.func,
+	data: PropTypes.object,
 	setValue: PropTypes.func.isRequired,
 };
 
 CurrencySelect.defaultProps = {
 	path: null,
-	data: [],
-	onSearch: null,
+	data: null,
 };
 
 export default connect(

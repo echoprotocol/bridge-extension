@@ -25,7 +25,6 @@ class Send extends React.Component {
 		super(props);
 
 		this.state = {
-			search: this.getSymbols(),
 			timeout: null,
 		};
 	}
@@ -36,10 +35,6 @@ class Send extends React.Component {
 		if (this.state.timeout) {
 			clearTimeout(this.state.timeout);
 		}
-
-		this.setState({
-			search: this.getSymbols(),
-		});
 
 		const { to, amount } = nextProps;
 
@@ -94,17 +89,6 @@ class Send extends React.Component {
 		return true;
 	}
 
-	onSearch(value) {
-		if (value) {
-			this.setState({
-				search: this.getSymbols().filter(({ text }) =>
-					text.toLowerCase().includes(value.toLowerCase())),
-			});
-		} else {
-			this.setState({ search: this.getSymbols() });
-		}
-	}
-
 	onSend() {
 		this.props.send();
 	}
@@ -119,46 +103,10 @@ class Send extends React.Component {
 		}
 	}
 
-	getSymbols() {
-		const { balances, assets, account } = this.props;
-
-		const symbolsList = [];
-
-		if (!account) {
-			return symbolsList;
-		}
-
-		balances.forEach((balance) => {
-			if (balance.get('owner') === account.get('id')) {
-				const symbol = assets.getIn([balance.get('asset_type'), 'symbol']);
-
-				if (!symbolsList.includes(symbol)) {
-					symbolsList.push({ text: symbol, value: balance.get('id') });
-				}
-			}
-		});
-
-		return symbolsList;
-	}
-
 	render() {
-		const { search } = this.state;
 		const {
-			to, amount, fee, memo, account, loading,
+			to, amount, fee, memo, account, loading, balances, assets,
 		} = this.props;
-
-		const dropdownData = [
-			{
-				id: 0,
-				title: 'Assets',
-				list: search,
-			},
-			// {
-			// 	id: 1,
-			// 	title: 'Tokens',
-			// 	list: ['ECHO', 'EchoTest', 'EchoEcho', 'EchoEcho245'],
-			// },
-		];
 
 		if (!account) {
 			return null;
@@ -205,6 +153,7 @@ class Send extends React.Component {
 								error={!!to.error}
 								errorText={to.error}
 								onKeyPress={(e) => this.onKeyPress(e)}
+								disabled={loading}
 							/>
 							<BridgeInput
 								name="amount"
@@ -213,13 +162,20 @@ class Send extends React.Component {
 								defaultUp
 								labelText="Amount"
 								leftLabel
-								innerDropdown={{ dropdownData, path: { form: FORM_SEND, field: 'selectedBalance' } }}
+								innerDropdown={{
+									dropdownData: {
+										balances,
+										assets,
+										account,
+									},
+									path: { form: FORM_SEND, field: 'selectedBalance' },
+								}}
 								value={amount.value}
 								onChange={(e) => this.onAmountChange(e)}
-								onDropdownSearch={(searchText) => this.onSearch(searchText)}
 								error={!!amount.error}
 								errorText={amount.error}
 								onKeyPress={(e) => this.onKeyPress(e)}
+								disabled={loading}
 							/>
 							<BridgeInput
 								name="fee"
@@ -228,10 +184,16 @@ class Send extends React.Component {
 								defaultUp
 								labelText="Fee"
 								leftLabel
-								innerDropdown={{ dropdownData, path: { form: FORM_SEND, field: 'selectedFeeBalance' } }}
+								innerDropdown={{
+									dropdownData: {
+										balances,
+										assets,
+										account,
+									},
+									path: { form: FORM_SEND, field: 'selectedFeeBalance' },
+								}}
 								value={fee.value.toString()}
 								disabled
-								onDropdownSearch={(searchText) => this.onSearch(searchText)}
 							/>
 							<BridgeTextArea
 								name="memo"
@@ -240,6 +202,7 @@ class Send extends React.Component {
 								label="Note (optional)"
 								error={!!memo.error}
 								errorText={memo.error}
+								disabled={loading}
 							/>
 							<Button
 								className={classnames('btn-in-light', { loading })}
