@@ -32,6 +32,8 @@ class CurrencySelect extends React.Component {
 		const { path } = this.props;
 		const { searchList } = this.state;
 
+		this.ddElement.getElementsByClassName('rcs-inner-container')[0].setAttribute('tabindex', '-1');
+
 		if (path) {
 			this.props.setValue(path.form, path.field, searchList[0].value);
 		}
@@ -142,7 +144,7 @@ class CurrencySelect extends React.Component {
 		if ([KEY_CODE_TAB].includes(code)) {
 			e.preventDefault();
 
-			if ((document.activeElement !== (this.searchInput)) && (document.activeElement.className !== 'dropdown-list-item')) {
+			if ((document.activeElement !== (this.searchInput)) && !['rcs-inner-container', 'dropdown-list-item'].includes(document.activeElement.className)) {
 				this.setState({ opened: false });
 			}
 		}
@@ -224,6 +226,7 @@ class CurrencySelect extends React.Component {
 								<div
 									className="user-scroll"
 									style={{ height: resultList.length > 3 ? 118 : '' }}
+									ref={(ref) => { this.ddElement = ref; }}
 								>
 									<CustomScroll
 										flex="1"
