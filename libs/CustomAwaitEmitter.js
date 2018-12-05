@@ -81,8 +81,6 @@ function removeListener(type, nullOrFn) {
 	if (typeof nullOrFn === 'function') {
 		let index,
 			found = false;
-		if (listeners[1]) {
-		}
 		while ((index = listeners.indexOf(nullOrFn)) >= 0) {
 			listeners.splice(index, 1);
 			this._events[type].splice(index, 1);
@@ -92,6 +90,12 @@ function removeListener(type, nullOrFn) {
 	}
 	return delete this._events[type];
 
+}
+
+function removeAllListeners() {
+	Object.keys(this._events).forEach((eventType) => delete this._events[eventType]);
+
+	return true;
 }
 
 async function emit(type, ...args) {
@@ -152,6 +156,7 @@ AwaitEventEmitter.prototype.once = once;
 AwaitEventEmitter.prototype.prependListener = prepend;
 AwaitEventEmitter.prototype.prependOnceListener = prependOnce;
 AwaitEventEmitter.prototype.off = AwaitEventEmitter.prototype.removeListener = removeListener;
+AwaitEventEmitter.prototype.removeAllListeners = removeAllListeners;
 AwaitEventEmitter.prototype.emit = emit;
 AwaitEventEmitter.prototype.emitSync = emitSync;
 AwaitEventEmitter.prototype.listeners = listeners;
