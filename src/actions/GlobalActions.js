@@ -27,7 +27,8 @@ import {
 import {
 	CREATE_ACCOUNT_PATH,
 	SUCCESS_ADD_NETWORK_PATH,
-	INDEX_PATH, WALLET_PATH,
+	INDEX_PATH,
+	WALLET_PATH,
 	EMPTY_PATH,
 } from '../constants/RouterConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';

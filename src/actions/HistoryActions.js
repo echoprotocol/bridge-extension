@@ -11,7 +11,31 @@ import { CORE_SYMBOL } from '../constants/GlobalConstants';
 
 import echoService from '../services/echo';
 
-const formatOperation = (data, index) => async (dispatch, getState) => {
+export const decryptNote = (index) => async (dispatch, getState) => {
+	const networkName = getState().global.getIn(['network', 'name']);
+	const { memo } = getState().global.get('formattedHistory').find((val) => val.id === index).content;
+
+	if (!memo) {
+		return null;
+	}
+
+	let note = '';
+
+	try {
+		note = await echoService.getCrypto().decryptMemo(networkName, memo);
+	} catch (err) {
+		dispatch(GlobalReducer.actions.set({
+			field: 'error',
+			value: err,
+		}));
+
+		return null;
+	}
+
+	return note;
+};
+
+const formatOperation = async (data, index) => {
 	const type = data.getIn(['op', '0']);
 	const operation = data.getIn(['op', '1']);
 
@@ -64,11 +88,7 @@ const formatOperation = (data, index) => async (dispatch, getState) => {
 	}
 
 	if (type === 0 && operation.get('memo') && operation.getIn(['memo', 'message'])) {
-		const networkName = getState().global.getIn(['network', 'name']);
-
-		const note = await echoService.getCrypto().decryptMemo(networkName, operation.get('memo'));
-
-		result.content.note = note;
+		result.content.memo = operation.get('memo');
 	}
 
 	return result;
@@ -78,7 +98,7 @@ const formatHistory = (activity) => async (dispatch) => {
 	if (!activity.size) { return; }
 
 	try {
-		let rows = activity.map((row, i) => dispatch(formatOperation(row, i)));
+		let rows = activity.map((row, i) => formatOperation(row, i));
 		rows = await Promise.all(rows);
 		dispatch(GlobalReducer.actions.set({ field: 'formattedHistory', value: rows }));
 	} catch (err) {
@@ -91,7 +111,7 @@ const formatHistory = (activity) => async (dispatch) => {
 	}
 };
 
-const updateHistory = () => async (dispatch, getState) => {
+export const updateHistory = () => async (dispatch, getState) => {
 	const accountName = getState().global.getIn(['account', 'name']);
 
 	if (!accountName) {
@@ -108,5 +128,3 @@ const updateHistory = () => async (dispatch, getState) => {
 
 	return true;
 };
-
-export default updateHistory;
