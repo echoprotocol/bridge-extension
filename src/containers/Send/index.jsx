@@ -26,6 +26,7 @@ class Send extends React.Component {
 
 		this.state = {
 			timeout: null,
+			warning: false,
 		};
 	}
 
@@ -74,7 +75,7 @@ class Send extends React.Component {
 
 		const asset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
 
-		const { value: validatedValue, error } =
+		const { value: validatedValue, error, warning } =
 			ValidateSendHelper.amountInput(value, {
 				precision: asset.get('precision'),
 				symbol: asset.get('symbol'),
@@ -82,9 +83,15 @@ class Send extends React.Component {
 
 		if (error) {
 			this.props.setFormError(field, error);
+
+			// if (warning) {
+			// 	this.setState({ warning });
+			// }
+
 			return false;
 		}
 
+		this.setState({ warning: false });
 		this.props.setFormValue(field, validatedValue);
 		return true;
 	}
@@ -101,6 +108,18 @@ class Send extends React.Component {
 		if (KEY_CODE_ENTER === code && to.value && amount.value) {
 			this.props.send();
 		}
+	}
+
+	onBlur(value) {
+		if (!this.state.warning) {
+			return false;
+		}
+
+		this.setState({ warning: false });
+
+		this.props.setFormError(value, null);
+
+		return true;
 	}
 
 	render() {
@@ -176,6 +195,7 @@ class Send extends React.Component {
 								errorText={amount.error}
 								onKeyPress={(e) => this.onKeyPress(e)}
 								disabled={loading}
+								onBlur={(value) => this.onBlur(value)}
 							/>
 							<BridgeInput
 								name="fee"

@@ -3,10 +3,11 @@ import BN from 'bignumber.js';
 class ValidateSendHelper {
 
 	static amountInput(value, asset) {
-		const result = { value: null, error: '' };
+		const result = { value: null, error: '', warning: false };
 
 		if (!value.match(/^[0-9]*[.,]?[0-9]*$/)) {
 			result.error = 'Amount must contain only digits and dot';
+			result.warning = true;
 			return result;
 		}
 
@@ -21,6 +22,7 @@ class ValidateSendHelper {
 
 			if (doublePath.toString().length > asset.precision) {
 				result.error = `${asset.symbol} precision is ${asset.precision}`;
+				result.warning = true;
 
 				return result;
 			}

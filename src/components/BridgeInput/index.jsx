@@ -23,6 +23,10 @@ class BridgeInput extends React.Component {
 
 
 	onBlur() {
+		if (this.props.onBlur) {
+			this.props.onBlur(this.props.name);
+		}
+
 		this.setState({ up: false });
 	}
 
@@ -176,6 +180,7 @@ BridgeInput.propTypes = {
 	onHintClick: PropTypes.func,
 	onKeyDown: PropTypes.func,
 	onKeyPress: PropTypes.func,
+	onBlur: PropTypes.func,
 };
 
 BridgeInput.defaultProps = {
@@ -204,6 +209,7 @@ BridgeInput.defaultProps = {
 	onHintClick: null,
 	onKeyDown: null,
 	onKeyPress: null,
+	onBlur: null,
 };
 
 export default BridgeInput;

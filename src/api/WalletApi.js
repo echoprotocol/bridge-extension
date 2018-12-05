@@ -115,7 +115,12 @@ export const getOperationFee = async (type, transaction) => {
 
 	const { TransactionBuilder } = await echoService.getChainLib();
 	const tr = new TransactionBuilder();
-	tr.add_type_operation(type, options);
+	console.log(options);
+	try {
+        tr.add_type_operation(type, options);
+    } catch (e) {
+		console.log(e);
+    }
 
 	const start = new Date().getTime();
 
