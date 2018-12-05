@@ -84,9 +84,9 @@ class Send extends React.Component {
 		if (error) {
 			this.props.setFormError(field, error);
 
-			// if (warning) {
-			// 	this.setState({ warning });
-			// }
+			if (warning) {
+				this.setState({ warning });
+			}
 
 			return false;
 		}

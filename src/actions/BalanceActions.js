@@ -194,10 +194,12 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 	const fromAccount = await fetchChain(getState().global.getIn(['account', 'name']));
 	const toAccount = await fetchChain(to.value);
 
+	const amountAsset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
+
 	const options = {
 		amount: {
-			amount,
-			asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
+			amount: amount * (10 ** amountAsset.get('precision')),
+			asset: amountAsset,
 		},
 		fee: {
 			amount: 0,
