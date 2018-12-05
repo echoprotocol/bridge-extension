@@ -23,6 +23,10 @@ class BridgeInput extends React.Component {
 
 
 	onBlur() {
+		if (this.props.onBlur) {
+			this.props.onBlur(this.props.name);
+		}
+
 		this.setState({ up: false });
 	}
 
@@ -127,11 +131,19 @@ class BridgeInput extends React.Component {
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
 					onChange={(e) => this.onChange(e)}
-					action={(innerDropdown) && (<CurrencySelect data={innerDropdown} />)}
+					action={
+						(innerDropdown) &&
+						(
+							<CurrencySelect
+								data={innerDropdown.dropdownData}
+								path={innerDropdown.path}
+							/>
+						)
+					}
 					onKeyDown={(e) => (onKeyDown ? onKeyDown(e) : null)}
 					onKeyPress={(e) => onKeyPress && onKeyPress(e)}
 				/>
-				{ userIcon ? this.renderImage('green', 3) : null}
+				{ userIcon ? this.renderImage(userIcon.color, userIcon.icon) : null}
 				{ error ? this.renderError() : null }
 				{ hintText ? this.renderHint() : null }
 				{ descriptionText ? <div className="message-description">{ descriptionText }</div> : null }
@@ -163,11 +175,12 @@ BridgeInput.propTypes = {
 	descriptionText: PropTypes.string,
 	onChange: PropTypes.func,
 	privacyEye: PropTypes.bool,
-	innerDropdown: PropTypes.array,
-	userIcon: PropTypes.string,
+	innerDropdown: PropTypes.object,
+	userIcon: PropTypes.object,
 	onHintClick: PropTypes.func,
 	onKeyDown: PropTypes.func,
 	onKeyPress: PropTypes.func,
+	onBlur: PropTypes.func,
 };
 
 BridgeInput.defaultProps = {
@@ -196,6 +209,7 @@ BridgeInput.defaultProps = {
 	onHintClick: null,
 	onKeyDown: null,
 	onKeyPress: null,
+	onBlur: null,
 };
 
 export default BridgeInput;

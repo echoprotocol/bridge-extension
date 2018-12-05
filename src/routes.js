@@ -16,7 +16,9 @@ import {
 	SEND_PATH,
 	BACKUP_PATH,
 	WATCH_TOKEN_PATH,
-	SIGN_TRANSACTION_PATH, SUCCESS_SEND_PATH, ERROR_SEND_PATH,
+	SIGN_TRANSACTION_PATH,
+	SUCCESS_SEND_PATH,
+	ERROR_SEND_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';

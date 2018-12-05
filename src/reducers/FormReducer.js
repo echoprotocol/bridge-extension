@@ -9,6 +9,7 @@ import {
 	FORM_UNLOCK,
 	FORM_WIPE,
 	FORM_CREATE_PIN,
+	FORM_SEND,
 } from '../constants/FormConstants';
 
 const DEFAULT_FIELDS = Map({
@@ -44,6 +45,26 @@ const DEFAULT_FORM_FIELDS = {
 	[FORM_WIPE]: Map({
 		checked: false,
 	}),
+	[FORM_SEND]: Map({
+		to: {
+			value: '',
+			error: null,
+		},
+		amount: {
+			value: '',
+			error: null,
+		},
+		selectedBalance: null,
+		fee: {
+			value: '',
+			error: null,
+		},
+		selectedFeeBalance: null,
+		memo: {
+			value: '',
+			error: null,
+		},
+	}),
 };
 
 export default createModule({
@@ -55,6 +76,7 @@ export default createModule({
 		[FORM_UNLOCK]: _.cloneDeep(DEFAULT_FIELDS),
 		[FORM_WIPE]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_WIPE]),
 		[FORM_CREATE_PIN]: _.cloneDeep(DEFAULT_FIELDS),
+		[FORM_SEND]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_SEND]),
 	}),
 	transformations: {
 		set: {
