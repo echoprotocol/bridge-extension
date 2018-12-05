@@ -296,7 +296,7 @@ const checkTransactionFee = (options, transaction) => async (dispatch, getState)
  *
  * 	@param {Object} options
  */
-export const getTransactionFee = async (options) => {
+const getTransactionFee = async (options) => {
 	const { fee } = options;
 	let amount = await getOperationFee(options.type, formatToSend(options.type, options));
 
@@ -567,9 +567,7 @@ emitter.on('windowRequest', windowRequestHandler);
  * 	@param {String} windowType
  */
 const trResponseHandler = (status, id, path, windowType) => {
-	if (status === ERROR_STATUS) {
-		path = NETWORK_ERROR_SEND_PATH;
-
+	if (path === NETWORK_ERROR_SEND_PATH) {
 		store.dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
 	}
 
