@@ -214,6 +214,8 @@ class Send extends React.Component {
 								}}
 								value={fee.value.toString()}
 								disabled
+								error={!!fee.error}
+								errorText={fee.error}
 							/>
 							<BridgeTextArea
 								name="memo"

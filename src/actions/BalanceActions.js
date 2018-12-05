@@ -261,13 +261,9 @@ export const send = () => async (dispatch, getState) => {
 
 	const activeUserName = getState().global.getIn(['account', 'name']);
 
-	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
-
 	const isAccount = await dispatch(checkAccount(activeUserName, to.value));
 
 	if (!isAccount) {
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
-
 		return false;
 	}
 
@@ -306,14 +302,14 @@ export const send = () => async (dispatch, getState) => {
 		const total = new BN(amount).times(10 ** options.amount.asset.get('precision')).plus(options.fee.amount);
 
 		if (total.gt(balances.getIn([selectedBalance, 'balance']))) {
-			dispatch(setFormError(FORM_SEND, 'fee', 'Insufficient funds for fee'));
+			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
 			return false;
 		}
 	} else {
 		const feeBalance = balances.find((val) => val.get('asset_type') === options.fee.asset.get('id')).get('balance');
 
 		if (new BN(fee.value).gt(feeBalance)) {
-			dispatch(setFormError(FORM_SEND, 'fee', 'Insufficient funds for fee'));
+			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
 			return false;
 		}
 	}
@@ -321,6 +317,8 @@ export const send = () => async (dispatch, getState) => {
 	options.amount.amount *= (10 ** options.amount.asset.get('precision'));
 
 	const activeNetworkName = getState().global.getIn(['network', 'name']);
+
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	emitter.emit('sendRequest', options, activeNetworkName);
 
