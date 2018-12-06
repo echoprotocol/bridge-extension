@@ -430,11 +430,7 @@ class Crypto extends EventEmitter {
 	async decryptMemo(networkName, memo) {
 		privateAES.required();
 
-		let encryptedPrivateKey = await this.getInByNetwork(networkName, memo.get('from'));
-
-		if (!encryptedPrivateKey) {
-			encryptedPrivateKey = await this.getInByNetwork(networkName, memo.get('to'));
-		}
+		const encryptedPrivateKey = await this.getInByNetwork(networkName, memo.get('from'), memo.get('to'));
 
 		if (!encryptedPrivateKey) {
 			throw new Error('Key not found.');
@@ -503,8 +499,9 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @param {String} networkName
 	 *  @param {String} field
+     *  @param {String} tmpfield - for decypt memo
 	 */
-	async getInByNetwork(networkName, field) {
+	async getInByNetwork(networkName, field, tmpfield) {
 		privateAES.required();
 
 		let networkData = await storage.get(networkName);
@@ -514,6 +511,11 @@ class Crypto extends EventEmitter {
 		} else {
 			networkData = {};
 		}
+
+		if (networkData[tmpfield]) {
+			return networkData[tmpfield];
+		}
+
 		return networkData[field];
 	}
 
