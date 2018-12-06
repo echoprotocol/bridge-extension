@@ -29,6 +29,7 @@ const DEFAULT_FIELDS = Map({
 		goTo: null,
 	}),
 	history: new List([]),
+	historyNote: '',
 	formattedHistory: null,
 });
 

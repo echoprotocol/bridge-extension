@@ -14,7 +14,6 @@ class Transactions extends React.Component {
 		super();
 		this.state = {
 			activeIndex: null,
-			note: '',
 		};
 		this.handleClick = this.handleClick.bind(this);
 	}
@@ -22,21 +21,21 @@ class Transactions extends React.Component {
 	componentDidMount() {
 	}
 
-	async handleClick(e, titleProps) {
+	handleClick(e, titleProps) {
 
 		const { index } = titleProps;
 		const { activeIndex } = this.state;
 		const newIndex = activeIndex === index ? -1 : index;
 
 		if (index !== activeIndex) {
-			this.setState({ note: await this.props.decryptNote(index) });
+			this.props.decryptNote(index);
 		}
 
 		this.setState({ activeIndex: newIndex });
 	}
 
 	render() {
-		const { history } = this.props;
+		const { history, historyNote } = this.props;
 
 		if (!history) {
 			return null;
@@ -91,7 +90,7 @@ class Transactions extends React.Component {
 														</div>
 														<div className="row">
 															<div className="left-block">Note</div>
-															<div className="right-block">{this.state.note}</div>
+															<div className="right-block">{historyNote}</div>
 														</div>
 													</div>
 												</Accordion.Content>
@@ -110,16 +109,19 @@ class Transactions extends React.Component {
 
 Transactions.propTypes = {
 	history: PropTypes.array,
+	historyNote: PropTypes.string,
 	decryptNote: PropTypes.func.isRequired,
 };
 
 Transactions.defaultProps = {
 	history: null,
+	historyNote: '',
 };
 
 export default withRouter(connect(
 	(state) => ({
 		history: state.global.get('formattedHistory'),
+		historyNote: state.global.get('historyNote'),
 	}),
 	(dispatch) => ({
 		decryptNote: (memo) => dispatch(decryptNote(memo)),

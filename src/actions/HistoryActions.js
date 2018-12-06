@@ -16,6 +16,8 @@ export const decryptNote = (index) => async (dispatch, getState) => {
 	const { memo } = getState().global.get('formattedHistory').find((val) => val.id === index).content;
 
 	if (!memo) {
+		dispatch(GlobalReducer.actions.set({ field: 'historyNote', value: '' }));
+
 		return null;
 	}
 
@@ -23,6 +25,8 @@ export const decryptNote = (index) => async (dispatch, getState) => {
 
 	try {
 		note = await echoService.getCrypto().decryptMemo(networkName, memo);
+
+		dispatch(GlobalReducer.actions.set({ field: 'historyNote', value: note }));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({
 			field: 'error',
