@@ -14,6 +14,8 @@ class Transactions extends React.Component {
 		super();
 		this.state = {
 			activeIndex: null,
+			note: '',
+			noteId: '',
 		};
 		this.handleClick = this.handleClick.bind(this);
 	}
@@ -21,27 +23,30 @@ class Transactions extends React.Component {
 	componentDidMount() {
 	}
 
-	handleClick(e, titleProps) {
+	async handleClick(e, titleProps) {
 
 		const { index } = titleProps;
-		const { activeIndex } = this.state;
+		const { activeIndex, noteId } = this.state;
 		const newIndex = activeIndex === index ? -1 : index;
 
-		if (index !== activeIndex) {
-			this.props.decryptNote(index);
+		if (noteId !== index) {
+			this.setState({
+				note: await this.props.decryptNote(index),
+				noteId: index,
+			});
 		}
 
 		this.setState({ activeIndex: newIndex });
 	}
 
 	render() {
-		const { history, historyNote } = this.props;
+		const { history } = this.props;
 
 		if (!history) {
 			return null;
 		}
 
-		const { activeIndex } = this.state;
+		const { activeIndex, note } = this.state;
 
 		return (
 			<React.Fragment>
@@ -88,10 +93,15 @@ class Transactions extends React.Component {
 															<div className="left-block">Fee</div>
 															<div className="right-block">{elem.content.fee}<span className="currency">{elem.content.feeCurrency}</span></div>
 														</div>
-														<div className="row">
-															<div className="left-block">Note</div>
-															<div className="right-block">{historyNote}</div>
-														</div>
+														{
+															note ?
+																<div className="row">
+																	<div className="left-block">Note</div>
+																	<div className="right-block">
+																		{note}
+																	</div>
+																</div> : null
+														}
 													</div>
 												</Accordion.Content>
 											</React.Fragment>))
@@ -109,19 +119,16 @@ class Transactions extends React.Component {
 
 Transactions.propTypes = {
 	history: PropTypes.array,
-	historyNote: PropTypes.string,
 	decryptNote: PropTypes.func.isRequired,
 };
 
 Transactions.defaultProps = {
 	history: null,
-	historyNote: '',
 };
 
 export default withRouter(connect(
 	(state) => ({
 		history: state.global.get('formattedHistory'),
-		historyNote: state.global.get('historyNote'),
 	}),
 	(dispatch) => ({
 		decryptNote: (memo) => dispatch(decryptNote(memo)),

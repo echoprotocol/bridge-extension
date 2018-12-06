@@ -11,13 +11,18 @@ import { CORE_SYMBOL } from '../constants/GlobalConstants';
 
 import echoService from '../services/echo';
 
+/**
+ *  @method decryptNote
+ *
+ * 	Decodes note for transaction details
+ *
+ * 	@param {String} index
+ */
 export const decryptNote = (index) => async (dispatch, getState) => {
 	const networkName = getState().global.getIn(['network', 'name']);
 	const { memo } = getState().global.get('formattedHistory').find((val) => val.id === index).content;
 
 	if (!memo) {
-		dispatch(GlobalReducer.actions.set({ field: 'historyNote', value: '' }));
-
 		return null;
 	}
 
@@ -25,8 +30,6 @@ export const decryptNote = (index) => async (dispatch, getState) => {
 
 	try {
 		note = await echoService.getCrypto().decryptMemo(networkName, memo);
-
-		dispatch(GlobalReducer.actions.set({ field: 'historyNote', value: note }));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({
 			field: 'error',
@@ -36,10 +39,19 @@ export const decryptNote = (index) => async (dispatch, getState) => {
 		return null;
 	}
 
+
 	return note;
+
 };
 
-const formatOperation = async (data, index) => {
+/**
+ *  @method formatOperation
+ *
+ * 	Formatting one transaction of account history
+ *
+ * 	@param {Object} data
+ */
+const formatOperation = async (data) => {
 	const type = data.getIn(['op', '0']);
 	const operation = data.getIn(['op', '1']);
 
@@ -50,7 +62,7 @@ const formatOperation = async (data, index) => {
 	const { name, options } = Object.values(operations).find((i) => i.value === type);
 
 	const result = {
-		id: index,
+		id: data.get('id'),
 		transaction: {
 			type: name,
 			typeName: name,
@@ -98,11 +110,18 @@ const formatOperation = async (data, index) => {
 	return result;
 };
 
-const formatHistory = (activity) => async (dispatch) => {
-	if (!activity.size) { return; }
+/**
+ *  @method formatHistory
+ *
+ * 	Formatting account transaction history
+ *
+ * 	@param {Object} history
+ */
+const formatHistory = (history) => async (dispatch) => {
+	if (!history.size) { return; }
 
 	try {
-		let rows = activity.map((row, i) => formatOperation(row, i));
+		let rows = history.map((row) => formatOperation(row));
 		rows = await Promise.all(rows);
 		dispatch(GlobalReducer.actions.set({ field: 'formattedHistory', value: rows }));
 	} catch (err) {
@@ -115,6 +134,11 @@ const formatHistory = (activity) => async (dispatch) => {
 	}
 };
 
+/**
+ *  @method updateHistory
+ *
+ * 	Update user's history
+ */
 export const updateHistory = () => async (dispatch, getState) => {
 	const accountName = getState().global.getIn(['account', 'name']);
 
