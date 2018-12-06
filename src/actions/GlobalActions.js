@@ -30,6 +30,9 @@ import {
 	INDEX_PATH,
 	WALLET_PATH,
 	EMPTY_PATH,
+	SUCCESS_SEND_PATH,
+	ERROR_SEND_PATH,
+	NETWORK_ERROR_SEND_PATH,
 } from '../constants/RouterConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
@@ -240,8 +243,15 @@ export const loadInfo = () => async (dispatch, getState) => {
 
 	if (accounts && accounts.length) {
 		await dispatch(initAccount(accounts.find((account) => account.active)));
-		const path = getState().global.getIn(['crypto', 'goTo']) || INDEX_PATH;
-		history.push(globals.WINDOW_TYPE === POPUP_WINDOW_TYPE ? EMPTY_PATH : path);
+
+		let path = getState().global.getIn(['crypto', 'goTo']) || INDEX_PATH;
+
+		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE
+			&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH].includes(path)) {
+			path = EMPTY_PATH;
+		}
+
+		history.push(path);
 	} else {
 		history.push(CREATE_ACCOUNT_PATH);
 	}

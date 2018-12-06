@@ -25,11 +25,14 @@ class BridgeTextArea extends React.Component {
 
 	onChange(e) {
 		this.setState({ filled: !!e.target.value.trim().length });
+		this.props.onChange(e);
 	}
 
 	render() {
 
-		const { label } = this.props;
+		const {
+			label, value, name, disabled,
+		} = this.props;
 
 		const {
 			up, filled,
@@ -45,9 +48,12 @@ class BridgeTextArea extends React.Component {
 			>
 				<Textarea
 					rows={1}
+					value={value}
+					name={name}
 					onChange={(e) => this.onChange(e)}
 					onFocus={() => this.onFocus()}
 					onBlur={() => this.onBlur()}
+					disabled={disabled}
 				/>
 				<span className="label">{label}</span>
 			</div>
@@ -58,10 +64,18 @@ class BridgeTextArea extends React.Component {
 
 BridgeTextArea.propTypes = {
 	label: PropTypes.string,
+	value: PropTypes.string,
+	name: PropTypes.string,
+	onChange: PropTypes.func,
+	disabled: PropTypes.bool,
 };
 
 BridgeTextArea.defaultProps = {
 	label: null,
+	value: '',
+	name: '',
+	onChange: null,
+	disabled: false,
 };
 
 export default BridgeTextArea;

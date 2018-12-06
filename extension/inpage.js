@@ -1,7 +1,7 @@
 import echojslib from 'echojs-lib';
 import echojsws from 'echojs-ws';
 
-const { APP_ID } = require('../src/constants/GlobalConstants');
+import { APP_ID } from '../src/constants/GlobalConstants';
 
 const requestQueue = [];
 

@@ -11,6 +11,9 @@ import {
 	UNLOCK_PATH,
 	INDEX_PATH,
 	SIGN_TRANSACTION_PATH,
+	SUCCESS_SEND_PATH,
+	ERROR_SEND_PATH,
+	NETWORK_ERROR_SEND_PATH,
 } from '../constants/RouterConstants';
 import { NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
 
@@ -99,9 +102,16 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 		dispatch(setValue(form, 'loading', true));
 
 		await getCrypto().unlock(pin);
+
 		dispatch(changeCrypto({ isLocked: false }));
+
 		await dispatch(loadInfo());
-		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
+
+		if (
+			globals.WINDOW_TYPE === POPUP_WINDOW_TYPE &&
+			![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH]
+				.includes(history.location.pathname)
+		) {
 			history.push(SIGN_TRANSACTION_PATH);
 		}
 		return true;
