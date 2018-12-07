@@ -18,31 +18,27 @@ import echoService from '../services/echo';
  *
  * 	@param {String} index
  */
-export const decryptNote = (index) => async (dispatch, getState) => {
+export const decryptNote = (index) => async (dispatch, getState) => new Promise((resolve) => {
+
 	const networkName = getState().global.getIn(['network', 'name']);
 	const { memo } = getState().global.get('formattedHistory').find((val) => val.id === index).content;
 
 	if (!memo) {
-		return null;
+		return resolve(null);
 	}
 
-	let note = '';
+	return setTimeout(async () => {
+		let note = null;
+		try {
+			note = await echoService.getCrypto().decryptMemo(networkName, memo);
+		} catch (err) {
+			return resolve(null);
+		}
 
-	try {
-		note = await echoService.getCrypto().decryptMemo(networkName, memo);
-	} catch (err) {
-		dispatch(GlobalReducer.actions.set({
-			field: 'error',
-			value: err,
-		}));
+		return resolve(note);
+	}, 0);
 
-		return null;
-	}
-
-
-	return note;
-
-};
+});
 
 /**
  *  @method formatOperation
@@ -66,7 +62,7 @@ const formatOperation = async (data) => {
 		transaction: {
 			type: name,
 			typeName: name,
-			date: moment.utc(block.timestamp).local().format('DD MMM, hh:mm'),
+			date: moment.utc(block.timestamp).local().format('DD MMM, HH:MM'),
 			value: 0,
 			currency: CORE_SYMBOL,
 		},

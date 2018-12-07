@@ -33,7 +33,7 @@ export const POPUP_PATH = 'index.html?windowType=popup';
 
 export const EMPTY_PATH = '/';
 
-export const INDEX_PATH = WALLET_PATH;
+export const INDEX_PATH = TRANSACTIONS_PATH;
 
 export const PIN_PATHS = [CREATE_PIN_PATH, UNLOCK_PATH, WIPE_PIN_PATH];
 

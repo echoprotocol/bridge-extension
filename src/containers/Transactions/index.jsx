@@ -10,33 +10,37 @@ import { decryptNote } from '../../actions/HistoryActions';
 
 class Transactions extends React.Component {
 
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.state = {
-			activeIndex: null,
+			activeId: null,
 			note: '',
 			noteId: '',
 		};
 		this.handleClick = this.handleClick.bind(this);
 	}
 
-	componentDidMount() {
-	}
-
 	async handleClick(e, titleProps) {
 
 		const { index } = titleProps;
-		const { activeIndex, noteId } = this.state;
-		const newIndex = activeIndex === index ? -1 : index;
+		const { activeId, noteId } = this.state;
+		const newIndex = activeId === index ? -1 : index;
+
+		this.setState({
+			noteId: index,
+		});
+
+		const id = index;
 
 		if (noteId !== index) {
-			this.setState({
-				note: await this.props.decryptNote(index),
-				noteId: index,
-			});
+			const note = await this.props.decryptNote(id);
+
+			if (this.state.noteId === id) {
+				this.setState({ note });
+			}
 		}
 
-		this.setState({ activeIndex: newIndex });
+		this.setState({ activeId: newIndex });
 	}
 
 	render() {
@@ -46,7 +50,7 @@ class Transactions extends React.Component {
 			return null;
 		}
 
-		const { activeIndex, note } = this.state;
+		const { activeId, note } = this.state;
 
 		return (
 			<React.Fragment>
@@ -62,7 +66,7 @@ class Transactions extends React.Component {
 										(
 											<React.Fragment key={elem.id}>
 												<Accordion.Title
-													active={activeIndex === elem.id}
+													active={activeId === elem.id}
 													index={elem.id}
 													onClick={this.handleClick}
 												>
@@ -83,7 +87,7 @@ class Transactions extends React.Component {
 														</div>
 													</div>
 												</Accordion.Title>
-												<Accordion.Content active={activeIndex === elem.id}>
+												<Accordion.Content active={activeId === elem.id}>
 													<div className="transaction-element-content">
 														<div className="row">
 															<div className="left-block">Receiver</div>
