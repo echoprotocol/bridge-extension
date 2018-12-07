@@ -4,6 +4,7 @@ import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Button } from 'semantic-ui-react';
 // import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import { RECEIVE_PATH, SEND_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
@@ -85,17 +86,11 @@ class Wallet extends React.Component {
 															<span>{asset.get('symbol')}</span>
 														</div>
 													</a>
-													{/* { */}
-													{/* asset.type === 'token' ? */}
-													{/* <React.Fragment> */}
-													{/* <Button className="btn-icon icon-closeBig" /> */}
-													{/* <div className="token-info"> */}
-													{/* <span>ERC20</span> */}
-													{/* <span>TOKEN</span> */}
-													{/* </div> */}
-													{/* </React.Fragment> : */}
-													{/* null */}
-													{/* } */}
+													<Button className="btn-icon icon-closeBig" />
+													<div className="token-info">
+														<span>ERC20</span>
+														<span>TOKEN</span>
+													</div>
 												</li>
 
 											);

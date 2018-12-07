@@ -30,6 +30,7 @@
     "immutable": "^3.8.2",
     "intl": "^1.2.5",
     "is-promise": "^2.1.0",
+    "js-sha3": "^0.8.0",
     "lodash": "^4.17.11",
     "prop-types": "^15.6.1",
     "query-string": "^6.2.0",

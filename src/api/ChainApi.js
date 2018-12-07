@@ -1,9 +1,11 @@
+import { keccak256 } from 'js-sha3';
+
 import echoService from '../services/echo';
 
 import { connect } from '../actions/ChainStoreAction';
 import { loadInfo } from '../actions/GlobalActions';
 import GlobalReducer from '../reducers/GlobalReducer';
-import { CHAINSTORE_INIT_TIMEOUT, WS_CLOSE_TIMEOUT } from '../constants/GlobalConstants';
+import { CHAINSTORE_INIT_TIMEOUT, CORE_ID, WS_CLOSE_TIMEOUT } from '../constants/GlobalConstants';
 
 let CHAIN_SUBSCRIBE = null;
 
@@ -179,6 +181,37 @@ export const getAccountRefsOfKey = async (key) => {
 	const { ChainStore } = echoService.getChainLib();
 
 	const result = await ChainStore.FetchChain('getAccountRefsOfKey', key);
+
+	return result;
+};
+
+export const getTokenDetails = async (contractId, accountId) => {
+	const { Apis } = echoService.getWsLib();
+	const instance = Apis.instance();
+
+	const methods = [
+		{
+			name: 'balanceOf',
+			inputs: [{ type: 'address' }],
+		},
+		{
+			name: 'symbol',
+			inputs: [],
+		},
+		{
+			name: 'decimals',
+			inputs: [],
+		},
+	];
+
+	const inputs = methods[0].inputs.map((input) => input.type).join(',');
+
+	const methodId = keccak256(`${methods[0].name}(${inputs})`).substr(0, 8);
+
+	const result = await instance.dbApi().exec(
+		'call_contract_no_changing_state',
+		[contractId, accountId, CORE_ID, code],
+	);
 
 	return result;
 };
