@@ -394,7 +394,8 @@
         padding-bottom: 7px;
         position: relative;
         z-index: 3;
-
+        overflow: hidden;
+        
         &::-webkit-input-placeholder {
             font-family: FNMedium;
         }
