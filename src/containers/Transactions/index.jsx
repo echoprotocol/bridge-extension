@@ -28,19 +28,20 @@ class Transactions extends React.Component {
 
 		this.setState({
 			noteId: index,
+			activeId: newIndex,
 		});
 
 		const id = index;
 
 		if (noteId !== index) {
+			this.setState({ note: null });
+
 			const note = await this.props.decryptNote(id);
 
 			if (this.state.noteId === id) {
 				this.setState({ note });
 			}
 		}
-
-		this.setState({ activeId: newIndex });
 	}
 
 	render() {
