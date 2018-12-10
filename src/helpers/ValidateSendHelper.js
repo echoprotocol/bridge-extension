@@ -5,7 +5,7 @@ class ValidateSendHelper {
 	static amountInput(value, asset) {
 		const result = { value: null, error: '', warning: false };
 
-		if (!value.match(/^[0-9]*[.,]?[0-9]*$/)) {
+		if (!value.match(/^$|^[0-9]+[.,]?[0-9]*$/)) {
 			result.error = 'Amount must contain only digits and dot';
 			result.warning = true;
 			return result;
@@ -28,6 +28,8 @@ class ValidateSendHelper {
 			}
 
 			result.value = `${intPath ? Number(intPath) : ''}.${doublePath || ''}`;
+
+			return result;
 		}
 		result.value = value ? value.toString() : value;
 

@@ -5,7 +5,7 @@ import CustomScroll from 'react-custom-scroll';
 import { connect } from 'react-redux';
 import _ from 'lodash';
 
-import { KEY_CODE_SPACE, KEY_CODE_ENTER, KEY_CODE_TAB } from '../../constants/GlobalConstants';
+import { KEY_CODE_SPACE, KEY_CODE_ENTER, KEY_CODE_TAB, CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 import CustomMenu from './CustomMenu';
 import { setValue } from '../../actions/FormActions';
@@ -113,10 +113,15 @@ class CurrencySelect extends React.Component {
 			if (balance.get('owner') === account.get('id')) {
 				const symbol = assets.getIn([balance.get('asset_type'), 'symbol']);
 
-				if (!symbolsList.includes(symbol)) {
-					symbolsList.push({ text: symbol, value: balance.get('id') });
+				if (symbol === CORE_SYMBOL) {
+					symbolsList.unshift({ text: symbol, value: balance.get('id') });
+					return null;
 				}
+
+				symbolsList.push({ text: symbol, value: balance.get('id') });
 			}
+
+			return null;
 		});
 
 		return symbolsList;
