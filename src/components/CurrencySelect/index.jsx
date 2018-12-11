@@ -4,6 +4,7 @@ import { Dropdown } from 'react-bootstrap';
 import CustomScroll from 'react-custom-scroll';
 import { connect } from 'react-redux';
 import _ from 'lodash';
+import classnames from 'classnames';
 
 import {
 	KEY_CODE_SPACE,
@@ -289,8 +290,13 @@ class CurrencySelect extends React.Component {
 							</div>
 							<div className="select-container">
 								<div
-									className="user-scroll"
-									style={{ height: resultList.length > 3 ? 118 : '' }}
+									style={{ height: resultList.length > 3 ? 116 : '' }}
+									className={
+										classnames(
+											'user-scroll',
+											{ 'no-scroll': resultList.length < 4 },
+										)
+									}
 								>
 									<CustomScroll
 										flex="1"

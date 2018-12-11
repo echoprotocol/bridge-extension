@@ -1,28 +1,38 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
 import BridgeBtnCopy from '../../components/BridgeBtnCopy';
 
-import { INDEX_PATH } from '../../constants/RouterConstants';
-
 class Receive extends React.Component {
 
+	onClick(e) {
+		e.preventDefault();
+		this.props.history.goBack();
+	}
+
 	render() {
+		const { accountName } = this.props;
+
+		if (!accountName) {
+			return null;
+		}
+
 		return (
 			<React.Fragment>
 				<div className="return-block">
-					<Link to={INDEX_PATH} className="link-return">
+					<a href="/" className="link-return" onClick={(e) => this.onClick(e)}>
 						<i className="icon-return" />
 						<span className="link-text">Return</span>
-					</Link>
+					</a>
 				</div>
 				<div className="page-wrap">
 					<div className="page recieve-page">
 						<p>Share your account name to request a transaction</p>
 
 						<div className="wif-wrap">
-							<div className="wif">Homersimpson345</div>
-							<BridgeBtnCopy compact text="Homersimpson345" />
+							<div className="wif">{accountName}</div>
+							<BridgeBtnCopy compact text={accountName} />
 						</div>
 					</div>
 				</div>
@@ -35,4 +45,11 @@ class Receive extends React.Component {
 
 }
 
-export default Receive;
+Receive.propTypes = {
+	accountName: PropTypes.string.isRequired,
+	history: PropTypes.object.isRequired,
+};
+
+export default connect((state) => ({
+	accountName: state.global.getIn(['account', 'name']),
+}))(Receive);
