@@ -8,7 +8,7 @@ import { CORE_ID, MEMO_FEE_KEYS, SET_TR_FEE_TIMEOUT } from '../src/constants/Glo
 import { formatToSend, getFetchMap } from '../src/services/operation';
 
 
-export const getTrOperationFee = async (type, transaction) => {
+export const getTrOperationFee = async (type, transaction, core) => {
 	const options = JSON.parse(JSON.stringify(transaction));
 
 	if (options.memo) {
@@ -37,7 +37,7 @@ export const getTrOperationFee = async (type, transaction) => {
 	const start = new Date().getTime();
 
 	await Promise.race([
-		tr.set_required_fees(options.fee.asset_id).then(() => (new Date().getTime() - start)),
+		tr.set_required_fees(core.get('id')).then(() => (new Date().getTime() - start)),
 		new Promise((resolve, reject) => {
 			const timeoutId = setTimeout(() => {
 				clearTimeout(timeoutId);
@@ -98,11 +98,11 @@ export const trFetchChain = async (key) => {
  */
 const getTransactionFee = async (options) => {
 	const { fee } = options;
-	let amount = await getTrOperationFee(options.type, formatToSend(options.type, options));
+	const core = await trFetchChain(CORE_ID);
+
+	let amount = await getTrOperationFee(options.type, formatToSend(options.type, options), core);
 
 	if (fee.asset.get('id') !== CORE_ID) {
-		const core = await trFetchChain(CORE_ID);
-
 		const price = new BN(fee.asset.getIn(['options', 'core_exchange_rate', 'quote', 'amount']))
 			.div(fee.asset.getIn(['options', 'core_exchange_rate', 'base', 'amount']))
 			.times(10 ** (core.get('precision') - fee.asset.get('precision')));
