@@ -42,7 +42,7 @@ const changeCrypto = (params) => (dispatch) => {
  */
 const lockCrypto = () => (dispatch) => {
 	dispatch(GlobalReducer.actions.lock({
-		goTo: history.location.pathname,
+		goTo: `${history.location.pathname}${history.location.search}`,
 	}));
 	try {
 		history.push(UNLOCK_PATH);
