@@ -269,7 +269,6 @@ class CurrencySelect extends React.Component {
 					pullRight
 					onToggle={() => true} // TAB close fix
 					open={this.state.opened}
-					// onKeyUp={(e) => { this.tabListener(e); }}
 					disabled={resultList.length === 1 && !opened}
 				>
 					<Dropdown.Toggle
