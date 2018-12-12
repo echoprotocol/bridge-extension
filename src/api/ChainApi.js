@@ -74,7 +74,7 @@ export const connectToAddress = async (address, subscribeCb, isRecreate) => {
 	try {
 		let instance = Apis.instance();
 
-		if (instance.url !== address) {
+		if (instance.url !== address || (isRecreate && !instance.ws_rpc)) {
 			const start = new Date().getTime();
 
 			await Promise.race([
@@ -95,21 +95,6 @@ export const connectToAddress = async (address, subscribeCb, isRecreate) => {
 				4000,
 				{ enableCrypto: false },
 			);
-
-			await instance.init_promise;
-		}
-
-		if (isRecreate) {
-			if (!instance.ws_rpc) {
-				instance = Apis.instance(
-					address,
-					true,
-					4000,
-					{ enableCrypto: false },
-				);
-			}
-
-			Apis.setAutoReconnect(false);
 
 			await instance.init_promise;
 		}
