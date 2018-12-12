@@ -9,9 +9,6 @@ class CustomMenu extends React.Component {
 		return (
 			<ul role="menu" className="dropdown-menu dropdown-menu-right">
 				{React.Children.toArray(children)}
-				{/* {React.Children.toArray(children).filter(
-                        (child) => !value.trim() || child.props.children.indexOf(value) !== -1
-                    )} */}
 			</ul>
 		);
 	}

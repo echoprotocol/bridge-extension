@@ -6,7 +6,14 @@ import { connect } from 'react-redux';
 import _ from 'lodash';
 import classnames from 'classnames';
 
-import { KEY_CODE_SPACE, KEY_CODE_ENTER, KEY_CODE_TAB, CORE_SYMBOL } from '../../constants/GlobalConstants';
+import {
+	KEY_CODE_SPACE,
+	KEY_CODE_ENTER,
+	KEY_CODE_TAB,
+	KEY_CODE_ARROW_DOWN,
+	KEY_CODE_ARROW_UP,
+	CORE_SYMBOL,
+} from '../../constants/GlobalConstants';
 
 import CustomMenu from './CustomMenu';
 import { setValue } from '../../actions/FormActions';
@@ -15,6 +22,8 @@ class CurrencySelect extends React.Component {
 
 	constructor(props) {
 		super(props);
+
+		this.refList = [];
 
 		this.state = {
 			search: '',
@@ -26,21 +35,17 @@ class CurrencySelect extends React.Component {
 		this.setMenuRef = this.setMenuRef.bind(this);
 
 		this.handleClickOutside = this.handleClickOutside.bind(this);
-		this.tabListener = this.tabListener.bind(this);
 	}
 
 	componentDidMount() {
 		const { path } = this.props;
 		const { searchList } = this.state;
 
-		this.ddElement.getElementsByClassName('rcs-inner-container')[0].setAttribute('tabindex', '-1');
-
 		if (path) {
 			this.props.setValue(path.form, path.field, searchList[0].value);
 		}
 
 		document.addEventListener('mousedown', this.handleClickOutside);
-		document.addEventListener('keyup', this.tabListener);
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -50,6 +55,11 @@ class CurrencySelect extends React.Component {
 			searchList: this.getSymbols(),
 		});
 	}
+
+	componentWillUpdate() {
+		this.refList = [];
+	}
+
 
 	componentDidUpdate(prevProps, prevState) {
 		const { opened } = this.state;
@@ -62,7 +72,6 @@ class CurrencySelect extends React.Component {
 
 	componentWillUnmount() {
 		document.removeEventListener('mousedown', this.handleClickOutside);
-		document.removeEventListener('keyup', this.tabListener);
 	}
 
 	onItemKeyPress(e, text, value) {
@@ -93,18 +102,84 @@ class CurrencySelect extends React.Component {
 		this.onSearch(e.target.value);
 	}
 
+	onKeyDown(e, index) {
+		const code = e.keyCode || e.which;
+
+		switch (code) {
+			case KEY_CODE_TAB:
+				if (this.state.opened) {
+					this.setState({
+						opened: false,
+						searchList: this.getSymbols(),
+					});
+				}
+				break;
+			case KEY_CODE_ARROW_DOWN:
+				if (index === this.refList.length - 1) {
+					this.searchInput.focus();
+				} else {
+					this.refList[index + 1].focus();
+				}
+
+				e.preventDefault();
+				break;
+			case KEY_CODE_ARROW_UP:
+				if (index === 0) {
+					this.searchInput.focus();
+				} else {
+					this.refList[index - 1].focus();
+				}
+
+				e.preventDefault();
+				break;
+			default:
+				return null;
+		}
+
+		return null;
+	}
+
+	onInputKeyDown(e) {
+		const code = e.keyCode || e.which;
+
+		switch (code) {
+			case KEY_CODE_TAB:
+				if (this.state.opened) {
+					this.setState({
+						opened: false,
+						searchList: this.getSymbols(),
+					});
+				}
+				break;
+			case KEY_CODE_ARROW_DOWN:
+				this.refList[0].focus();
+
+				e.preventDefault();
+				break;
+			case KEY_CODE_ARROW_UP:
+				this.refList[this.refList.length - 1].focus();
+
+				e.preventDefault();
+				break;
+			default:
+				return null;
+		}
+
+		return null;
+	}
+
 	setMenuRef(node) {
 		this.menuRef = node;
 	}
 
 	getSymbols() {
+		const symbolsList = [];
+
 		if (!this.props) {
-			return null;
+			return symbolsList;
 		}
 
 		const { balances, assets, account } = this.props.data;
-
-		const symbolsList = [];
 
 		if (!account) {
 			return symbolsList;
@@ -141,18 +216,6 @@ class CurrencySelect extends React.Component {
 
 		if (path) {
 			this.props.setValue(path.form, path.field, value);
-		}
-	}
-
-	tabListener(e) {
-		const code = e.keyCode || e.which;
-
-		if ([KEY_CODE_TAB].includes(code)) {
-			e.preventDefault();
-
-			if ((document.activeElement !== (this.searchInput)) && !['rcs-inner-container', 'dropdown-list-item'].includes(document.activeElement.className)) {
-				this.setState({ opened: false });
-			}
 		}
 	}
 
@@ -206,7 +269,6 @@ class CurrencySelect extends React.Component {
 					pullRight
 					onToggle={() => true} // TAB close fix
 					open={this.state.opened}
-					onKeyUp={(e) => { this.tabListener(e); }}
 					disabled={resultList.length === 1 && !opened}
 				>
 					<Dropdown.Toggle
@@ -221,17 +283,16 @@ class CurrencySelect extends React.Component {
 								<input
 									value={search}
 									type="text"
-									tabIndex={0}
 									placeholder="Type asset or token name"
 									onClick={(e) => { e.stopPropagation(); e.preventDefault(); }}
 									onChange={(e) => this.onChange(e)}
+									onKeyDown={(e) => { this.onInputKeyDown(e); }}
 									ref={(node) => { this.searchInput = node; }}
 								/>
 							</div>
 							<div className="select-container">
 								<div
 									style={{ height: resultList.length > 3 ? 116 : '' }}
-									ref={(ref) => { this.ddElement = ref; }}
 									className={
 										classnames(
 											'user-scroll',
@@ -252,9 +313,10 @@ class CurrencySelect extends React.Component {
 													<div className="title">{elem.title}</div>
 													<ul>
 														{
-															elem.list.map(({ text, value }) => (
+															elem.list.map(({ text, value }, i) => (
 																<li key={Math.random()}>
 																	<a
+																		ref={(ref) => { if (ref) { this.refList[i] = ref; } }}
 																		href=""
 																		className="dropdown-list-item"
 																		tabIndex={0}
@@ -263,6 +325,7 @@ class CurrencySelect extends React.Component {
 																				this.onItemKeyPress(e, text, value); e.preventDefault();
 																			}
 																		}
+																		onKeyDown={(e) => this.onKeyDown(e, i)}
 																		onClick={(e) => {
 																			this.handleClick(text, value);
 																			e.preventDefault();
