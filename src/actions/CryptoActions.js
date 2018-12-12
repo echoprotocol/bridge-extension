@@ -1,5 +1,6 @@
 /* eslint-disable no-empty */
 import history from '../history';
+import store from '../store';
 
 import storage from '../services/storage';
 import echoService from '../services/echo';
@@ -57,31 +58,6 @@ const lockCrypto = () => (dispatch) => {
 export const getCrypto = () => echoService.getCrypto();
 
 /**
- *  @method initCrypto
- *
- * 	Check is pin setted
- * 	If it doesn't exist, redirect to create pin. Otherwise - to unlock
- * 	Set subscribe on lock event
- */
-export const initCrypto = () => async (dispatch) => {
-	try {
-		if (!getCrypto().isLocked()) {
-			dispatch(changeCrypto({ isLocked: false }));
-			await dispatch(loadInfo());
-			history.push(globals.WINDOW_TYPE === POPUP_WINDOW_TYPE ? SIGN_TRANSACTION_PATH : INDEX_PATH);
-		} else {
-			const isFirstTime = await getCrypto().isFirstTime();
-
-			history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
-		}
-		getCrypto().removeAllListeners();
-		getCrypto().on('locked', () => dispatch(lockCrypto()));
-	} catch (err) {
-		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
-	}
-};
-
-/**
  *  @method unlockCrypto
  *
  * 	Validate PIN and try to unlock
@@ -108,8 +84,8 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 		await dispatch(loadInfo());
 
 		if (
-			globals.WINDOW_TYPE === POPUP_WINDOW_TYPE &&
-			![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH]
+			globals.WINDOW_TYPE === POPUP_WINDOW_TYPE
+			&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH]
 				.includes(history.location.pathname)
 		) {
 			history.push(SIGN_TRANSACTION_PATH);
@@ -120,6 +96,61 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 		return false;
 	} finally {
 		dispatch(setValue(form, 'loading', false));
+	}
+};
+
+/**
+ *  @method unlockResponse
+ *
+ * 	Unlock crypto response
+ */
+const unlockResponse = async () => {
+	store.dispatch(changeCrypto({ isLocked: false }));
+
+	await store.dispatch(loadInfo());
+
+	if (
+		globals.WINDOW_TYPE === POPUP_WINDOW_TYPE
+		&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH]
+			.includes(history.location.pathname)
+	) {
+		history.push(SIGN_TRANSACTION_PATH);
+	}
+	return true;
+};
+
+/**
+ *  @method lockResponse
+ *
+ * 	Lock crypto response
+ */
+const lockResponse = () => {
+	store.dispatch(lockCrypto());
+};
+
+/**
+ *  @method initCrypto
+ *
+ * 	Check is pin setted
+ * 	If it doesn't exist, redirect to create pin. Otherwise - to unlock
+ * 	Set subscribe on lock event
+ */
+export const initCrypto = () => async (dispatch) => {
+	try {
+		if (!getCrypto().isLocked()) {
+			dispatch(changeCrypto({ isLocked: false }));
+			await dispatch(loadInfo());
+			history.push(globals.WINDOW_TYPE === POPUP_WINDOW_TYPE ? SIGN_TRANSACTION_PATH : INDEX_PATH);
+		} else {
+			const isFirstTime = await getCrypto().isFirstTime();
+
+			history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
+		}
+
+		getCrypto().on('locked', lockResponse);
+		getCrypto().on('unlocked', unlockResponse);
+	} catch (err) {
+		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };
 
@@ -200,4 +231,9 @@ export const wipeCrypto = () => async (dispatch, getState) => {
 	await Promise.all(promises);
 
 	history.push(CREATE_PIN_PATH);
+};
+
+window.onunload = () => {
+	getCrypto().removeListener('locked', lockResponse);
+	getCrypto().removeListener('unlocked', unlockResponse);
 };
