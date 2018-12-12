@@ -1,4 +1,6 @@
 /* eslint-disable no-empty */
+import { batchActions } from 'redux-batched-actions';
+
 import history from '../history';
 import store from '../store';
 
@@ -42,9 +44,12 @@ const changeCrypto = (params) => (dispatch) => {
  * 	Lock crypto in GlobalReducer and redirect to unlock
  */
 const lockCrypto = () => (dispatch) => {
-	dispatch(GlobalReducer.actions.lock({
-		goTo: `${history.location.pathname}${history.location.search}`,
-	}));
+	dispatch(batchActions([
+		GlobalReducer.actions.set({ field: 'loading', value: false }),
+		GlobalReducer.actions.lock({
+			goTo: `${history.location.pathname}${history.location.search}`,
+		}),
+	]));
 	try {
 		history.push(UNLOCK_PATH);
 	} catch (e) {}
