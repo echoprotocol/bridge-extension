@@ -56,6 +56,11 @@ class CurrencySelect extends React.Component {
 		});
 	}
 
+	componentWillUpdate() {
+		this.refList = [];
+	}
+
+
 	componentDidUpdate(prevProps, prevState) {
 		const { opened } = this.state;
 		const { opened: prevOpened } = prevState;
@@ -168,13 +173,13 @@ class CurrencySelect extends React.Component {
 	}
 
 	getSymbols() {
+		const symbolsList = [];
+
 		if (!this.props) {
-			return null;
+			return symbolsList;
 		}
 
 		const { balances, assets, account } = this.props.data;
-
-		const symbolsList = [];
 
 		if (!account) {
 			return symbolsList;
@@ -255,8 +260,6 @@ class CurrencySelect extends React.Component {
 		];
 
 		const resultList = dropdownData.reduce((result, value) => result.concat(value.list), []);
-
-		this.refList = [];
 
 		return (
 			<div ref={this.setMenuRef}>
