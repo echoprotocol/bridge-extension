@@ -395,7 +395,14 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
  */
 export const globalInit = (isRecreate) => async (dispatch) => {
 	await dispatch(connect(!!isRecreate));
+
+	if (isRecreate) {
+		return null;
+	}
+
 	await dispatch(initCrypto());
+
+	return null;
 };
 
 /**
