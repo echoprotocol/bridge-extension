@@ -30,6 +30,10 @@ class Wallet extends React.Component {
 		});
 	}
 
+	sendRedirect(assetSymbol) {
+		console.log(assetSymbol);
+	}
+
 
 	render() {
 		const { assets, balances, account } = this.props;
@@ -76,13 +80,20 @@ class Wallet extends React.Component {
 												return null;
 											}
 
+											const assetSymbol = asset.get('symbol');
+
 											return (
 
 												<li key={balance.get('id')}>
-													<a>
+													<a
+														role="button"
+														onClick={() => this.sendRedirect(assetSymbol)}
+														tabIndex={0}
+														onKeyPress={() => this.sendRedirect(assetSymbol)}
+													>
 														<div className="balance-info">
 															<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
-															<span>{asset.get('symbol')}</span>
+															<span>{assetSymbol}</span>
 														</div>
 													</a>
 													{/* { */}
@@ -127,6 +138,7 @@ Wallet.propTypes = {
 	assets: PropTypes.object.isRequired,
 	balances: PropTypes.object.isRequired,
 	account: PropTypes.object,
+	sendRedirect: PropTypes.func.isRequired,
 };
 
 Wallet.defaultProps = {
@@ -139,5 +151,7 @@ export default connect(
 		balances: state.balance.get('balances'),
 		account: state.global.get('account'),
 	}),
-	() => ({}),
+	(dispatch) => ({
+		sendRedirect: (assetSymbol) => dispatch(sendRedirect(assetSymbol)),
+	}),
 )(Wallet);

@@ -1,9 +1,11 @@
 import { createModule } from 'redux-modules';
 import { Map } from 'immutable';
+import { CORE_SYMBOL } from '../constants/GlobalConstants';
 
 const DEFAULT_FIELDS = Map({
 	balances: new Map({}),
 	assets: new Map({}),
+	redirectSymbol: CORE_SYMBOL,
 });
 
 export default createModule({
