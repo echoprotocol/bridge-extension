@@ -28,7 +28,7 @@ class CurrencySelect extends React.Component {
 		this.state = {
 			search: '',
 			searchList: this.getSymbols(),
-			currentVal: '',
+			currentVal: props.path.field === 'selectedBalance' ? props.redirectSymbol : '',
 			opened: false,
 		};
 
@@ -39,10 +39,14 @@ class CurrencySelect extends React.Component {
 
 	componentDidMount() {
 		const { path } = this.props;
-		const { searchList } = this.state;
+		const { searchList, currentVal } = this.state;
 
 		if (path) {
-			this.props.setValue(path.form, path.field, searchList[0].value);
+			this.props.setValue(
+				path.form,
+				path.field,
+				path.field === 'selectedBalance' ? searchList.find((val) => val.text === currentVal).value : searchList[0].value,
+			);
 		}
 
 		document.addEventListener('mousedown', this.handleClickOutside);
@@ -353,6 +357,7 @@ class CurrencySelect extends React.Component {
 }
 
 CurrencySelect.propTypes = {
+	redirectSymbol: PropTypes.string.isRequired,
 	path: PropTypes.object,
 	data: PropTypes.object,
 	setValue: PropTypes.func.isRequired,
@@ -364,7 +369,9 @@ CurrencySelect.defaultProps = {
 };
 
 export default connect(
-	() => ({}),
+	(state) => ({
+		redirectSymbol: state.balance.get('redirectSymbol'),
+	}),
 	(dispatch) => ({
 		setValue: (form, field, value) => dispatch(setValue(form, field, value)),
 	}),

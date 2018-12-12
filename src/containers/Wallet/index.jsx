@@ -6,6 +6,8 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 // import { Dropdown, MenuItem } from 'react-bootstrap';
 
+import { sendRedirect } from '../../actions/BalanceActions';
+
 import { RECEIVE_PATH, SEND_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
@@ -31,7 +33,7 @@ class Wallet extends React.Component {
 	}
 
 	sendRedirect(assetSymbol) {
-		console.log(assetSymbol);
+		this.props.sendRedirect(assetSymbol);
 	}
 
 
