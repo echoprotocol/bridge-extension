@@ -1,4 +1,5 @@
 import moment from 'moment';
+import { Map } from 'immutable';
 
 import { fetchChain } from '../api/ChainApi';
 
@@ -11,6 +12,8 @@ import { CORE_SYMBOL } from '../constants/GlobalConstants';
 
 import echoService from '../services/echo';
 
+import { isAssetsChanged } from './BalanceActions';
+
 /**
  *  @method decryptNote
  *
@@ -21,7 +24,7 @@ import echoService from '../services/echo';
 export const decryptNote = (index) => async (dispatch, getState) => new Promise((resolve) => {
 
 	const networkName = getState().global.getIn(['network', 'name']);
-	const { memo } = getState().global.get('formattedHistory').find((val) => val.id === index).content;
+	const memo = getState().global.getIn(['formattedHistory', index, 'content', 'memo']);
 
 	if (!memo) {
 		return resolve(null);
@@ -46,8 +49,9 @@ export const decryptNote = (index) => async (dispatch, getState) => new Promise(
  * 	Formatting one transaction of account history
  *
  * 	@param {Object} data
+ * 	@param {Object} result
  */
-const formatOperation = async (data) => {
+const formatOperation = async (data, result) => {
 	const type = data.getIn(['op', '0']);
 	const operation = data.getIn(['op', '1']);
 
@@ -57,50 +61,44 @@ const formatOperation = async (data) => {
 
 	const { name, options } = Object.values(operations).find((i) => i.value === type);
 
-	const result = {
-		id: data.get('id'),
-		transaction: {
-			type: name,
-			typeName: name,
-			date: moment.utc(block.timestamp).local().format('DD MMM, HH:MM'),
-			value: 0,
-			currency: CORE_SYMBOL,
-		},
-		content: {
-			fee: FormatHelper.formatAmount(operation.getIn(['fee', 'amount']), feeAsset.get('precision')),
-			feeCurrency: feeAsset.get('symbol'),
-		},
-	};
+	result = result.set('id', data.get('id'));
+	result = result.setIn(['transaction', 'type'], name);
+	result = result.setIn(['transaction', 'typeName'], name);
+	result = result.setIn(['transaction', 'date'], moment.utc(block.timestamp).local().format('DD MMM, HH:mm'));
+	result = result.setIn(['transaction', 'value'], 0);
+	result = result.setIn(['transaction', 'currency'], CORE_SYMBOL);
+	result = result.setIn(['content', 'fee'], FormatHelper.formatAmount(operation.getIn(['fee', 'amount']), feeAsset.get('precision')));
+	result = result.setIn(['content', 'feeCurrency'], feeAsset.get('symbol'));
 
 	if (options.subject) {
 		if (options.subject[1]) {
 			const request = operation.get(options.subject[0]);
 			const response = await fetchChain(request);
 
-			result.content.receiver = response.get(options.subject[1]);
+			result = result.setIn(['content', 'receiver'], response.get(options.subject[1]));
 		} else {
-			result.content.receiver = operation.get(options.subject[0]);
+			result = result.setIn(['content', 'receiver'], operation.get(options.subject[0]));
 		}
 	}
 
 	if (options.value) {
-		result.transaction.value = operation.getIn(options.value.split('.'));
+		result = result.setIn(['transaction', 'value'], operation.getIn(options.value.split('.')));
 	}
 
 	if (options.asset) {
 		const request = operation.getIn(options.asset.split('.'));
 		const response = await fetchChain(request);
 
-		result.transaction.value = FormatHelper.formatAmount(result.transaction.value, response.get('precision'));
-		result.transaction.currency = response.get('symbol');
+		result = result.setIn(['transaction', 'value'], FormatHelper.formatAmount(result.getIn(['transaction', 'value']), response.get('precision')));
+		result = result.setIn(['transaction', 'currency'], response.get('symbol'));
 	}
 
 	if (type === 47) {
-		result.content.receiver = data.getIn(['result', '1']);
+		result = result.setIn(['content', 'receiver'], data.getIn(['result', '1']));
 	}
 
 	if (type === 0 && operation.get('memo') && operation.getIn(['memo', 'message'])) {
-		result.content.memo = operation.get('memo');
+		result = result.setIn(['content', 'memo'], operation.get('memo'));
 	}
 
 	return result;
@@ -113,13 +111,25 @@ const formatOperation = async (data) => {
  *
  * 	@param {Object} history
  */
-const formatHistory = (history) => async (dispatch) => {
-	if (!history.size) { return; }
+const formatHistory = (history) => async (dispatch, getState) => {
+	if (!history || !history.size) { return; }
 
 	try {
-		let rows = history.map((row) => formatOperation(row));
+		let formattedHistory = getState().global.get('formattedHistory');
+
+		let rows = history.map(async (row) => {
+			const id = row.get('id');
+
+			return formatOperation(row, formattedHistory.get(id) || new Map({}));
+		});
+
 		rows = await Promise.all(rows);
-		dispatch(GlobalReducer.actions.set({ field: 'formattedHistory', value: rows }));
+
+		rows.forEach((row) => {
+			formattedHistory = formattedHistory.set(row.get('id'), row);
+		});
+
+		dispatch(GlobalReducer.actions.set({ field: 'formattedHistory', value: formattedHistory }));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({
 			field: 'error',
@@ -148,6 +158,17 @@ export const updateHistory = () => async (dispatch, getState) => {
 	if (stateHistory !== historyAccount) {
 		dispatch(GlobalReducer.actions.set({ field: 'history', value: historyAccount }));
 		dispatch(formatHistory(historyAccount));
+	}
+
+	try {
+		dispatch(isAssetsChanged());
+	} catch (err) {
+		if (err === 'update history') {
+			dispatch(formatHistory(historyAccount));
+			return null;
+		}
+
+		throw err;
 	}
 
 	return true;

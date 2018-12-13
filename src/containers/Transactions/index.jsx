@@ -24,11 +24,11 @@ class Transactions extends React.Component {
 
 		const { index } = titleProps;
 		const { activeId, noteId } = this.state;
-		const newIndex = activeId === index ? -1 : index;
+		const newId = activeId === index ? -1 : index;
 
 		this.setState({
 			noteId: index,
-			activeId: newIndex,
+			activeId: newId,
 		});
 
 		const id = index;
@@ -63,50 +63,50 @@ class Transactions extends React.Component {
 						<div className="transactions-wrapper">
 							<Accordion>
 								{
-									history.map((elem) =>
+									history.toArray().map((elem) =>
 										(
-											<React.Fragment key={elem.id}>
+											<React.Fragment key={elem.get('id')}>
 												<Accordion.Title
-													active={activeId === elem.id}
-													index={elem.id}
+													active={activeId === elem.get('id')}
+													index={elem.get('id')}
 													onClick={this.handleClick}
 												>
 													<div className="transaction-element">
 														<div className="top-block">
 															<div className="transaction-type">
-																<div className={`icon-Pic${elem.transaction.type}`} />
-																{elem.transaction.typeName}
+																<div className={`icon-Pic${elem.getIn(['transaction', 'type'])}`} />
+																{elem.getIn(['transaction', 'typeName'])}
 															</div>
-															<div className="transaction-date">{elem.transaction.date}</div>
+															<div className="transaction-date">{elem.getIn(['transaction', 'date'])}</div>
 														</div>
 														<div className="bottom-block">
 															<div className="transaction-value">
-																{elem.transaction.value}
-																<span className="currency">{elem.transaction.currency}</span>
+																{elem.getIn(['transaction', 'value'])}
+																<span className="currency">{elem.getIn(['transaction', 'currency'])}</span>
 															</div>
 															<div className="icon icon-dropdown" />
 														</div>
 													</div>
 												</Accordion.Title>
-												<Accordion.Content active={activeId === elem.id}>
+												<Accordion.Content active={activeId === elem.get('id')}>
 													<div className="transaction-element-content">
 														<div className="row">
 															<div className="left-block">Receiver</div>
-															<div className="right-block">{elem.content.receiver}</div>
+															<div className="right-block">{elem.getIn(['content', 'receiver'])}</div>
 														</div>
 														<div className="row">
 															<div className="left-block">Fee</div>
-															<div className="right-block">{elem.content.fee}<span className="currency">{elem.content.feeCurrency}</span></div>
+															<div className="right-block">{elem.getIn(['content', 'fee'])}<span className="currency">{elem.getIn(['content', 'feeCurrency'])}</span></div>
 														</div>
-														{
-															note ?
-																<div className="row">
-																	<div className="left-block">Note</div>
-																	<div className="right-block">
-																		{note}
-																	</div>
-																</div> : null
-														}
+														<div className="row">
+															<div className="left-block">Note</div>
+															{
+																note &&
+																<div className="right-block">
+																	{note}
+																</div>
+															}
+														</div>
 													</div>
 												</Accordion.Content>
 											</React.Fragment>))
@@ -123,7 +123,7 @@ class Transactions extends React.Component {
 }
 
 Transactions.propTypes = {
-	history: PropTypes.array,
+	history: PropTypes.object,
 	decryptNote: PropTypes.func.isRequired,
 };
 
