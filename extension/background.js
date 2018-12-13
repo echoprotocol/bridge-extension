@@ -23,7 +23,12 @@ import {
 import FormatHelper from '../src/helpers/FormatHelper';
 import { operationKeys } from '../src/constants/OperationConstants';
 import { formatToSend } from '../src/services/operation';
-import { ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH, SUCCESS_SEND_PATH } from '../src/constants/RouterConstants';
+import {
+	ERROR_SEND_PATH,
+	NETWORK_ERROR_SEND_PATH,
+	SUCCESS_SEND_INDEX_PATH,
+	SUCCESS_SEND_PATH,
+} from '../src/constants/RouterConstants';
 import getTransaction from './transaction';
 
 const notificationManager = new NotificationManager();
@@ -355,6 +360,43 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 	return null;
 };
 
+const onSend = async (options, networkName) => {
+	let path = SUCCESS_SEND_INDEX_PATH;
+
+	try {
+		const start = new Date().getTime();
+
+		await Promise.race([
+			sendTransaction(options, networkName)
+				.then(() => {})
+				.catch((err) => {
+					if (err) { path = ERROR_SEND_PATH; }
+				})
+				.finally(() => new Date().getTime() - start),
+			new Promise((resolve, reject) => {
+				const timeoutId = setTimeout(() => {
+					clearTimeout(timeoutId);
+					reject(new Error('Send transaction timeout'));
+				}, BROADCAST_LIMIT);
+			}),
+		]);
+	} catch (err) {
+		path = NETWORK_ERROR_SEND_PATH;
+
+		try {
+			emitter.emit('sendResponse', path);
+		} catch (e) {}
+
+		return null;
+	}
+
+	try {
+		emitter.emit('sendResponse', path);
+	} catch (e) {}
+
+	return null;
+};
+
 createSocket();
 
 window.getWsLib = () => echojs;
@@ -366,6 +408,8 @@ window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }
 emitter.on('response', onResponse);
 
 emitter.on('trRequest', onTransaction);
+
+emitter.on('sendRequest', onSend);
 
 extensionizer.runtime.onMessage.addListener(onMessage);
 

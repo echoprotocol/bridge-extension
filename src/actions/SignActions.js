@@ -296,7 +296,7 @@ const checkTransactionFee = (options, transaction) => async (dispatch, getState)
  *
  * 	@param {Object} options
  */
-const getTransactionFee = async (options) => {
+export const getTransactionFee = async (options) => {
 	const { fee } = options;
 	const core = await fetchChain(CORE_ID);
 
