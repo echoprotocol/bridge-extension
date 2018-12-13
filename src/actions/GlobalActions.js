@@ -392,10 +392,20 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
  *  @method globalInit
  *
  *  Initialize crypto and connect to blockchain
+ *
+ *  @param {Boolean} isRecreate - when trying to manual reconnect
  */
 export const globalInit = (isRecreate) => async (dispatch) => {
 	await dispatch(connect(!!isRecreate));
+
+	if (isRecreate) {
+		await dispatch(loadInfo());
+		return null;
+	}
+
 	await dispatch(initCrypto());
+
+	return null;
 };
 
 /**

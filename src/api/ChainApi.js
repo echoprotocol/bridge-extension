@@ -74,7 +74,7 @@ export const connectToAddress = async (address, subscribeCb, isRecreate) => {
 	try {
 		let instance = Apis.instance();
 
-		if (instance.url !== address || isRecreate) {
+		if (instance.url !== address || (isRecreate && !instance.ws_rpc)) {
 			const start = new Date().getTime();
 
 			await Promise.race([
