@@ -342,8 +342,8 @@ const sendHandler = (path) => {
 
 emitter.on('sendResponse', sendHandler);
 
-export const sendRedirect = (assetSymbol) => (dispatch) => {
-	dispatch(BalanceReducer.actions.set({ field: 'redirectSymbol', value: assetSymbol }));
+export const sendRedirect = (balanceId) => (dispatch) => {
+	dispatch(setValue(FORM_SEND, 'selectedBalance', balanceId));
 
 	history.push(SEND_PATH);
 };
