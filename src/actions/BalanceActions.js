@@ -7,7 +7,7 @@ import { fetchChain, lookupAccounts } from '../api/ChainApi';
 
 import { FORM_SEND } from '../constants/FormConstants';
 import { CORE_ID } from '../constants/GlobalConstants';
-import { ERROR_SEND_PATH } from '../constants/RouterConstants';
+import { ERROR_SEND_PATH, SEND_PATH } from '../constants/RouterConstants';
 
 import echoService from '../services/echo';
 
@@ -341,3 +341,9 @@ const sendHandler = (path) => {
 };
 
 emitter.on('sendResponse', sendHandler);
+
+export const sendRedirect = (balanceId) => (dispatch) => {
+	dispatch(setValue(FORM_SEND, 'selectedBalance', balanceId));
+
+	history.push(SEND_PATH);
+};

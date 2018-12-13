@@ -6,6 +6,8 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 // import { Dropdown, MenuItem } from 'react-bootstrap';
 
+import { sendRedirect } from '../../actions/BalanceActions';
+
 import { RECEIVE_PATH, SEND_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
@@ -28,6 +30,10 @@ class Wallet extends React.Component {
 
 			return 0;
 		});
+	}
+
+	sendRedirect(balanceId) {
+		this.props.sendRedirect(balanceId);
 	}
 
 
@@ -76,10 +82,17 @@ class Wallet extends React.Component {
 												return null;
 											}
 
+											const balanceId = balance.get('id');
+
 											return (
 
-												<li key={balance.get('id')}>
-													<a>
+												<li key={balanceId}>
+													<a
+														role="button"
+														onClick={() => this.sendRedirect(balanceId)}
+														tabIndex={0}
+														onKeyPress={() => this.sendRedirect(balanceId)}
+													>
 														<div className="balance-info">
 															<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
 															<span>{asset.get('symbol')}</span>
@@ -127,6 +140,7 @@ Wallet.propTypes = {
 	assets: PropTypes.object.isRequired,
 	balances: PropTypes.object.isRequired,
 	account: PropTypes.object,
+	sendRedirect: PropTypes.func.isRequired,
 };
 
 Wallet.defaultProps = {
@@ -139,5 +153,7 @@ export default connect(
 		balances: state.balance.get('balances'),
 		account: state.global.get('account'),
 	}),
-	() => ({}),
+	(dispatch) => ({
+		sendRedirect: (balanceId) => dispatch(sendRedirect(balanceId)),
+	}),
 )(Wallet);

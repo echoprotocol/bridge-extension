@@ -14,6 +14,7 @@ import {
 	KEY_CODE_ARROW_UP,
 	CORE_SYMBOL,
 } from '../../constants/GlobalConstants';
+import { FORM_SEND } from '../../constants/FormConstants';
 
 import CustomMenu from './CustomMenu';
 import { setValue } from '../../actions/FormActions';
@@ -25,10 +26,17 @@ class CurrencySelect extends React.Component {
 
 		this.refList = [];
 
+		const searchList = this.getSymbols();
+		let symbolValue = '';
+
+		if (props.path.field === 'selectedBalance' && props.selectedBalance) {
+			symbolValue = searchList.find((val) => val.value === props.selectedBalance).text;
+		}
+
 		this.state = {
 			search: '',
-			searchList: this.getSymbols(),
-			currentVal: '',
+			searchList,
+			currentVal: symbolValue,
 			opened: false,
 		};
 
@@ -38,14 +46,24 @@ class CurrencySelect extends React.Component {
 	}
 
 	componentDidMount() {
-		const { path } = this.props;
+		const { path, selectedBalance } = this.props;
 		const { searchList } = this.state;
 
-		if (path) {
-			this.props.setValue(path.form, path.field, searchList[0].value);
+		document.addEventListener('mousedown', this.handleClickOutside);
+
+		if (path.field === 'selectedBalance' && selectedBalance) {
+			return null;
 		}
 
-		document.addEventListener('mousedown', this.handleClickOutside);
+		if (path) {
+			this.props.setValue(
+				path.form,
+				path.field,
+				searchList[0].value,
+			);
+		}
+
+		return null;
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -353,6 +371,7 @@ class CurrencySelect extends React.Component {
 }
 
 CurrencySelect.propTypes = {
+	selectedBalance: PropTypes.string,
 	path: PropTypes.object,
 	data: PropTypes.object,
 	setValue: PropTypes.func.isRequired,
@@ -361,10 +380,13 @@ CurrencySelect.propTypes = {
 CurrencySelect.defaultProps = {
 	path: null,
 	data: null,
+	selectedBalance: '',
 };
 
 export default connect(
-	() => ({}),
+	(state) => ({
+		selectedBalance: state.form.getIn([FORM_SEND, 'selectedBalance']),
+	}),
 	(dispatch) => ({
 		setValue: (form, field, value) => dispatch(setValue(form, field, value)),
 	}),
