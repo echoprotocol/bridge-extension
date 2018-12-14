@@ -18,6 +18,7 @@ import { FORM_SEND } from '../../constants/FormConstants';
 
 import CustomMenu from './CustomMenu';
 import { setValue } from '../../actions/FormActions';
+import { setAssetFormValue } from '../../actions/BalanceActions';
 
 class CurrencySelect extends React.Component {
 
@@ -46,22 +47,12 @@ class CurrencySelect extends React.Component {
 	}
 
 	componentDidMount() {
-		const { path, selectedBalance } = this.props;
+		const { path } = this.props;
 		const { searchList } = this.state;
 
 		document.addEventListener('mousedown', this.handleClickOutside);
 
-		if (path.field === 'selectedBalance' && selectedBalance) {
-			return null;
-		}
-
-		if (path) {
-			this.props.setValue(
-				path.form,
-				path.field,
-				searchList[0].value,
-			);
-		}
+		this.props.setAssetFormValue(path.form, path.field, searchList[0].value);
 
 		return null;
 	}
@@ -375,6 +366,7 @@ CurrencySelect.propTypes = {
 	path: PropTypes.object,
 	data: PropTypes.object,
 	setValue: PropTypes.func.isRequired,
+	setAssetFormValue: PropTypes.func.isRequired,
 };
 
 CurrencySelect.defaultProps = {
@@ -389,5 +381,6 @@ export default connect(
 	}),
 	(dispatch) => ({
 		setValue: (form, field, value) => dispatch(setValue(form, field, value)),
+		setAssetFormValue: (form, field, value) => dispatch(setAssetFormValue(form, field, value)),
 	}),
 )(CurrencySelect);
