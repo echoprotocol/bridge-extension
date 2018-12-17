@@ -314,7 +314,7 @@ export const send = () => async (dispatch, getState) => {
 		}
 	}
 
-	options.amount.amount *= (10 ** options.amount.asset.get('precision'));
+	options.amount.amount = parseInt(options.amount.amount * (10 ** options.amount.asset.get('precision')), 10);
 
 	const activeNetworkName = getState().global.getIn(['network', 'name']);
 
@@ -342,8 +342,36 @@ const sendHandler = (path) => {
 
 emitter.on('sendResponse', sendHandler);
 
+/**
+ *  @method sendRedirect
+ *
+ * 	On wallet balance choose redirect from wallet to send
+ *
+ * 	@param {String} balanceId
+ */
 export const sendRedirect = (balanceId) => (dispatch) => {
 	dispatch(setValue(FORM_SEND, 'selectedBalance', balanceId));
 
 	history.push(SEND_PATH);
+};
+
+/**
+ *  @method setAssetFormValue
+ *
+ * 	Set asset form value
+ *
+ * 	@param {String} form
+ * 	@param {String} field
+ * 	@param {String} value
+ */
+export const setAssetFormValue = (form, field, value) => (dispatch, getState) => {
+	const selectedBalance = getState().form.getIn([FORM_SEND, 'selectedBalance']);
+
+	if (field === 'selectedBalance' && selectedBalance) {
+		return null;
+	}
+
+	dispatch(setValue(form, field, value));
+
+	return null;
 };

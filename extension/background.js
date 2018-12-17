@@ -368,11 +368,9 @@ const onSend = async (options, networkName) => {
 
 		await Promise.race([
 			sendTransaction(options, networkName)
-				.then(() => {})
-				.catch((err) => {
+				.then(() => {}, (err) => {
 					if (err) { path = ERROR_SEND_PATH; }
-				})
-				.finally(() => new Date().getTime() - start),
+				}).finally(() => new Date().getTime() - start),
 			new Promise((resolve, reject) => {
 				const timeoutId = setTimeout(() => {
 					clearTimeout(timeoutId);
