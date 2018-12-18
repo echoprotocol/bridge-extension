@@ -258,9 +258,14 @@ const checkTransactionFee = (options, transaction) => async (dispatch, getState)
 		return 'Account not available';
 	}
 
-	const balance = balances
-		.find((val) => val.get('owner') === accountId && val.get('asset_type') === transaction.fee.asset.get('id'))
-		.get('balance');
+	let balance = balances
+		.find((val) => val.get('owner') === accountId && val.get('asset_type') === transaction.fee.asset.get('id'));
+
+	if (!balance) {
+		return 'Fee asset is not found';
+	}
+
+	balance = balance.get('balance');
 
 	if (valueAssetId.get('id') === transaction.fee.asset.get('id')) {
 		let value = '';
