@@ -31,10 +31,13 @@ import {
 } from '../src/constants/RouterConstants';
 import getTransaction from './transaction';
 
+
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
 
+const isAccountRequest = { value: false };
+let sendResponseCb = null;
 const requestQueue = [];
 let lastTransaction = null;
 const { ChainStore } = chainjs;
@@ -108,21 +111,6 @@ const createNotification = (title = '', message = '') => {
 };
 
 /**
- * Get user account if unlocked
- * @returns {Promise.<*>}
- */
-const getAccountList = async () => {
-	const network = (await storage.get('current_network')) || NETWORKS[0];
-
-	try {
-		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
-		return accounts;
-	} catch (e) {
-		return { error: e.message };
-	}
-};
-
-/**
  * On content script request
  * @param request
  * @param sender
@@ -147,7 +135,8 @@ const onMessage = (request, sender, sendResponse) => {
 
 		try {
 			emitter.emit('request', id, request.data);
-		} catch (e) {}
+		} catch (e) { return null; }
+
 
 		notificationManager.getPopup()
 			.then((popup) => {
@@ -157,11 +146,47 @@ const onMessage = (request, sender, sendResponse) => {
 			})
 			.catch(triggerPopup);
 	} else if (request.method === 'accounts') {
-		getAccountList().then((res) => sendResponse({ id, res }));
+		isAccountRequest.value = true;
+		sendResponseCb = sendResponse;
+
+		notificationManager.getPopup()
+			.then((popup) => {
+				if (!popup) {
+					triggerPopup();
+				}
+			})
+			.catch(triggerPopup);
+
 	}
 
 	return true;
 };
+
+/**
+ * Get user account if unlocked
+ * @returns {Promise.<*>}
+ * @param setDefault
+ */
+const getAccounts = async (setDefault) => {
+
+	if (setDefault) {
+		isAccountRequest.value = false;
+		return null;
+	}
+	const network = (await storage.get('current_network')) || NETWORKS[0];
+
+	isAccountRequest.value = false;
+
+	try {
+		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+
+		return sendResponseCb(accounts);
+	} catch (e) {
+		return { error: e.message };
+	}
+
+};
+
 
 /**
  * @method removeTransaction
@@ -335,7 +360,7 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 			} else {
 				emitter.emit('trResponse', ERROR_STATUS, id, path, windowType);
 			}
-		} catch (e) {}
+		} catch (e) { return null; }
 
 		return null;
 	}
@@ -355,7 +380,7 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 		} else {
 			emitter.emit('trResponse', APPROVED_STATUS, id, path, windowType);
 		}
-	} catch (e) {}
+	} catch (e) { return null; }
 
 	return null;
 };
@@ -383,14 +408,14 @@ const onSend = async (options, networkName) => {
 
 		try {
 			emitter.emit('sendResponse', path);
-		} catch (e) {}
+		} catch (e) { return null; }
 
 		return null;
 	}
 
 	try {
 		emitter.emit('sendResponse', path);
-	} catch (e) {}
+	} catch (e) { return null; }
 
 	return null;
 };
@@ -402,12 +427,14 @@ window.getChainLib = () => chainjs;
 window.getCrypto = () => crypto;
 window.getEmitter = () => emitter;
 window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }));
-
+window.isAccountRequest = isAccountRequest;
 emitter.on('response', onResponse);
 
 emitter.on('trRequest', onTransaction);
 
 emitter.on('sendRequest', onSend);
+
+emitter.on('getAccounts', getAccounts);
 
 extensionizer.runtime.onMessage.addListener(onMessage);
 

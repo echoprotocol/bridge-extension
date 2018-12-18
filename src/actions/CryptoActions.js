@@ -27,6 +27,8 @@ import { globals } from './SignActions';
 import FormatHelper from '../helpers/FormatHelper';
 import ValidatePinHelper from '../helpers/ValidatePinHelper';
 
+const emitter = echoService.getEmitter();
+
 /**
  *  @method changeCrypto
  *
@@ -71,13 +73,19 @@ export const getCrypto = () => echoService.getCrypto();
  * 	@param {String} form
  * 	@param {String} pin
  */
-export const unlockCrypto = (form, pin) => async (dispatch) => {
+export const unlockCrypto = (form, pin) => async (dispatch, getState) => {
 	const error = ValidatePinHelper.validatePin(pin);
 
+	if (getState().global.get('isAccountRequest')) {
+
+		dispatch(GlobalReducer.actions.set({ field: 'isAccountRequest', value: false }));
+		emitter.emit('getAccounts');
+	}
 	if (error) {
 		dispatch(setValue(form, 'error', error));
 		return false;
 	}
+
 
 	try {
 		dispatch(setValue(form, 'loading', true));
@@ -112,6 +120,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 const unlockResponse = async () => {
 	store.dispatch(changeCrypto({ isLocked: false }));
 
+
 	await store.dispatch(loadInfo());
 
 	if (
@@ -142,6 +151,10 @@ const lockResponse = () => {
  */
 export const initCrypto = () => async (dispatch) => {
 	try {
+		if (echoService.isAccountRequest().value) {
+			dispatch(GlobalReducer.actions.set({ field: 'isAccountRequest', value: echoService.isAccountRequest().value }));
+			emitter.emit('getAccounts', true);
+		}
 		if (!getCrypto().isLocked()) {
 			dispatch(changeCrypto({ isLocked: false }));
 			await dispatch(loadInfo());
@@ -211,6 +224,7 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
  * 	@param {String} field
  */
 export const removeCryptoInfo = (field, networkName) => async (dispatch, getState) => {
+
 	try {
 		if (!networkName) {
 			networkName = getState().global.getIn(['network', 'name']);
