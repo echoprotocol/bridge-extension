@@ -76,11 +76,7 @@ export const getCrypto = () => echoService.getCrypto();
 export const unlockCrypto = (form, pin) => async (dispatch, getState) => {
 	const error = ValidatePinHelper.validatePin(pin);
 
-	if (getState().global.get('isAccountRequest')) {
 
-		dispatch(GlobalReducer.actions.set({ field: 'isAccountRequest', value: false }));
-		emitter.emit('getAccounts');
-	}
 	if (error) {
 		dispatch(setValue(form, 'error', error));
 		return false;
@@ -95,6 +91,12 @@ export const unlockCrypto = (form, pin) => async (dispatch, getState) => {
 		dispatch(changeCrypto({ isLocked: false }));
 
 		await dispatch(loadInfo());
+
+		if (getState().global.get('isAccountRequest')) {
+
+			dispatch(GlobalReducer.actions.set({ field: 'isAccountRequest', value: false }));
+			emitter.emit('getAccounts');
+		}
 
 		if (
 			globals.WINDOW_TYPE === POPUP_WINDOW_TYPE

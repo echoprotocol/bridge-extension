@@ -37,7 +37,7 @@ const emitter = new EventEmitter();
 const crypto = new Crypto();
 
 const isAccountRequest = { value: false };
-let sendResponseCb = null;
+const getInfo = { cb: null, id: null };
 const requestQueue = [];
 let lastTransaction = null;
 const { ChainStore } = chainjs;
@@ -109,6 +109,35 @@ const createNotification = (title = '', message = '') => {
 		title,
 	});
 };
+/**
+ * Get user account if unlocked
+ * @returns {Promise.<*>}
+ * @param setDefault
+ */
+const getAccounts = async (setDefault) => {
+
+	if (setDefault) {
+		isAccountRequest.value = false;
+		return null;
+	}
+
+	const network = (await storage.get('current_network')) || NETWORKS[0];
+	isAccountRequest.value = false;
+
+	try {
+
+		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		getInfo.cb({ res: accounts, id: getInfo.id });
+		getInfo.cb = null;
+		getInfo.id = null;
+		closePopup();
+		return null;
+	} catch (e) {
+
+		return { error: e.message };
+	}
+
+};
 
 /**
  * On content script request
@@ -147,8 +176,14 @@ const onMessage = (request, sender, sendResponse) => {
 			.catch(triggerPopup);
 	} else if (request.method === 'accounts') {
 		isAccountRequest.value = true;
-		sendResponseCb = sendResponse;
+		getInfo.cb = sendResponse;
+		getInfo.id = id;
 
+		if (!crypto.isLocked()) {
+			console.log('here');
+
+			return getAccounts();
+		}
 		notificationManager.getPopup()
 			.then((popup) => {
 				if (!popup) {
@@ -160,31 +195,6 @@ const onMessage = (request, sender, sendResponse) => {
 	}
 
 	return true;
-};
-
-/**
- * Get user account if unlocked
- * @returns {Promise.<*>}
- * @param setDefault
- */
-const getAccounts = async (setDefault) => {
-
-	if (setDefault) {
-		isAccountRequest.value = false;
-		return null;
-	}
-	const network = (await storage.get('current_network')) || NETWORKS[0];
-
-	isAccountRequest.value = false;
-
-	try {
-		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
-
-		return sendResponseCb(accounts);
-	} catch (e) {
-		return { error: e.message };
-	}
-
 };
 
 
