@@ -35,8 +35,9 @@ const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
 
-const isAccountRequest = { value: false };
-const getInfo = { cb: null, id: null };
+let isAccountsRequest = false;
+const accountsRequests = [];
+
 const requestQueue = [];
 let lastTransaction = null;
 const { ChainStore } = chainjs;
@@ -111,26 +112,16 @@ const createNotification = (title = '', message = '') => {
 /**
  * Get user account if unlocked
  * @returns {Promise.<*>}
- * @param setDefault
  */
-const getAccounts = async (setDefault) => {
+const resolveAccounts = async () => {
 
-	if (setDefault) {
-		isAccountRequest.value = false;
-		return null;
-	}
 
 	const network = (await storage.get('current_network')) || NETWORKS[0];
-	isAccountRequest.value = false;
 
 	try {
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		return accountsRequests.forEach((i) => i.cb({ id: i.id, res: accounts }));
 
-		getInfo.cb({ res: accounts, id: getInfo.id });
-		getInfo.cb = null;
-		getInfo.id = null;
-
-		return !crypto.isLocked() ? closePopup() : null;
 	} catch (e) {
 		return { error: e.message };
 	}
@@ -151,7 +142,7 @@ const onMessage = (request, sender, sendResponse) => {
 	if (!request.method || !request.id || !request.appId || request.appId !== APP_ID) return false;
 
 	const { id } = request;
-
+	isAccountsRequest = false;
 	if (request.method === 'confirm' && request.data) {
 
 		requestQueue.push({
@@ -162,7 +153,7 @@ const onMessage = (request, sender, sendResponse) => {
 
 		try {
 			emitter.emit('request', id, request.data);
-		} catch (e) {}
+		} catch (e) { return null; }
 
 
 		notificationManager.getPopup()
@@ -172,14 +163,18 @@ const onMessage = (request, sender, sendResponse) => {
 				}
 			})
 			.catch(triggerPopup);
+
 	} else if (request.method === 'accounts') {
-		isAccountRequest.value = true;
-		getInfo.cb = sendResponse;
-		getInfo.id = id;
+
+		isAccountsRequest = true;
+
+		accountsRequests.push({
+			id, cb: sendResponse,
+		});
 
 		if (!crypto.isLocked()) {
-			getAccounts()
-				.then((rezult) => rezult)
+			resolveAccounts()
+				.then((result) => result)
 				.catch();
 
 		} else {
@@ -198,6 +193,17 @@ const onMessage = (request, sender, sendResponse) => {
 	return true;
 };
 
+
+const onPinUnlock = () => {
+	if (isAccountsRequest) {
+		resolveAccounts()
+			.then((result) => result)
+			.catch();
+		return !requestQueue.length ? closePopup() : null;
+	}
+	return null;
+
+};
 
 /**
  * @method removeTransaction
@@ -438,16 +444,17 @@ window.getChainLib = () => chainjs;
 window.getCrypto = () => crypto;
 window.getEmitter = () => emitter;
 window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }));
-window.isAccountRequest = isAccountRequest;
+
 emitter.on('response', onResponse);
 
 emitter.on('trRequest', onTransaction);
 
 emitter.on('sendRequest', onSend);
 
-emitter.on('getAccounts', getAccounts);
-
 extensionizer.runtime.onMessage.addListener(onMessage);
+
+crypto.on('unlocked', onPinUnlock);
+
 
 extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 

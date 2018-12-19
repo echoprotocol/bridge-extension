@@ -42,10 +42,6 @@ class Echo {
 		return EXTENSION ? extension.extension.getBackgroundPage().getList() : [];
 	}
 
-	static isAccountRequest() {
-		return EXTENSION ? extension.extension.getBackgroundPage().isAccountRequest : false;
-	}
-
 }
 
 export default Echo;
