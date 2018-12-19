@@ -31,7 +31,6 @@ import {
 } from '../src/constants/RouterConstants';
 import getTransaction from './transaction';
 
-
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
@@ -125,15 +124,14 @@ const getAccounts = async (setDefault) => {
 	isAccountRequest.value = false;
 
 	try {
-
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+
 		getInfo.cb({ res: accounts, id: getInfo.id });
 		getInfo.cb = null;
 		getInfo.id = null;
-		closePopup();
-		return null;
-	} catch (e) {
 
+		return !crypto.isLocked() ? closePopup() : null;
+	} catch (e) {
 		return { error: e.message };
 	}
 
@@ -164,7 +162,7 @@ const onMessage = (request, sender, sendResponse) => {
 
 		try {
 			emitter.emit('request', id, request.data);
-		} catch (e) { return null; }
+		} catch (e) {}
 
 
 		notificationManager.getPopup()
@@ -180,17 +178,20 @@ const onMessage = (request, sender, sendResponse) => {
 		getInfo.id = id;
 
 		if (!crypto.isLocked()) {
-			console.log('here');
+			getAccounts()
+				.then((rezult) => rezult)
+				.catch();
 
-			return getAccounts();
+		} else {
+			notificationManager.getPopup()
+				.then((popup) => {
+					if (!popup) {
+						triggerPopup();
+					}
+				})
+				.catch(triggerPopup);
 		}
-		notificationManager.getPopup()
-			.then((popup) => {
-				if (!popup) {
-					triggerPopup();
-				}
-			})
-			.catch(triggerPopup);
+
 
 	}
 
