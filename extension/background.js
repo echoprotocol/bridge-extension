@@ -72,12 +72,26 @@ const createSocket = () => {
 		.then(() => {});
 };
 
+
 /**
  * trigger popup
  */
 const triggerPopup = () => {
 	notificationManager.showPopup();
 
+};
+
+/**
+ * check before trigger popup
+ */
+const onTriggerPopup = () => {
+	notificationManager.getPopup()
+		.then((popup) => {
+			if (!popup) {
+				triggerPopup();
+			}
+		})
+		.catch(triggerPopup);
 };
 
 /**
@@ -134,17 +148,6 @@ const resolveAccounts = async () => {
 
 };
 
-
-const onOpenPopup = () => {
-	notificationManager.getPopup()
-		.then((popup) => {
-			if (!popup) {
-				triggerPopup();
-			}
-		})
-		.catch(triggerPopup);
-};
-
 /**
  * On content script request
  * @param request
@@ -159,7 +162,9 @@ const onMessage = (request, sender, sendResponse) => {
 	if (!request.method || !request.id || !request.appId || request.appId !== APP_ID) return false;
 
 	const { id } = request;
+
 	lastRequestType = request.method;
+
 	if (request.method === 'confirm' && request.data) {
 
 		requestQueue.push({
@@ -172,7 +177,7 @@ const onMessage = (request, sender, sendResponse) => {
 			emitter.emit('request', id, request.data);
 		} catch (e) { return null; }
 
-		onOpenPopup();
+		onTriggerPopup();
 
 	} else if (request.method === 'accounts') {
 
@@ -184,7 +189,7 @@ const onMessage = (request, sender, sendResponse) => {
 			resolveAccounts();
 
 		} else {
-			onOpenPopup();
+			onTriggerPopup();
 		}
 
 
@@ -197,7 +202,7 @@ const onMessage = (request, sender, sendResponse) => {
 const onPinUnlock = () => {
 	if (lastRequestType === 'accounts') {
 		resolveAccounts();
-		return !requestQueue.length ? closePopup() : null;
+		closePopup();
 	}
 	return null;
 
@@ -231,7 +236,6 @@ const removeTransaction = (err, id) => {
  * @returns {Promise.<void>}
  */
 const onResponse = (err, id, status) => {
-
 	if ([CLOSE_STATUS, OPEN_STATUS].includes(status)) {
 		if (CLOSE_STATUS === status && requestQueue.length === 1) {
 			closePopup();
