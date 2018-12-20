@@ -74,24 +74,23 @@ const createSocket = () => {
 
 
 /**
- * trigger popup
+ * show popup
  */
-const triggerPopup = () => {
+const showPopup = () => {
 	notificationManager.showPopup();
-
 };
 
 /**
- * check before trigger popup
+ * check before show popup
  */
-const onTriggerPopup = () => {
+const triggerPopup = () => {
 	notificationManager.getPopup()
 		.then((popup) => {
 			if (!popup) {
-				triggerPopup();
+				showPopup();
 			}
 		})
-		.catch(triggerPopup);
+		.catch(showPopup);
 };
 
 /**
@@ -177,7 +176,7 @@ const onMessage = (request, sender, sendResponse) => {
 			emitter.emit('request', id, request.data);
 		} catch (e) { return null; }
 
-		onTriggerPopup();
+		triggerPopup();
 
 	} else if (request.method === 'accounts') {
 
@@ -189,7 +188,7 @@ const onMessage = (request, sender, sendResponse) => {
 			resolveAccounts();
 
 		} else {
-			onTriggerPopup();
+			triggerPopup();
 		}
 
 
