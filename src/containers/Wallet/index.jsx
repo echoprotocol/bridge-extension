@@ -8,11 +8,11 @@ import PropTypes from 'prop-types';
 import { Button } from 'semantic-ui-react';
 // import { Dropdown, MenuItem } from 'react-bootstrap';
 
+import { sendRedirect, removeToken } from '../../actions/BalanceActions';
+
 import { RECEIVE_PATH, SEND_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
-
-import { removeToken } from '../../actions/BalanceActions';
 
 class Wallet extends React.Component {
 
@@ -28,10 +28,17 @@ class Wallet extends React.Component {
 				return null;
 			}
 
+			const balanceId = balance.get('id');
+
 			return (
 
-				<li key={balance.get('id')}>
-					<a>
+				<li key={balanceId}>
+					<a
+						role="button"
+						onClick={() => this.sendRedirect(balanceId)}
+						tabIndex={0}
+						onKeyPress={() => this.sendRedirect(balanceId)}
+					>
 						<div className="balance-info">
 							<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
 							<span>{asset.get('symbol')}</span>
@@ -117,6 +124,10 @@ class Wallet extends React.Component {
 		};
 	}
 
+	sendRedirect(balanceId) {
+		this.props.sendRedirect(balanceId);
+	}
+
 	render() {
 		const { balances, account } = this.props;
 
@@ -185,6 +196,7 @@ Wallet.propTypes = {
 	tokens: PropTypes.object.isRequired,
 	account: PropTypes.object,
 	removeToken: PropTypes.func.isRequired,
+	sendRedirect: PropTypes.func.isRequired,
 };
 
 Wallet.defaultProps = {
@@ -200,5 +212,6 @@ export default connect(
 	}),
 	(dispatch) => ({
 		removeToken: (id) => dispatch(removeToken(id)),
+		sendRedirect: (balanceId) => dispatch(sendRedirect(balanceId)),
 	}),
 )(Wallet);

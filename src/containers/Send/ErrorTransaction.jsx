@@ -3,9 +3,10 @@ import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import query from 'query-string';
 
-import { closePopup } from '../../actions/SignActions';
+import { closePopup, globals } from '../../actions/SignActions';
 
-import { DISCONNECT_STATUS } from '../../constants/GlobalConstants';
+import { DISCONNECT_STATUS, POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
+import { INDEX_PATH } from '../../constants/RouterConstants';
 
 class ErrorTransaction extends React.PureComponent {
 
@@ -15,7 +16,16 @@ class ErrorTransaction extends React.PureComponent {
 		}
 
 		closePopup(network && DISCONNECT_STATUS);
-		this.props.history.goBack();
+
+		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
+			this.props.history.goBack();
+
+			return null;
+		}
+
+		this.props.history.push(INDEX_PATH);
+
+		return null;
 	}
 
 	render() {

@@ -216,7 +216,7 @@ const onResponse = (err, id, status) => {
 
 	if (
 		(requestQueue.length === 0 && [COMPLETE_STATUS, ERROR_STATUS].includes(status))
-		|| DISCONNECT_STATUS === status
+        || DISCONNECT_STATUS === status
 	) closePopup();
 
 	return null;
@@ -300,12 +300,13 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 		await Promise.race([
 			sendTransaction(transaction, networkName).then((result) => {
 				resultBroadcast = result;
-			}).catch((err) => {
-				if (err) {
-					path = ERROR_SEND_PATH;
-				}
-				return new Date().getTime() - start;
-			}),
+			}, (err) => {
+				resultBroadcast = err;
+
+				path = ERROR_SEND_PATH;
+
+				throw new Error(err);
+			}).finally(() => new Date().getTime() - start),
 			new Promise((resolve, reject) => {
 				const timeoutId = setTimeout(() => {
 					clearTimeout(timeoutId);
@@ -314,6 +315,7 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 			}),
 		]);
 	} catch (err) {
+		resultBroadcast = err;
 		currentTransactionCb({
 			id,
 			status: ERROR_STATUS,
@@ -322,6 +324,10 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 		});
 
 		createNotification('Transaction', `${ERROR_STATUS} ${FormatHelper.formatError(err).toLowerCase()}`);
+
+		if (FormatHelper.formatError(err) === 'Send transaction timeout') {
+			path = NETWORK_ERROR_SEND_PATH;
+		}
 
 		try {
 			if (popupId !== notificationManager.popupId) {
@@ -362,11 +368,9 @@ const onSend = async (options, networkName) => {
 
 		await Promise.race([
 			sendTransaction(options, networkName)
-				.then(() => {})
-				.catch((err) => {
+				.then(() => {}, (err) => {
 					if (err) { path = ERROR_SEND_PATH; }
-				})
-				.finally(() => new Date().getTime() - start),
+				}).finally(() => new Date().getTime() - start),
 			new Promise((resolve, reject) => {
 				const timeoutId = setTimeout(() => {
 					clearTimeout(timeoutId);

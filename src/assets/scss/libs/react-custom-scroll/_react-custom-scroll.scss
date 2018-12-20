@@ -1,93 +1,106 @@
+
+
+
 .rcs-custom-scroll {
-    width: 100%;
-    .rcs-outer-container {
-        overflow: hidden;
-        position: relative;
+	width: 100%;
+	.rcs-outer-container {
+		overflow: hidden;
+		position: relative;
 
-        .rcs-positioning {
-            position: absolute;
-            top: 0;
-            width: 9px;
-            right: 0;
-            height: 100%;
+		.rcs-positioning {
+			position: absolute;
+			top: 0;
+			width: 9px;
+			right: 0;
+			height: 100%;
 
-            &:hover {
-                .rcs-inner-handle {
-                    background-color: #415151;
-                }
-            }
+			&:hover {
+				.rcs-inner-handle {
+					background-color: #415151;
+				}
+			}
 
-            &:active {
-                .rcs-inner-handle {
-                    background-color: #657272;
-                }
-            }
-        }
-        &:hover {
-            .rcs-custom-scrollbar {
-                opacity: 1;
-                transition-duration: 0.2s;
-            }
-        }
-    }
-    .rcs-inner-container {
-        overflow-x: hidden;
-        overflow-y: scroll;
-        &.rcs-content-scrolled {
-            &:after {
-                height: 5px;
-                transition: height 0.15s ease-out;
-            }
-        }
-        &:after {
-            content: '';
-            position: absolute;
-            top: 0;
-            right: 0;
-            left: 0;
-            height: 0;
-            background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.05) 60%, transparent 100%);
-            pointer-events: none;
-            transition: height 0.1s ease-in;
-            will-change: height;
-        }
-    }
-    &.rcs-scroll-handle-dragged {
-        .rcs-inner-container {
-            user-select: none;
-        }
-        .rcs-custom-scrollbar {
-            opacity: 1;
-        }
-    }
-    .rcs-custom-scrollbar {
-        position: absolute;
-        height: 100%;
-        width: 4px;
-        right: 3px;
-        // opacity: 0;
-        opacity: 1;
-        z-index: 99;
-        transition: opacity 0.4s ease-out;
-        padding: 6px 0;
-        box-sizing: border-box;
-        will-change: opacity;
-        pointer-events: none;
-        &.rcs-custom-scrollbar-rtl {
-            right: auto;
-            left: 3px;
-        }
-    }
-    .rcs-custom-scroll-handle {
-        position: absolute;
-        width: 100%;
-        top: 0;
-    }
-    .rcs-inner-handle {
-        height: calc(100% - 12px);
-        margin-top: 6px;
-        background-color: #b8bfc0;
-        border-radius: 1px;
-        transition: opacity .3s ease-out, background-color .3s ease-out;
-    }
+			&:active {
+				.rcs-inner-handle {
+					background-color: #657272;
+				}
+			}
+		}
+		&:hover {
+			.rcs-custom-scrollbar {
+				opacity: 1;
+				transition-duration: 0.2s;
+			}
+		}
+	}
+	.rcs-inner-container {
+		overflow-x: hidden;
+		overflow-y: scroll;
+		&.rcs-content-scrolled {
+			&:after {
+				height: 5px;
+				transition: height 0.15s ease-out;
+			}
+		}
+		&:after {
+			content: '';
+			position: absolute;
+			top: 0;
+			right: 0;
+			left: 0;
+			height: 0;
+			background-image: linear-gradient(to bottom, rgba(0, 0, 0, 0.2) 0%, rgba(0, 0, 0, 0.05) 60%, transparent 100%);
+			pointer-events: none;
+			transition: height 0.1s ease-in;
+			will-change: height;
+		}
+	}
+	&.rcs-scroll-handle-dragged {
+		.rcs-inner-container {
+			user-select: none;
+		}
+		.rcs-custom-scrollbar {
+			opacity: 1;
+		}
+	}
+	.rcs-custom-scrollbar {
+		position: absolute;
+		height: 100%;
+		width: 4px;
+		right: 3px;
+		opacity: 1;
+		z-index: 99;
+		transition: opacity 0.4s ease-out;
+		padding: 6px 0;
+		box-sizing: border-box;
+		will-change: opacity;
+		pointer-events: none;
+		&.rcs-custom-scrollbar-rtl {
+			right: auto;
+			left: 3px;
+		}
+	}
+	.rcs-custom-scroll-handle {
+		position: absolute;
+		width: 100%;
+		top: 0;
+	}
+	.rcs-inner-handle {
+		height: calc(100% - 12px);
+		margin-top: 6px;
+		background-color: #b8bfc0;
+		border-radius: 1px;
+		transition: opacity .3s ease-out, background-color .3s ease-out;
+	}
+}
+
+.no-scroll {
+	.rcs-custom-scroll {
+		.rcs-custom-scrollbar {
+			display: none;
+		}
+	}
+	.rcs-inner-container > div {
+		height: auto !important;
+	}
 }

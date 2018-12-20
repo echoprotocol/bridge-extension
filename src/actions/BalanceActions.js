@@ -11,7 +11,7 @@ import { fetchChain, getContract, getTokenDetails, lookupAccounts } from '../api
 
 import { FORM_SEND, FORM_WATCH_TOKEN } from '../constants/FormConstants';
 import { CORE_ID, GLOBAL_ID_1 } from '../constants/GlobalConstants';
-import { ERROR_SEND_PATH, WALLET_PATH } from '../constants/RouterConstants';
+import { ERROR_SEND_PATH, WALLET_PATH, SEND_PATH } from '../constants/RouterConstants';
 
 import echoService from '../services/echo';
 
@@ -266,13 +266,9 @@ export const send = () => async (dispatch, getState) => {
 
 	const activeUserName = getState().global.getIn(['account', 'name']);
 
-	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
-
 	const isAccount = await dispatch(checkAccount(activeUserName, to.value));
 
 	if (!isAccount) {
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
-
 		return false;
 	}
 
@@ -311,21 +307,23 @@ export const send = () => async (dispatch, getState) => {
 		const total = new BN(amount).times(10 ** options.amount.asset.get('precision')).plus(options.fee.amount);
 
 		if (total.gt(balances.getIn([selectedBalance, 'balance']))) {
-			dispatch(setFormError(FORM_SEND, 'fee', 'Insufficient funds for fee'));
+			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
 			return false;
 		}
 	} else {
 		const feeBalance = balances.find((val) => val.get('asset_type') === options.fee.asset.get('id')).get('balance');
 
 		if (new BN(fee.value).gt(feeBalance)) {
-			dispatch(setFormError(FORM_SEND, 'fee', 'Insufficient funds for fee'));
+			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
 			return false;
 		}
 	}
 
-	options.amount.amount *= (10 ** options.amount.asset.get('precision'));
+	options.amount.amount = parseInt(options.amount.amount * (10 ** options.amount.asset.get('precision')), 10);
 
 	const activeNetworkName = getState().global.getIn(['network', 'name']);
+
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	emitter.emit('sendRequest', options, activeNetworkName);
 
@@ -536,4 +534,38 @@ export const removeToken = (contractId) => async (dispatch, getState) => {
 	});
 
 	dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTmpTokens }));
+};
+
+/**
+ *  @method sendRedirect
+ *
+ * 	On wallet balance choose redirect from wallet to send
+ *
+ * 	@param {String} balanceId
+ */
+export const sendRedirect = (balanceId) => (dispatch) => {
+	dispatch(setValue(FORM_SEND, 'selectedBalance', balanceId));
+
+	history.push(SEND_PATH);
+};
+
+/**
+ *  @method setAssetFormValue
+ *
+ * 	Set asset form value
+ *
+ * 	@param {String} form
+ * 	@param {String} field
+ * 	@param {String} value
+ */
+export const setAssetFormValue = (form, field, value) => (dispatch, getState) => {
+	const selectedBalance = getState().form.getIn([FORM_SEND, 'selectedBalance']);
+
+	if (field === 'selectedBalance' && selectedBalance) {
+		return null;
+	}
+
+	dispatch(setValue(form, field, value));
+
+	return null;
 };
