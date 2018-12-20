@@ -180,6 +180,7 @@ export const setCryptoInfo = (field, value, networkName) => async (dispatch, get
 	}
 };
 
+
 /**
  *  @method getCryptoInfo
  *

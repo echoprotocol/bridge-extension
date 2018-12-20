@@ -241,9 +241,9 @@ class Crypto extends EventEmitter {
 		return privateKey.toPublicKey().toString();
 	}
 	/**
-	 *  @method getBeckup
+	 *  @method getBackup
 	 *
-	 *  Get key for beckup page
+	 *  Get key for backup page
 	 *
 	 *  @param {String} username
 	 *  @param {String} password
@@ -251,13 +251,14 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @return {String} publicKey
 	 */
-	getBeckup(username, password, role = ACTIVE_KEY) {
-
-		const keys = [];
-		const privateKey = this.getPublicKey(username, password, role);
-		const publickKey = this.getPublicKey(username, password, role);
-		keys.push({ public: publickKey, wif: privateKey });
-		return keys;
+	getBackup(network, publicKeys) {
+		privateAES.required();
+		return publicKeys.map(() => ({
+			// todo: getInByNetwork - encrypted private key (HEX)
+			// todo: Aes decryptHexToBuffer - decrypted private key buffer
+			// todo: privateKey = PrivateKey.fromBuffer
+			// todo: privateKey.toWif()
+		}));
 	}
 
 	/**
