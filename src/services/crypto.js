@@ -240,6 +240,25 @@ class Crypto extends EventEmitter {
 		const privateKey = PrivateKey.fromSeed(seed);
 		return privateKey.toPublicKey().toString();
 	}
+	/**
+	 *  @method getBeckup
+	 *
+	 *  Get key for beckup page
+	 *
+	 *  @param {String} username
+	 *  @param {String} password
+	 *  @param {String} role - optional
+	 *
+	 *  @return {String} publicKey
+	 */
+	getBeckup(username, password, role = ACTIVE_KEY) {
+
+		const keys = [];
+		const privateKey = this.getPublicKey(username, password, role);
+		const publickKey = this.getPublicKey(username, password, role);
+		keys.push({ public: publickKey, wif: privateKey });
+		return keys;
+	}
 
 	/**
 	 *  @method isWIF
