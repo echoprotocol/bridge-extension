@@ -35,7 +35,7 @@ const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
 
-let isAccountsRequest = false;
+let lastRequestType = '';
 const accountsRequests = [];
 
 const requestQueue = [];
@@ -120,12 +120,29 @@ const resolveAccounts = async () => {
 
 	try {
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
-		return accountsRequests.forEach((i) => i.cb({ id: i.id, res: accounts }));
+		return accountsRequests.forEach((request) => {
+			try {
+				request.cb({ id: request.id, res: accounts });
+			} catch (e) {
+				console.log(e.message);
+			}
+		});
 
 	} catch (e) {
 		return { error: e.message };
 	}
 
+};
+
+
+const onOpenPopup = () => {
+	notificationManager.getPopup()
+		.then((popup) => {
+			if (!popup) {
+				triggerPopup();
+			}
+		})
+		.catch(triggerPopup);
 };
 
 /**
@@ -142,7 +159,7 @@ const onMessage = (request, sender, sendResponse) => {
 	if (!request.method || !request.id || !request.appId || request.appId !== APP_ID) return false;
 
 	const { id } = request;
-	isAccountsRequest = false;
+	lastRequestType = request.method;
 	if (request.method === 'confirm' && request.data) {
 
 		requestQueue.push({
@@ -155,36 +172,19 @@ const onMessage = (request, sender, sendResponse) => {
 			emitter.emit('request', id, request.data);
 		} catch (e) { return null; }
 
-
-		notificationManager.getPopup()
-			.then((popup) => {
-				if (!popup) {
-					triggerPopup();
-				}
-			})
-			.catch(triggerPopup);
+		onOpenPopup();
 
 	} else if (request.method === 'accounts') {
-
-		isAccountsRequest = true;
 
 		accountsRequests.push({
 			id, cb: sendResponse,
 		});
 
 		if (!crypto.isLocked()) {
-			resolveAccounts()
-				.then((result) => result)
-				.catch();
+			resolveAccounts();
 
 		} else {
-			notificationManager.getPopup()
-				.then((popup) => {
-					if (!popup) {
-						triggerPopup();
-					}
-				})
-				.catch(triggerPopup);
+			onOpenPopup();
 		}
 
 
@@ -195,10 +195,8 @@ const onMessage = (request, sender, sendResponse) => {
 
 
 const onPinUnlock = () => {
-	if (isAccountsRequest) {
-		resolveAccounts()
-			.then((result) => result)
-			.catch();
+	if (lastRequestType === 'accounts') {
+		resolveAccounts();
 		return !requestQueue.length ? closePopup() : null;
 	}
 	return null;
