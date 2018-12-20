@@ -140,7 +140,7 @@ const resolveAccounts = async () => {
 				console.log(e.message);
 			}
 		});
-		accountsRequests.splice(0, accountsRequests.length);
+		return accountsRequests.splice(0, accountsRequests.length);
 
 
 	} catch (e) {
