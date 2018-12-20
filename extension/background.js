@@ -133,13 +133,15 @@ const resolveAccounts = async () => {
 
 	try {
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
-		return accountsRequests.forEach((request) => {
+		accountsRequests.forEach((request) => {
 			try {
 				request.cb({ id: request.id, res: accounts });
 			} catch (e) {
 				console.log(e.message);
 			}
 		});
+		accountsRequests.splice(0, accountsRequests.length);
+
 
 	} catch (e) {
 		return { error: e.message };
