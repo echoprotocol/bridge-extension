@@ -1,5 +1,6 @@
 import React from 'react';
 import CustomScroll from 'react-custom-scroll';
+import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import { getWIFByPublicKey } from '../../actions/CryptoActions';
@@ -9,11 +10,10 @@ import BridgeBtnCopy from '../../components/BridgeBtnCopy';
 class Backup extends React.Component {
 
 	componentWillMount() {
-		this.props.getWIFByPublicKey(network);
+		this.props.getWIFByPublicKey();
 	}
 
 	render() {
-		const { keys } = this.state;
 		return (
 			<React.Fragment>
 				<div className="page-wrap backup-page">
@@ -28,7 +28,7 @@ class Backup extends React.Component {
 						>
 							<div className="page">
 
-								{
+								{/* {
 									keys.map((key) => (
 										<div className="backup-container">
 											<p className="title">Public key</p>
@@ -41,8 +41,7 @@ class Backup extends React.Component {
 											</div>
 										</div>
 									))
-								}
-
+								} */}
 								<div className="backup-container">
 									<p className="title">Public key</p>
 									<span className="key">5Kb8kLf9zgWQnogidDaA76MzPL6TsZZY36hWXMssSzNydYXYB9KF</span>
@@ -65,9 +64,13 @@ class Backup extends React.Component {
 }
 
 Backup.propTypes = {
-	network: PropTypes.string.isRequired,
-	accountKeys: PropTypes.object.isRequired,
+	// accountKeys: PropTypes.object.isRequired,
 	getWIFByPublicKey: PropTypes.func.isRequired,
 };
 
-export default Backup;
+export default connect(
+	() => ({}),
+	(dispatch) => ({
+		getWIFByPublicKey: () => dispatch(getWIFByPublicKey()),
+	}),
+)(Backup);

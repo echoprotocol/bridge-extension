@@ -240,20 +240,22 @@ class Crypto extends EventEmitter {
 		const privateKey = PrivateKey.fromSeed(seed);
 		return privateKey.toPublicKey().toString();
 	}
+
 	/**
 	 *  @method getBackup
 	 *
 	 *  Get key for backup page
 	 *
-	 *  @param {String} username
-	 *  @param {String} password
-	 *  @param {String} role - optional
+	 *  @param {String} network
+	 *  @param {String} publicKey
 	 *
-	 *  @return {String} publicKey
+	 *  @return {String} WIF
 	 */
 	getBackup(network, publicKeys) {
 		privateAES.required();
+		console.log(network, publicKeys);
 		return publicKeys.map(() => ({
+
 			// todo: getInByNetwork - encrypted private key (HEX)
 			// todo: Aes decryptHexToBuffer - decrypted private key buffer
 			// todo: privateKey = PrivateKey.fromBuffer

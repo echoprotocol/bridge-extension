@@ -204,6 +204,14 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
 	}
 };
 
+export const getWIFByPublicKey = () => (dispatch, getState) => {
+
+	const networkName = getState().global.getIn(['network', 'name']);
+	const publicKeys = getState().global.getIn(['accounts']);
+	console.log('acc: ', publicKeys);
+	getCrypto().getBackup(networkName, [1, 2, 3]);
+};
+
 /**
  *  @method removeCryptoInfo
  *
