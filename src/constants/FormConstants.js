@@ -5,3 +5,4 @@ export const FORM_UNLOCK = 'unlock';
 export const FORM_WIPE = 'wipe';
 export const FORM_CREATE_PIN = 'create_pin';
 export const FORM_SEND = 'send';
+export const FORM_WATCH_TOKEN = 'watch_token';

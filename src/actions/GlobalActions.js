@@ -34,9 +34,10 @@ import {
 } from '../constants/RouterConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
-import { fetchChain } from '../api/ChainApi';
+import { fetchChain, getTokenDetails } from '../api/ChainApi';
 
 import storage from '../services/storage';
+import BalanceReducer from '../reducers/BalanceReducer';
 
 /**
  *  @method set
@@ -46,7 +47,8 @@ import storage from '../services/storage';
  * 	@param {String} field
  * 	@param {Any} value
  */
-const set = (field, value) => (dispatch) => dispatch(GlobalReducer.actions.set({ field, value }));
+export const set = (field, value) => (dispatch) =>
+	dispatch(GlobalReducer.actions.set({ field, value }));
 
 
 /**
@@ -220,21 +222,50 @@ export const switchAccount = (name) => async (dispatch, getState) => {
  * 	Load info from storage after unlock crypto
  */
 export const loadInfo = () => async (dispatch, getState) => {
+
+
 	const networks = getState().global.get('networks');
 	let accountsNetworks = new Map();
 
-	const accountsPromises = networks.concat(NETWORKS).map(async (network) => {
+	const resultPromises = networks.concat(NETWORKS).map(async (network) => {
 		const accounts = await dispatch(getCryptoInfo('accounts', network.name));
-		return [network.name, accounts];
+		const tokens = await dispatch(getCryptoInfo('tokens', network.name));
+		return [network.name, accounts, tokens];
 	});
 
-	const resultAccounts = await Promise.all(accountsPromises);
+	const result = await Promise.all(resultPromises);
 
-	resultAccounts.forEach(([networkName, accounts]) => {
+	let tokensObject = {};
+	let stateTokens = new Map({});
+	result.forEach(([networkName, accounts, tokens]) => {
 		accountsNetworks = accountsNetworks.set(networkName, new List(accounts));
+
+		Object.entries(tokens).forEach(([accountId, tokensArray]) => {
+			tokensArray.forEach((id) => {
+				stateTokens = stateTokens.setIn([`1.16.${id}`, 'accountId'], accountId);
+			});
+		});
+		tokensObject = Object.assign(tokensObject, tokens);
 	});
 
 	dispatch(set('accounts', accountsNetworks));
+
+	let tokensDetails = [];
+
+	stateTokens.mapEntries(([contractId, tokenMap]) => {
+		tokensDetails.push(getTokenDetails(contractId, tokenMap.get('accountId')));
+	});
+
+	tokensDetails = await Promise.all(tokensDetails);
+
+	stateTokens.mapEntries(([contractId], index) => {
+		stateTokens = stateTokens
+			.setIn([contractId, 'symbol'], tokensDetails[index].symbol)
+			.setIn([contractId, 'precision'], tokensDetails[index].precision)
+			.setIn([contractId, 'balance'], tokensDetails[index].balance);
+	});
+
+	dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }));
 
 
 	const accounts = await dispatch(getCryptoInfo('accounts'));

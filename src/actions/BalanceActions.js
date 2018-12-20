@@ -1,13 +1,17 @@
 import BN from 'bignumber.js';
+import { Map } from 'immutable';
+import { batchActions } from 'redux-batched-actions';
 
 import { setFormError, setValue, setFormValue } from './FormActions';
 import { getTransactionFee } from './SignActions';
+import { getCryptoInfo, setCryptoInfo } from './CryptoActions';
+import { set } from './GlobalActions';
 
-import { fetchChain, lookupAccounts } from '../api/ChainApi';
+import { fetchChain, getContract, getTokenDetails, lookupAccounts } from '../api/ChainApi';
 
-import { FORM_SEND } from '../constants/FormConstants';
-import { CORE_ID } from '../constants/GlobalConstants';
-import { ERROR_SEND_PATH } from '../constants/RouterConstants';
+import { FORM_SEND, FORM_WATCH_TOKEN } from '../constants/FormConstants';
+import { CORE_ID, GLOBAL_ID_1 } from '../constants/GlobalConstants';
+import { ERROR_SEND_PATH, WALLET_PATH } from '../constants/RouterConstants';
 
 import echoService from '../services/echo';
 
@@ -19,6 +23,7 @@ import GlobalReducer from '../reducers/GlobalReducer';
 
 import history from '../history';
 import store from '../store';
+import ValidateTransactionHelper from '../helpers/ValidateTransactionHelper';
 
 const emitter = echoService.getEmitter();
 
@@ -343,3 +348,192 @@ const sendHandler = (path) => {
 };
 
 emitter.on('sendResponse', sendHandler);
+
+export const watchToken = (contractId) => async (dispatch, getState) => {
+	if (!contractId) {
+		dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Contract id should not be empty'));
+		return null;
+	}
+
+	if (ValidateTransactionHelper.validateContractId(contractId)) {
+		dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Invalid contract id'));
+		return null;
+	}
+
+	try {
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
+		const contract = await getContract(contractId);
+
+		if (!contract) {
+			dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Invalid contract id'));
+			dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+			return null;
+		}
+
+		const accountId = getState().global.getIn(['account', 'id']);
+
+		const { symbol, precision, balance } = await getTokenDetails(contractId, accountId);
+
+		if (!symbol || !Number.isInteger(precision)) {
+			dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Invalid token contract'));
+			dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+			return null;
+		}
+
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		let tokens = await dispatch(getCryptoInfo('tokens', networkName));
+
+
+		if (tokens && Object.values(tokens).find((id) => id.includes(contractId.split('.')[2]))) {
+			dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Token already exists'));
+			dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+			return null;
+		}
+
+		if (!tokens) {
+			tokens = {};
+			tokens[accountId] = [];
+		}
+
+		tokens[accountId].push(contractId.split('.')[2]);
+
+		dispatch(setCryptoInfo('tokens', tokens));
+
+		let stateTokens = getState().balance.get('tokens');
+
+		stateTokens = stateTokens
+			.setIn([contractId, 'accountId'], accountId)
+			.setIn([contractId, 'symbol'], symbol)
+			.setIn([contractId, 'precision'], precision)
+			.setIn([contractId, 'balance'], balance);
+
+		dispatch(batchActions([
+			BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }),
+			GlobalReducer.actions.set({ field: 'loading', value: false }),
+		]));
+
+		history.push(WALLET_PATH);
+	} catch (err) {
+		dispatch(setValue(FORM_WATCH_TOKEN, 'error', FormatHelper.formatError(err)));
+
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	}
+
+	return null;
+};
+
+const checkBlockTransactions = async (blockNum, count, tokens) => {
+	const { ChainStore } = echoService.getChainLib();
+
+
+	const block = await ChainStore.getBlock(blockNum);
+
+	if (block.transactions.length) {
+		for (let tr = 0; tr < block.transactions.length; tr += 1) {
+			for (let i = 0; i < block.transactions[tr].operations.length; i += 1) {
+				const [, data] = block.transactions[tr].operations[i];
+				if (tokens.findKey((value, key) => key === data.receiver)) {
+					return true;
+				}
+			}
+		}
+	}
+
+	blockNum += 1;
+	count -= 1;
+
+	if (count < 0) {
+		return false;
+	}
+
+	const isUpdated = await checkBlockTransactions(blockNum, count, tokens);
+
+	return !!isUpdated;
+};
+
+
+const isBlockChanged = (tokens) => async (dispatch, getState) => {
+	const blockNum = (await fetchChain(GLOBAL_ID_1)).get('head_block_number');
+
+	const stateBlockNum = getState().global.get('headBlockNum');
+
+	if (stateBlockNum === 0) {
+		dispatch(GlobalReducer.actions.set({ field: 'headBlockNum', value: blockNum }));
+		return false;
+	}
+
+	if (blockNum === stateBlockNum) {
+		return false;
+	}
+
+	let isUpdated = false;
+
+	isUpdated = await checkBlockTransactions(stateBlockNum, blockNum - stateBlockNum, tokens);
+
+	dispatch(GlobalReducer.actions.set({ field: 'headBlockNum', value: blockNum }));
+
+	return isUpdated;
+};
+
+export const updateTokens = () => async (dispatch, getState) => {
+	const tokens = getState().balance.get('tokens');
+
+	try {
+		if (!(await dispatch(isBlockChanged(tokens)))) {
+			return false;
+		}
+
+		let tokensDetails = [];
+
+		tokens.mapKeys((contractId) => {
+			const accountId = tokens.getIn([contractId, 'accountId']);
+			tokensDetails.push(getTokenDetails(contractId, accountId));
+		});
+
+		tokensDetails = await Promise.all(tokensDetails);
+
+		let stateTokens = tokens;
+
+		tokens.mapEntries(([contractId], index) => {
+			stateTokens = stateTokens
+				.setIn([contractId, 'symbol'], tokensDetails[index].symbol)
+				.setIn([contractId, 'precision'], tokensDetails[index].precision)
+				.setIn([contractId, 'balance'], tokensDetails[index].balance);
+		});
+
+		if (stateTokens !== tokens) {
+			dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }));
+		}
+	} catch (err) {
+		dispatch(set('error', FormatHelper.formatError(err)));
+
+		return false;
+	}
+
+	return true;
+};
+
+export const removeToken = (contractId) => async (dispatch, getState) => {
+	const networkName = getState().global.getIn(['network', 'name']);
+
+	const tokens = await dispatch(getCryptoInfo('tokens', networkName));
+
+	const accountId = getState().global.getIn(['account', 'id']);
+
+	tokens[accountId] = tokens[accountId].filter((id) => contractId.split('.')[2] !== id);
+
+	dispatch(setCryptoInfo('tokens', tokens));
+
+
+	const stateTokens = getState().balance.get('tokens');
+	let stateTmpTokens = new Map({});
+
+	stateTokens.mapEntries(([id, value]) => {
+		if (contractId !== id) {
+			stateTmpTokens = stateTmpTokens.set(id, value);
+		}
+	});
+
+	dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTmpTokens }));
+};

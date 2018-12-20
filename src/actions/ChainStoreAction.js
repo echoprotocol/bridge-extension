@@ -5,7 +5,7 @@ import GlobalReducer from '../reducers/GlobalReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
 import BalanceReducer from '../reducers/BalanceReducer';
 
-import { initAssetsBalances } from './BalanceActions';
+import { initAssetsBalances, updateTokens } from './BalanceActions';
 
 import { fetchChain, connectToAddress, disconnectFromAddress, checkConnection } from '../api/ChainApi';
 
@@ -44,6 +44,7 @@ export const subscribe = () => (dispatch) => {
 	});
 
 	dispatch(initAssetsBalances());
+	dispatch(updateTokens());
 };
 
 /**

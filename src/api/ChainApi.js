@@ -1,4 +1,5 @@
 import { keccak256 } from 'js-sha3';
+import utf8 from 'utf8';
 
 import echoService from '../services/echo';
 
@@ -185,7 +186,32 @@ export const getAccountRefsOfKey = async (key) => {
 	return result;
 };
 
-export const getTokenDetails = async (contractId, accountId) => {
+const toUtf8 = (hex) => {
+	let str = '';
+
+	for (let i = 0; i < hex.length; i += 2) {
+		const code = parseInt(hex.substr(i, 2), 16);
+		if (code !== 0) {
+			str += String.fromCharCode(code);
+		}
+	}
+	let result = str;
+	try {
+		result = utf8.decode(str);
+	} catch (error) {
+		result = str;
+	}
+	return result;
+};
+
+export const getContract = (contractId) => {
+	const { Apis } = echoService.getWsLib();
+	const instance = Apis.instance();
+
+	return instance.dbApi().exec('get_contract', [contractId]);
+};
+
+export const getTokenDetails = async (contractId = '1.16.7807', accountId = '1.2.22') => {
 	const { Apis } = echoService.getWsLib();
 	const instance = Apis.instance();
 
@@ -204,14 +230,35 @@ export const getTokenDetails = async (contractId, accountId) => {
 		},
 	];
 
-	const inputs = methods[0].inputs.map((input) => input.type).join(',');
+	const tokenDetails = [];
 
-	const methodId = keccak256(`${methods[0].name}(${inputs})`).substr(0, 8);
+	try {
+		const resultEncode = Number(accountId.substr(accountId.lastIndexOf('.') + 1)).toString(16).padStart(64, '0');
 
-	const result = await instance.dbApi().exec(
-		'call_contract_no_changing_state',
-		[contractId, accountId, CORE_ID, code],
-	);
+		methods.forEach((method) => {
 
-	return result;
+			const inputs = method.inputs.map((input) => input.type).join(',');
+
+			let methodId = keccak256(`${method.name}(${inputs})`).substr(0, 8);
+
+			if (method.inputs.length) {
+				methodId = methodId.concat(resultEncode);
+			}
+
+			tokenDetails.push(instance.dbApi().exec(
+				'call_contract_no_changing_state',
+				[contractId, accountId, CORE_ID, methodId],
+			));
+		});
+
+		const result = await Promise.all(tokenDetails);
+
+		return {
+			balance: parseInt(result[0], 16),
+			symbol: toUtf8(result[1].substr(-64)),
+			precision: parseInt(result[2], 16),
+		};
+	} catch (e) {
+		return e;
+	}
 };

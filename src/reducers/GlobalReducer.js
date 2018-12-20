@@ -28,6 +28,7 @@ const DEFAULT_FIELDS = Map({
 		transactions: new List([]),
 		goTo: null,
 	}),
+	headBlockNum: 0,
 });
 
 export default createModule({
