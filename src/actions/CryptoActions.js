@@ -27,6 +27,7 @@ import { globals } from './SignActions';
 import FormatHelper from '../helpers/FormatHelper';
 import ValidatePinHelper from '../helpers/ValidatePinHelper';
 
+
 /**
  *  @method changeCrypto
  *
@@ -74,10 +75,12 @@ export const getCrypto = () => echoService.getCrypto();
 export const unlockCrypto = (form, pin) => async (dispatch) => {
 	const error = ValidatePinHelper.validatePin(pin);
 
+
 	if (error) {
 		dispatch(setValue(form, 'error', error));
 		return false;
 	}
+
 
 	try {
 		dispatch(setValue(form, 'loading', true));
@@ -112,6 +115,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 const unlockResponse = async () => {
 	store.dispatch(changeCrypto({ isLocked: false }));
 
+
 	await store.dispatch(loadInfo());
 
 	if (
@@ -142,6 +146,7 @@ const lockResponse = () => {
  */
 export const initCrypto = () => async (dispatch) => {
 	try {
+
 		if (!getCrypto().isLocked()) {
 			dispatch(changeCrypto({ isLocked: false }));
 			await dispatch(loadInfo());
@@ -211,6 +216,7 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
  * 	@param {String} field
  */
 export const removeCryptoInfo = (field, networkName) => async (dispatch, getState) => {
+
 	try {
 		if (!networkName) {
 			networkName = getState().global.getIn(['network', 'name']);

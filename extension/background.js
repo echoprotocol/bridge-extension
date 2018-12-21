@@ -35,6 +35,9 @@ const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
 
+let lastRequestType = '';
+const accountsRequests = [];
+
 const requestQueue = [];
 let lastTransaction = null;
 const { ChainStore } = chainjs;
@@ -69,12 +72,25 @@ const createSocket = () => {
 		.then(() => {});
 };
 
+
 /**
- * trigger popup
+ * show popup
+ */
+const showPopup = () => {
+	notificationManager.showPopup();
+};
+
+/**
+ * check before show popup
  */
 const triggerPopup = () => {
-	notificationManager.showPopup();
-
+	notificationManager.getPopup()
+		.then((popup) => {
+			if (!popup) {
+				showPopup();
+			}
+		})
+		.catch(showPopup);
 };
 
 /**
@@ -106,20 +122,31 @@ const createNotification = (title = '', message = '') => {
 		title,
 	});
 };
-
 /**
  * Get user account if unlocked
  * @returns {Promise.<*>}
  */
-const getAccountList = async () => {
+const resolveAccounts = async () => {
+
+
 	const network = (await storage.get('current_network')) || NETWORKS[0];
 
 	try {
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
-		return accounts;
+		accountsRequests.forEach((request) => {
+			try {
+				request.cb({ id: request.id, res: accounts });
+			} catch (e) {
+				console.log(e.message);
+			}
+		});
+		return accountsRequests.splice(0, accountsRequests.length);
+
+
 	} catch (e) {
 		return { error: e.message };
 	}
+
 };
 
 /**
@@ -137,6 +164,8 @@ const onMessage = (request, sender, sendResponse) => {
 
 	const { id } = request;
 
+	lastRequestType = request.method;
+
 	if (request.method === 'confirm' && request.data) {
 
 		requestQueue.push({
@@ -147,20 +176,37 @@ const onMessage = (request, sender, sendResponse) => {
 
 		try {
 			emitter.emit('request', id, request.data);
-		} catch (e) {}
+		} catch (e) { return null; }
 
-		notificationManager.getPopup()
-			.then((popup) => {
-				if (!popup) {
-					triggerPopup();
-				}
-			})
-			.catch(triggerPopup);
+		triggerPopup();
+
 	} else if (request.method === 'accounts') {
-		getAccountList().then((res) => sendResponse({ id, res }));
+
+		accountsRequests.push({
+			id, cb: sendResponse,
+		});
+
+		if (!crypto.isLocked()) {
+			resolveAccounts();
+
+		} else {
+			triggerPopup();
+		}
+
+
 	}
 
 	return true;
+};
+
+
+const onPinUnlock = () => {
+	if (lastRequestType === 'accounts') {
+		resolveAccounts();
+		closePopup();
+	}
+	return null;
+
 };
 
 /**
@@ -191,7 +237,6 @@ const removeTransaction = (err, id) => {
  * @returns {Promise.<void>}
  */
 const onResponse = (err, id, status) => {
-
 	if ([CLOSE_STATUS, OPEN_STATUS].includes(status)) {
 		if (CLOSE_STATUS === status && requestQueue.length === 1) {
 			closePopup();
@@ -335,7 +380,7 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 			} else {
 				emitter.emit('trResponse', ERROR_STATUS, id, path, windowType);
 			}
-		} catch (e) {}
+		} catch (e) { return null; }
 
 		return null;
 	}
@@ -355,7 +400,7 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 		} else {
 			emitter.emit('trResponse', APPROVED_STATUS, id, path, windowType);
 		}
-	} catch (e) {}
+	} catch (e) { return null; }
 
 	return null;
 };
@@ -383,14 +428,14 @@ const onSend = async (options, networkName) => {
 
 		try {
 			emitter.emit('sendResponse', path);
-		} catch (e) {}
+		} catch (e) { return null; }
 
 		return null;
 	}
 
 	try {
 		emitter.emit('sendResponse', path);
-	} catch (e) {}
+	} catch (e) { return null; }
 
 	return null;
 };
@@ -410,6 +455,9 @@ emitter.on('trRequest', onTransaction);
 emitter.on('sendRequest', onSend);
 
 extensionizer.runtime.onMessage.addListener(onMessage);
+
+crypto.on('unlocked', onPinUnlock);
+
 
 extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
