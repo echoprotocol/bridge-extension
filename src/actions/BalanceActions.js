@@ -347,6 +347,13 @@ const sendHandler = (path) => {
 
 emitter.on('sendResponse', sendHandler);
 
+/**
+ *  @method watchToken
+ *
+ * 	Add token to wallet balances list
+ *
+ * 	@param {String} contractId
+ */
 export const watchToken = (contractId) => async (dispatch, getState) => {
 	if (!contractId) {
 		dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Contract id should not be empty'));
@@ -421,6 +428,15 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
 	return null;
 };
 
+/**
+ *  @method checkBlockTransactions
+ *
+ * 	Check transactions in the last blocks
+ *
+ * 	@param {Number} blockNum
+ * 	@param {Number} count
+ * 	@param {Object} tokens
+ */
 const checkBlockTransactions = async (blockNum, count, tokens) => {
 	const { ChainStore } = echoService.getChainLib();
 
@@ -450,7 +466,13 @@ const checkBlockTransactions = async (blockNum, count, tokens) => {
 	return !!isUpdated;
 };
 
-
+/**
+ *  @method isBlockChanged
+ *
+ * 	Is token was used in the last blocks
+ *
+ * 	@param {Object} tokens
+ */
 const isBlockChanged = (tokens) => async (dispatch, getState) => {
 	const blockNum = (await fetchChain(GLOBAL_ID_1)).get('head_block_number');
 
@@ -474,6 +496,11 @@ const isBlockChanged = (tokens) => async (dispatch, getState) => {
 	return isUpdated;
 };
 
+/**
+ *  @method updateTokens
+ *
+ *  Update tokens in state when when contract was used in the last proceed blocks
+ */
 export const updateTokens = () => async (dispatch, getState) => {
 	const tokens = getState().balance.get('tokens');
 
@@ -512,6 +539,13 @@ export const updateTokens = () => async (dispatch, getState) => {
 	return true;
 };
 
+/**
+ *  @method removeToken
+ *
+ * 	Remove token from wallet balances list
+ *
+ * 	@param {String} contractId
+ */
 export const removeToken = (contractId) => async (dispatch, getState) => {
 	const networkName = getState().global.getIn(['network', 'name']);
 
