@@ -37,6 +37,10 @@ import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 import { fetchChain } from '../api/ChainApi';
 
 import storage from '../services/storage';
+import store from '../store';
+import echoService from '../services/echo';
+
+const emitter = echoService.getEmitter();
 
 /**
  *  @method set
@@ -147,26 +151,41 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
  */
 export const removeAccount = (name) => async (dispatch, getState) => {
 	const accountName = getState().global.getIn(['account', 'name']);
+	const networkName = getState().global.getIn(['network', 'name']);
+	const accounts = getState().global.get('accounts');
+
+	emitter.emit('logout', name, accountName, networkName, accounts);
+};
+
+/**
+ *  @method onLogout
+ *
+ * 	Logout into the all windows
+ *
+ * 	@param {String} name
+ * 	@param {String} accountName
+ * 	@param {String} networkName
+ * 	@param {Object} accounts
+ */
+const onLogout = async (name, accountName, networkName, accounts) => {
 
 	try {
-		const networkName = getState().global.getIn(['network', 'name']);
-		let accounts = getState().global.get('accounts');
 
 		const { keys, id } = accounts.get(networkName).find((i) => i.name === name);
 
-		dispatch(removeBalances(id));
+		store.dispatch(removeBalances(id));
 
-		await Promise.all(keys.map((key) => dispatch(removeCryptoInfo(key))));
+		await Promise.all(keys.map((key) => store.dispatch(removeCryptoInfo(key))));
 
 		accounts = accounts.set(networkName, accounts.get(networkName).filter((i) => i.name !== name));
-		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
-		dispatch(set('accounts', accounts));
+		await store.dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+		store.dispatch(set('accounts', accounts));
 		if (accountName !== name) {
 			return false;
 		}
 
 		if (!accounts.get(networkName).size) {
-			dispatch(GlobalReducer.actions.logout());
+			store.dispatch(GlobalReducer.actions.logout());
 			history.push(CREATE_ACCOUNT_PATH);
 			return false;
 		}
@@ -176,16 +195,18 @@ export const removeAccount = (name) => async (dispatch, getState) => {
 			accounts.get(networkName).set(0, { ...accounts.getIn([networkName, 0]), active: true }),
 		);
 
-		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
-		dispatch(set('accounts', accounts));
+		await store.dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+		store.dispatch(set('accounts', accounts));
 
-		dispatch(initAccount(accounts.getIn([networkName, 0])));
+		store.dispatch(initAccount(accounts.getIn([networkName, 0])));
 	} catch (err) {
-		dispatch(set('error', FormatHelper.formatError(err)));
+		store.dispatch(set('error', FormatHelper.formatError(err)));
 	}
 
 	return true;
 };
+
+emitter.on('logout', onLogout);
 
 /**
  *  @method switchAccount
