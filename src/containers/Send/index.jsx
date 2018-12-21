@@ -18,6 +18,7 @@ import BridgeInput from '../../components/BridgeInput';
 import BridgeTextArea from '../../components/BridgeTextArea';
 
 import ValidateSendHelper from '../../helpers/ValidateSendHelper';
+import ValidateTransactionHelper from '../../helpers/ValidateTransactionHelper';
 
 class Send extends React.Component {
 
@@ -92,17 +93,26 @@ class Send extends React.Component {
 	}
 
 	onAmountChange(e) {
-		const { selectedBalance, balances, assets } = this.props;
+		const {
+			selectedBalance, balances, assets, tokens,
+		} = this.props;
 
 		const field = e.target.name;
 		const { value } = e.target;
 
+		let precision = null;
+		let symbol = null;
+
+		if (!ValidateTransactionHelper.validateContractId(selectedBalance)) {
+			precision = tokens.getIn([selectedBalance, 'precision']);
+			symbol = tokens.getIn([selectedBalance, 'symbol']);
+		}
 		const asset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
 
 		const { value: validatedValue, error, warning } =
 			ValidateSendHelper.amountInput(value, {
-				precision: asset.get('precision'),
-				symbol: asset.get('symbol'),
+				precision: precision || asset.get('precision'),
+				symbol: symbol || asset.get('symbol'),
 			});
 
 		if (error) {
@@ -154,7 +164,7 @@ class Send extends React.Component {
 
 	render() {
 		const {
-			to, amount, fee, memo, account, loading, balances, assets,
+			to, amount, fee, memo, account, loading, balances, assets, tokens,
 		} = this.props;
 
 		if (!account) {
@@ -217,6 +227,7 @@ class Send extends React.Component {
 										balances,
 										assets,
 										account,
+										tokens,
 									},
 									path: { form: FORM_SEND, field: 'selectedBalance' },
 								}}
@@ -283,6 +294,7 @@ Send.propTypes = {
 	memo: PropTypes.object.isRequired,
 	balances: PropTypes.object.isRequired,
 	assets: PropTypes.object.isRequired,
+	tokens: PropTypes.object.isRequired,
 	selectedBalance: PropTypes.string,
 	setFormValue: PropTypes.func.isRequired,
 	setFormError: PropTypes.func.isRequired,
@@ -308,6 +320,7 @@ export default connect(
 		selectedFeeBalance: state.form.getIn([FORM_SEND, 'selectedFeeBalance']),
 		balances: state.balance.get('balances'),
 		assets: state.balance.get('assets'),
+		tokens: state.balance.get('tokens'),
 		loading: state.global.get('loading'),
 	}),
 	(dispatch) => ({

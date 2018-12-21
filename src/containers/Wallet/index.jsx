@@ -57,7 +57,12 @@ class Wallet extends React.Component {
 			}
 
 			resultTokens.push(<li key={contractId}>
-				<a>
+				<a
+					role="button"
+					onClick={() => this.sendRedirect(contractId)}
+					tabIndex={0}
+					onKeyPress={() => this.sendRedirect(contractId)}
+				>
 					<div className="balance-info">
 						<span>{FormatHelper.formatAmount(token.get('balance'), token.get('precision'))}</span>
 						<span>{token.get('symbol')}</span>
@@ -83,7 +88,7 @@ class Wallet extends React.Component {
 	sortAssets() {
 		const { assets, balances, tokens } = this.props;
 
-		const sortedBalalnces = balances.toArray().sort((a, b) => {
+		const sortedBalances = balances.toArray().sort((a, b) => {
 			if (!a || !b) {
 				return 0;
 			}
@@ -119,7 +124,7 @@ class Wallet extends React.Component {
 		});
 
 		return {
-			balances: sortedBalalnces,
+			balances: sortedBalances,
 			tokens: sortedTokens,
 		};
 	}
