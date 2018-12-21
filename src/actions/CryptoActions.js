@@ -21,7 +21,7 @@ import {
 import { NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
 
 import { setValue } from './FormActions';
-import { loadInfo } from './GlobalActions';
+import { loadInfo, set } from './GlobalActions';
 import { globals } from './SignActions';
 
 import FormatHelper from '../helpers/FormatHelper';
@@ -180,7 +180,6 @@ export const setCryptoInfo = (field, value, networkName) => async (dispatch, get
 	}
 };
 
-
 /**
  *  @method getCryptoInfo
  *
@@ -204,12 +203,23 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
 	}
 };
 
-export const getWIFByPublicKey = () => (dispatch, getState) => {
+/**
+ *  @method transitPublicKey
+ *
+ */
+export const transitPublicKey = () => async (dispatch, getState) => {
+	try {
+		const networkName = getState().global.getIn(['network', 'name']);
+		const accounts = getState().global.getIn(['accounts', networkName]);
+		const accountID = getState().global.get('account').get('id');
+		const publicKey = accounts.find((account) => account.id === accountID).keys[0];
 
-	const networkName = getState().global.getIn(['network', 'name']);
-	const publicKeys = getState().global.getIn(['accounts']);
-	console.log('acc: ', publicKeys);
-	getCrypto().getBackup(networkName, [1, 2, 3]);
+		const wif = await getCrypto().getWIFByPublicKey(networkName, publicKey);
+		return { publicKey, wif };
+	} catch (err) {
+		dispatch(set('error', FormatHelper.formatError(err)));
+		return null;
+	}
 };
 
 /**

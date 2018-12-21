@@ -46,7 +46,9 @@ import storage from '../services/storage';
  * 	@param {String} field
  * 	@param {Any} value
  */
-const set = (field, value) => (dispatch) => dispatch(GlobalReducer.actions.set({ field, value }));
+
+export const set = (field, value) => (dispatch) =>
+	dispatch(GlobalReducer.actions.set({ field, value }));
 
 
 /**

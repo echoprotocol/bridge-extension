@@ -3,15 +3,31 @@ import CustomScroll from 'react-custom-scroll';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { getWIFByPublicKey } from '../../actions/CryptoActions';
+import { transitPublicKey } from '../../actions/CryptoActions';
 
 import BridgeBtnCopy from '../../components/BridgeBtnCopy';
 
 class Backup extends React.Component {
 
-	componentWillMount() {
-		this.props.getWIFByPublicKey();
+	constructor() {
+		super();
+		this.state = {
+			keys: [],
+		};
 	}
+
+	async componentWillMount() {
+
+		const keys = await this.props.transitPublicKey();
+
+		this.setState({ keys: [keys] });
+
+	}
+
+	componentWillUnmount() {
+		this.setState({ keys: [] });
+	}
+
 
 	render() {
 		return (
@@ -28,11 +44,11 @@ class Backup extends React.Component {
 						>
 							<div className="page">
 
-								{/* {
-									keys.map((key) => (
-										<div className="backup-container">
+								{
+									this.state.keys.map((key) => (
+										<div className="backup-container" key={key.wif} >
 											<p className="title">Public key</p>
-											<span className="key">{key.public}</span>
+											<span className="key">{key.publicKey}</span>
 
 											<div className="wif-wrap backup-key">
 												<div className="wif">WIF</div>
@@ -41,17 +57,7 @@ class Backup extends React.Component {
 											</div>
 										</div>
 									))
-								} */}
-								<div className="backup-container">
-									<p className="title">Public key</p>
-									<span className="key">5Kb8kLf9zgWQnogidDaA76MzPL6TsZZY36hWXMssSzNydYXYB9KF</span>
-
-									<div className="wif-wrap backup-key">
-										<div className="wif">WIF</div>
-										<div className="wif-key">5Kb8kLf9zgWQnogidDaA76MzPL6TsZZY36hWXMssSzNydYXYB9KF</div>
-										<BridgeBtnCopy compact btnTextWif text="5Kb8kLf9zgWQnogidDaA76MzPL6TsZZY36hWXMssSzNydYXYB9KF" />
-									</div>
-								</div>
+								}
 							</div>
 						</CustomScroll>
 					</div>
@@ -64,13 +70,12 @@ class Backup extends React.Component {
 }
 
 Backup.propTypes = {
-	// accountKeys: PropTypes.object.isRequired,
-	getWIFByPublicKey: PropTypes.func.isRequired,
+	transitPublicKey: PropTypes.func.isRequired,
 };
 
 export default connect(
 	() => ({}),
 	(dispatch) => ({
-		getWIFByPublicKey: () => dispatch(getWIFByPublicKey()),
+		transitPublicKey: () => dispatch(transitPublicKey()),
 	}),
 )(Backup);

@@ -242,7 +242,7 @@ class Crypto extends EventEmitter {
 	}
 
 	/**
-	 *  @method getBackup
+	 *  @method getWIFByPublicKey
 	 *
 	 *  Get key for backup page
 	 *
@@ -251,16 +251,19 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @return {String} WIF
 	 */
-	getBackup(network, publicKeys) {
+	async getWIFByPublicKey(networkName, publicKey) {
 		privateAES.required();
-		console.log(network, publicKeys);
-		return publicKeys.map(() => ({
 
-			// todo: getInByNetwork - encrypted private key (HEX)
-			// todo: Aes decryptHexToBuffer - decrypted private key buffer
-			// todo: privateKey = PrivateKey.fromBuffer
-			// todo: privateKey.toWif()
-		}));
+		try {
+			const encryptedPrivateKey = await this.getInByNetwork(networkName, publicKey);
+			const aes = privateAES.get();
+			const privateKeyBuffer = aes.decryptHexToBuffer(encryptedPrivateKey);
+			const privateKey = PrivateKey.fromBuffer(privateKeyBuffer);
+			return privateKey.toWif();
+		} catch (err) {
+			return false;
+		}
+
 	}
 
 	/**
