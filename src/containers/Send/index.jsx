@@ -24,6 +24,9 @@ class Send extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.toRef = null;
+		this.amountRef = null;
+
 		this.state = {
 			timeout: null,
 			warning: false,
@@ -48,6 +51,27 @@ class Send extends React.Component {
 		} else {
 			this.props.setFormValue('fee', '');
 		}
+	}
+
+	componentDidUpdate(prevProps) {
+		const { to: prevTo, amount: prevAmount } = prevProps;
+
+		const {
+			to, amount,
+		} = this.props;
+
+
+		if ((to.value !== prevTo.value) || (amount.value !== prevAmount.value)) {
+			return false;
+		}
+
+		if (to.error && !amount.error && this.toRef) {
+			this.toRef.focus();
+		} else if (amount.error && this.amountRef) {
+			this.amountRef.focus();
+		}
+
+		return true;
 	}
 
 	componentWillUnmount() {
@@ -122,6 +146,12 @@ class Send extends React.Component {
 		return true;
 	}
 
+	handleRef(ref, type) {
+		if (ref) {
+			this[`${type}Ref`] = ref.bridgeInput;
+		}
+	}
+
 	render() {
 		const {
 			to, amount, fee, memo, account, loading, balances, assets,
@@ -173,6 +203,7 @@ class Send extends React.Component {
 								errorText={to.error}
 								onKeyPress={(e) => this.onKeyPress(e)}
 								disabled={loading}
+								ref={(r) => this.handleRef(r, 'to')}
 							/>
 							<BridgeInput
 								name="amount"
@@ -196,6 +227,7 @@ class Send extends React.Component {
 								onKeyPress={(e) => this.onKeyPress(e)}
 								disabled={loading}
 								onBlur={(value) => this.onBlur(value)}
+								ref={(r) => this.handleRef(r, 'amount')}
 							/>
 							<BridgeInput
 								name="fee"
@@ -214,6 +246,8 @@ class Send extends React.Component {
 								}}
 								value={fee.value.toString()}
 								disabled
+								error={!!fee.error}
+								errorText={fee.error}
 							/>
 							<BridgeTextArea
 								name="memo"

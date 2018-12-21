@@ -44,12 +44,29 @@ class Transactions extends React.Component {
 		}
 	}
 
+	sortTransactions() {
+
+	}
+
 	render() {
 		const { history } = this.props;
 
 		if (!history) {
 			return null;
 		}
+		const ordered = history.sort((a, b) => {
+			if (!a || !b) {
+				return 0;
+			}
+
+			const timeA = a.getIn(['transaction', 'data']);
+			const timeB = b.getIn(['transaction', 'data']);
+
+			if (timeA < timeB) { return -1; }
+			if (timeA > timeB) { return 1; }
+
+			return 0;
+		});
 
 		const { activeId, note } = this.state;
 
@@ -63,7 +80,7 @@ class Transactions extends React.Component {
 						<div className="transactions-wrapper">
 							<Accordion>
 								{
-									history.toArray().map((elem) =>
+									ordered.toArray().map((elem) =>
 										(
 											<React.Fragment key={elem.get('id')}>
 												<Accordion.Title

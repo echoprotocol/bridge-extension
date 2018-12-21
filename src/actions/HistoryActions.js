@@ -1,5 +1,5 @@
 import moment from 'moment';
-import { Map } from 'immutable';
+import { Map, OrderedMap } from 'immutable';
 
 import { fetchChain } from '../api/ChainApi';
 
@@ -61,14 +61,14 @@ const formatOperation = async (data, result) => {
 
 	const { name, options } = Object.values(operations).find((i) => i.value === type);
 
-	result = result.set('id', data.get('id'));
-	result = result.setIn(['transaction', 'type'], name);
-	result = result.setIn(['transaction', 'typeName'], name);
-	result = result.setIn(['transaction', 'date'], moment.utc(block.timestamp).local().format('DD MMM, HH:mm'));
-	result = result.setIn(['transaction', 'value'], 0);
-	result = result.setIn(['transaction', 'currency'], CORE_SYMBOL);
-	result = result.setIn(['content', 'fee'], FormatHelper.formatAmount(operation.getIn(['fee', 'amount']), feeAsset.get('precision')));
-	result = result.setIn(['content', 'feeCurrency'], feeAsset.get('symbol'));
+	result = result.set('id', data.get('id'))
+		.setIn(['transaction', 'type'], name)
+		.setIn(['transaction', 'typeName'], name)
+		.setIn(['transaction', 'date'], moment.utc(block.timestamp).local().format('DD MMM, HH:mm'))
+		.setIn(['transaction', 'value'], 0)
+		.setIn(['transaction', 'currency'], CORE_SYMBOL)
+		.setIn(['content', 'fee'], FormatHelper.formatAmount(operation.getIn(['fee', 'amount']), feeAsset.get('precision')))
+		.setIn(['content', 'feeCurrency'], feeAsset.get('symbol'));
 
 	if (options.subject) {
 		if (options.subject[1]) {
@@ -93,11 +93,11 @@ const formatOperation = async (data, result) => {
 		result = result.setIn(['transaction', 'currency'], response.get('symbol'));
 	}
 
-	if (type === 47) {
+	if (type === operations.contract.value) {
 		result = result.setIn(['content', 'receiver'], data.getIn(['result', '1']));
 	}
 
-	if (type === 0 && operation.get('memo') && operation.getIn(['memo', 'message'])) {
+	if (type === operations.transfer.value && operation.get('memo') && operation.getIn(['memo', 'message'])) {
 		result = result.setIn(['content', 'memo'], operation.get('memo'));
 	}
 
@@ -115,7 +115,7 @@ const formatHistory = (history) => async (dispatch, getState) => {
 	if (!history || !history.size) { return; }
 
 	try {
-		let formattedHistory = getState().global.get('formattedHistory');
+		const formattedHistory = getState().global.get('formattedHistory');
 
 		let rows = history.map(async (row) => {
 			const id = row.get('id');
@@ -125,11 +125,13 @@ const formatHistory = (history) => async (dispatch, getState) => {
 
 		rows = await Promise.all(rows);
 
+		let ordered = new OrderedMap({});
+
 		rows.forEach((row) => {
-			formattedHistory = formattedHistory.set(row.get('id'), row);
+			ordered = ordered.set(row.get('id'), row);
 		});
 
-		dispatch(GlobalReducer.actions.set({ field: 'formattedHistory', value: formattedHistory }));
+		dispatch(GlobalReducer.actions.set({ field: 'formattedHistory', value: ordered }));
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({
 			field: 'error',
@@ -163,7 +165,7 @@ export const updateHistory = () => async (dispatch, getState) => {
 	try {
 		dispatch(isAssetsChanged());
 	} catch (err) {
-		if (err === 'update history') {
+		if (FormatHelper.formatError(err) === 'update history') {
 			dispatch(formatHistory(historyAccount));
 			return null;
 		}

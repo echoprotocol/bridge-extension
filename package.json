@@ -1,7 +1,7 @@
 {
   "name": "echo-bridge",
   "description": "Echo Bridge",
-  "version": "1.1.0",
+  "version": "1.1.2",
   "scripts": {
     "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8081",
     "build": "cross-env NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
@@ -31,7 +31,7 @@
     "intl": "^1.2.5",
     "is-promise": "^2.1.0",
     "lodash": "^4.17.11",
-    "moment": "^2.22.2",
+    "moment": "^2.23.0",
     "prop-types": "^15.6.1",
     "query-string": "^6.2.0",
     "react": "^16.5.2",

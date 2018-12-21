@@ -298,11 +298,11 @@ const checkTransactionFee = (options, transaction) => async (dispatch, getState)
  */
 export const getTransactionFee = async (options) => {
 	const { fee } = options;
-	let amount = await getOperationFee(options.type, formatToSend(options.type, options));
+	const core = await fetchChain(CORE_ID);
+
+	let amount = await getOperationFee(options.type, formatToSend(options.type, options), core);
 
 	if (fee.asset.get('id') !== CORE_ID) {
-		const core = await fetchChain(CORE_ID);
-
 		const price = new BN(fee.asset.getIn(['options', 'core_exchange_rate', 'quote', 'amount']))
 			.div(fee.asset.getIn(['options', 'core_exchange_rate', 'base', 'amount']))
 			.times(10 ** (core.get('precision') - fee.asset.get('precision')));
@@ -567,9 +567,7 @@ emitter.on('windowRequest', windowRequestHandler);
  * 	@param {String} windowType
  */
 const trResponseHandler = (status, id, path, windowType) => {
-	if (status === ERROR_STATUS) {
-		path = NETWORK_ERROR_SEND_PATH;
-
+	if (path === NETWORK_ERROR_SEND_PATH) {
 		store.dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
 	}
 

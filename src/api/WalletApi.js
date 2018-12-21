@@ -91,7 +91,7 @@ export const createWallet = async (registrator, account, wif) => {
 	}
 };
 
-export const getOperationFee = async (type, transaction) => {
+export const getOperationFee = async (type, transaction, core) => {
 	const options = JSON.parse(JSON.stringify(transaction));
 
 	if (options.memo) {
@@ -121,7 +121,7 @@ export const getOperationFee = async (type, transaction) => {
 	const start = new Date().getTime();
 
 	await Promise.race([
-		tr.set_required_fees(options.fee.asset_id).then(() => (new Date().getTime() - start)),
+		tr.set_required_fees(core.get('id')).then(() => (new Date().getTime() - start)),
 		new Promise((resolve, reject) => {
 			const timeoutId = setTimeout(() => {
 				clearTimeout(timeoutId);
