@@ -340,6 +340,13 @@ const sendHandler = (path) => {
 	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 };
 
+/**
+ *  @method removeSendListener
+ *
+ * 	Remove emitter listener
+ */
+export const removeSendListener = () => emitter.removeListener('sendResponse', sendHandler);
+
 emitter.on('sendResponse', sendHandler);
 
 /**

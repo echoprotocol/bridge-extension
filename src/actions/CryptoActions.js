@@ -238,7 +238,12 @@ export const wipeCrypto = () => async (dispatch, getState) => {
 	history.push(CREATE_PIN_PATH);
 };
 
-window.onunload = () => {
+/**
+ *  @method removeCryptoListeners
+ *
+ *  Remove emitter listeners
+ */
+export const removeCryptoListeners = () => {
 	getCrypto().removeListener('locked', lockResponse);
 	getCrypto().removeListener('unlocked', unlockResponse);
 };

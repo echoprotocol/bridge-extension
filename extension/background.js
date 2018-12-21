@@ -145,12 +145,9 @@ const onMessage = (request, sender, sendResponse) => {
 
 		setBadge();
 
-		if (requestQueue.length !== 1) {
-			try {
-				emitter.emit('request', id, request.data);
-			} catch (e) {
-			}
-		}
+		try {
+			emitter.emit('request', id, request.data);
+		} catch (e) {}
 
 		notificationManager.getPopup()
 			.then((popup) => {

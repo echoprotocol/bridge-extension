@@ -31,6 +31,8 @@ import {
 import { operationKeys, operationTypes } from '../constants/OperationConstants';
 
 import GlobalReducer from '../reducers/GlobalReducer';
+import { removeCryptoListeners } from './CryptoActions';
+import { removeSendListener } from './BalanceActions';
 
 const emitter = echoService.getEmitter();
 
@@ -598,6 +600,8 @@ window.onunload = () => {
 	emitter.removeListener('request', requestHandler);
 	emitter.removeListener('windowRequest', windowRequestHandler);
 	emitter.removeListener('trResponse', trResponseHandler);
+	removeCryptoListeners();
+	removeSendListener();
 };
 
 /**
