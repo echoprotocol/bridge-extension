@@ -10,7 +10,13 @@ class CreateComponent extends React.Component {
 	constructor(props) {
 		super(props);
 
+		this.state = {
+			btnDisabled: false,
+		};
+
 		this.inputRef = null;
+
+
 	}
 
 	componentDidUpdate() {
@@ -23,6 +29,11 @@ class CreateComponent extends React.Component {
 
 	onChangeName(e) {
 		this.props.changeName(e.target.value.trim().toLowerCase());
+	}
+
+	createAccount(e) {
+		this.setState({ btnDisabled: true });
+		this.props.createAccount(e);
 	}
 
 	isButtonDisabled() {
@@ -79,8 +90,8 @@ class CreateComponent extends React.Component {
 								className={classnames('btn-in-light', { loading })}
 								content={<span className="btn-text">Create</span>}
 								type="submit"
-								onClick={(e) => this.props.createAccount(e)}
-								disabled={this.isButtonDisabled()}
+								onClick={(e) => this.createAccount(e)}
+								disabled={this.state.btnDisabled || this.isButtonDisabled()}
 							/>
 						</div>
 					</div>
