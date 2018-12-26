@@ -240,12 +240,19 @@ export const loadInfo = () => async (dispatch, getState) => {
 	result.forEach(([networkName, accounts, tokens]) => {
 		accountsNetworks = accountsNetworks.set(networkName, new List(accounts));
 
+		if (!tokens) {
+			return null;
+		}
+
 		Object.entries(tokens).forEach(([accountId, tokensArray]) => {
 			tokensArray.forEach((id) => {
 				stateTokens = stateTokens.setIn([`1.16.${id}`, 'accountId'], accountId);
 			});
 		});
+
 		tokensObject = Object.assign(tokensObject, tokens);
+
+		return null;
 	});
 
 	dispatch(set('accounts', accountsNetworks));

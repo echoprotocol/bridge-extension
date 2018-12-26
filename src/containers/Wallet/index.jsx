@@ -134,14 +134,14 @@ class Wallet extends React.Component {
 	}
 
 	render() {
-		const { balances, account } = this.props;
+		const { balances, account, tokens } = this.props;
 
 		if (!account) {
 			return null;
 		}
 
-		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size;
-		this.getBalances();
+		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size
+			+ tokens.filter((token) => account.get('id') === token.get('accountId')).size;
 
 		return (
 			<React.Fragment>
