@@ -261,7 +261,7 @@ class Crypto extends EventEmitter {
 			const privateKey = PrivateKey.fromBuffer(privateKeyBuffer);
 			return privateKey.toWif();
 		} catch (err) {
-			return false;
+			return null;
 		}
 
 	}

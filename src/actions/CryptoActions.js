@@ -216,10 +216,15 @@ export const transitPublicKey = () => async (dispatch, getState) => {
 	try {
 		const networkName = getState().global.getIn(['network', 'name']);
 		const accounts = getState().global.getIn(['accounts', networkName]);
+		const account = getState().global.get('account');
+		if (!account) {
+			return null;
+		}
 		const accountID = getState().global.get('account').get('id');
-		const publicKey = accounts.find((account) => account.id === accountID).keys[0];
+		const publicKey = accounts.find((acc) => acc.id === accountID).keys[0];
 
 		const wif = await getCrypto().getWIFByPublicKey(networkName, publicKey);
+
 		return { publicKey, wif };
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));

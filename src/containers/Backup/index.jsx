@@ -9,54 +9,49 @@ import BridgeBtnCopy from '../../components/BridgeBtnCopy';
 
 class Backup extends React.Component {
 
-	constructor() {
-		super();
+	constructor(props) {
+		super(props);
 		this.state = {
-			keys: [],
+			key: {},
 		};
 	}
 
 	async componentWillMount() {
 
-		const keys = await this.props.transitPublicKey();
+		const key = await this.props.transitPublicKey();
 
-		this.setState({ keys: [keys] });
+		this.setState({ key });
 
-	}
-
-	componentWillUnmount() {
-		this.setState({ keys: [] });
 	}
 
 
 	render() {
+		const { key } = this.state;
+
+		if (!key) {
+			return null;
+		}
 		return (
 			<React.Fragment>
 				<div className="page-wrap backup-page">
-
-					<div
-						className="user-scroll"
-						style={{ height: '488px' }}
-					>
+					<div className="user-scroll">
 						<CustomScroll
 							flex="1"
 							heightRelativeToParent="calc(100%)"
 						>
 							<div className="page">
-
 								{
-									this.state.keys.map((key) => (
-										<div className="backup-container" key={key.wif} >
-											<p className="title">Public key</p>
-											<span className="key">{key.publicKey}</span>
+									<div className="backup-container">
+										<p className="title">Public key</p>
+										<span className="key">{key.publicKey}</span>
 
-											<div className="wif-wrap backup-key">
-												<div className="wif">WIF</div>
-												<div className="wif-key">{key.wif}</div>
-												<BridgeBtnCopy compact btnTextWif text={key.wif} />
-											</div>
+										<div className="wif-wrap backup-key">
+											<div className="wif">WIF</div>
+											<div className="wif-key">{key.wif}</div>
+											<BridgeBtnCopy compact btnTextWif text={key.wif} />
 										</div>
-									))
+									</div>
+
 								}
 							</div>
 						</CustomScroll>
