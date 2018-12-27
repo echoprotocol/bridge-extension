@@ -7,7 +7,7 @@ import { CHAINSTORE_INIT_TIMEOUT, WS_CLOSE_TIMEOUT } from '../constants/GlobalCo
 
 let CHAIN_SUBSCRIBE = null;
 
-export const getChainSubcribe = () => CHAIN_SUBSCRIBE;
+export const getChainSubscribe = () => CHAIN_SUBSCRIBE;
 
 /**
  * return method name by key type
