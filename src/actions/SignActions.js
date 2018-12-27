@@ -9,7 +9,6 @@ import { fetchChain, lookupAccounts } from '../api/ChainApi';
 
 import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
-import storeEmitter from '../services/emitter';
 
 import FormatHelper from '../helpers/FormatHelper';
 import {
@@ -31,8 +30,6 @@ import {
 import { operationKeys, operationTypes } from '../constants/OperationConstants';
 
 import GlobalReducer from '../reducers/GlobalReducer';
-
-const emitter = echoService.getEmitter();
 
 export const globals = {
 	WINDOW_TYPE: null,
@@ -326,6 +323,8 @@ export const getTransactionFee = async (options) => {
  * 	@param {String} id
  */
 const getFetchedObjects = async (fetchList, id) => {
+	const emitter = echoService.getEmitter();
+
 	try {
 		return Promise.all(fetchList.map(async ([key, value]) => {
 			const result = await fetchChain(value);
@@ -351,6 +350,8 @@ const getFetchedObjects = async (fetchList, id) => {
  * 	@param {Object} options
  */
 const setTransaction = ({ id, options }) => async (dispatch) => {
+	const emitter = echoService.getEmitter();
+
 	const transaction = JSON.parse(JSON.stringify(options));
 	transaction.fee = transaction.fee || { amount: 0, asset_id: CORE_ID };
 
@@ -438,6 +439,8 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
  * 	@param {String} status
  */
 export const closePopup = (status) => {
+	const emitter = echoService.getEmitter();
+
 	try {
 		emitter.emit('response', null, null, status || COMPLETE_STATUS);
 	} catch (e) {}
@@ -502,36 +505,36 @@ export const removeTransactionWindow = (id, isClose) => async (dispatch, getStat
  * 	@param {String} id
  * 	@param {Object} options
  */
-export const requestHandler = async (id, options) => {
-	const store = storeEmitter.getStore();
+export const requestHandler = (id, options) => async (dispatch, getState) => {
+	const emitter = echoService.getEmitter();
 
-	const isLocked = store.getState().global.getIn(['crypto', 'isLocked']);
+	const isLocked = getState().global.getIn(['crypto', 'isLocked']);
 
 	if (isLocked) {
 		emitter.emit('response', 'Unlock required', id, ERROR_STATUS);
 		return null;
 	}
 
-	const connected = store.getState().global.get('connected');
+	const connected = getState().global.get('connected');
 
 	if (!connected) {
 		emitter.emit('response', 'Network error', id, ERROR_STATUS);
 		return null;
 	}
 
-	const error = await store.dispatch(validateTransaction(options));
+	const error = await dispatch(validateTransaction(options));
 	if (error) {
 		emitter.emit('response', `${error}`, id, ERROR_STATUS);
 		return null;
 	}
 
-	const transactions = store.getState().global.getIn(['sign', 'transactions']);
+	const transactions = getState().global.getIn(['sign', 'transactions']);
 
 	if (!transactions.size) {
-		await store.dispatch(setTransaction({ id, options }));
+		await dispatch(setTransaction({ id, options }));
 	}
 
-	store.dispatch(GlobalReducer.actions.setIn({
+	dispatch(GlobalReducer.actions.setIn({
 		field: 'sign',
 		params: { transactions: transactions.push({ id, options }) },
 	}));
@@ -547,11 +550,9 @@ export const requestHandler = async (id, options) => {
  * 	@param {Number} id
  * 	@param {String} windowType
  */
-export const windowRequestHandler = async (id, windowType) => {
-	const store = storeEmitter.getStore();
-
+export const windowRequestHandler = (id, windowType) => async (dispatch) => {
 	if (globals.WINDOW_TYPE !== windowType) {
-		store.dispatch(removeTransactionWindow(id));
+		dispatch(removeTransactionWindow(id));
 	}
 };
 
@@ -565,21 +566,19 @@ export const windowRequestHandler = async (id, windowType) => {
  * 	@param {Object} path
  * 	@param {String} windowType
  */
-export const trResponseHandler = (status, id, path, windowType) => {
-	const store = storeEmitter.getStore();
-
+export const trResponseHandler = (status, id, path, windowType) => (dispatch) => {
 	if (path === NETWORK_ERROR_SEND_PATH) {
-		store.dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
+		dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
 	}
 
 	if (windowType === globals.WINDOW_TYPE) {
-		store.dispatch(removeTransaction(id));
+		dispatch(removeTransaction(id));
 
 		if (path) {
 			history.push(path);
 		}
 
-		store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
 
@@ -589,6 +588,8 @@ export const trResponseHandler = (status, id, path, windowType) => {
  * 	Load transactions data from query to redux store
  */
 export const loadRequests = () => async (dispatch, getState) => {
+	const emitter = echoService.getEmitter();
+
 	const connected = getState().global.get('connected');
 	const requests = echoService.getRequests();
 
@@ -635,6 +636,8 @@ export const loadRequests = () => async (dispatch, getState) => {
  * 	@param {Object} transaction
  */
 export const approveTransaction = (transaction) => async (dispatch, getState) => {
+	const emitter = echoService.getEmitter();
+
 	try {
 		emitter.emit('response', null, transaction.get('id'), globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
 
@@ -672,6 +675,8 @@ export const approveTransaction = (transaction) => async (dispatch, getState) =>
  * 	@param {String} id
  */
 export const cancelTransaction = (id) => (dispatch) => {
+	const emitter = echoService.getEmitter();
+
 	try {
 		emitter.emit('response', null, id, CANCELED_STATUS);
 

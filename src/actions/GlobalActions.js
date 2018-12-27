@@ -37,10 +37,8 @@ import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 import { fetchChain } from '../api/ChainApi';
 
 import storage from '../services/storage';
-import storeEmitter from '../services/emitter';
 import echoService from '../services/echo';
-
-const emitter = echoService.getEmitter();
+import Listeners from '../services/listeners';
 
 /**
  *  @method set
@@ -149,12 +147,10 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
  *
  * 	@param {String} name
  */
-export const removeAccount = (name) => async (dispatch, getState) => {
-	const accountName = getState().global.getIn(['account', 'name']);
-	const networkName = getState().global.getIn(['network', 'name']);
-	const accounts = getState().global.get('accounts');
+export const removeAccount = (name) => {
+	const emitter = echoService.getEmitter();
 
-	emitter.emit('logout', name, accountName, networkName, accounts);
+	emitter.emit('logout', name);
 };
 
 /**
@@ -163,31 +159,30 @@ export const removeAccount = (name) => async (dispatch, getState) => {
  * 	Logout into the all windows
  *
  * 	@param {String} name
- * 	@param {String} accountName
- * 	@param {String} networkName
- * 	@param {Object} accounts
  */
-export const onLogout = async (name, accountName, networkName, accounts) => {
+export const onLogout = (name) => async (dispatch, getState) => {
 
-	const store = storeEmitter.getStore();
+	const accountName = getState().global.getIn(['account', 'name']);
+	const networkName = getState().global.getIn(['network', 'name']);
+	let accounts = getState().global.get('accounts');
 
 	try {
 
 		const { keys, id } = accounts.get(networkName).find((i) => i.name === name);
 
-		store.dispatch(removeBalances(id));
+		dispatch(removeBalances(id));
 
-		await Promise.all(keys.map((key) => store.dispatch(removeCryptoInfo(key))));
+		await Promise.all(keys.map((key) => dispatch(removeCryptoInfo(key))));
 
 		accounts = accounts.set(networkName, accounts.get(networkName).filter((i) => i.name !== name));
-		await store.dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
-		store.dispatch(set('accounts', accounts));
+		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+		dispatch(set('accounts', accounts));
 		if (accountName !== name) {
 			return false;
 		}
 
 		if (!accounts.get(networkName).size) {
-			store.dispatch(GlobalReducer.actions.logout());
+			dispatch(GlobalReducer.actions.logout());
 			history.push(CREATE_ACCOUNT_PATH);
 			return false;
 		}
@@ -197,12 +192,12 @@ export const onLogout = async (name, accountName, networkName, accounts) => {
 			accounts.get(networkName).set(0, { ...accounts.getIn([networkName, 0]), active: true }),
 		);
 
-		await store.dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
-		store.dispatch(set('accounts', accounts));
+		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+		dispatch(set('accounts', accounts));
 
-		store.dispatch(initAccount(accounts.getIn([networkName, 0])));
+		dispatch(initAccount(accounts.getIn([networkName, 0])));
 	} catch (err) {
-		store.dispatch(set('error', FormatHelper.formatError(err)));
+		dispatch(set('error', FormatHelper.formatError(err)));
 	}
 
 	return true;
@@ -427,6 +422,16 @@ export const globalInit = (isRecreate) => async (dispatch) => {
 	await dispatch(initCrypto());
 
 	return null;
+};
+
+/**
+ *  @method initListeners
+ *
+ *  Initialize emitter listeners
+ */
+export const initListeners = () => (dispatch) => {
+	const listeners = new Listeners();
+	listeners.initListeners(dispatch);
 };
 
 /**

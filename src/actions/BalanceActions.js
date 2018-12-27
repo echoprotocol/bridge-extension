@@ -10,7 +10,6 @@ import { CORE_ID } from '../constants/GlobalConstants';
 import { ERROR_SEND_PATH, SEND_PATH } from '../constants/RouterConstants';
 
 import echoService from '../services/echo';
-import storeEmitter from '../services/emitter';
 
 import FormatHelper from '../helpers/FormatHelper';
 import ValidateSendHelper from '../helpers/ValidateSendHelper';
@@ -19,8 +18,6 @@ import BalanceReducer from '../reducers/BalanceReducer';
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import history from '../history';
-
-const emitter = echoService.getEmitter();
 
 /**
  *  @method initAssetsBalances
@@ -320,6 +317,8 @@ export const send = () => async (dispatch, getState) => {
 
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
+	const emitter = echoService.getEmitter();
+
 	emitter.emit('sendRequest', options, activeNetworkName);
 
 	return true;
@@ -332,14 +331,12 @@ export const send = () => async (dispatch, getState) => {
  *
  * 	@param {String} path
  */
-export const sendHandler = (path) => {
-	const store = storeEmitter.getStore();
-
-	if (store.getState().global.get('loading')) {
+export const sendHandler = (path) => (dispatch, getState) => {
+	if (getState().global.get('loading')) {
 		history.push(path);
 	}
 
-	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 };
 
 /**

@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { Dimmer, Sidebar } from 'semantic-ui-react';
 
-import { globalInit } from '../actions/GlobalActions';
+import { globalInit, initListeners as init } from '../actions/GlobalActions';
 
 import Navigator from '../components/Navigator';
 
@@ -16,6 +16,8 @@ import { PIN_PATHS, SIGN_TRANSACTION_PATH } from '../constants/RouterConstants';
 class App extends React.Component {
 
 	componentDidMount() {
+		this.props.initListeners();
+
 		this.props.initApp();
 	}
 
@@ -71,13 +73,17 @@ App.propTypes = {
 	loading: PropTypes.bool.isRequired,
 	pathname: PropTypes.string.isRequired,
 	initApp: PropTypes.func.isRequired,
+	initListeners: PropTypes.func.isRequired,
 };
 export default connect(
 	(state) => ({
 		loading: state.global.get('loading'),
 		pathname: state.router.location.pathname,
 	}),
-	(dispatch) => ({
-		initApp: () => dispatch(globalInit()),
-	}),
+	(dispatch) => {
+		const initApp = () => dispatch(globalInit(false));
+		const initListeners = () => dispatch(init());
+
+		return { initApp, initListeners };
+	},
 )(App);

@@ -15,8 +15,6 @@ import { POPUP_HEIGHT, POPUP_WIDTH, POPUP_WINDOW_TYPE } from './constants/Global
 
 import { setWindowType } from './actions/SignActions';
 
-import StoreEmitter from './services/emitter';
-
 if (window.innerWidth !== window.outerWidth || window.innerHeight !== window.outerHeight) {
 	window.resizeBy(POPUP_WIDTH - window.innerWidth, POPUP_HEIGHT - window.innerHeight);
 }
@@ -26,11 +24,6 @@ const { windowType } = query.parse(window.location.search);
 if (windowType === POPUP_WINDOW_TYPE) {
 	setWindowType(POPUP_WINDOW_TYPE);
 }
-
-StoreEmitter.setStore(store);
-
-const Emitter = new StoreEmitter();
-Emitter.initListeners();
 
 ReactDOM.render(
 	<Provider store={store}>

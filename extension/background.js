@@ -5,7 +5,7 @@ import EventEmitter from '../libs/CustomAwaitEmitter';
 
 import Crypto from '../src/services/crypto';
 import storage from '../src/services/storage';
-import storeEmitter from '../src/services/emitter';
+import Listeners from '../src/services/listeners';
 import extensionizer from './extensionizer';
 import NotificationManager from './NotificationManager';
 
@@ -396,7 +396,8 @@ export const onSend = async (options, networkName) => {
 	return null;
 };
 
-storeEmitter.initBackgroundListeners(onResponse, onTransaction, onSend);
+const listeners = new Listeners(emitter, crypto);
+listeners.initBackgroundListeners(onResponse, onTransaction, onSend);
 
 createSocket();
 
