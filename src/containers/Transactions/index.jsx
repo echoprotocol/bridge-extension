@@ -3,110 +3,72 @@
 import React from 'react';
 import { Accordion } from 'semantic-ui-react';
 import CustomScroll from 'react-custom-scroll';
+import { withRouter } from 'react-router';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import { decryptNote } from '../../actions/HistoryActions';
 
 class Transactions extends React.Component {
 
-	constructor() {
-		super();
-		this.state = { activeIndex: null };
+	constructor(props) {
+		super(props);
+		this.state = {
+			activeId: null,
+			note: '',
+			noteId: '',
+		};
 		this.handleClick = this.handleClick.bind(this);
 	}
 
-	handleClick(e, titleProps) {
+	async handleClick(e, titleProps) {
 
 		const { index } = titleProps;
-		const { activeIndex } = this.state;
-		const newIndex = activeIndex === index ? -1 : index;
+		const { activeId, noteId } = this.state;
+		const newId = activeId === index ? -1 : index;
 
-		this.setState({ activeIndex: newIndex });
+		this.setState({
+			noteId: index,
+			activeId: newId,
+		});
+
+		const id = index;
+
+		if (noteId !== index) {
+			this.setState({ note: null });
+
+			const note = await this.props.decryptNote(id);
+
+			if (this.state.noteId === id) {
+				this.setState({ note });
+			}
+		}
+	}
+
+	sortTransactions() {
+
 	}
 
 	render() {
-		const { activeIndex } = this.state;
+		const { history } = this.props;
 
-		// CODING
-		const codingTransactions = [
-			{
-				id: 0,
-				transaction: {
-					type: 'Contract',
-					typeName: 'Contract created',
-					date: '01 Oct, 11:35',
-					value: '-230.000',
-					currency: 'ECHO',
-				},
-				content: {
-					receiver: 'HomerSimpson435',
-					fee: '0.000000034',
-					feeCurrency: 'ECHO',
-					note: "Hey, that's the second part. The next transaction is about to come",
-				},
-			},
-			{
-				id: 1,
-				transaction: {
-					type: 'Recieved',
-					typeName: 'Recieved',
-					date: '23 Oct, 11:35',
-					value: '+ 0.000231234892',
-					currency: 'RLY',
-				},
-				content: {
-					receiver: 'HomerSimpson435',
-					fee: '0.000000034',
-					feeCurrency: 'RLY',
-					note: "Hey, that's the second part. The next transaction is about to come",
-				},
-			},
-			{
-				id: 2,
-				transaction: {
-					type: 'Transaction',
-					typeName: 'Transaction',
-					date: '23 Oct, 11:35',
-					value: '+ 0.000231234892',
-					currency: 'ZSHC',
-				},
-				content: {
-					receiver: 'HomerSimpson435',
-					fee: '0.000000034',
-					feeCurrency: 'ZSHC',
-					note: "Hey, that's the second part. The next transaction is about to come",
-				},
-			},
-			{
-				id: 3,
-				transaction: {
-					type: 'Sent',
-					typeName: 'Sent',
-					date: '23 Oct, 11:35',
-					value: '+ 0.000231234892',
-					currency: 'RLY',
-				},
-				content: {
-					receiver: 'HomerSimpson435',
-					fee: '0.000000034',
-					feeCurrency: 'RLY',
-					note: "Hey, that's the second part. The next transaction is about to come",
-				},
-			},
-			{
-				id: 4,
-				transaction: {
-					type: 'Account',
-					typeName: 'Account created',
-					date: '23 Oct, 11:35',
-					value: '- 0.000',
-					currency: 'ECHO',
-				},
-				content: {
-					receiver: 'HomerSimpson435',
-					fee: '0.000000034',
-					feeCurrency: 'ECHO',
-					note: "Hey, that's the second part. The next transaction is about to come",
-				},
-			},
-		];
+		if (!history) {
+			return null;
+		}
+		const ordered = history.sort((a, b) => {
+			if (!a || !b) {
+				return 0;
+			}
+
+			const timeA = a.getIn(['transaction', 'data']);
+			const timeB = b.getIn(['transaction', 'data']);
+
+			if (timeA < timeB) { return -1; }
+			if (timeA > timeB) { return 1; }
+
+			return 0;
+		});
+
+		const { activeId, note } = this.state;
 
 		return (
 			<React.Fragment>
@@ -118,44 +80,49 @@ class Transactions extends React.Component {
 						<div className="transactions-wrapper">
 							<Accordion>
 								{
-									codingTransactions.map((elem) =>
+									ordered.toArray().map((elem) =>
 										(
-											<React.Fragment key={elem.id}>
+											<React.Fragment key={elem.get('id')}>
 												<Accordion.Title
-													active={activeIndex === elem.id}
-													index={elem.id}
+													active={activeId === elem.get('id')}
+													index={elem.get('id')}
 													onClick={this.handleClick}
 												>
 													<div className="transaction-element">
 														<div className="top-block">
 															<div className="transaction-type">
-																<div className={`icon-Pic${elem.transaction.type}`} />
-																{elem.transaction.typeName}
+																<div className={`icon-Pic${elem.getIn(['transaction', 'type'])}`} />
+																{elem.getIn(['transaction', 'typeName'])}
 															</div>
-															<div className="transaction-date">{elem.transaction.date}</div>
+															<div className="transaction-date">{elem.getIn(['transaction', 'date'])}</div>
 														</div>
 														<div className="bottom-block">
 															<div className="transaction-value">
-																{elem.transaction.value}
-																<span className="currency">{elem.transaction.currency}</span>
+																{elem.getIn(['transaction', 'value'])}
+																<span className="currency">{elem.getIn(['transaction', 'currency'])}</span>
 															</div>
 															<div className="icon icon-dropdown" />
 														</div>
 													</div>
 												</Accordion.Title>
-												<Accordion.Content active={activeIndex === elem.id}>
+												<Accordion.Content active={activeId === elem.get('id')}>
 													<div className="transaction-element-content">
 														<div className="row">
 															<div className="left-block">Receiver</div>
-															<div className="right-block">{elem.content.receiver}</div>
+															<div className="right-block">{elem.getIn(['content', 'receiver'])}</div>
 														</div>
 														<div className="row">
 															<div className="left-block">Fee</div>
-															<div className="right-block">{elem.content.fee}<span className="currency">{elem.content.feeCurrency}</span></div>
+															<div className="right-block">{elem.getIn(['content', 'fee'])}<span className="currency">{elem.getIn(['content', 'feeCurrency'])}</span></div>
 														</div>
 														<div className="row">
 															<div className="left-block">Note</div>
-															<div className="right-block">{elem.content.note}</div>
+															{
+																note &&
+																<div className="right-block">
+																	{note}
+																</div>
+															}
 														</div>
 													</div>
 												</Accordion.Content>
@@ -172,4 +139,20 @@ class Transactions extends React.Component {
 
 }
 
-export default Transactions;
+Transactions.propTypes = {
+	history: PropTypes.object,
+	decryptNote: PropTypes.func.isRequired,
+};
+
+Transactions.defaultProps = {
+	history: null,
+};
+
+export default withRouter(connect(
+	(state) => ({
+		history: state.global.get('formattedHistory'),
+	}),
+	(dispatch) => ({
+		decryptNote: (memo) => dispatch(decryptNote(memo)),
+	}),
+)(Transactions));

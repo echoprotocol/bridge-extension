@@ -347,6 +347,30 @@ const sendHandler = (path) => {
 
 emitter.on('sendResponse', sendHandler);
 
+
+export const isAssetsChanged = () => async (dispatch, getState) => {
+	const assets = getState().balance.get('assets');
+
+	if (!assets.size) {
+		return false;
+	}
+
+	let assetArr = [];
+
+	assets.forEach((asset) => {
+		assetArr.push(fetchChain(asset.get('id')));
+	});
+
+	assetArr = await Promise.all(assetArr);
+
+	assetArr.forEach((asset) => {
+		if (asset !== assets.get(asset.get('id'))) {
+			throw new Error('update history');
+		}
+	});
+
+	return false;
+};
 /**
  *  @method watchToken
  *

@@ -17,6 +17,7 @@ import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 import storage from '../services/storage';
 
 import FormatHelper from '../helpers/FormatHelper';
+import { updateHistory } from './HistoryActions';
 
 let INTERVAL_LOGIN_CALL = null;
 
@@ -45,6 +46,7 @@ export const subscribe = () => (dispatch) => {
 
 	dispatch(initAssetsBalances());
 	dispatch(updateTokens());
+	dispatch(updateHistory());
 };
 
 /**

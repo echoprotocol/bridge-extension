@@ -105,7 +105,7 @@ module.exports = {
 		}),
 		new CopyWebpackPlugin([
 			{
-				from: 'src/assets/extention_config/manifest.json'
+				from: 'config/manifest.json'
 			},
 		]),
 		new ZipPlugin({

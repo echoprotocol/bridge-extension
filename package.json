@@ -10,7 +10,7 @@
     "build-stage": "cross-env NODE_ENV=stage webpack --progress --display-error-details --colors --mode production",
     "lint": "$(npm bin)/eslint 'src/**/*.jsx' 'src/**/*.js'",
     "lint-win": "cross-env eslint 'src/**/*.jsx' 'src/**/*.js' --fix",
-    "copy-manifest": "copyfiles -f src/assets/extention_config/manifest.json build/src"
+    "copy-manifest": "copyfiles -f config/manifest.json build/src"
   },
   "dependencies": {
     "EventEmitter": "^1.0.0",
@@ -32,6 +32,7 @@
     "is-promise": "^2.1.0",
     "js-sha3": "^0.8.0",
     "lodash": "^4.17.11",
+    "moment": "^2.23.0",
     "prop-types": "^15.6.1",
     "query-string": "^6.2.0",
     "react": "^16.5.2",
