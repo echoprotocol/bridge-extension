@@ -37,7 +37,7 @@ import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 import { fetchChain } from '../api/ChainApi';
 
 import storage from '../services/storage';
-import store from '../store';
+import storeEmitter from '../services/emitter';
 import echoService from '../services/echo';
 
 const emitter = echoService.getEmitter();
@@ -167,7 +167,9 @@ export const removeAccount = (name) => async (dispatch, getState) => {
  * 	@param {String} networkName
  * 	@param {Object} accounts
  */
-const onLogout = async (name, accountName, networkName, accounts) => {
+export const onLogout = async (name, accountName, networkName, accounts) => {
+
+	const store = storeEmitter.getStore();
 
 	try {
 
@@ -205,8 +207,6 @@ const onLogout = async (name, accountName, networkName, accounts) => {
 
 	return true;
 };
-
-emitter.on('logout', onLogout);
 
 /**
  *  @method switchAccount

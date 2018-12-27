@@ -2,10 +2,10 @@
 import { batchActions } from 'redux-batched-actions';
 
 import history from '../history';
-import store from '../store';
 
 import storage from '../services/storage';
 import echoService from '../services/echo';
+import storeEmitter from '../services/emitter';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -109,7 +109,9 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
  *
  * 	Unlock crypto response
  */
-const unlockResponse = async () => {
+export const unlockResponse = async () => {
+	const store = storeEmitter.getStore();
+
 	store.dispatch(changeCrypto({ isLocked: false }));
 
 	await store.dispatch(loadInfo());
@@ -129,7 +131,9 @@ const unlockResponse = async () => {
  *
  * 	Lock crypto response
  */
-const lockResponse = () => {
+export const lockResponse = () => {
+	const store = storeEmitter.getStore();
+
 	store.dispatch(lockCrypto());
 };
 
@@ -151,9 +155,6 @@ export const initCrypto = () => async (dispatch) => {
 
 			history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
 		}
-
-		getCrypto().on('locked', lockResponse);
-		getCrypto().on('unlocked', unlockResponse);
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
@@ -236,9 +237,4 @@ export const wipeCrypto = () => async (dispatch, getState) => {
 	await Promise.all(promises);
 
 	history.push(CREATE_PIN_PATH);
-};
-
-window.onunload = () => {
-	getCrypto().removeListener('locked', lockResponse);
-	getCrypto().removeListener('unlocked', unlockResponse);
 };

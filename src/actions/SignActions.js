@@ -3,13 +3,13 @@ import { Map, List } from 'immutable';
 import BN from 'bignumber.js';
 
 import history from '../history';
-import store from '../store';
 
 import { getOperationFee } from '../api/WalletApi';
-import { fetchChain, getChainSubcribe, lookupAccounts } from '../api/ChainApi';
+import { fetchChain, lookupAccounts } from '../api/ChainApi';
 
 import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
+import storeEmitter from '../services/emitter';
 
 import FormatHelper from '../helpers/FormatHelper';
 import {
@@ -502,7 +502,8 @@ export const removeTransactionWindow = (id, isClose) => async (dispatch, getStat
  * 	@param {String} id
  * 	@param {Object} options
  */
-const requestHandler = async (id, options) => {
+export const requestHandler = async (id, options) => {
+	const store = storeEmitter.getStore();
 
 	const isLocked = store.getState().global.getIn(['crypto', 'isLocked']);
 
@@ -538,8 +539,6 @@ const requestHandler = async (id, options) => {
 	return null;
 };
 
-emitter.on('request', requestHandler);
-
 /**
  *  @method windowRequestHandler
  *
@@ -548,13 +547,13 @@ emitter.on('request', requestHandler);
  * 	@param {Number} id
  * 	@param {String} windowType
  */
-const windowRequestHandler = async (id, windowType) => {
+export const windowRequestHandler = async (id, windowType) => {
+	const store = storeEmitter.getStore();
+
 	if (globals.WINDOW_TYPE !== windowType) {
 		store.dispatch(removeTransactionWindow(id));
 	}
 };
-
-emitter.on('windowRequest', windowRequestHandler);
 
 /**
  *  @method requestHandler
@@ -566,7 +565,9 @@ emitter.on('windowRequest', windowRequestHandler);
  * 	@param {Object} path
  * 	@param {String} windowType
  */
-const trResponseHandler = (status, id, path, windowType) => {
+export const trResponseHandler = (status, id, path, windowType) => {
+	const store = storeEmitter.getStore();
+
 	if (path === NETWORK_ERROR_SEND_PATH) {
 		store.dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
 	}
@@ -580,19 +581,6 @@ const trResponseHandler = (status, id, path, windowType) => {
 
 		store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
-};
-
-emitter.on('trResponse', trResponseHandler);
-
-window.onunload = () => {
-	if (getChainSubcribe()) {
-		const { ChainStore } = echoService.getChainLib();
-		ChainStore.unsubscribe(getChainSubcribe());
-	}
-
-	emitter.removeListener('request', requestHandler);
-	emitter.removeListener('windowRequest', windowRequestHandler);
-	emitter.removeListener('trResponse', trResponseHandler);
 };
 
 /**
