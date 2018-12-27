@@ -1,12 +1,14 @@
+/* eslint-disable react/jsx-closing-tag-location */
 import React from 'react';
 import CustomScroll from 'react-custom-scroll';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
+import { Button } from 'semantic-ui-react';
 // import { Dropdown, MenuItem } from 'react-bootstrap';
 
-import { sendRedirect } from '../../actions/BalanceActions';
+import { sendRedirect, removeToken } from '../../actions/BalanceActions';
 
 import { RECEIVE_PATH, SEND_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
 
@@ -14,37 +16,132 @@ import FormatHelper from '../../helpers/FormatHelper';
 
 class Wallet extends React.Component {
 
-	sortAssets() {
-		const { assets, balances } = this.props;
+	getBalances() {
+		const { assets, account } = this.props;
+		const { balances, tokens } = this.sortAssets();
 
-		return balances.toArray().sort((a, b) => {
+
+		const resultBalances = balances.map((balance) => {
+			const asset = assets.get(balance.get('asset_type'));
+
+			if (!asset || account.get('id') !== balance.get('owner')) {
+				return null;
+			}
+
+			const balanceId = balance.get('id');
+
+			return (
+
+				<li key={balanceId}>
+					<a
+						role="button"
+						onClick={() => this.sendRedirect(balanceId)}
+						tabIndex={0}
+						onKeyPress={() => this.sendRedirect(balanceId)}
+					>
+						<div className="balance-info">
+							<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
+							<span>{asset.get('symbol')}</span>
+						</div>
+					</a>
+
+				</li>
+
+			);
+		});
+
+		const resultTokens = [];
+		tokens.mapEntries(([contractId, token]) => {
+			if (account.get('id') !== token.get('accountId')) {
+				return null;
+			}
+
+			resultTokens.push(<li key={contractId}>
+				<a
+					role="button"
+					onClick={() => this.sendRedirect(contractId)}
+					tabIndex={0}
+					onKeyPress={() => this.sendRedirect(contractId)}
+				>
+					<div className="balance-info">
+						<span>{FormatHelper.formatAmount(token.get('balance'), token.get('precision'))}</span>
+						<span>{token.get('symbol')}</span>
+					</div>
+					<div className="token-info">
+						<span>ERC20</span>
+						<span>TOKEN</span>
+					</div>
+				</a>
+				<Button
+					className="btn-icon icon-closeBig"
+					onClick={() => this.props.removeToken(contractId)}
+				/>
+
+			</li>);
+
+			return null;
+		});
+
+		return resultBalances.concat(resultTokens);
+	}
+
+	sortAssets() {
+		const { assets, balances, tokens } = this.props;
+
+		const sortedBalances = balances.toArray().sort((a, b) => {
 			if (!a || !b) {
 				return 0;
 			}
 
-			const assetA = assets.getIn([a.get('asset_type'), 'symbol']);
-			const assetB = assets.getIn([b.get('asset_type'), 'symbol']);
+			let assetA = assets.getIn([a.get('asset_type'), 'symbol']);
+			let assetB = assets.getIn([b.get('asset_type'), 'symbol']);
+
+			if (!assetA) {
+				assetA = a.get('symbol');
+			}
+			if (!assetB) {
+				assetB = b.get('symbol');
+			}
 
 			if (assetA < assetB) { return -1; }
 			if (assetA > assetB) { return 1; }
 
 			return 0;
 		});
+
+		const sortedTokens = tokens.sort((a, b) => {
+			if (!a || !b) {
+				return 0;
+			}
+
+			const assetA = a.get('symbol');
+			const assetB = b.get('symbol');
+
+			if (assetA < assetB) { return -1; }
+			if (assetA > assetB) { return 1; }
+
+			return 0;
+		});
+
+		return {
+			balances: sortedBalances,
+			tokens: sortedTokens,
+		};
 	}
 
 	sendRedirect(balanceId) {
 		this.props.sendRedirect(balanceId);
 	}
 
-
 	render() {
-		const { assets, balances, account } = this.props;
+		const { balances, account, tokens } = this.props;
 
 		if (!account) {
 			return null;
 		}
 
-		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size;
+		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size
+			+ tokens.filter((token) => account.get('id') === token.get('accountId')).size;
 
 		return (
 			<React.Fragment>
@@ -75,45 +172,7 @@ class Wallet extends React.Component {
 								)}
 								>
 									{
-										this.sortAssets().map((balance) => {
-											const asset = assets.get(balance.get('asset_type'));
-
-											if (!asset || account.get('id') !== balance.get('owner')) {
-												return null;
-											}
-
-											const balanceId = balance.get('id');
-
-											return (
-
-												<li key={balanceId}>
-													<a
-														role="button"
-														onClick={() => this.sendRedirect(balanceId)}
-														tabIndex={0}
-														onKeyPress={() => this.sendRedirect(balanceId)}
-													>
-														<div className="balance-info">
-															<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
-															<span>{asset.get('symbol')}</span>
-														</div>
-													</a>
-													{/* { */}
-													{/* asset.type === 'token' ? */}
-													{/* <React.Fragment> */}
-													{/* <Button className="btn-icon icon-closeBig" /> */}
-													{/* <div className="token-info"> */}
-													{/* <span>ERC20</span> */}
-													{/* <span>TOKEN</span> */}
-													{/* </div> */}
-													{/* </React.Fragment> : */}
-													{/* null */}
-													{/* } */}
-												</li>
-
-											);
-
-										})
+										this.getBalances()
 									}
 								</ul>
 							</CustomScroll>
@@ -139,7 +198,9 @@ class Wallet extends React.Component {
 Wallet.propTypes = {
 	assets: PropTypes.object.isRequired,
 	balances: PropTypes.object.isRequired,
+	tokens: PropTypes.object.isRequired,
 	account: PropTypes.object,
+	removeToken: PropTypes.func.isRequired,
 	sendRedirect: PropTypes.func.isRequired,
 };
 
@@ -151,9 +212,11 @@ export default connect(
 	(state) => ({
 		assets: state.balance.get('assets'),
 		balances: state.balance.get('balances'),
+		tokens: state.balance.get('tokens'),
 		account: state.global.get('account'),
 	}),
 	(dispatch) => ({
+		removeToken: (id) => dispatch(removeToken(id)),
 		sendRedirect: (balanceId) => dispatch(sendRedirect(balanceId)),
 	}),
 )(Wallet);
