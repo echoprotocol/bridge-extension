@@ -37,6 +37,8 @@ import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 import { fetchChain } from '../api/ChainApi';
 
 import storage from '../services/storage';
+import echoService from '../services/echo';
+import Listeners from '../services/listeners';
 
 /**
  *  @method set
@@ -145,12 +147,26 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
  *
  * 	@param {String} name
  */
-export const removeAccount = (name) => async (dispatch, getState) => {
+export const removeAccount = (name) => {
+	const emitter = echoService.getEmitter();
+
+	emitter.emit('logout', name);
+};
+
+/**
+ *  @method onLogout
+ *
+ * 	Logout into the all windows
+ *
+ * 	@param {String} name
+ */
+export const onLogout = (name) => async (dispatch, getState) => {
+
 	const accountName = getState().global.getIn(['account', 'name']);
+	const networkName = getState().global.getIn(['network', 'name']);
+	let accounts = getState().global.get('accounts');
 
 	try {
-		const networkName = getState().global.getIn(['network', 'name']);
-		let accounts = getState().global.get('accounts');
 
 		const { keys, id } = accounts.get(networkName).find((i) => i.name === name);
 
@@ -406,6 +422,16 @@ export const globalInit = (isRecreate) => async (dispatch) => {
 	await dispatch(initCrypto());
 
 	return null;
+};
+
+/**
+ *  @method initListeners
+ *
+ *  Initialize emitter listeners
+ */
+export const initListeners = () => (dispatch) => {
+	const listeners = new Listeners();
+	listeners.initListeners(dispatch);
 };
 
 /**

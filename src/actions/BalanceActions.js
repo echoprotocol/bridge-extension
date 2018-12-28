@@ -18,9 +18,6 @@ import BalanceReducer from '../reducers/BalanceReducer';
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import history from '../history';
-import store from '../store';
-
-const emitter = echoService.getEmitter();
 
 /**
  *  @method initAssetsBalances
@@ -320,6 +317,8 @@ export const send = () => async (dispatch, getState) => {
 
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
+	const emitter = echoService.getEmitter();
+
 	emitter.emit('sendRequest', options, activeNetworkName);
 
 	return true;
@@ -332,22 +331,13 @@ export const send = () => async (dispatch, getState) => {
  *
  * 	@param {String} path
  */
-const sendHandler = (path) => {
-	if (store.getState().global.get('loading')) {
+export const sendHandler = (path) => (dispatch, getState) => {
+	if (getState().global.get('loading')) {
 		history.push(path);
 	}
 
-	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 };
-
-/**
- *  @method removeSendListener
- *
- * 	Remove emitter listener
- */
-export const removeSendListener = () => emitter.removeListener('sendResponse', sendHandler);
-
-emitter.on('sendResponse', sendHandler);
 
 /**
  *  @method sendRedirect

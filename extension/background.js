@@ -5,6 +5,7 @@ import EventEmitter from '../libs/CustomAwaitEmitter';
 
 import Crypto from '../src/services/crypto';
 import storage from '../src/services/storage';
+import Listeners from '../src/services/listeners';
 import extensionizer from './extensionizer';
 import NotificationManager from './NotificationManager';
 
@@ -190,7 +191,7 @@ const removeTransaction = (err, id) => {
  * @param status
  * @returns {Promise.<void>}
  */
-const onResponse = (err, id, status) => {
+export const onResponse = (err, id, status) => {
 
 	if ([CLOSE_STATUS, OPEN_STATUS].includes(status)) {
 		if (CLOSE_STATUS === status && requestQueue.length === 1) {
@@ -285,7 +286,7 @@ const sendTransaction = async (transaction, networkName) => {
  * 	@param {Number} balance
  * 	@param {String} windowType
  */
-const onTransaction = async (id, networkName, balance, windowType) => {
+export const onTransaction = async (id, networkName, balance, windowType) => {
 	const currentTransactionCb = lastTransaction.cb;
 	const { popupId } = notificationManager;
 
@@ -360,7 +361,7 @@ const onTransaction = async (id, networkName, balance, windowType) => {
 	return null;
 };
 
-const onSend = async (options, networkName) => {
+export const onSend = async (options, networkName) => {
 	let path = SUCCESS_SEND_INDEX_PATH;
 
 	try {
@@ -395,6 +396,9 @@ const onSend = async (options, networkName) => {
 	return null;
 };
 
+const listeners = new Listeners(emitter, crypto);
+listeners.initBackgroundListeners(onResponse, onTransaction, onSend);
+
 createSocket();
 
 window.getWsLib = () => echojs;
@@ -402,12 +406,6 @@ window.getChainLib = () => chainjs;
 window.getCrypto = () => crypto;
 window.getEmitter = () => emitter;
 window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }));
-
-emitter.on('response', onResponse);
-
-emitter.on('trRequest', onTransaction);
-
-emitter.on('sendRequest', onSend);
 
 extensionizer.runtime.onMessage.addListener(onMessage);
 

@@ -2,7 +2,6 @@
 import { batchActions } from 'redux-batched-actions';
 
 import history from '../history';
-import store from '../store';
 
 import storage from '../services/storage';
 import echoService from '../services/echo';
@@ -72,6 +71,8 @@ export const getCrypto = () => echoService.getCrypto();
  * 	@param {String} pin
  */
 export const unlockCrypto = (form, pin) => async (dispatch) => {
+	const crypto = echoService.getCrypto();
+
 	const error = ValidatePinHelper.validatePin(pin);
 
 	if (error) {
@@ -82,7 +83,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 	try {
 		dispatch(setValue(form, 'loading', true));
 
-		await getCrypto().unlock(pin);
+		await crypto.unlock(pin);
 
 		dispatch(changeCrypto({ isLocked: false }));
 
@@ -109,10 +110,10 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
  *
  * 	Unlock crypto response
  */
-const unlockResponse = async () => {
-	store.dispatch(changeCrypto({ isLocked: false }));
+export const unlockResponse = () => async (dispatch) => {
+	dispatch(changeCrypto({ isLocked: false }));
 
-	await store.dispatch(loadInfo());
+	await dispatch(loadInfo());
 
 	if (
 		globals.WINDOW_TYPE === POPUP_WINDOW_TYPE
@@ -129,8 +130,8 @@ const unlockResponse = async () => {
  *
  * 	Lock crypto response
  */
-const lockResponse = () => {
-	store.dispatch(lockCrypto());
+export const lockResponse = () => (dispatch) => {
+	dispatch(lockCrypto());
 };
 
 /**
@@ -141,19 +142,18 @@ const lockResponse = () => {
  * 	Set subscribe on lock event
  */
 export const initCrypto = () => async (dispatch) => {
+	const crypto = echoService.getCrypto();
+
 	try {
-		if (!getCrypto().isLocked()) {
+		if (!crypto.isLocked()) {
 			dispatch(changeCrypto({ isLocked: false }));
 			await dispatch(loadInfo());
 			history.push(globals.WINDOW_TYPE === POPUP_WINDOW_TYPE ? SIGN_TRANSACTION_PATH : INDEX_PATH);
 		} else {
-			const isFirstTime = await getCrypto().isFirstTime();
+			const isFirstTime = await crypto.isFirstTime();
 
 			history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
 		}
-
-		getCrypto().on('locked', lockResponse);
-		getCrypto().on('unlocked', unlockResponse);
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
@@ -169,12 +169,13 @@ export const initCrypto = () => async (dispatch) => {
  * 	@param {String?} networkName
  */
 export const setCryptoInfo = (field, value, networkName) => async (dispatch, getState) => {
+	const crypto = echoService.getCrypto();
 	try {
 		if (!networkName) {
 			networkName = getState().global.getIn(['network', 'name']);
 		}
 
-		await getCrypto().setInByNetwork(networkName, field, value);
+		await crypto.setInByNetwork(networkName, field, value);
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
@@ -189,12 +190,14 @@ export const setCryptoInfo = (field, value, networkName) => async (dispatch, get
  * 	@param {String} networkName
  */
 export const getCryptoInfo = (field, networkName) => async (dispatch, getState) => {
+	const crypto = echoService.getCrypto();
+
 	try {
 		if (!networkName) {
 			networkName = getState().global.getIn(['network', 'name']);
 		}
 
-		const value = await getCrypto().getInByNetwork(networkName, field);
+		const value = await crypto.getInByNetwork(networkName, field);
 
 		return value;
 	} catch (err) {
@@ -211,12 +214,14 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
  * 	@param {String} field
  */
 export const removeCryptoInfo = (field, networkName) => async (dispatch, getState) => {
+	const crypto = echoService.getCrypto();
+
 	try {
 		if (!networkName) {
 			networkName = getState().global.getIn(['network', 'name']);
 		}
 
-		await getCrypto().removeInByNetwork(networkName, field);
+		await crypto.removeInByNetwork(networkName, field);
 	} catch (err) {
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
@@ -236,14 +241,4 @@ export const wipeCrypto = () => async (dispatch, getState) => {
 	await Promise.all(promises);
 
 	history.push(CREATE_PIN_PATH);
-};
-
-/**
- *  @method removeCryptoListeners
- *
- *  Remove emitter listeners
- */
-export const removeCryptoListeners = () => {
-	getCrypto().removeListener('locked', lockResponse);
-	getCrypto().removeListener('unlocked', unlockResponse);
 };
