@@ -426,8 +426,7 @@ export const sendHandler = (path) => (dispatch, getState) => {
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 };
 
-export const isAssetsChanged = () => async (dispatch, getState) => {
-	const assets = getState().balance.get('assets');
+export const isAssetsChanged = async (assets) => {
 
 	if (!assets.size) {
 		return false;
@@ -441,13 +440,15 @@ export const isAssetsChanged = () => async (dispatch, getState) => {
 
 	assetArr = await Promise.all(assetArr);
 
+	let isChanged = false;
+
 	assetArr.forEach((asset) => {
 		if (asset !== assets.get(asset.get('id'))) {
-			throw new Error('update history');
+			isChanged = true;
 		}
 	});
 
-	return false;
+	return isChanged;
 };
 /**
  *  @method watchToken

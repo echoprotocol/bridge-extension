@@ -122,7 +122,7 @@ class CurrencySelect extends React.Component {
 		this.onSearch(e.target.value);
 	}
 
-	onKeyDown(e, index) {
+	onKeyDown(e, index, row) {
 		const code = e.keyCode || e.which;
 
 		switch (code) {
@@ -135,19 +135,26 @@ class CurrencySelect extends React.Component {
 				}
 				break;
 			case KEY_CODE_ARROW_DOWN:
-				if (index === this.refList.length - 1) {
+				if ((row === this.refList[index].length - 1) && (index === this.refList.length - 1)) {
 					this.searchInput.focus();
-				} else {
-					this.refList[index + 1].focus();
+				} else if (
+					(row === this.refList[index].length - 1)
+					&& (index !== this.refList.length - 1)
+				) {
+					this.refList[index + 1][0].focus();
+				} else if ((row !== this.refList[index].length - 1)) {
+					this.refList[index][row + 1].focus();
 				}
 
 				e.preventDefault();
 				break;
 			case KEY_CODE_ARROW_UP:
-				if (index === 0) {
+				if ((index === 0) && (row === 0)) {
 					this.searchInput.focus();
-				} else {
-					this.refList[index - 1].focus();
+				} else if (row !== 0) {
+					this.refList[index][row - 1].focus();
+				} else if ((row === 0) && (index !== 0)) {
+					this.refList[index - 1][this.refList[index - 1].length - 1].focus();
 				}
 
 				e.preventDefault();
@@ -172,15 +179,17 @@ class CurrencySelect extends React.Component {
 				}
 				break;
 			case KEY_CODE_ARROW_DOWN:
-				this.refList[0].focus();
+				this.refList[0][0].focus();
 
 				e.preventDefault();
 				break;
-			case KEY_CODE_ARROW_UP:
-				this.refList[this.refList.length - 1].focus();
+			case KEY_CODE_ARROW_UP: {
+				const rowLength = this.refList[this.refList.length - 1].length - 1;
+				this.refList[this.refList.length - 1][rowLength].focus();
 
 				e.preventDefault();
 				break;
+			}
 			default:
 				return null;
 		}
@@ -343,7 +352,7 @@ class CurrencySelect extends React.Component {
 										heightRelativeToParent="calc(100%)"
 									>
 										{
-											dropdownData.map((elem) => (
+											dropdownData.map((elem, index) => (
 												<div
 													key={elem.id}
 													className="select-item"
@@ -354,16 +363,24 @@ class CurrencySelect extends React.Component {
 															elem.list.map(({ text, value }, i) => (
 																<li key={Math.random()}>
 																	<a
-																		ref={(ref) => { if (ref) { this.refList[i] = ref; } }}
+																		ref={(ref) => {
+																			if (ref) {
+																				if (!this.refList[index]) {
+																					this.refList[index] = [];
+																				}
+																				this.refList[index][i] = ref;
+																			}
+																		}}
 																		href=""
 																		className="dropdown-list-item"
 																		tabIndex={0}
 																		onKeyPress={
 																			(e) => {
-																				this.onItemKeyPress(e, text, value); e.preventDefault();
+																				this.onItemKeyPress(e, text, value);
+																				e.preventDefault();
 																			}
 																		}
-																		onKeyDown={(e) => this.onKeyDown(e, i)}
+																		onKeyDown={(e) => this.onKeyDown(e, index, i)}
 																		onClick={(e) => {
 																			this.handleClick(text, value);
 																			e.preventDefault();
