@@ -64,7 +64,7 @@ class UserDropdown extends React.PureComponent {
 	onRemoveAccount(e, name) {
 		e.stopPropagation();
 		e.preventDefault();
-		this.props.removeAccount(name);
+		removeAccount(name);
 	}
 
 	setDDMenuHeight() {
@@ -216,7 +216,6 @@ UserDropdown.propTypes = {
 	account: PropTypes.object,
 	networkName: PropTypes.string.isRequired,
 	switchAccount: PropTypes.func.isRequired,
-	removeAccount: PropTypes.func.isRequired,
 };
 
 UserDropdown.defaultProps = {
@@ -233,6 +232,5 @@ export default withRouter(connect(
 	}),
 	(dispatch) => ({
 		switchAccount: (name) => dispatch(switchAccount(name)),
-		removeAccount: (name) => dispatch(removeAccount(name)),
 	}),
 )(UserDropdown));

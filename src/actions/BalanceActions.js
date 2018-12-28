@@ -18,15 +18,12 @@ import echoService from '../services/echo';
 
 import FormatHelper from '../helpers/FormatHelper';
 import ValidateSendHelper from '../helpers/ValidateSendHelper';
+import ValidateTransactionHelper from '../helpers/ValidateTransactionHelper';
 
 import BalanceReducer from '../reducers/BalanceReducer';
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import history from '../history';
-import store from '../store';
-import ValidateTransactionHelper from '../helpers/ValidateTransactionHelper';
-
-const emitter = echoService.getEmitter();
 
 /**
  *  @method initAssetsBalances
@@ -407,6 +404,8 @@ export const send = () => async (dispatch, getState) => {
 
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
+	const emitter = echoService.getEmitter();
+
 	emitter.emit('sendRequest', options, activeNetworkName);
 
 	return true;
@@ -419,16 +418,13 @@ export const send = () => async (dispatch, getState) => {
  *
  * 	@param {String} path
  */
-const sendHandler = (path) => {
-	if (store.getState().global.get('loading')) {
+export const sendHandler = (path) => (dispatch, getState) => {
+	if (getState().global.get('loading')) {
 		history.push(path);
 	}
 
-	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 };
-
-emitter.on('sendResponse', sendHandler);
-
 
 export const isAssetsChanged = () => async (dispatch, getState) => {
 	const assets = getState().balance.get('assets');
