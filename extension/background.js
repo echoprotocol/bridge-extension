@@ -178,7 +178,13 @@ const onMessage = (request, sender, sendResponse) => {
 			emitter.emit('request', id, request.data);
 		} catch (e) { return null; }
 
-		triggerPopup();
+		notificationManager.getPopup()
+			.then((popup) => {
+				if (!popup) {
+					triggerPopup();
+				}
+			})
+			.catch(triggerPopup);
 
 	} else if (request.method === 'accounts') {
 

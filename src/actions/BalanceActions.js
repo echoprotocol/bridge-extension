@@ -1,6 +1,7 @@
 import BN from 'bignumber.js';
 import { Map } from 'immutable';
 import { batchActions } from 'redux-batched-actions';
+import { keccak256 } from 'js-sha3';
 
 import { setFormError, setValue, setFormValue } from './FormActions';
 import { getTransactionFee } from './SignActions';
@@ -174,6 +175,15 @@ export const checkAccount = (fromAccount, toAccount, limit = 50) => async (dispa
 	return true;
 };
 
+const getTransferCode = (id, amount) => {
+	const method = keccak256('transfer(address,uint256)').substr(0, 8);
+
+	const idArg = id.split('.')[2].toString(16).padStart(64, '0');
+	const amountArg = amount.toString(16).padStart(64, '0');
+
+	return method + idArg + amountArg;
+};
+
 /**
  *  @method setFeeFormValue
  *
@@ -199,25 +209,55 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 	const fromAccount = await fetchChain(getState().global.getIn(['account', 'name']));
 	const toAccount = await fetchChain(to.value);
 
-	const amountAsset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
+	let isToken = false;
 
-	const options = {
-		amount: {
-			amount: amount * (10 ** amountAsset.get('precision')),
-			asset: amountAsset,
-		},
-		fee: {
-			amount: 0,
-			asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
-		},
-		from: fromAccount,
-		to: toAccount,
-		memo: memo.value,
-		type: 'transfer',
-	};
+	if (!ValidateTransactionHelper.validateContractId(selectedBalance)) {
+		isToken = true;
+	}
 
-	if (!options.amount.asset || !options.fee.asset || !options.from) {
-		return false;
+	let options = {};
+
+	if (!isToken) {
+		const amountAsset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
+
+		options = {
+			amount: {
+				amount: amount * (10 ** amountAsset.get('precision')),
+				asset: amountAsset,
+			},
+			fee: {
+				amount: 0,
+				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			},
+			from: fromAccount,
+			to: toAccount,
+			memo: memo.value,
+			type: 'transfer',
+		};
+
+		if (!options.amount.asset || !options.fee.asset || !options.from) {
+			return false;
+		}
+	} else {
+		const precision = getState().balance.getIn(['tokens', selectedBalance, 'precision']);
+		const code = getTransferCode(toAccount.get('id'), amount * (10 ** precision));
+		const receiver = await fetchChain(selectedBalance);
+		options = {
+			asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			code,
+			fee: {
+				amount: 0,
+				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			},
+			receiver,
+			registrar: fromAccount,
+			type: 'contract',
+			value: amount,
+		};
+
+		if (!options.asset_id || !options.fee.asset || !options.registrar) {
+			return false;
+		}
 	}
 
 	const resultFee = await getTransactionFee(options);
@@ -251,11 +291,25 @@ export const send = () => async (dispatch, getState) => {
 	const balances = getState().balance.get('balances');
 	const assets = getState().balance.get('assets');
 
-	const balance = {
-		symbol: assets.getIn([balances.getIn([selectedBalance, 'asset_type']), 'symbol']),
-		precision: assets.getIn([balances.getIn([selectedBalance, 'asset_type']), 'precision']),
-		balance: balances.getIn([selectedBalance, 'balance']),
-	};
+	let isToken = false;
+
+	if (!ValidateTransactionHelper.validateContractId(selectedBalance)) {
+		isToken = true;
+	}
+
+	const token = getState().balance.getIn(['tokens', selectedBalance]);
+	const balance = isToken ?
+		{
+			symbol: token.get('symbol'),
+			precision: token.get('precision'),
+			balance: token.get('balance'),
+		}
+		:
+		{
+			symbol: assets.getIn([balances.getIn([selectedBalance, 'asset_type']), 'symbol']),
+			precision: assets.getIn([balances.getIn([selectedBalance, 'asset_type']), 'precision']),
+			balance: balances.getIn([selectedBalance, 'balance']),
+		};
 
 	const amountError = ValidateSendHelper.validateAmount(amount, balance);
 
@@ -275,20 +329,41 @@ export const send = () => async (dispatch, getState) => {
 	const fromAccount = await fetchChain(activeUserName);
 	const toAccount = await fetchChain(to.value);
 
-	const options = {
-		amount: {
-			amount,
-			asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
-		},
-		fee: {
-			amount: fee.value || 0,
-			asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
-		},
-		from: fromAccount,
-		to: toAccount,
-		memo: memo.value,
-		type: 'transfer',
-	};
+	let options = {};
+
+	if (isToken) {
+		const precision = getState().balance.getIn(['tokens', selectedBalance, 'precision']);
+		const code = getTransferCode(toAccount.get('id'), amount * (10 ** precision));
+		const receiver = await fetchChain(selectedBalance);
+		options = {
+			asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			code,
+			fee: {
+				amount: fee.value || 0,
+				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			},
+			receiver,
+			registrar: fromAccount,
+			type: 'contract',
+			value: amount,
+		};
+	} else {
+
+		options = {
+			amount: {
+				amount,
+				asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
+			},
+			fee: {
+				amount: fee.value || 0,
+				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			},
+			from: fromAccount,
+			to: toAccount,
+			memo: memo.value,
+			type: 'transfer',
+		};
+	}
 
 	if (!fee.value) {
 		options.fee = await getTransactionFee(options);
@@ -303,23 +378,30 @@ export const send = () => async (dispatch, getState) => {
 		return false;
 	}
 
-	if (options.amount.asset.get('id') === options.fee.asset.get('id')) {
-		const total = new BN(amount).times(10 ** options.amount.asset.get('precision')).plus(options.fee.amount);
+	if (!isToken) {
+		if (options.amount.asset.get('id') === options.fee.asset.get('id')) {
+			const total = new BN(amount).times(10 ** options.amount.asset.get('precision')).plus(options.fee.amount);
 
-		if (total.gt(balances.getIn([selectedBalance, 'balance']))) {
-			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
-			return false;
-		}
-	} else {
-		const feeBalance = balances.find((val) => val.get('asset_type') === options.fee.asset.get('id')).get('balance');
+			if (total.gt(balances.getIn([selectedBalance, 'balance']))) {
+				dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
+				return false;
+			}
+		} else {
+			const feeBalance = balances.find((val) => val.get('asset_type') === options.fee.asset.get('id')).get('balance');
 
-		if (new BN(fee.value).gt(feeBalance)) {
-			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
-			return false;
+			if (new BN(fee.value).gt(feeBalance)) {
+				dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
+				return false;
+			}
 		}
 	}
 
-	options.amount.amount = parseInt(options.amount.amount * (10 ** options.amount.asset.get('precision')), 10);
+	if (isToken) {
+		options.value = 0;
+		options.fee.amount *= 10 ** options.fee.asset.get('precision');
+	} else {
+		options.amount.amount = parseInt(options.amount.amount * (10 ** options.amount.asset.get('precision')), 10);
+	}
 
 	const activeNetworkName = getState().global.getIn(['network', 'name']);
 
