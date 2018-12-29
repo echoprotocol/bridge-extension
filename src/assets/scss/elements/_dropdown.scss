@@ -210,7 +210,7 @@
             overflow: hidden;
             box-shadow: 0px 0px 21px 0px rgba(#213034, .9);
             font-size: 13px;
-
+			letter-spacing: .2px;
 
             .default-networks,
             .custom-networks {
@@ -477,7 +477,8 @@
             background-color: #384549;
             border-radius: $angularMin;
             overflow: hidden;
-            font-size: 13px;
+			font-size: 13px;
+			letter-spacing: .2px;
             .user-list {
                 display: block;
                 width: 100%;
@@ -556,7 +557,8 @@
             .user-balance {
                 margin: 2px 0 0 auto;
                 white-space: nowrap;
-                letter-spacing: .2px;
+				letter-spacing: .2px;
+				-webkit-font-smoothing: auto;
                 &.positive {
                     color: #61D3AD;
                     margin-right: 10px;
@@ -576,7 +578,8 @@
             
             span {
                 color: #E4E7E8;
-                margin-right: 6px;
+				margin-right: 6px;
+				-webkit-font-smoothing: antialiased;
             }
             li {
                 & + span {
