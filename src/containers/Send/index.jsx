@@ -274,6 +274,7 @@ class Send extends React.Component {
 								errorText={fee.error}
 							/>
 							<div className="message-error">
+
 								<BridgeTextArea
 									name="memo"
 									value={memo.value}
