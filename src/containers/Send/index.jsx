@@ -30,7 +30,6 @@ class Send extends React.Component {
 		this.state = {
 			timeout: null,
 			warning: false,
-			// btnDisabled: false,
 		};
 
 	}
@@ -81,7 +80,6 @@ class Send extends React.Component {
 	}
 
 	onChange(e, lowerCase) {
-		// this.setState({ btnDisabled: false });
 
 		const field = e.target.name;
 		let { value } = e.target;
@@ -96,7 +94,6 @@ class Send extends React.Component {
 	}
 
 	onAmountChange(e) {
-		// this.setState({ btnDisabled: false });
 		const { selectedBalance, balances, assets } = this.props;
 
 		const field = e.target.name;
@@ -126,7 +123,6 @@ class Send extends React.Component {
 	}
 
 	onSend() {
-		// this.setState({ btnDisabled: true });
 		this.props.send();
 	}
 
