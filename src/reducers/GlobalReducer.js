@@ -1,5 +1,5 @@
 import { createModule } from 'redux-modules';
-import { Map, List } from 'immutable';
+import { Map, List, OrderedMap } from 'immutable';
 import _ from 'lodash';
 
 const DEFAULT_LOCKED_FIELDS = Map({
@@ -28,6 +28,9 @@ const DEFAULT_FIELDS = Map({
 		transactions: new List([]),
 		goTo: null,
 	}),
+	headBlockNum: 0,
+	history: new List([]),
+	formattedHistory: new OrderedMap({}),
 });
 
 export default createModule({

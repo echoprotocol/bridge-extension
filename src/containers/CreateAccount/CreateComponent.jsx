@@ -25,12 +25,16 @@ class CreateComponent extends React.Component {
 		this.props.changeName(e.target.value.trim().toLowerCase());
 	}
 
+	createAccount(e) {
+		this.props.createAccount(e);
+	}
+
 	isButtonDisabled() {
 		const {
-			name, error,
+			name, error, loading,
 		} = this.props;
 
-		return !!(!name || error);
+		return !!(!name || error || loading);
 	}
 
 	handleRef(ref) {
@@ -79,7 +83,7 @@ class CreateComponent extends React.Component {
 								className={classnames('btn-in-light', { loading })}
 								content={<span className="btn-text">Create</span>}
 								type="submit"
-								onClick={(e) => this.props.createAccount(e)}
+								onClick={(e) => this.createAccount(e)}
 								disabled={this.isButtonDisabled()}
 							/>
 						</div>

@@ -55,5 +55,13 @@
         .page {
             min-height: 332px;
         }
-    }
+	}
+	.page-action-wrap {
+		.btn-in-dark, 
+		.btn-in-light, 
+		.btn-transparent, 
+		.btn-inverted {
+			min-width: 220px;
+		}
+	}
 }

@@ -27,16 +27,21 @@ import {
 import {
 	CREATE_ACCOUNT_PATH,
 	SUCCESS_ADD_NETWORK_PATH,
-	INDEX_PATH, WALLET_PATH,
-	EMPTY_PATH, SUCCESS_SEND_PATH,
+	INDEX_PATH,
+	WALLET_PATH,
+	EMPTY_PATH,
+	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
 	NETWORK_ERROR_SEND_PATH,
 } from '../constants/RouterConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
-import { fetchChain } from '../api/ChainApi';
+import { fetchChain, getTokenDetails } from '../api/ChainApi';
 
 import storage from '../services/storage';
+import BalanceReducer from '../reducers/BalanceReducer';
+import echoService from '../services/echo';
+import Listeners from '../services/listeners';
 
 /**
  *  @method set
@@ -147,12 +152,26 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
  *
  * 	@param {String} name
  */
-export const removeAccount = (name) => async (dispatch, getState) => {
+export const removeAccount = (name) => {
+	const emitter = echoService.getEmitter();
+
+	emitter.emit('logout', name);
+};
+
+/**
+ *  @method onLogout
+ *
+ * 	Logout into the all windows
+ *
+ * 	@param {String} name
+ */
+export const onLogout = (name) => async (dispatch, getState) => {
+
 	const accountName = getState().global.getIn(['account', 'name']);
+	const networkName = getState().global.getIn(['network', 'name']);
+	let accounts = getState().global.get('accounts');
 
 	try {
-		const networkName = getState().global.getIn(['network', 'name']);
-		let accounts = getState().global.get('accounts');
 
 		const { keys, id } = accounts.get(networkName).find((i) => i.name === name);
 
@@ -222,21 +241,57 @@ export const switchAccount = (name) => async (dispatch, getState) => {
  * 	Load info from storage after unlock crypto
  */
 export const loadInfo = () => async (dispatch, getState) => {
+
+
 	const networks = getState().global.get('networks');
 	let accountsNetworks = new Map();
 
-	const accountsPromises = networks.concat(NETWORKS).map(async (network) => {
+	const resultPromises = networks.concat(NETWORKS).map(async (network) => {
 		const accounts = await dispatch(getCryptoInfo('accounts', network.name));
-		return [network.name, accounts];
+		const tokens = await dispatch(getCryptoInfo('tokens', network.name));
+		return [network.name, accounts, tokens];
 	});
 
-	const resultAccounts = await Promise.all(accountsPromises);
+	const result = await Promise.all(resultPromises);
 
-	resultAccounts.forEach(([networkName, accounts]) => {
+	let tokensObject = {};
+	let stateTokens = new Map({});
+	result.forEach(([networkName, accounts, tokens]) => {
 		accountsNetworks = accountsNetworks.set(networkName, new List(accounts));
+
+		if (!tokens) {
+			return null;
+		}
+
+		Object.entries(tokens).forEach(([accountId, tokensArray]) => {
+			tokensArray.forEach((id) => {
+				stateTokens = stateTokens.setIn([`1.16.${id}`, 'accountId'], accountId);
+			});
+		});
+
+		tokensObject = Object.assign(tokensObject, tokens);
+
+		return null;
 	});
 
 	dispatch(set('accounts', accountsNetworks));
+
+	let tokensDetails = [];
+
+	stateTokens.mapEntries(([contractId, tokenMap]) => {
+		tokensDetails.push(getTokenDetails(contractId, tokenMap.get('accountId')));
+	});
+
+	tokensDetails = await Promise.all(tokensDetails);
+
+	stateTokens.mapEntries(([contractId], index) => {
+		stateTokens = stateTokens
+			.setIn([contractId, 'symbol'], tokensDetails[index].symbol)
+			.setIn([contractId, 'precision'], tokensDetails[index].precision)
+			.setIn([contractId, 'balance'], tokensDetails[index].balance);
+	});
+
+	dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }));
 
 
 	const accounts = await dispatch(getCryptoInfo('accounts'));
@@ -408,6 +463,16 @@ export const globalInit = (isRecreate) => async (dispatch) => {
 	await dispatch(initCrypto());
 
 	return null;
+};
+
+/**
+ *  @method initListeners
+ *
+ *  Initialize emitter listeners
+ */
+export const initListeners = () => (dispatch) => {
+	const listeners = new Listeners();
+	listeners.initListeners(dispatch);
 };
 
 /**

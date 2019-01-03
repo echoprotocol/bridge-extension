@@ -9,7 +9,7 @@
 
     transition: color $speed, padding $speed;
     padding: 0;
-    letter-spacing: .15em;
+    letter-spacing: .13em;
 }
 
 .input {
@@ -307,7 +307,7 @@
 		font-size $speed,
 		color $speed;
         font-family: FNMedium;
-        letter-spacing: 0.025em;
+        letter-spacing: 0.05em;
     }
 
     // BORDER
@@ -333,7 +333,10 @@
 
     input {
         cursor: pointer;
-        @extend %input;
+		@extend %input;
+		&[type="password"] {
+			letter-spacing: -.15em;
+		}
         height: 42px;
 
         &::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
@@ -383,8 +386,8 @@
         width: 100%;
         padding: 0;
         background: transparent;
-        min-height: 31px;
-
+		min-height: 31px;
+		color: #3F4A52;
         font-family: FNMedium;
         letter-spacing: 1.8px;
         font-size: 18px;
@@ -415,7 +418,7 @@
         left: 0;
         z-index: 2;
         font-size: 18px;
-        font-family: FNBook;
+		font-family: FNMedium;
         color: #434c53;
         opacity: 0.7;
 
@@ -478,16 +481,14 @@
     }
     &-description {
         font-family: FNBook;
-        font-size: 14px;
+        font-size: 15px;
         color: #9ca1a5;
         margin: 15px auto 0;
-        letter-spacing: 1px;
-        line-height: 21px;
+        letter-spacing: .6px;
+        line-height: 22px;
         max-width: 238px;
         padding-left: 3px;
     }
 }
 
-input[type="password" i] {
-    // letter-spacing: -5px !important;
-}
+

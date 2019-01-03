@@ -36,7 +36,6 @@ class ImportComponent extends React.Component {
 
 	onChange(e, lowercase) {
 		const { name, value } = e.target;
-
 		this.props.change(name, lowercase ? value.trim().toLowerCase() : value.trim());
 	}
 
@@ -47,12 +46,16 @@ class ImportComponent extends React.Component {
 		}
 	}
 
+	importAccount(e) {
+		this.props.importAccount(e);
+	}
+
 	isButtonDisabled() {
 		const {
-			password, nameError, passwordError,
+			password, nameError, passwordError, loading,
 		} = this.props;
 
-		return !!(!password || nameError || passwordError);
+		return !!(!password || nameError || passwordError || loading);
 	}
 
 	handleRef(ref, type) {
@@ -112,7 +115,7 @@ class ImportComponent extends React.Component {
 								className={classnames('btn-in-light', { loading })}
 								content={<span className="btn-text">Import</span>}
 								type="submit"
-								onClick={(e) => this.props.importAccount(e)}
+								onClick={(e) => this.importAccount(e)}
 							/>
 						</div>
 					</div>
