@@ -2,15 +2,57 @@ import React from 'react';
 import CustomScroll from 'react-custom-scroll';
 import { Button } from 'semantic-ui-react';
 import { Link } from 'react-router-dom';
-import { WALLET_PATH } from '../../constants/RouterConstants';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
+import classnames from 'classnames';
 
+import { WALLET_PATH } from '../../constants/RouterConstants';
+import { FORM_WATCH_TOKEN } from '../../constants/FormConstants';
 
 import BridgeInput from '../../components/BridgeInput';
 
-export default class WatchTokens extends React.Component {
+import { watchToken } from '../../actions/BalanceActions';
+import { clearForm, setFormValue } from '../../actions/FormActions';
+import { KEY_CODE_ENTER } from '../../constants/GlobalConstants';
 
+class WatchTokens extends React.Component {
+
+	componentWillUnmount() {
+		this.props.clearForm();
+	}
+
+
+	onChange(e, lowerCase) {
+		const field = e.target.name;
+		let { value } = e.target;
+
+		if (lowerCase) {
+			value = value.toLowerCase();
+		}
+
+		if (field) {
+			this.props.setFormValue(field, value);
+		}
+	}
+
+	onKeyPress(e) {
+		const { contractId } = this.props;
+		const code = e.keyCode || e.which;
+
+		if (KEY_CODE_ENTER === code && contractId.value) {
+			this.props.addToken(contractId.value);
+		}
+	}
+
+	watchToken() {
+		const { contractId } = this.props;
+
+		this.props.addToken(contractId.value);
+	}
 
 	render() {
+		const { contractId, loading } = this.props;
+
 		return (
 			<React.Fragment>
 				<div className="return-block">
@@ -31,13 +73,17 @@ export default class WatchTokens extends React.Component {
 							<div className="page">
 								<div className="one-input-wrap">
 									<BridgeInput
-										name="name"
-										readOnly
+										name="contractId"
+										autoFocus
 										leftLabel
 										defaultUp
 										theme="input-light"
 										labelText="Contract ID"
-										value="375534329sasjbvhhsd324nsad"
+										value={contractId.value}
+										error={!!contractId.error}
+										errorText={contractId.error}
+										onChange={(e) => this.onChange(e)}
+										onKeyPress={(e) => this.onKeyPress(e)}
 									/>
 								</div>
 							</div>
@@ -46,7 +92,9 @@ export default class WatchTokens extends React.Component {
 							<div className="one-btn-wrap" >
 								<Button
 									content={<span className="btn-text">Watch</span>}
-									className="btn-in-light"
+									className={classnames('btn-in-light', { loading })}
+									onClick={() => this.watchToken()}
+									type="submit"
 								/>
 							</div>
 						</div>
@@ -59,3 +107,23 @@ export default class WatchTokens extends React.Component {
 	}
 
 }
+
+WatchTokens.propTypes = {
+	loading: PropTypes.bool.isRequired,
+	contractId: PropTypes.object.isRequired,
+	addToken: PropTypes.func.isRequired,
+	setFormValue: PropTypes.func.isRequired,
+	clearForm: PropTypes.func.isRequired,
+};
+
+export default connect(
+	(state) => ({
+		contractId: state.form.getIn([FORM_WATCH_TOKEN, 'contractId']),
+		loading: state.form.getIn([FORM_WATCH_TOKEN, 'loading']),
+	}),
+	(dispatch) => ({
+		addToken: (id) => dispatch(watchToken(id)),
+		setFormValue: (field, value) => dispatch(setFormValue(FORM_WATCH_TOKEN, field, value)),
+		clearForm: () => dispatch(clearForm(FORM_WATCH_TOKEN)),
+	}),
+)(WatchTokens);
