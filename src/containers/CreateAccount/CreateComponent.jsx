@@ -10,13 +10,7 @@ class CreateComponent extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			btnDisabled: false,
-		};
-
 		this.inputRef = null;
-
-
 	}
 
 	componentDidUpdate() {
@@ -32,16 +26,15 @@ class CreateComponent extends React.Component {
 	}
 
 	createAccount(e) {
-		this.setState({ btnDisabled: true });
 		this.props.createAccount(e);
 	}
 
 	isButtonDisabled() {
 		const {
-			name, error,
+			name, error, loading,
 		} = this.props;
 
-		return !!(!name || error);
+		return !!(!name || error || loading);
 	}
 
 	handleRef(ref) {
@@ -91,7 +84,7 @@ class CreateComponent extends React.Component {
 								content={<span className="btn-text">Create</span>}
 								type="submit"
 								onClick={(e) => this.createAccount(e)}
-								disabled={this.state.btnDisabled || this.isButtonDisabled()}
+								disabled={this.isButtonDisabled()}
 							/>
 						</div>
 					</div>
