@@ -19,6 +19,7 @@ import { FORM_SEND } from '../../constants/FormConstants';
 import CustomMenu from './CustomMenu';
 import { setValue } from '../../actions/FormActions';
 import { setAssetFormValue } from '../../actions/BalanceActions';
+import ValidateTransactionHelper from '../../helpers/ValidateTransactionHelper';
 
 class CurrencySelect extends React.Component {
 
@@ -27,16 +28,19 @@ class CurrencySelect extends React.Component {
 
 		this.refList = [];
 
-		const searchList = this.getSymbols();
+		const { symbolsList, tokensList } = this.getSymbols();
 		let symbolValue = '';
 
 		if (props.path.field === 'selectedBalance' && props.selectedBalance) {
-			symbolValue = searchList.find((val) => val.value === props.selectedBalance).text;
+			const list = ValidateTransactionHelper.validateContractId(props.selectedBalance) ?
+				symbolsList : tokensList;
+
+			symbolValue = list.find((val) => val.value === props.selectedBalance).text;
 		}
 
 		this.state = {
 			search: '',
-			searchList,
+			searchList: { symbolsList, tokensList },
 			currentVal: symbolValue,
 			opened: false,
 		};
@@ -52,7 +56,7 @@ class CurrencySelect extends React.Component {
 
 		document.addEventListener('mousedown', this.handleClickOutside);
 
-		this.props.setAssetFormValue(path.form, path.field, searchList[0].value);
+		this.props.setAssetFormValue(path.form, path.field, searchList.symbolsList[0].value);
 
 		return null;
 	}
@@ -94,9 +98,16 @@ class CurrencySelect extends React.Component {
 
 	onSearch(value) {
 		if (value) {
+			const { symbolsList, tokensList } = this.getSymbols();
+
 			this.setState({
-				searchList: this.getSymbols().filter(({ text }) =>
-					text.toLowerCase().includes(value.toLowerCase())),
+				searchList:
+					{
+						symbolsList: symbolsList.filter(({ text }) =>
+							text.toLowerCase().includes(value.toLowerCase())),
+						tokensList: tokensList.filter(({ text }) =>
+							text.toLowerCase().includes(value.toLowerCase())),
+					},
 			});
 		} else {
 			this.setState({ searchList: this.getSymbols() });
@@ -111,7 +122,7 @@ class CurrencySelect extends React.Component {
 		this.onSearch(e.target.value);
 	}
 
-	onKeyDown(e, index) {
+	onKeyDown(e, index, row) {
 		const code = e.keyCode || e.which;
 
 		switch (code) {
@@ -124,19 +135,26 @@ class CurrencySelect extends React.Component {
 				}
 				break;
 			case KEY_CODE_ARROW_DOWN:
-				if (index === this.refList.length - 1) {
+				if ((row === this.refList[index].length - 1) && (index === this.refList.length - 1)) {
 					this.searchInput.focus();
-				} else {
-					this.refList[index + 1].focus();
+				} else if (
+					(row === this.refList[index].length - 1)
+					&& (index !== this.refList.length - 1)
+				) {
+					this.refList[index + 1][0].focus();
+				} else if ((row !== this.refList[index].length - 1)) {
+					this.refList[index][row + 1].focus();
 				}
 
 				e.preventDefault();
 				break;
 			case KEY_CODE_ARROW_UP:
-				if (index === 0) {
+				if ((index === 0) && (row === 0)) {
 					this.searchInput.focus();
-				} else {
-					this.refList[index - 1].focus();
+				} else if (row !== 0) {
+					this.refList[index][row - 1].focus();
+				} else if ((row === 0) && (index !== 0)) {
+					this.refList[index - 1][this.refList[index - 1].length - 1].focus();
 				}
 
 				e.preventDefault();
@@ -161,15 +179,17 @@ class CurrencySelect extends React.Component {
 				}
 				break;
 			case KEY_CODE_ARROW_DOWN:
-				this.refList[0].focus();
+				this.refList[0][0].focus();
 
 				e.preventDefault();
 				break;
-			case KEY_CODE_ARROW_UP:
-				this.refList[this.refList.length - 1].focus();
+			case KEY_CODE_ARROW_UP: {
+				const rowLength = this.refList[this.refList.length - 1].length - 1;
+				this.refList[this.refList.length - 1][rowLength].focus();
 
 				e.preventDefault();
 				break;
+			}
 			default:
 				return null;
 		}
@@ -183,12 +203,15 @@ class CurrencySelect extends React.Component {
 
 	getSymbols() {
 		const symbolsList = [];
+		const tokensList = [];
 
 		if (!this.props) {
 			return symbolsList;
 		}
 
-		const { balances, assets, account } = this.props.data;
+		const {
+			balances, assets, account, tokens,
+		} = this.props.data;
 
 		if (!account) {
 			return symbolsList;
@@ -209,7 +232,22 @@ class CurrencySelect extends React.Component {
 			return null;
 		});
 
-		return symbolsList;
+		if (tokens) {
+			tokens.mapEntries(([contractId, token]) => {
+				if (token.get('accountId') !== account.get('id')) {
+					return null;
+				}
+
+				tokensList.push({
+					text: token.get('symbol'),
+					value: contractId,
+				});
+
+				return null;
+			});
+		}
+
+		return { symbolsList, tokensList };
 	}
 
 	handleClick(text, value) {
@@ -259,13 +297,13 @@ class CurrencySelect extends React.Component {
 			{
 				id: 0,
 				title: 'Assets',
-				list: searchList,
+				list: searchList.symbolsList,
 			},
-			// {
-			// 	id: 1,
-			// 	title: 'Tokens',
-			// 	list: ['ECHO', 'EchoTest', 'EchoEcho', 'EchoEcho245'],
-			// },
+			{
+				id: 1,
+				title: 'Tokens',
+				list: searchList.tokensList,
+			},
 		];
 
 		const resultList = dropdownData.reduce((result, value) => result.concat(value.list), []);
@@ -314,27 +352,35 @@ class CurrencySelect extends React.Component {
 										heightRelativeToParent="calc(100%)"
 									>
 										{
-											dropdownData.map((elem) => (
+											dropdownData.map((elem, index) => (
 												<div
 													key={elem.id}
 													className="select-item"
 												>
-													<div className="title">{elem.title}</div>
+													{ elem.list.length ? <div className="title">{elem.title}</div> : '' }
 													<ul>
 														{
 															elem.list.map(({ text, value }, i) => (
 																<li key={Math.random()}>
 																	<a
-																		ref={(ref) => { if (ref) { this.refList[i] = ref; } }}
+																		ref={(ref) => {
+																			if (ref) {
+																				if (!this.refList[index]) {
+																					this.refList[index] = [];
+																				}
+																				this.refList[index][i] = ref;
+																			}
+																		}}
 																		href=""
 																		className="dropdown-list-item"
 																		tabIndex={0}
 																		onKeyPress={
 																			(e) => {
-																				this.onItemKeyPress(e, text, value); e.preventDefault();
+																				this.onItemKeyPress(e, text, value);
+																				e.preventDefault();
 																			}
 																		}
-																		onKeyDown={(e) => this.onKeyDown(e, i)}
+																		onKeyDown={(e) => this.onKeyDown(e, index, i)}
 																		onClick={(e) => {
 																			this.handleClick(text, value);
 																			e.preventDefault();

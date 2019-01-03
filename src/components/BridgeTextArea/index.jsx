@@ -1,7 +1,6 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import Textarea from 'react-textarea-autosize';
-
 import classnames from 'classnames';
 
 class BridgeTextArea extends React.Component {
@@ -20,18 +19,26 @@ class BridgeTextArea extends React.Component {
 	}
 
 	onBlur() {
+		if (this.props.value.length === 0) {
+			this.setState({ filled: false });
+		}
 		this.setState({ up: false });
 	}
 
 	onChange(e) {
+
 		this.setState({ filled: !!e.target.value.trim().length });
 		this.props.onChange(e);
+	}
+
+	renderError() {
+		return (<div className="message-error"> {this.props.errorText}</div>);
 	}
 
 	render() {
 
 		const {
-			label, value, name, disabled,
+			label, value, error, name, disabled,
 		} = this.props;
 
 		const {
@@ -39,24 +46,29 @@ class BridgeTextArea extends React.Component {
 		} = this.state;
 
 		return (
-			<div
-				className={classnames(
-					'input-wrap textarea-wrap',
-					{ up },
-					{ filled },
-				)}
-			>
-				<Textarea
-					rows={1}
-					value={value}
-					name={name}
-					onChange={(e) => this.onChange(e)}
-					onFocus={() => this.onFocus()}
-					onBlur={() => this.onBlur()}
-					disabled={disabled}
-				/>
-				<span className="label">{label}</span>
-			</div>
+			<React.Fragment>
+				<div
+					className={classnames(
+						'input-wrap textarea-wrap',
+						{ up },
+						{ filled },
+					)}
+				>
+					<Textarea
+						rows={1}
+						value={value}
+						name={name}
+						onChange={(e) => this.onChange(e)}
+						onFocus={() => this.onFocus()}
+						onBlur={() => this.onBlur()}
+						disabled={disabled}
+					/>
+
+					<span className="label">{label}</span>
+
+				</div>
+				{ error ? this.renderError() : null }
+			</React.Fragment>
 		);
 	}
 
@@ -65,6 +77,8 @@ class BridgeTextArea extends React.Component {
 BridgeTextArea.propTypes = {
 	label: PropTypes.string,
 	value: PropTypes.string,
+	error: PropTypes.bool,
+	errorText: PropTypes.string,
 	name: PropTypes.string,
 	onChange: PropTypes.func,
 	disabled: PropTypes.bool,
@@ -74,6 +88,8 @@ BridgeTextArea.defaultProps = {
 	label: null,
 	value: '',
 	name: '',
+	error: false,
+	errorText: '',
 	onChange: null,
 	disabled: false,
 };

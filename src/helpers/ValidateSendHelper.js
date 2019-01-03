@@ -1,5 +1,7 @@
 import BN from 'bignumber.js';
 
+import { MAX_NOTE_LENGTH } from '../constants/GlobalConstants';
+
 class ValidateSendHelper {
 
 	static amountInput(value, asset) {
@@ -50,6 +52,14 @@ class ValidateSendHelper {
 
 		if (new BN(value).times(10 ** precision).gt(balance)) {
 			return 'Insufficient funds';
+		}
+
+		return null;
+	}
+
+	static validateMemo(memo) {
+		if (memo.length >= MAX_NOTE_LENGTH) {
+			return 'Note length must be less than 200000 symbols';
 		}
 
 		return null;

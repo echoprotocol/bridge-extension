@@ -162,15 +162,12 @@ export const updateHistory = () => async (dispatch, getState) => {
 		dispatch(formatHistory(historyAccount));
 	}
 
-	try {
-		dispatch(isAssetsChanged());
-	} catch (err) {
-		if (FormatHelper.formatError(err) === 'update history') {
-			dispatch(formatHistory(historyAccount));
-			return null;
-		}
+	const assets = getState().balance.get('assets');
 
-		throw err;
+	const isChanged = await isAssetsChanged(assets);
+
+	if (isChanged) {
+		dispatch(formatHistory(historyAccount));
 	}
 
 	return true;

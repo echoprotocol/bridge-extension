@@ -9,7 +9,7 @@ import {
 	FORM_UNLOCK,
 	FORM_WIPE,
 	FORM_CREATE_PIN,
-	FORM_SEND,
+	FORM_SEND, FORM_WATCH_TOKEN,
 } from '../constants/FormConstants';
 
 const DEFAULT_FIELDS = Map({
@@ -65,6 +65,12 @@ const DEFAULT_FORM_FIELDS = {
 			error: null,
 		},
 	}),
+	[FORM_WATCH_TOKEN]: Map({
+		contractId: {
+			value: '',
+			error: null,
+		},
+	}),
 };
 
 export default createModule({
@@ -77,6 +83,7 @@ export default createModule({
 		[FORM_WIPE]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_WIPE]),
 		[FORM_CREATE_PIN]: _.cloneDeep(DEFAULT_FIELDS),
 		[FORM_SEND]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_SEND]),
+		[FORM_WATCH_TOKEN]: _.cloneDeep(DEFAULT_FIELDS).merge(DEFAULT_FORM_FIELDS[FORM_WATCH_TOKEN]),
 	}),
 	transformations: {
 		set: {

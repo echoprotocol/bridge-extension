@@ -1,7 +1,7 @@
 {
   "name": "echo-bridge",
   "description": "Echo Bridge",
-  "version": "1.1.2",
+  "version": "1.2.0",
   "scripts": {
     "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8081",
     "build": "cross-env NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
@@ -30,6 +30,7 @@
     "immutable": "^3.8.2",
     "intl": "^1.2.5",
     "is-promise": "^2.1.0",
+    "js-sha3": "^0.8.0",
     "lodash": "^4.17.11",
     "moment": "^2.23.0",
     "prop-types": "^15.6.1",
@@ -50,7 +51,8 @@
     "redux-modules": "^1.1.0",
     "redux-thunk": "^2.3.0",
     "semantic-ui-react": "^0.78.3",
-    "uglifyjs-webpack-plugin": "^1.2.2"
+    "uglifyjs-webpack-plugin": "^1.2.2",
+    "utf8": "^3.0.0"
   },
   "devDependencies": {
     "@babel/core": "^7.1.0",

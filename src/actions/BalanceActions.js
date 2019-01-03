@@ -1,26 +1,29 @@
 import BN from 'bignumber.js';
+import { Map } from 'immutable';
+import { batchActions } from 'redux-batched-actions';
+import { keccak256 } from 'js-sha3';
 
 import { setFormError, setValue, setFormValue } from './FormActions';
 import { getTransactionFee } from './SignActions';
+import { getCryptoInfo, setCryptoInfo } from './CryptoActions';
+import { set } from './GlobalActions';
 
-import { fetchChain, lookupAccounts } from '../api/ChainApi';
+import { fetchChain, getContract, getTokenDetails, lookupAccounts } from '../api/ChainApi';
 
-import { FORM_SEND } from '../constants/FormConstants';
-import { CORE_ID } from '../constants/GlobalConstants';
-import { ERROR_SEND_PATH, SEND_PATH } from '../constants/RouterConstants';
+import { FORM_SEND, FORM_WATCH_TOKEN } from '../constants/FormConstants';
+import { CORE_ID, GLOBAL_ID_1 } from '../constants/GlobalConstants';
+import { ERROR_SEND_PATH, WALLET_PATH, SEND_PATH } from '../constants/RouterConstants';
 
 import echoService from '../services/echo';
 
 import FormatHelper from '../helpers/FormatHelper';
 import ValidateSendHelper from '../helpers/ValidateSendHelper';
+import ValidateTransactionHelper from '../helpers/ValidateTransactionHelper';
 
 import BalanceReducer from '../reducers/BalanceReducer';
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import history from '../history';
-import store from '../store';
-
-const emitter = echoService.getEmitter();
 
 /**
  *  @method initAssetsBalances
@@ -169,6 +172,15 @@ export const checkAccount = (fromAccount, toAccount, limit = 50) => async (dispa
 	return true;
 };
 
+const getTransferCode = (id, amount) => {
+	const method = keccak256('transfer(address,uint256)').substr(0, 8);
+
+	const idArg = id.split('.')[2].toString(16).padStart(64, '0');
+	const amountArg = amount.toString(16).padStart(64, '0');
+
+	return method + idArg + amountArg;
+};
+
 /**
  *  @method setFeeFormValue
  *
@@ -194,25 +206,55 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 	const fromAccount = await fetchChain(getState().global.getIn(['account', 'name']));
 	const toAccount = await fetchChain(to.value);
 
-	const amountAsset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
+	let isToken = false;
 
-	const options = {
-		amount: {
-			amount: amount * (10 ** amountAsset.get('precision')),
-			asset: amountAsset,
-		},
-		fee: {
-			amount: 0,
-			asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
-		},
-		from: fromAccount,
-		to: toAccount,
-		memo: memo.value,
-		type: 'transfer',
-	};
+	if (!ValidateTransactionHelper.validateContractId(selectedBalance)) {
+		isToken = true;
+	}
 
-	if (!options.amount.asset || !options.fee.asset || !options.from) {
-		return false;
+	let options = {};
+
+	if (!isToken) {
+		const amountAsset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
+
+		options = {
+			amount: {
+				amount: amount * (10 ** amountAsset.get('precision')),
+				asset: amountAsset,
+			},
+			fee: {
+				amount: 0,
+				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			},
+			from: fromAccount,
+			to: toAccount,
+			memo: memo.value,
+			type: 'transfer',
+		};
+
+		if (!options.amount.asset || !options.fee.asset || !options.from) {
+			return false;
+		}
+	} else {
+		const precision = getState().balance.getIn(['tokens', selectedBalance, 'precision']);
+		const code = getTransferCode(toAccount.get('id'), amount * (10 ** precision));
+		const receiver = await fetchChain(selectedBalance);
+		options = {
+			asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			code,
+			fee: {
+				amount: 0,
+				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			},
+			receiver,
+			registrar: fromAccount,
+			type: 'contract',
+			value: amount,
+		};
+
+		if (!options.asset_id || !options.fee.asset || !options.registrar) {
+			return false;
+		}
 	}
 
 	const resultFee = await getTransactionFee(options);
@@ -246,11 +288,25 @@ export const send = () => async (dispatch, getState) => {
 	const balances = getState().balance.get('balances');
 	const assets = getState().balance.get('assets');
 
-	const balance = {
-		symbol: assets.getIn([balances.getIn([selectedBalance, 'asset_type']), 'symbol']),
-		precision: assets.getIn([balances.getIn([selectedBalance, 'asset_type']), 'precision']),
-		balance: balances.getIn([selectedBalance, 'balance']),
-	};
+	let isToken = false;
+
+	if (!ValidateTransactionHelper.validateContractId(selectedBalance)) {
+		isToken = true;
+	}
+
+	const token = getState().balance.getIn(['tokens', selectedBalance]);
+	const balance = isToken ?
+		{
+			symbol: token.get('symbol'),
+			precision: token.get('precision'),
+			balance: token.get('balance'),
+		}
+		:
+		{
+			symbol: assets.getIn([balances.getIn([selectedBalance, 'asset_type']), 'symbol']),
+			precision: assets.getIn([balances.getIn([selectedBalance, 'asset_type']), 'precision']),
+			balance: balances.getIn([selectedBalance, 'balance']),
+		};
 
 	const amountError = ValidateSendHelper.validateAmount(amount, balance);
 
@@ -270,20 +326,41 @@ export const send = () => async (dispatch, getState) => {
 	const fromAccount = await fetchChain(activeUserName);
 	const toAccount = await fetchChain(to.value);
 
-	const options = {
-		amount: {
-			amount,
-			asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
-		},
-		fee: {
-			amount: fee.value || 0,
-			asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
-		},
-		from: fromAccount,
-		to: toAccount,
-		memo: memo.value,
-		type: 'transfer',
-	};
+	let options = {};
+
+	if (isToken) {
+		const precision = getState().balance.getIn(['tokens', selectedBalance, 'precision']);
+		const code = getTransferCode(toAccount.get('id'), amount * (10 ** precision));
+		const receiver = await fetchChain(selectedBalance);
+		options = {
+			asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			code,
+			fee: {
+				amount: fee.value || 0,
+				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			},
+			receiver,
+			registrar: fromAccount,
+			type: 'contract',
+			value: amount,
+		};
+	} else {
+
+		options = {
+			amount: {
+				amount,
+				asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
+			},
+			fee: {
+				amount: fee.value || 0,
+				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			},
+			from: fromAccount,
+			to: toAccount,
+			memo: memo.value,
+			type: 'transfer',
+		};
+	}
 
 	if (!fee.value) {
 		options.fee = await getTransactionFee(options);
@@ -298,27 +375,36 @@ export const send = () => async (dispatch, getState) => {
 		return false;
 	}
 
-	if (options.amount.asset.get('id') === options.fee.asset.get('id')) {
-		const total = new BN(amount).times(10 ** options.amount.asset.get('precision')).plus(options.fee.amount);
+	if (!isToken) {
+		if (options.amount.asset.get('id') === options.fee.asset.get('id')) {
+			const total = new BN(amount).times(10 ** options.amount.asset.get('precision')).plus(options.fee.amount);
 
-		if (total.gt(balances.getIn([selectedBalance, 'balance']))) {
-			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
-			return false;
-		}
-	} else {
-		const feeBalance = balances.find((val) => val.get('asset_type') === options.fee.asset.get('id')).get('balance');
+			if (total.gt(balances.getIn([selectedBalance, 'balance']))) {
+				dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
+				return false;
+			}
+		} else {
+			const feeBalance = balances.find((val) => val.get('asset_type') === options.fee.asset.get('id')).get('balance');
 
-		if (new BN(fee.value).gt(feeBalance)) {
-			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
-			return false;
+			if (new BN(fee.value).gt(feeBalance)) {
+				dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
+				return false;
+			}
 		}
 	}
 
-	options.amount.amount = parseInt(options.amount.amount * (10 ** options.amount.asset.get('precision')), 10);
+	if (isToken) {
+		options.value = 0;
+		options.fee.amount *= 10 ** options.fee.asset.get('precision');
+	} else {
+		options.amount.amount = parseInt(options.amount.amount * (10 ** options.amount.asset.get('precision')), 10);
+	}
 
 	const activeNetworkName = getState().global.getIn(['network', 'name']);
 
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
+
+	const emitter = echoService.getEmitter();
 
 	emitter.emit('sendRequest', options, activeNetworkName);
 
@@ -332,19 +418,15 @@ export const send = () => async (dispatch, getState) => {
  *
  * 	@param {String} path
  */
-const sendHandler = (path) => {
-	if (store.getState().global.get('loading')) {
+export const sendHandler = (path) => (dispatch, getState) => {
+	if (getState().global.get('loading')) {
 		history.push(path);
 	}
 
-	store.dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 };
 
-emitter.on('sendResponse', sendHandler);
-
-
-export const isAssetsChanged = () => async (dispatch, getState) => {
-	const assets = getState().balance.get('assets');
+export const isAssetsChanged = async (assets) => {
 
 	if (!assets.size) {
 		return false;
@@ -358,14 +440,239 @@ export const isAssetsChanged = () => async (dispatch, getState) => {
 
 	assetArr = await Promise.all(assetArr);
 
+	let isChanged = false;
+
 	assetArr.forEach((asset) => {
 		if (asset !== assets.get(asset.get('id'))) {
-			throw new Error('update history');
+			isChanged = true;
 		}
 	});
 
-	return false;
+	return isChanged;
 };
+/**
+ *  @method watchToken
+ *
+ * 	Add token to wallet balances list
+ *
+ * 	@param {String} contractId
+ */
+export const watchToken = (contractId) => async (dispatch, getState) => {
+	if (!contractId) {
+		dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Contract id should not be empty'));
+		return null;
+	}
+
+	if (ValidateTransactionHelper.validateContractId(contractId)) {
+		dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Invalid contract id'));
+		return null;
+	}
+
+	try {
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
+		const contract = await getContract(contractId);
+
+		if (!contract) {
+			dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Invalid contract id'));
+			dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+			return null;
+		}
+
+		const accountId = getState().global.getIn(['account', 'id']);
+
+		const { symbol, precision, balance } = await getTokenDetails(contractId, accountId);
+
+		if (!symbol || !Number.isInteger(precision)) {
+			dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Invalid token contract'));
+			dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+			return null;
+		}
+
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		let tokens = await dispatch(getCryptoInfo('tokens', networkName));
+
+
+		if (tokens && Object.values(tokens).find((id) => id.includes(contractId.split('.')[2]))) {
+			dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Token already exists'));
+			dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+			return null;
+		}
+
+		if (!tokens) {
+			tokens = {};
+			tokens[accountId] = [];
+		}
+
+		tokens[accountId].push(contractId.split('.')[2]);
+
+		dispatch(setCryptoInfo('tokens', tokens));
+
+		let stateTokens = getState().balance.get('tokens');
+
+		stateTokens = stateTokens
+			.setIn([contractId, 'accountId'], accountId)
+			.setIn([contractId, 'symbol'], symbol)
+			.setIn([contractId, 'precision'], precision)
+			.setIn([contractId, 'balance'], balance);
+
+		dispatch(batchActions([
+			BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }),
+			GlobalReducer.actions.set({ field: 'loading', value: false }),
+		]));
+
+		history.push(WALLET_PATH);
+	} catch (err) {
+		dispatch(setValue(FORM_WATCH_TOKEN, 'error', FormatHelper.formatError(err)));
+
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+	}
+
+	return null;
+};
+
+/**
+ *  @method checkBlockTransactions
+ *
+ * 	Check transactions in the last blocks
+ *
+ * 	@param {Number} blockNum
+ * 	@param {Number} count
+ * 	@param {Object} tokens
+ */
+const checkBlockTransactions = async (blockNum, count, tokens) => {
+	const { ChainStore } = echoService.getChainLib();
+
+
+	const block = await ChainStore.getBlock(blockNum);
+
+	if (block.transactions.length) {
+		for (let tr = 0; tr < block.transactions.length; tr += 1) {
+			for (let i = 0; i < block.transactions[tr].operations.length; i += 1) {
+				const [, data] = block.transactions[tr].operations[i];
+				if (tokens.findKey((value, key) => key === data.receiver)) {
+					return true;
+				}
+			}
+		}
+	}
+
+	blockNum += 1;
+	count -= 1;
+
+	if (count < 0) {
+		return false;
+	}
+
+	const isUpdated = await checkBlockTransactions(blockNum, count, tokens);
+
+	return !!isUpdated;
+};
+
+/**
+ *  @method isBlockChanged
+ *
+ * 	Is token was used in the last blocks
+ *
+ * 	@param {Object} tokens
+ */
+const isBlockChanged = (tokens) => async (dispatch, getState) => {
+	const blockNum = (await fetchChain(GLOBAL_ID_1)).get('head_block_number');
+
+	const stateBlockNum = getState().global.get('headBlockNum');
+
+	if (stateBlockNum === 0) {
+		dispatch(GlobalReducer.actions.set({ field: 'headBlockNum', value: blockNum }));
+		return false;
+	}
+
+	if (blockNum === stateBlockNum) {
+		return false;
+	}
+
+	let isUpdated = false;
+
+	isUpdated = await checkBlockTransactions(stateBlockNum, blockNum - stateBlockNum, tokens);
+
+	dispatch(GlobalReducer.actions.set({ field: 'headBlockNum', value: blockNum }));
+
+	return isUpdated;
+};
+
+/**
+ *  @method updateTokens
+ *
+ *  Update tokens in state when when contract was used in the last proceed blocks
+ */
+export const updateTokens = () => async (dispatch, getState) => {
+	const tokens = getState().balance.get('tokens');
+
+	try {
+		if (!(await dispatch(isBlockChanged(tokens)))) {
+			return false;
+		}
+
+		let tokensDetails = [];
+
+		tokens.mapKeys((contractId) => {
+			const accountId = tokens.getIn([contractId, 'accountId']);
+			tokensDetails.push(getTokenDetails(contractId, accountId));
+		});
+
+		tokensDetails = await Promise.all(tokensDetails);
+
+		let stateTokens = tokens;
+
+		tokens.mapEntries(([contractId], index) => {
+			stateTokens = stateTokens
+				.setIn([contractId, 'symbol'], tokensDetails[index].symbol)
+				.setIn([contractId, 'precision'], tokensDetails[index].precision)
+				.setIn([contractId, 'balance'], tokensDetails[index].balance);
+		});
+
+		if (stateTokens !== tokens) {
+			dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }));
+		}
+	} catch (err) {
+		dispatch(set('error', FormatHelper.formatError(err)));
+
+		return false;
+	}
+
+	return true;
+};
+
+/**
+ *  @method removeToken
+ *
+ * 	Remove token from wallet balances list
+ *
+ * 	@param {String} contractId
+ */
+export const removeToken = (contractId) => async (dispatch, getState) => {
+	const networkName = getState().global.getIn(['network', 'name']);
+
+	const tokens = await dispatch(getCryptoInfo('tokens', networkName));
+
+	const accountId = getState().global.getIn(['account', 'id']);
+
+	tokens[accountId] = tokens[accountId].filter((id) => contractId.split('.')[2] !== id);
+
+	dispatch(setCryptoInfo('tokens', tokens));
+
+
+	const stateTokens = getState().balance.get('tokens');
+	let stateTmpTokens = new Map({});
+
+	stateTokens.mapEntries(([id, value]) => {
+		if (contractId !== id) {
+			stateTmpTokens = stateTmpTokens.set(id, value);
+		}
+	});
+
+	dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTmpTokens }));
+};
+
 /**
  *  @method sendRedirect
  *
