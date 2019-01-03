@@ -87,9 +87,22 @@ class Send extends React.Component {
 			value = value.toLowerCase();
 		}
 
+		let error = null;
+
+		if (field && field === 'memo') {
+			error = ValidateSendHelper.validateMemo(value);
+		}
+
+		if (error) {
+			this.props.setFormError(field, error);
+			return null;
+		}
+
 		if (field) {
 			this.props.setFormValue(field, value);
 		}
+
+		return null;
 	}
 
 	onAmountChange(e) {
@@ -260,18 +273,21 @@ class Send extends React.Component {
 								error={!!fee.error}
 								errorText={fee.error}
 							/>
-							<BridgeTextArea
-								name="memo"
-								value={memo.value}
-								onChange={(e) => this.onChange(e)}
-								label="Note (optional)"
-								error={!!memo.error}
-								errorText={memo.error}
-								disabled={loading}
-							/>
+							<div className="message-error">
+
+								<BridgeTextArea
+									name="memo"
+									value={memo.value}
+									onChange={(e) => this.onChange(e)}
+									label="Note (optional)"
+									error={!!memo.error}
+									errorText={memo.error}
+									disabled={loading}
+								/>
+							</div>
 							<Button
 								className={classnames('btn-in-light', { loading })}
-								disabled={(!to.value || !amount.value)}
+								disabled={(!to.value || !amount.value || !!memo.error)}
 								content={<span className="btn-text">Send</span>}
 								onClick={() => this.onSend()}
 								type="submit"
