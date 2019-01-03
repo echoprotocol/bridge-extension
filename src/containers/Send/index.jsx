@@ -32,6 +32,7 @@ class Send extends React.Component {
 			timeout: null,
 			warning: false,
 		};
+
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -80,6 +81,7 @@ class Send extends React.Component {
 	}
 
 	onChange(e, lowerCase) {
+
 		const field = e.target.name;
 		let { value } = e.target;
 
@@ -287,7 +289,7 @@ class Send extends React.Component {
 							</div>
 							<Button
 								className={classnames('btn-in-light', { loading })}
-								disabled={(!to.value || !amount.value || !!memo.error)}
+								disabled={(!to.value || !amount.value || !!memo.error || loading)}
 								content={<span className="btn-text">Send</span>}
 								onClick={() => this.onSend()}
 								type="submit"
