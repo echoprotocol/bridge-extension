@@ -59,7 +59,7 @@ class ValidateSendHelper {
 
 	static validateMemo(memo) {
 		if (memo.length >= MAX_NOTE_LENGTH) {
-			return 'Note length must be less than 200000 symbols';
+			return `Note length must be less than ${MAX_NOTE_LENGTH} symbols`;
 		}
 
 		return null;
