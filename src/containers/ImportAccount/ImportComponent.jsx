@@ -10,10 +10,6 @@ class ImportComponent extends React.Component {
 	constructor(props) {
 		super(props);
 
-		this.state = {
-			btnDisabled: false,
-		};
-
 		this.nameRef = null;
 		this.passwordRef = null;
 	}
@@ -40,7 +36,6 @@ class ImportComponent extends React.Component {
 
 	onChange(e, lowercase) {
 		const { name, value } = e.target;
-		this.setState({ btnDisabled: false });
 		this.props.change(name, lowercase ? value.trim().toLowerCase() : value.trim());
 	}
 
@@ -52,16 +47,15 @@ class ImportComponent extends React.Component {
 	}
 
 	importAccount(e) {
-		this.setState({ btnDisabled: true });
 		this.props.importAccount(e);
 	}
 
 	isButtonDisabled() {
 		const {
-			password, nameError, passwordError,
+			password, nameError, passwordError, loading,
 		} = this.props;
 
-		return !!(!password || nameError || passwordError);
+		return !!(!password || nameError || passwordError || loading);
 	}
 
 	handleRef(ref, type) {
@@ -117,7 +111,7 @@ class ImportComponent extends React.Component {
 					<div className="page-action-wrap">
 						<div className="one-btn-wrap" >
 							<Button
-								disabled={this.state.btnDisabled || this.isButtonDisabled()}
+								disabled={this.isButtonDisabled()}
 								className={classnames('btn-in-light', { loading })}
 								content={<span className="btn-text">Import</span>}
 								type="submit"
