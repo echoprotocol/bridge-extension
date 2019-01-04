@@ -146,6 +146,38 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
 };
 
 /**
+ *  @method addKeyToAccount
+ *
+ * 	Add account
+ *
+ * 	@param {String} newPublicKey
+ * 	@param {String} networkName
+ */
+export const addKeyToAccount = (newPublicKey, networkName) => async (dispatch, getState) => {
+	try {
+		const accounts = getState().global.getIn(['accounts', networkName]);
+		const accountID = getState().global.get('account').get('id');
+
+		accounts.map((acc) => {
+			if (acc.id === accountID) {
+				if (Array.isArray(acc.keys[0])) {
+					acc.keys[0].push(newPublicKey);
+				} else {
+					acc.keys[0] = [acc.keys[0], newPublicKey];
+				}
+			}
+			return null;
+		});
+
+		accounts.set(networkName, accounts);
+
+	} catch (err) {
+		dispatch(set('error', FormatHelper.formatError(err)));
+	}
+};
+
+
+/**
  *  @method removeAccount
  *
  * 	Remove account

@@ -18,7 +18,7 @@ import {
 	NETWORK_ERROR_SEND_PATH,
 } from '../constants/RouterConstants';
 import { NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
-
+import { fetchChain } from '../api/ChainApi';
 import { setValue } from './FormActions';
 import { loadInfo, set } from './GlobalActions';
 import { globals } from './SignActions';
@@ -216,12 +216,16 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
 export const transitPublicKey = () => async (dispatch, getState) => {
 	try {
 		const networkName = getState().global.getIn(['network', 'name']);
+
 		const accounts = getState().global.getIn(['accounts', networkName]);
 		const account = getState().global.get('account');
 		if (!account) {
 			return null;
 		}
 		const accountID = getState().global.get('account').get('id');
+
+		const accountNew = await fetchChain(accountID);
+		console.log(accountNew.toJS());
 		const publicKey = accounts.find((acc) => acc.id === accountID).keys[0];
 
 		const wif = await getCrypto().getWIFByPublicKey(networkName, publicKey);
