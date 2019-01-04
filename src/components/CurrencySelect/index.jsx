@@ -232,6 +232,7 @@ class CurrencySelect extends React.Component {
 			return null;
 		});
 
+		console.log('zdes POPRAVIT');
 		if (tokens) {
 			tokens.mapEntries(([contractId, token]) => {
 				if (token.get('accountId') !== account.get('id')) {

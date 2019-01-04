@@ -253,7 +253,6 @@ export const loadInfo = () => async (dispatch, getState) => {
 
 	const result = await Promise.all(resultPromises);
 
-	let tokensObject = {};
 	let stateTokens = new Map({});
 	result.forEach(([networkName, accounts, tokens]) => {
 		accountsNetworks = accountsNetworks.set(networkName, new List(accounts));
@@ -264,30 +263,34 @@ export const loadInfo = () => async (dispatch, getState) => {
 
 		Object.entries(tokens).forEach(([accountId, tokensArray]) => {
 			tokensArray.forEach((id) => {
-				stateTokens = stateTokens.setIn([`1.16.${id}`, 'accountId'], accountId);
+				stateTokens = stateTokens.setIn([accountId, `1.16.${id}`], new Map({}));
 			});
 		});
-
-		tokensObject = Object.assign(tokensObject, tokens);
 
 		return null;
 	});
 
 	dispatch(set('accounts', accountsNetworks));
 
-	let tokensDetails = [];
+	const tokensDetails = [];
 
-	stateTokens.mapEntries(([contractId, tokenMap]) => {
-		tokensDetails.push(getTokenDetails(contractId, tokenMap.get('accountId')));
+	stateTokens.mapEntries(([accountId, tokensArr]) => {
+		const tokenPromises = [];
+		tokensArr.mapKeys((contractId) => {
+			tokenPromises.push(getTokenDetails(contractId, accountId));
+		});
+		tokensDetails.push(Promise.all(tokenPromises));
 	});
 
-	tokensDetails = await Promise.all(tokensDetails);
+	const resTokensDetails = await Promise.all(tokensDetails);
 
-	stateTokens.mapEntries(([contractId], index) => {
-		stateTokens = stateTokens
-			.setIn([contractId, 'symbol'], tokensDetails[index].symbol)
-			.setIn([contractId, 'precision'], tokensDetails[index].precision)
-			.setIn([contractId, 'balance'], tokensDetails[index].balance);
+	stateTokens.mapEntries(([accountId, tokensArr], i) => {
+		tokensArr.mapEntries(([contractId], j) => {
+			stateTokens = stateTokens
+				.setIn([accountId, contractId, 'symbol'], resTokensDetails[i][j].symbol)
+				.setIn([accountId, contractId, 'precision'], resTokensDetails[i][j].precision)
+				.setIn([accountId, contractId, 'balance'], resTokensDetails[i][j].balance);
+		});
 	});
 
 	dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }));

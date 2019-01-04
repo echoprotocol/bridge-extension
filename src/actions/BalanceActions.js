@@ -492,15 +492,28 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
 
 		let tokens = await dispatch(getCryptoInfo('tokens', networkName));
 
+		if (tokens) {
+			const isExists = Object.entries(tokens).find(([accId, tokensArr]) => {
+				if (accId === accountId) {
+					return !!tokensArr.find((id) => id.includes(contractId.split('.')[2]));
+				}
 
-		if (tokens && Object.values(tokens).find((id) => id.includes(contractId.split('.')[2]))) {
-			dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Token already exists'));
-			dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
-			return null;
+				return false;
+			});
+
+			if (isExists) {
+				dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Token already exists'));
+				dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+				return null;
+			}
 		}
 
 		if (!tokens) {
 			tokens = {};
+			tokens[accountId] = [];
+		}
+
+		if (!tokens[accountId]) {
 			tokens[accountId] = [];
 		}
 
@@ -511,10 +524,9 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
 		let stateTokens = getState().balance.get('tokens');
 
 		stateTokens = stateTokens
-			.setIn([contractId, 'accountId'], accountId)
-			.setIn([contractId, 'symbol'], symbol)
-			.setIn([contractId, 'precision'], precision)
-			.setIn([contractId, 'balance'], balance);
+			.setIn([accountId, contractId, 'symbol'], symbol)
+			.setIn([accountId, contractId, 'precision'], precision)
+			.setIn([accountId, contractId, 'balance'], balance);
 
 		dispatch(batchActions([
 			BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }),
@@ -612,22 +624,27 @@ export const updateTokens = () => async (dispatch, getState) => {
 			return false;
 		}
 
-		let tokensDetails = [];
+		const tokensDetails = [];
 
-		tokens.mapKeys((contractId) => {
-			const accountId = tokens.getIn([contractId, 'accountId']);
-			tokensDetails.push(getTokenDetails(contractId, accountId));
+		tokens.mapEntries(([accountId, tokensArr]) => {
+			const tokenPromises = [];
+			tokensArr.mapKeys((contractId) => {
+				tokenPromises.push(getTokenDetails(contractId, accountId));
+			});
+			tokensDetails.push(Promise.all(tokenPromises));
 		});
 
-		tokensDetails = await Promise.all(tokensDetails);
+		const resTokensDetails = await Promise.all(tokensDetails);
 
 		let stateTokens = tokens;
 
-		tokens.mapEntries(([contractId], index) => {
-			stateTokens = stateTokens
-				.setIn([contractId, 'symbol'], tokensDetails[index].symbol)
-				.setIn([contractId, 'precision'], tokensDetails[index].precision)
-				.setIn([contractId, 'balance'], tokensDetails[index].balance);
+		tokens.mapEntries(([accountId, tokensArr], i) => {
+			tokensArr.mapEntries(([contractId], j) => {
+				stateTokens = stateTokens
+					.setIn([accountId, contractId, 'symbol'], resTokensDetails[i][j].symbol)
+					.setIn([accountId, contractId, 'precision'], resTokensDetails[i][j].precision)
+					.setIn([accountId, contractId, 'balance'], resTokensDetails[i][j].balance);
+			});
 		});
 
 		if (stateTokens !== tokens) {
