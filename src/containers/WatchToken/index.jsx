@@ -22,13 +22,9 @@ class WatchTokens extends React.Component {
 	}
 
 
-	onChange(e, lowerCase) {
+	onChange(e) {
 		const field = e.target.name;
-		let { value } = e.target;
-
-		if (lowerCase) {
-			value = value.toLowerCase();
-		}
+		const { value } = e.target;
 
 		if (field) {
 			this.props.setFormValue(field, value);
@@ -47,7 +43,7 @@ class WatchTokens extends React.Component {
 	watchToken() {
 		const { contractId } = this.props;
 
-		this.props.addToken(contractId.value);
+		this.props.addToken(contractId.value.trim());
 	}
 
 	render() {
