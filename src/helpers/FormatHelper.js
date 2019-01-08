@@ -1,20 +1,20 @@
 import _ from 'lodash';
+import BN from 'bignumber.js';
 
 class FormatHelper {
 
 	static toFixed(value, precision) {
-		const power = 10 ** precision;
 
-		return (Math.round(value * power) / power).toFixed(precision);
+		return value.toFixed(precision).toString(10);
 	}
 
 	static formatAmount(amount, precision, symbol) {
-		const number = Math.abs(amount / (10 ** precision));
+		const number = new BN(amount).div(10 ** precision);
 
 		const base = `${parseInt(this.toFixed(Math.abs(number || 0), precision), 10)}`;
 		const mod = base.length > 3 ? base.length % 3 : 0;
 
-		let postfix = `.${this.toFixed(Math.abs(number), precision).split('.')[1]}`;
+		let postfix = `.${this.toFixed(number, precision).split('.')[1]}`;
 
 		for (let i = postfix.length - 1; i >= 0; i -= 1) {
 			if (postfix[i] === '0') {
