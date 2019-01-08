@@ -521,27 +521,20 @@ export const changeAccountIcon = (icon, iconColor) => async (dispatch, getState)
  *
  *  Remove all info
  */
-export const isPublicKeyAdded = (active) => async (dispatch, getState) => {
+export const isPublicKeyAdded = (accountId, active) => async (dispatch, getState) => {
 	const networkName = getState().global.getIn(['network', 'name']);
 	const accounts = getState().global.getIn(['accounts', networkName]);
 	const account = getState().global.get('account');
 	if (!account) {
 		return null;
 	}
-	const accountID = getState().global.get('account').get('id');
-	const publicKey = accounts.find((acc) => acc.id === accountID).keys[0];
-
+	const publicKey = accounts.find((acc) => acc.id === accountId).keys[0];
 
 	if (typeof publicKey === 'string') {
 		return publicKey === active;
 	}
 
-	publicKey.find((item) => {
-		console.log(item === active);
-
-		return null;
-
-	});
+	return publicKey.find((item) => item === active);
 };
 
 
@@ -550,28 +543,42 @@ export const isPublicKeyAdded = (active) => async (dispatch, getState) => {
  *
  * 	Add account
  *
- * 	@param {String} newPublicKey
- * 	@param {String} networkName
+ * 	@param {String} active
  */
-export const addKeyToAccount = (newPublicKey, networkName) => async (dispatch, getState) => {
-	try {
-		const accounts = getState().global.getIn(['accounts', networkName]);
-		const accountID = getState().global.get('account').get('id');
+export const addKeyToAccount = (accountId, active) => async (dispatch, getState) => {
 
-		accounts.map((acc) => {
-			if (acc.id === accountID) {
-				if (Array.isArray(acc.keys[0])) {
-					acc.keys[0].push(newPublicKey);
-				} else {
-					acc.keys[0] = [acc.keys[0], newPublicKey];
-				}
+	const networkName = getState().global.getIn(['network', 'name']);
+	const accounts = getState().global.getIn(['accounts', networkName]);
+	// const accountID = getState().global.getIn(['account', 'id']);
+
+
+	accounts.map((acc) => {
+
+		if (acc.id === accountId) {
+
+			if (Array.isArray(acc.keys[0]) && !acc.keys[0].includes(active)) {
+				console.log('0');
+
+				acc.keys[0].push(active);
 			}
-			return null;
-		});
+			const account = [acc.keys[0]];
 
-		accounts.set(networkName, accounts);
+			if (!account.includes(active)) {
+				console.log('1');
+				account.push(active);
+				acc.keys = account;
+			}
 
-	} catch (err) {
-		dispatch(set('error', FormatHelper.formatError(err)));
-	}
+		}
+
+		return null;
+
+	});
+
+	console.log(accounts.toJS());
+
+	// emmit event
+	// return accounts.set(networkName, accounts);
+
+
 };

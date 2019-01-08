@@ -4,7 +4,7 @@ import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 import FormatHelper from '../helpers/FormatHelper';
 
 import { setValue } from './FormActions';
-import { addAccount, isAccountAdded, isPublicKeyAdded } from './GlobalActions';
+import { addAccount, isAccountAdded, addKeyToAccount, isPublicKeyAdded } from './GlobalActions';
 import { getCrypto } from './CryptoActions';
 
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
@@ -185,24 +185,28 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 				return false;
 			}
 
-			if (await dispatch(isPublicKeyAdded(active))) {
+			if (await dispatch(isPublicKeyAdded(accountId, active))) {
 				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'WIF already added'));
 				return false;
 			}
-
+			await dispatch(addKeyToAccount(accountId, active));
 			await getCrypto().importByWIF(networkName, password);
 
 			const account = await fetchChain(accountId);
+			name = account.get('name');
+			if (dispatch(isAccountAdded(name))) {
 
-			if (dispatch(isAccountAdded(account.get('name')))) {
-
-				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Account already added'));
-				return false;
+				return name;
 			}
 
-			name = account.get('name');
 			const memo = account.getIn(['options', 'memo_key']);
-			keys = [active, active === memo ? memo : null];
+
+			if (active === memo) {
+				keys = [active, memo];
+			} else {
+				keys = [active];
+			}
+
 		} else {
 			success = await dispatch(importByPassword(networkName, name, password));
 
