@@ -250,7 +250,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 			receiver,
 			registrar: fromAccount,
 			type: 'contract',
-			value: amount,
+			value: 0,
 		};
 
 		if (!options.asset_id || !options.fee.asset || !options.registrar) {
@@ -342,7 +342,7 @@ export const send = () => async (dispatch, getState) => {
 			receiver,
 			registrar: fromAccount,
 			type: 'contract',
-			value: amount,
+			value: 0,
 		};
 	} else {
 
