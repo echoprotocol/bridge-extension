@@ -175,7 +175,8 @@ export const checkAccount = (fromAccount, toAccount, limit = 50) => async (dispa
 const getTransferCode = (id, amount) => {
 	const method = keccak256('transfer(address,uint256)').substr(0, 8);
 
-	const idArg = id.split('.')[2].toString(16).padStart(64, '0');
+	const idArg = Number(id.split('.')[2]).toString(16).padStart(64, '0');
+
 	const amountArg = amount.toString(16).padStart(64, '0');
 
 	return method + idArg + amountArg;
@@ -294,7 +295,9 @@ export const send = () => async (dispatch, getState) => {
 		isToken = true;
 	}
 
-	const token = getState().balance.getIn(['tokens', selectedBalance]);
+	const activeUser = getState().global.getIn(['account']);
+
+	const token = getState().balance.getIn(['tokens', activeUser.get('id'), selectedBalance]);
 	const balance = isToken ?
 		{
 			symbol: token.get('symbol'),
@@ -315,22 +318,19 @@ export const send = () => async (dispatch, getState) => {
 		return false;
 	}
 
-	const activeUserName = getState().global.getIn(['account', 'name']);
-
-	const isAccount = await dispatch(checkAccount(activeUserName, to.value));
+	const isAccount = await dispatch(checkAccount(activeUser.get('name'), to.value));
 
 	if (!isAccount) {
 		return false;
 	}
 
-	const fromAccount = await fetchChain(activeUserName);
+	const fromAccount = await fetchChain(activeUser.get('name'));
 	const toAccount = await fetchChain(to.value);
 
 	let options = {};
 
 	if (isToken) {
-		const precision = getState().balance.getIn(['tokens', selectedBalance, 'precision']);
-		const code = getTransferCode(toAccount.get('id'), amount * (10 ** precision));
+		const code = getTransferCode(toAccount.get('id'), amount * (10 ** token.get('precision')));
 		const receiver = await fetchChain(selectedBalance);
 		options = {
 			asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
@@ -492,15 +492,28 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
 
 		let tokens = await dispatch(getCryptoInfo('tokens', networkName));
 
+		if (tokens) {
+			const isExists = Object.entries(tokens).find(([accId, tokensArr]) => {
+				if (accId === accountId) {
+					return !!tokensArr.find((id) => id.includes(contractId.split('.')[2]));
+				}
 
-		if (tokens && Object.values(tokens).find((id) => id.includes(contractId.split('.')[2]))) {
-			dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Token already exists'));
-			dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
-			return null;
+				return false;
+			});
+
+			if (isExists) {
+				dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Token already exists'));
+				dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+				return null;
+			}
 		}
 
 		if (!tokens) {
 			tokens = {};
+			tokens[accountId] = [];
+		}
+
+		if (!tokens[accountId]) {
 			tokens[accountId] = [];
 		}
 
@@ -511,10 +524,9 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
 		let stateTokens = getState().balance.get('tokens');
 
 		stateTokens = stateTokens
-			.setIn([contractId, 'accountId'], accountId)
-			.setIn([contractId, 'symbol'], symbol)
-			.setIn([contractId, 'precision'], precision)
-			.setIn([contractId, 'balance'], balance);
+			.setIn([accountId, contractId, 'symbol'], symbol)
+			.setIn([accountId, contractId, 'precision'], precision)
+			.setIn([accountId, contractId, 'balance'], balance);
 
 		dispatch(batchActions([
 			BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }),
@@ -550,7 +562,16 @@ const checkBlockTransactions = async (blockNum, count, tokens) => {
 		for (let tr = 0; tr < block.transactions.length; tr += 1) {
 			for (let i = 0; i < block.transactions[tr].operations.length; i += 1) {
 				const [, data] = block.transactions[tr].operations[i];
-				if (tokens.findKey((value, key) => key === data.receiver)) {
+
+				let isChanged = false;
+
+				tokens.mapEntries(([, tokensArr]) => {
+					if (tokensArr.findKey((value, key) => key === data.receiver)) {
+						isChanged = true;
+					}
+				});
+
+				if (isChanged) {
 					return true;
 				}
 			}
@@ -612,22 +633,27 @@ export const updateTokens = () => async (dispatch, getState) => {
 			return false;
 		}
 
-		let tokensDetails = [];
+		const tokensDetails = [];
 
-		tokens.mapKeys((contractId) => {
-			const accountId = tokens.getIn([contractId, 'accountId']);
-			tokensDetails.push(getTokenDetails(contractId, accountId));
+		tokens.mapEntries(([accountId, tokensArr]) => {
+			const tokenPromises = [];
+			tokensArr.mapKeys((contractId) => {
+				tokenPromises.push(getTokenDetails(contractId, accountId));
+			});
+			tokensDetails.push(Promise.all(tokenPromises));
 		});
 
-		tokensDetails = await Promise.all(tokensDetails);
+		const resTokensDetails = await Promise.all(tokensDetails);
 
 		let stateTokens = tokens;
 
-		tokens.mapEntries(([contractId], index) => {
-			stateTokens = stateTokens
-				.setIn([contractId, 'symbol'], tokensDetails[index].symbol)
-				.setIn([contractId, 'precision'], tokensDetails[index].precision)
-				.setIn([contractId, 'balance'], tokensDetails[index].balance);
+		tokens.mapEntries(([accountId, tokensArr], i) => {
+			tokensArr.mapEntries(([contractId], j) => {
+				stateTokens = stateTokens
+					.setIn([accountId, contractId, 'symbol'], resTokensDetails[i][j].symbol)
+					.setIn([accountId, contractId, 'precision'], resTokensDetails[i][j].precision)
+					.setIn([accountId, contractId, 'balance'], resTokensDetails[i][j].balance);
+			});
 		});
 
 		if (stateTokens !== tokens) {
@@ -664,10 +690,19 @@ export const removeToken = (contractId) => async (dispatch, getState) => {
 	const stateTokens = getState().balance.get('tokens');
 	let stateTmpTokens = new Map({});
 
-	stateTokens.mapEntries(([id, value]) => {
-		if (contractId !== id) {
-			stateTmpTokens = stateTmpTokens.set(id, value);
+	stateTokens.mapEntries(([accId, tokensArr]) => {
+		if (accId !== accountId) {
+			stateTmpTokens = stateTmpTokens.set(accId, tokensArr);
+			return null;
 		}
+
+		tokensArr.mapEntries(([id, value]) => {
+			if (contractId !== id) {
+				stateTmpTokens = stateTmpTokens.setIn([accId, id], value);
+			}
+		});
+
+		return null;
 	});
 
 	dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTmpTokens }));
