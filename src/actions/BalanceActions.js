@@ -238,7 +238,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 		}
 	} else {
 		const precision = getState().balance.getIn(['tokens', selectedBalance, 'precision']);
-		const code = getTransferCode(toAccount.get('id'), amount * (10 ** precision));
+		const code = getTransferCode(toAccount.get('id'), new BN(amount).times(10 ** precision));
 		const receiver = await fetchChain(selectedBalance);
 		options = {
 			asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
@@ -274,7 +274,7 @@ export const send = () => async (dispatch, getState) => {
 
 	const form = getState().form.get(FORM_SEND);
 
-	const amount = Number(form.get('amount').value).toString();
+	const amount = new BN(form.get('amount').value).toString();
 
 	const to = form.get('to');
 	const fee = form.get('fee');
@@ -330,7 +330,7 @@ export const send = () => async (dispatch, getState) => {
 	let options = {};
 
 	if (isToken) {
-		const code = getTransferCode(toAccount.get('id'), amount * (10 ** token.get('precision')));
+		const code = getTransferCode(toAccount.get('id'), new BN(amount).times(10 ** token.get('precision')));
 		const receiver = await fetchChain(selectedBalance);
 		options = {
 			asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
