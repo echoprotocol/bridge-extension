@@ -82,6 +82,10 @@ class ImportAccount extends React.Component {
 	}
 
 	async onImportAccount() {
+
+		console.log('im here');
+
+
 		const { name, password } = this.state;
 
 		const success = await this.props.importAccount(name, password);

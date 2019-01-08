@@ -12,25 +12,28 @@ class Backup extends React.Component {
 	constructor(props) {
 		super(props);
 		this.state = {
-			key: {},
+			keys: [],
 		};
 	}
 
-	async componentWillMount() {
+	componentWillMount() {
 
-		const key = await this.props.transitPublicKey();
+		const keys = this.props.transitPublicKey();
 
-		this.setState({ key });
+		keys.then((value) => {
+			this.setState({ keys: value });
+		});
 
 	}
 
 
 	render() {
-		const { key } = this.state;
+		const { keys } = this.state;
 
-		if (!key) {
+		if (!keys.length) {
 			return null;
 		}
+
 		return (
 			<React.Fragment>
 				<div className="page-wrap backup-page">
@@ -41,17 +44,19 @@ class Backup extends React.Component {
 						>
 							<div className="page">
 								{
-									<div className="backup-container">
-										<p className="title">Public key</p>
-										<span className="key">{key.publicKey}</span>
+									keys.map((key) => (
+										key.wif ?
+											<div className="backup-container" key={key.wif}>
+												<p className="title">Public key</p>
+												<span className="key">{key.publicKey}</span>
 
-										<div className="wif-wrap backup-key">
-											<div className="wif">WIF</div>
-											<div className="wif-key">{key.wif}</div>
-											<BridgeBtnCopy compact btnTextWif text={key.wif} />
-										</div>
-									</div>
-
+												<div className="wif-wrap backup-key">
+													<div className="wif">WIF</div>
+													<div className="wif-key">{key.wif}</div>
+													<BridgeBtnCopy compact btnTextWif text={key.wif} />
+												</div>
+											</div> : null
+									))
 								}
 							</div>
 						</CustomScroll>

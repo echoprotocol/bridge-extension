@@ -209,28 +209,43 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
 	}
 };
 
+
 /**
  *  @method transitPublicKey
  *
  */
 export const transitPublicKey = () => async (dispatch, getState) => {
-	try {
-		const networkName = getState().global.getIn(['network', 'name']);
 
-		const accounts = getState().global.getIn(['accounts', networkName]);
+
+	try {
+		const keys = [];
+		let wifs = [];
+		const networkName = getState().global.getIn(['network', 'name']);
 		const account = getState().global.get('account');
+
 		if (!account) {
 			return null;
 		}
+
 		const accountID = getState().global.get('account').get('id');
 
-		const accountNew = await fetchChain(accountID);
-		console.log(accountNew.toJS());
-		const publicKey = accounts.find((acc) => acc.id === accountID).keys[0];
+		let accountChain = await fetchChain(accountID);
+		accountChain = accountChain.getIn(['active', 'key_auths']);
 
-		const wif = await getCrypto().getWIFByPublicKey(networkName, publicKey);
 
-		return { publicKey, wif };
+		accountChain.forEach(((item) => {
+			const wif = getCrypto().getWIFByPublicKey(networkName, item.getIn([0]));
+			wifs.push(wif);
+		}));
+
+		wifs = await Promise.all(wifs);
+
+		accountChain.forEach(((item, i) => {
+			// проверка добавлен ли ключ в сторе
+			keys.push({ publicKey: item.getIn([0]), wif: wifs[i] });
+		}));
+
+		return keys;
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 		return null;
@@ -273,3 +288,4 @@ export const wipeCrypto = () => async (dispatch, getState) => {
 
 	history.push(CREATE_PIN_PATH);
 };
+
