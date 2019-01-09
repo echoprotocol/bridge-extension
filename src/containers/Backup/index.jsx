@@ -17,15 +17,23 @@ class Backup extends React.Component {
 	}
 
 	componentWillMount() {
+		this.getKeys();
+	}
 
+	componentWillReceiveProps(nextProps) {
+		if (nextProps.accountName !== this.props.accountName) {
+			this.getKeys();
+		}
+	}
+
+
+	getKeys() {
 		const keys = this.props.transitPublicKey();
 
 		keys.then((value) => {
 			this.setState({ keys: value });
 		});
-
 	}
-
 
 	render() {
 		const { keys } = this.state;
@@ -71,10 +79,11 @@ class Backup extends React.Component {
 
 Backup.propTypes = {
 	transitPublicKey: PropTypes.func.isRequired,
+	accountName: PropTypes.string.isRequired,
 };
 
 export default connect(
-	() => ({}),
+	(state) => ({ accountName: state.global.getIn(['account', 'name']) }),
 	(dispatch) => ({
 		transitPublicKey: () => dispatch(transitPublicKey()),
 	}),
