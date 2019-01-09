@@ -6,9 +6,10 @@ import { fetchChain } from '../api/ChainApi';
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import operations from '../constants/TransactionConstants';
+import { CORE_SYMBOL } from '../constants/GlobalConstants';
+import { historyOperations } from '../constants/OperationConstants';
 
 import FormatHelper from '../helpers/FormatHelper';
-import { CORE_SYMBOL } from '../constants/GlobalConstants';
 
 import echoService from '../services/echo';
 
@@ -61,8 +62,10 @@ const formatOperation = async (data, result, accountName) => {
 
 	const { name, options } = Object.values(operations).find((i) => i.value === type);
 
+	const typeOperation = historyOperations.find((item) => item.value === name);
+
 	result = result.set('id', data.get('id'))
-		.setIn(['transaction', 'type'], name)
+		.setIn(['transaction', 'type'], typeOperation ? typeOperation.type : 'Transaction')
 		.setIn(['transaction', 'typeName'], name)
 		.setIn(['transaction', 'date'], moment.utc(block.timestamp).local().format('DD MMM, HH:mm'))
 		.setIn(['transaction', 'value'], 0)
@@ -85,6 +88,10 @@ const formatOperation = async (data, result, accountName) => {
 
 	if (result.getIn(['content', 'receiver']) && result.getIn(['content', 'receiver']) === accountName) {
 		numberSign = '+';
+
+		if (result.getIn(['transaction', 'type']) === 'Sent') {
+			result = result.setIn(['transaction', 'type'], 'Recieved');
+		}
 	}
 
 	if (options.value) {

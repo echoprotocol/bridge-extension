@@ -81,3 +81,18 @@ export const operationTypes = {
 		code: 47,
 	},
 };
+
+export const historyOperations = [
+	{
+		value: 'Transfer',
+		type: 'Sent',
+	},
+	{
+		value: 'Create account',
+		type: 'Account',
+	},
+	{
+		value: 'Contract',
+		type: 'Contract',
+	},
+];

@@ -44,10 +44,6 @@ class Transactions extends React.Component {
 		}
 	}
 
-	sortTransactions() {
-
-	}
-
 	render() {
 		const { history } = this.props;
 
