@@ -184,7 +184,7 @@ class Wallet extends React.Component {
 						<div className="page-action-wrap">
 							<div className="two-btn-wrap" >
 								<Link className="btn-transparent link" to={RECEIVE_PATH}>
-									<span className="btn-text">Recieve</span>
+									<span className="btn-text">Receive</span>
 								</Link>
 								<Link className="btn-in-light link" to={SEND_PATH}>
 									<span className="btn-text">Send</span>
