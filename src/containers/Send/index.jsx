@@ -205,7 +205,7 @@ class Send extends React.Component {
 								theme="input-light"
 								labelText="To"
 								defaultUp
-								placeholder="Reciever's name"
+								placeholder="Receiver's name"
 								leftLabel
 								value={to.value}
 								onChange={(e) => this.onChange(e, true)}
