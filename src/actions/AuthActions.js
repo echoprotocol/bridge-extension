@@ -83,7 +83,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
 
-		await dispatch(addAccount(name, [[key], key], networkName));
+		await dispatch(addAccount(name, [key, key], networkName));
 
 		return wif;
 
@@ -152,6 +152,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
  * 	@return {String} name
  */
 export const importAccount = (name, password) => async (dispatch, getState) => {
+
 	const networkName = getState().global.getIn(['network', 'name']);
 
 	const passwordError = ValidateAccountHelper.validatePassword(password);
@@ -176,6 +177,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		let keys = [];
 
 		if (getCrypto().isWIF(password)) {
+
 			const active = PrivateKey.fromWif(password).toPublicKey().toString();
 
 			const [accountId] = await getAccountRefsOfKey(active);
@@ -195,10 +197,8 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			const account = await fetchChain(accountId);
 			name = account.get('name');
 			if (dispatch(isAccountAdded(name))) {
-
-				return name;
+				return { name, isAccountAdded: true };
 			}
-
 			const memo = account.getIn(['options', 'memo_key']);
 
 			if (active === memo) {

@@ -14,6 +14,7 @@ import { clearForm, setValue } from '../../actions/FormActions';
 
 import ImportComponent from './ImportComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
+import NewKeyComponent from '../../components/NewKeyComponent';
 import SettingsAccount from '../SettingsAccount';
 
 class ImportAccount extends React.Component {
@@ -26,6 +27,7 @@ class ImportAccount extends React.Component {
 			password: '',
 			success: false,
 			settings: false,
+			isAccountAdded: false,
 		};
 	}
 
@@ -84,11 +86,20 @@ class ImportAccount extends React.Component {
 	async onImportAccount() {
 
 		const { name, password } = this.state;
-
 		const success = await this.props.importAccount(name, password);
 
+
 		if (success) {
-			this.setState({ success: true, name: success });
+			if (typeof success === 'object') {
+				this.setState({
+					success: true,
+					name: success.name,
+					isAccountAdded: success.isAccountAdded,
+				});
+			} else {
+				this.setState({ success: true, name: success });
+			}
+
 			this.props.history.push(IMPORT_SUCCESS_PATH);
 		}
 	}
@@ -120,7 +131,7 @@ class ImportAccount extends React.Component {
 			nameError, passwordError, loading, accounts, networkName,
 		} = this.props;
 		const {
-			name, password, success, settings,
+			name, password, success, settings, isAccountAdded,
 		} = this.state;
 
 		if (success) {
@@ -134,6 +145,18 @@ class ImportAccount extends React.Component {
 
 			if (!account) {
 				return null;
+			}
+
+			if (isAccountAdded) {
+				return (
+					<NewKeyComponent
+						name={name}
+						icon={account.icon}
+						iconColor={account.iconColor}
+						proceed={() => this.onProceedClick()}
+						onChangeIcon={() => this.onChangeIcon()}
+					/>
+				);
 			}
 
 			return (

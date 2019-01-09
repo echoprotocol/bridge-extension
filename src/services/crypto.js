@@ -167,6 +167,7 @@ class Crypto extends EventEmitter {
 		await this.setInByNetwork(networkName, publicKey.toString(), encryptedPrivateKey);
 	}
 
+
 	/**
 	 *  @method importByPassword
 	 *

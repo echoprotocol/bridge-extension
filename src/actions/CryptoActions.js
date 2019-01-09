@@ -226,8 +226,8 @@ export const transitPublicKey = () => async (dispatch, getState) => {
 		if (!account) {
 			return null;
 		}
-
-		const accountID = getState().global.get('account').get('id');
+		const accountID = getState().global.getIn(['account', 'id']);
+		// const accountID = getState().global.get('account').get('id');
 
 		let accountChain = await fetchChain(accountID);
 		accountChain = accountChain.getIn(['active', 'key_auths']);
@@ -241,7 +241,6 @@ export const transitPublicKey = () => async (dispatch, getState) => {
 		wifs = await Promise.all(wifs);
 
 		accountChain.forEach(((item, i) => {
-			// проверка добавлен ли ключ в сторе
 			keys.push({ publicKey: item.getIn([0]), wif: wifs[i] });
 		}));
 
