@@ -90,15 +90,11 @@ class ImportAccount extends React.Component {
 
 
 		if (success) {
-			if (typeof success === 'object') {
-				this.setState({
-					success: true,
-					name: success.name,
-					isAccountAdded: success.isAccountAdded,
-				});
-			} else {
-				this.setState({ success: true, name: success });
-			}
+			this.setState({
+				success: true,
+				name: success.name,
+				isAccountAdded: success.isAccountAdded,
+			});
 
 			this.props.history.push(IMPORT_SUCCESS_PATH);
 		}

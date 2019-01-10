@@ -527,31 +527,30 @@ export const changeAccountIcon = (icon, iconColor) => async (dispatch, getState)
  *  @param {String} accountId
  *  @param {String} active
  */
+
 export const isPublicKeyAdded = (accountId, active) => async (dispatch, getState) => {
 
 	const networkName = getState().global.getIn(['network', 'name']);
 	const accounts = getState().global.getIn(['accounts', networkName]);
 	const account = getState().global.get('account');
 
-	if (!account || !!accounts.findIndex((i) => i.id === accountId)) {
+	if (!account || (accounts.findIndex((i) => i.id === accountId) < 0)) {
 		return false;
 	}
 
-	const publicKey = accounts.find((item) => item.id === accountId).keys;
-	if (typeof publicKey === 'string') {
-		return publicKey === active;
-	}
+	const publicKeys = accounts.find((item) => item.id === accountId).keys;
 
-	return publicKey.find((item) => item === active);
+	return !!publicKeys.find((key) => key === active);
 };
 
 
 /**
  *  @method addKeyToAccount
  *
- * 	Add account
+ *  Add public key to account
  *
- * 	@param {String} active
+ * 	@param {String} accountId
+ *  @param {String} active
  */
 export const addKeyToAccount = (accountId, active) => async (dispatch, getState) => {
 
@@ -571,7 +570,6 @@ export const addKeyToAccount = (accountId, active) => async (dispatch, getState)
 
 	}));
 
-	await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
 	dispatch(set('accounts', accounts));
 
 };

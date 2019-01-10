@@ -1,11 +1,10 @@
 import React from 'react';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
-import { withRouter } from 'react-router';
 
 import UserIcon from '../UserIcon';
 
-class WelcomeComponent extends React.Component {
+class NewKeyComponent extends React.Component {
 
 	render() {
 		const {
@@ -38,7 +37,7 @@ class WelcomeComponent extends React.Component {
 								content={
 									<div className="btn-text">
 										<i className="icon-arrowDown" />
-											Proceed
+										Proceed
 									</div>
 								}
 							/>
@@ -52,11 +51,11 @@ class WelcomeComponent extends React.Component {
 }
 
 
-WelcomeComponent.defaultProps = {
+NewKeyComponent.defaultProps = {
 	onChangeIcon: null,
 };
 
-WelcomeComponent.propTypes = {
+NewKeyComponent.propTypes = {
 	name: PropTypes.string.isRequired,
 	icon: PropTypes.number.isRequired,
 	iconColor: PropTypes.string.isRequired,
@@ -64,4 +63,4 @@ WelcomeComponent.propTypes = {
 	onChangeIcon: PropTypes.func,
 };
 
-export default withRouter(WelcomeComponent);
+export default NewKeyComponent;
