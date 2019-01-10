@@ -102,7 +102,9 @@ const formatOperation = async (data, result, accountName) => {
 		const request = operation.getIn(options.asset.split('.'));
 		const response = await fetchChain(request);
 
-		result = result.setIn(['transaction', 'value'], `${numberSign} ${FormatHelper.formatAmount(result.getIn(['transaction', 'value']), response.get('precision'))}`);
+		const resultValue = result.getIn(['transaction', 'value']) !== 0 ? `${numberSign} ${FormatHelper.formatAmount(result.getIn(['transaction', 'value']), response.get('precision'))}` :
+			FormatHelper.formatAmount(result.getIn(['transaction', 'value']), response.get('precision'));
+		result = result.setIn(['transaction', 'value'], resultValue);
 		result = result.setIn(['transaction', 'currency'], response.get('symbol'));
 	}
 
