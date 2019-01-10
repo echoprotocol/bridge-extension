@@ -522,7 +522,10 @@ export const changeAccountIcon = (icon, iconColor) => async (dispatch, getState)
 /**
  *  @method isPublicKeyAdded
  *
- *  Remove all info
+ *  Check is Public Key was Added
+ *
+ *  @param {String} accountId
+ *  @param {String} active
  */
 export const isPublicKeyAdded = (accountId, active) => async (dispatch, getState) => {
 

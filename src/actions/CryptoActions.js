@@ -227,7 +227,6 @@ export const transitPublicKey = () => async (dispatch, getState) => {
 			return null;
 		}
 		const accountID = getState().global.getIn(['account', 'id']);
-		// const accountID = getState().global.get('account').get('id');
 
 		let accountChain = await fetchChain(accountID);
 		accountChain = accountChain.getIn(['active', 'key_auths']);
