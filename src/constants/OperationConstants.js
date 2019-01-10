@@ -84,15 +84,15 @@ export const operationTypes = {
 
 export const historyOperations = [
 	{
-		value: 'Transfer',
+		value: 'Sent',
 		type: 'Sent',
 	},
 	{
-		value: 'Create account',
+		value: 'Account created',
 		type: 'Account',
 	},
 	{
-		value: 'Contract',
+		value: 'Contract created',
 		type: 'Contract',
 	},
 ];

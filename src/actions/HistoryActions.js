@@ -90,7 +90,8 @@ const formatOperation = async (data, result, accountName) => {
 		numberSign = '+';
 
 		if (result.getIn(['transaction', 'type']) === 'Sent') {
-			result = result.setIn(['transaction', 'type'], 'Recieved');
+			result = result.setIn(['transaction', 'type'], 'Recieved')
+				.setIn(['transaction', 'typeName'], 'Received');
 		}
 	}
 
