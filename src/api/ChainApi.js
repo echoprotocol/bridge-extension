@@ -34,6 +34,16 @@ const getTypeByKey = (key) => {
 	return 'getBlock';
 };
 
+const createInstance = (url) => {
+	const { Apis } = echoService.getWsLib();
+	return Apis.instance(
+		url,
+		true,
+		4000,
+		{ enableCrypto: false },
+	);
+};
+
 /**
  *  @method checkConnection
  *
@@ -44,9 +54,12 @@ const getTypeByKey = (key) => {
 export const checkConnection = (url) => async (dispatch, getState) => {
 	const { Apis, Manager } = echoService.getWsLib();
 	const manager = new Manager({ url, urls: [] });
-	const instance = Apis.instance();
+	let instance = Apis.instance();
 
 	try {
+		if (instance.ws_rpc === null) {
+			instance = createInstance(url);
+		}
 		await manager.checkSingleUrlConnection(instance.ws_rpc);
 	} catch (err) {
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
@@ -92,12 +105,7 @@ export const connectToAddress = async (address, subscribeCb, isRecreate) => {
 
 			Apis.setAutoReconnect(false);
 
-			instance = Apis.instance(
-				address,
-				true,
-				4000,
-				{ enableCrypto: false },
-			);
+			instance = createInstance(address);
 
 			await instance.init_promise;
 		}
