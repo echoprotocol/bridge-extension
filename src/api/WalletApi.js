@@ -87,8 +87,10 @@ export const createWallet = async (registrator, account, wif) => {
 	response = await response.json();
 
 	if (!response || (response && response.errors)) {
-		throw response.errors.join();
+		return response.errors.join();
 	}
+
+	return null;
 };
 
 export const getOperationFee = async (type, transaction, core) => {
