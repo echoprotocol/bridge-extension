@@ -34,6 +34,12 @@ const getTypeByKey = (key) => {
 	return 'getBlock';
 };
 
+/**
+ *  @method createInstance
+ *
+ * 	@param {String} url
+ */
+
 const createInstance = (url) => {
 	const { Apis } = echoService.getWsLib();
 	return Apis.instance(
