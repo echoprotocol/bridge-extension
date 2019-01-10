@@ -1,7 +1,7 @@
 export default {
 	transfer: {
 		value: 0,
-		name: 'Transfer',
+		name: 'Sent',
 		options: {
 			from: 'from',
 			subject: ['to', 'name'],
@@ -51,7 +51,7 @@ export default {
 	},
 	account_create: {
 		value: 5,
-		name: 'Create account',
+		name: 'Account created',
 		options: {
 			from: 'registrar',
 			subject: ['name', null],
@@ -451,7 +451,7 @@ export default {
 	},
 	contract: {
 		value: 47,
-		name: 'Contract',
+		name: 'Contract created',
 		options: {
 			from: 'registrar',
 			subject: null,
