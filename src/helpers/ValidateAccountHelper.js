@@ -3,6 +3,7 @@ import { ChainValidation } from 'echojs-lib';
 class ValidateAccountHelper {
 
 	static validateAccountName(accountName) {
+
 		if (!accountName) {
 			return 'Account name should not be empty';
 		}

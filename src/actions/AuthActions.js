@@ -116,10 +116,12 @@ export const createAccount = (name) => async (dispatch, getState) => {
 const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	const nameError = ValidateAccountHelper.validateAccountName(name);
+	const existError = await validateImportAccountExist(name, true, networkName);
+
 	const account = await fetchChain(name);
 	const active = getCrypto().getPublicKey(name, password);
 	const [accountId] = await getAccountRefsOfKey(active);
-	const existError = await validateImportAccountExist(name, true, networkName);
+
 	let fieldError = 'nameError';
 	let isNewAccount = true;
 
@@ -135,11 +137,13 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	if (dispatch(isAccountAdded(name))) {
 		isNewAccount = false;
+
 		if (!await dispatch(isPublicKeyAdded(accountId, active))) {
 
 			await dispatch(addKeyToAccount(accountId, active));
 			return { successStatus: true, isNewAccount };
 		}
+
 		fieldError = 'passwordError';
 		addedError = 'WIF already added';
 	}
@@ -152,11 +156,24 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 		return { successStatus: false, isNewAccount };
 	}
 
-
 	const keys = account.getIn(['active', 'key_auths']);
 
+	let hasKey = false;
 
-	if (keys.find(((key) => key.find((i) => i !== active)))) {
+	keys.find((
+		(key) => {
+			key = key.get('0');
+			if (key === active) {
+				hasKey = true;
+				return null;
+			}
+			return null;
+		}));
+
+	console.log('hasKey: ', hasKey);
+
+
+	if (!hasKey) {
 		dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid password'));
 		return { successStatus: false, isNewAccount };
 	}
@@ -168,7 +185,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 		account.getIn(['options', 'memo_key']),
 	);
 
-	return { successStatus: false, isNewAccount };
+	return { successStatus: true, isNewAccount: true };
 };
 
 /**
@@ -182,6 +199,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
  * 	@return {String} name
  */
 export const importAccount = (name, password) => async (dispatch, getState) => {
+
 
 	const networkName = getState().global.getIn(['network', 'name']);
 
@@ -206,6 +224,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		let success = true;
 		let keys = [];
 
+		let isAccAdded = false;
 
 		if (getCrypto().isWIF(password)) {
 
@@ -225,12 +244,14 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 			const account = await fetchChain(accountId);
 			name = account.get('name');
+
 			await getCrypto().importByWIF(networkName, password);
 
 			if (dispatch(isAccountAdded(name))) {
+				isAccAdded = true;
 				await dispatch(addKeyToAccount(accountId, active));
 
-				return { name, isAccountAdded: true };
+				return { name, isAccAdded };
 			}
 
 			const memo = account.getIn(['options', 'memo_key']);
@@ -248,12 +269,16 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 				isNewAccount,
 			} = await dispatch(importByPassword(networkName, name, password));
 
-
+			isAccAdded = isNewAccount;
 			success = successStatus;
 
-			if (success || !isNewAccount) {
+			console.log('isNewAccount ???: ', isNewAccount);
 
-				return { name, isAccountAdded: true };
+
+			if (successStatus && !isAccAdded) {
+				console.log('Я тут?');
+
+				return { name, isAccAdded };
 			}
 
 
@@ -265,10 +290,15 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		}
 
 		if (success) {
+
+			console.log('from addAccount - isAccAdded: ', isAccAdded);
+
 			await dispatch(addAccount(name, keys, networkName));
 		}
 
-		return success ? { name, isAccountAdded: false } : null;
+		console.log('from return - isAccAdded: ', isAccAdded);
+		return success ? { name, isAccAdded: !isAccAdded } : null;
+
 	} catch (err) {
 
 		dispatch(setValue(FORM_SIGN_IN,	'error', FormatHelper.formatError(err)));

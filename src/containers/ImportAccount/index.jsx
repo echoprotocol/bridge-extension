@@ -130,7 +130,12 @@ class ImportAccount extends React.Component {
 			name, password, success, settings, isAccountAdded,
 		} = this.state;
 
+		// console.log('success: ', success);
+		// console.log('isAccountAdded: ', isAccountAdded);
+
 		if (success) {
+
+
 			const accountsNetwork = accounts.get(networkName);
 
 			if (!accountsNetwork) {
