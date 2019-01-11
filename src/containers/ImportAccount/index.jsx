@@ -27,7 +27,7 @@ class ImportAccount extends React.Component {
 			password: '',
 			success: false,
 			settings: false,
-			isAccountAdded: false,
+			isAccAdded: false,
 		};
 	}
 
@@ -93,7 +93,7 @@ class ImportAccount extends React.Component {
 			this.setState({
 				success: true,
 				name: success.name,
-				isAccountAdded: success.isAccountAdded,
+				isAccAdded: success.isAccAdded,
 			});
 
 			this.props.history.push(IMPORT_SUCCESS_PATH);
@@ -127,11 +127,8 @@ class ImportAccount extends React.Component {
 			nameError, passwordError, loading, accounts, networkName,
 		} = this.props;
 		const {
-			name, password, success, settings, isAccountAdded,
+			name, password, success, settings, isAccAdded,
 		} = this.state;
-
-		// console.log('success: ', success);
-		// console.log('isAccountAdded: ', isAccountAdded);
 
 		if (success) {
 
@@ -148,7 +145,8 @@ class ImportAccount extends React.Component {
 				return null;
 			}
 
-			if (isAccountAdded) {
+
+			if (isAccAdded) {
 				return (
 					<NewKeyComponent
 						name={name}

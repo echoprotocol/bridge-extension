@@ -258,6 +258,7 @@ export const transitPublicKey = () => async (dispatch, getState) => {
  * 	@param {String} field
  */
 export const removeCryptoInfo = (field, networkName) => async (dispatch, getState) => {
+
 	const crypto = echoService.getCrypto();
 
 	try {

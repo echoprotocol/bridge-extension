@@ -11,8 +11,6 @@ class NewKeyComponent extends React.Component {
 			name, icon, iconColor,
 		} = this.props;
 
-		console.log('here: ', icon, iconColor);
-
 
 		return (
 			<div className="welcome-wrap">

@@ -98,8 +98,6 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 };
 
-// todo: вынести errors в imortErrors()
-// todo: не отображаются ключи в бэкапе после importByPassword
 
 /**
  *  @method importByPassword
@@ -117,31 +115,38 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	const nameError = ValidateAccountHelper.validateAccountName(name);
 	const existError = await validateImportAccountExist(name, true, networkName);
-
-	const account = await fetchChain(name);
-	const active = getCrypto().getPublicKey(name, password);
-	const [accountId] = await getAccountRefsOfKey(active);
-
 	let fieldError = 'nameError';
-	let isNewAccount = true;
+	let isAccAddedByPas = false;
 
 	if (nameError || existError) {
 		const error = nameError || existError;
 
 		dispatch(setValue(FORM_SIGN_IN, fieldError, error));
-		return { successStatus: false, isNewAccount };
+		return { successStatus: false, isAccAddedByPas };
 	}
+
+	const account = await fetchChain(name);
+	const active = getCrypto().getPublicKey(name, password);
+	const [accountId] = await getAccountRefsOfKey(active);
+
 
 	let addedError = '';
 
 
 	if (dispatch(isAccountAdded(name))) {
-		isNewAccount = false;
+		isAccAddedByPas = true;
 
 		if (!await dispatch(isPublicKeyAdded(accountId, active))) {
 
 			await dispatch(addKeyToAccount(accountId, active));
-			return { successStatus: true, isNewAccount };
+			await getCrypto().importByPassword(
+				networkName,
+				name,
+				password,
+				account.getIn(['options', 'memo_key']),
+			);
+
+			return { successStatus: true, isAccAddedByPas };
 		}
 
 		fieldError = 'passwordError';
@@ -153,7 +158,8 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 		const error = addedError;
 
 		dispatch(setValue(FORM_SIGN_IN, fieldError, error));
-		return { successStatus: false, isNewAccount };
+
+		return { successStatus: false, isAccAddedByPas };
 	}
 
 	const keys = account.getIn(['active', 'key_auths']);
@@ -170,12 +176,9 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 			return null;
 		}));
 
-	console.log('hasKey: ', hasKey);
-
-
 	if (!hasKey) {
 		dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid password'));
-		return { successStatus: false, isNewAccount };
+		return { successStatus: false, isAccAddedByPas };
 	}
 
 	await getCrypto().importByPassword(
@@ -185,7 +188,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 		account.getIn(['options', 'memo_key']),
 	);
 
-	return { successStatus: true, isNewAccount: true };
+	return { successStatus: true, isAccAddedByPas };
 };
 
 /**
@@ -196,7 +199,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
  * 	@param {String} name
  * 	@param {String} password
  *
- * 	@return {String} name
+ * 	@return {Object} name, isAccAdded
  */
 export const importAccount = (name, password) => async (dispatch, getState) => {
 
@@ -248,39 +251,28 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			await getCrypto().importByWIF(networkName, password);
 
 			if (dispatch(isAccountAdded(name))) {
+
 				isAccAdded = true;
 				await dispatch(addKeyToAccount(accountId, active));
 
 				return { name, isAccAdded };
 			}
-
-			const memo = account.getIn(['options', 'memo_key']);
-
-			if (active === memo) {
-				keys = [active, memo];
-			} else {
-				keys = [active];
-			}
+			keys = [active];
 
 		} else {
 
 			const {
 				successStatus,
-				isNewAccount,
+				isAccAddedByPas,
 			} = await dispatch(importByPassword(networkName, name, password));
 
-			isAccAdded = isNewAccount;
+			isAccAdded = isAccAddedByPas;
 			success = successStatus;
 
-			console.log('isNewAccount ???: ', isNewAccount);
-
-
-			if (successStatus && !isAccAdded) {
-				console.log('Я тут?');
+			if (success && isAccAddedByPas) {
 
 				return { name, isAccAdded };
 			}
-
 
 			keys = [
 				getCrypto().getPublicKey(name, password, ACTIVE_KEY),
@@ -291,13 +283,10 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 		if (success) {
 
-			console.log('from addAccount - isAccAdded: ', isAccAdded);
-
 			await dispatch(addAccount(name, keys, networkName));
 		}
 
-		console.log('from return - isAccAdded: ', isAccAdded);
-		return success ? { name, isAccAdded: !isAccAdded } : null;
+		return success ? { name, isAccAdded } : null;
 
 	} catch (err) {
 

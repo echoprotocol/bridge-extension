@@ -140,6 +140,7 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
 		}));
 
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+
 		dispatch(set('accounts', accounts));
 
 		dispatch(initAccount({ name, icon, iconColor }));
@@ -181,7 +182,11 @@ export const onLogout = (name) => async (dispatch, getState) => {
 
 		dispatch(removeBalances(id));
 
-		await Promise.all(keys.map((key) => dispatch(removeCryptoInfo(key))));
+		/* eslint-disable no-await-in-loop, no-plusplus */
+		for (let i = 0; i < keys.length; i++) {
+			await dispatch(removeCryptoInfo(keys[i]));
+		}
+		/* eslint-enable no-await-in-loop, no-plusplus */
 
 		accounts = accounts.set(networkName, accounts.get(networkName).filter((i) => i.name !== name));
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
@@ -570,6 +575,7 @@ export const addKeyToAccount = (accountId, active) => async (dispatch, getState)
 
 	}));
 
+	await dispatch(setCryptoInfo('accounts', accounts.get(networkName).toJS()));
 	dispatch(set('accounts', accounts));
 
 };
