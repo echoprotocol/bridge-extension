@@ -109,7 +109,7 @@ class Send extends React.Component {
 
 	onAmountChange(e) {
 		const {
-			selectedBalance, balances, assets, tokens,
+			selectedBalance, balances, assets, tokens, account,
 		} = this.props;
 
 		const field = e.target.name;
@@ -119,8 +119,8 @@ class Send extends React.Component {
 		let symbol = null;
 
 		if (!ValidateTransactionHelper.validateContractId(selectedBalance)) {
-			precision = tokens.getIn([selectedBalance, 'precision']);
-			symbol = tokens.getIn([selectedBalance, 'symbol']);
+			precision = tokens.getIn([account.get('id'), selectedBalance, 'precision']);
+			symbol = tokens.getIn([account.get('id'), selectedBalance, 'symbol']);
 		}
 		const asset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
 
@@ -220,7 +220,7 @@ class Send extends React.Component {
 								theme="input-light"
 								labelText="To"
 								defaultUp
-								placeholder="Reciever's name"
+								placeholder="Receiver's name"
 								leftLabel
 								value={to.value}
 								onChange={(e) => this.onChange(e, true)}

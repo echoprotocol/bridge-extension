@@ -1,5 +1,6 @@
 import { keccak256 } from 'js-sha3';
 import utf8 from 'utf8';
+import BN from 'bignumber.js';
 
 import echoService from '../services/echo';
 
@@ -254,7 +255,7 @@ export const getTokenDetails = async (contractId = '1.16.7807', accountId = '1.2
 		const result = await Promise.all(tokenDetails);
 
 		return {
-			balance: parseInt(result[0], 16),
+			balance: new BN(result[0], 16).toString(10),
 			symbol: toUtf8(result[1].substr(-64)),
 			precision: parseInt(result[2], 16),
 		};

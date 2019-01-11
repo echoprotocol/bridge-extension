@@ -77,7 +77,12 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		}
 		const wif = getCrypto().generateWIF();
 
-		await createWallet(registrator, name, wif);
+		const createError = await createWallet(registrator, name, wif);
+
+		if (createError) {
+			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error: 'Account has not been created', example: '' }));
+			return null;
+		}
 
 		await getCrypto().importByWIF(networkName, wif);
 
