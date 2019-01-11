@@ -115,7 +115,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	const nameError = ValidateAccountHelper.validateAccountName(name);
 	const existError = await validateImportAccountExist(name, true, networkName);
-	let fieldError = 'nameError';
+	const fieldError = 'nameError';
 	let isAccAddedByPas = false;
 
 	if (nameError || existError) {
@@ -128,9 +128,6 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 	const account = await fetchChain(name);
 	const active = getCrypto().getPublicKey(name, password);
 	const [accountId] = await getAccountRefsOfKey(active);
-
-
-	let addedError = '';
 
 
 	if (dispatch(isAccountAdded(name))) {
@@ -149,18 +146,12 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 			return { successStatus: true, isAccAddedByPas };
 		}
 
-		fieldError = 'passwordError';
-		addedError = 'WIF already added';
-	}
 
-
-	if (addedError.length) {
-		const error = addedError;
-
-		dispatch(setValue(FORM_SIGN_IN, fieldError, error));
+		dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'WIF already added'));
 
 		return { successStatus: false, isAccAddedByPas };
 	}
+
 
 	const keys = account.getIn(['active', 'key_auths']);
 
