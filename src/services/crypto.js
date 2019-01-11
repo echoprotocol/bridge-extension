@@ -376,7 +376,7 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @param {String} networkName
 	 *  @param {String} field
-     *  @param {String} tmpfield - for decypt memo
+     *  @param {String?} tmpfield - for decypt memo
 	 */
 	async getInByNetwork(networkName, field, tmpfield) {
 		privateAES.required();

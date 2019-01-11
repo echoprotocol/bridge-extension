@@ -305,11 +305,18 @@ const sendTransaction = async (transaction, networkName) => {
 	const account = transaction[operationKeys[type]];
 	const options = formatToSend(type, transaction);
 
-	const publicKey = account.getIn(['active', 'key_auths', '0', '0']);
+	const publicKeys = account.getIn(['active', 'key_auths']);
 
+
+	const keyPromises =
+        await Promise.all(publicKeys.map((key) => crypto.getInByNetwork(networkName, key.get(0))));
+
+	const indexPublicKey = keyPromises.findIndex((key) => !!key);
+
+	const pKey = publicKeys.getIn([indexPublicKey, 0]);
 	const { TransactionBuilder } = chainjs;
 	let tr = new TransactionBuilder();
-	tr = await crypto.sign(networkName, tr, publicKey);
+	tr = await crypto.sign(networkName, tr, pKey);
 
 	if (memo) {
 		const { to } = transaction;
