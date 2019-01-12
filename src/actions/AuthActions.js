@@ -4,7 +4,7 @@ import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 import FormatHelper from '../helpers/FormatHelper';
 
 import { setValue } from './FormActions';
-import { addAccount, isAccountAdded } from './GlobalActions';
+import { addAccount, isAccountAdded, addKeyToAccount, isPublicKeyAdded } from './GlobalActions';
 import { getCrypto } from './CryptoActions';
 
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
@@ -77,16 +77,12 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		}
 		const wif = getCrypto().generateWIF();
 
-		const createError = await createWallet(registrator, name, wif);
-
-		if (createError) {
-			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error: 'Account has not been created', example: '' }));
-			return null;
-		}
+		await createWallet(registrator, name, wif);
 
 		await getCrypto().importByWIF(networkName, wif);
 
 		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
+
 		await dispatch(addAccount(name, [key, key], networkName));
 
 		return wif;
@@ -102,6 +98,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 };
 
+
 /**
  *  @method importByPassword
  *
@@ -111,30 +108,68 @@ export const createAccount = (name) => async (dispatch, getState) => {
  * 	@param {String} name
  * 	@param {String} password
  *
- * 	@return {Boolean} success
+* 	@return {Boolean} successStatus
+ *  @return {Boolean} isNewAccount
  */
 const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	const nameError = ValidateAccountHelper.validateAccountName(name);
-	const addedError = dispatch(isAccountAdded(name)) ? 'Account already added' : null;
-
 	const existError = await validateImportAccountExist(name, true, networkName);
+	const fieldError = 'nameError';
+	let isAccAddedByPas = false;
 
-	if (nameError || addedError || existError) {
-		const error = nameError || addedError || existError;
+	if (nameError || existError) {
+		const error = nameError || existError;
 
-		dispatch(setValue(FORM_SIGN_IN, 'nameError', error));
-		return false;
+		dispatch(setValue(FORM_SIGN_IN, fieldError, error));
+		return { successStatus: false, isAccAddedByPas };
 	}
 
 	const account = await fetchChain(name);
-
 	const active = getCrypto().getPublicKey(name, password);
+	const [accountId] = await getAccountRefsOfKey(active);
 
-	if (account.getIn(['active', 'key_auths', '0', '0']) !== active) {
+	const keys = account.getIn(['active', 'key_auths']);
+
+	let hasKey = false;
+
+	keys.find((
+		(key) => {
+			key = key.get('0');
+			if (key === active) {
+				hasKey = true;
+				return null;
+			}
+			return null;
+		}));
+
+	if (!hasKey) {
 		dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid password'));
-		return false;
+		return { successStatus: false, isAccAddedByPas };
 	}
+
+	if (dispatch(isAccountAdded(name))) {
+		isAccAddedByPas = true;
+
+		if (!await dispatch(isPublicKeyAdded(accountId, active))) {
+
+			await dispatch(addKeyToAccount(accountId, active));
+			await getCrypto().importByPassword(
+				networkName,
+				name,
+				password,
+				account.getIn(['options', 'memo_key']),
+			);
+
+			return { successStatus: true, isAccAddedByPas };
+		}
+
+
+		dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'WIF already added'));
+
+		return { successStatus: false, isAccAddedByPas };
+	}
+
 
 	await getCrypto().importByPassword(
 		networkName,
@@ -143,7 +178,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 		account.getIn(['options', 'memo_key']),
 	);
 
-	return true;
+	return { successStatus: true, isAccAddedByPas };
 };
 
 /**
@@ -154,11 +189,12 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
  * 	@param {String} name
  * 	@param {String} password
  *
- * 	@return {String} name
+ * 	@return {Object} name, isAccAdded
  */
 export const importAccount = (name, password) => async (dispatch, getState) => {
-	const networkName = getState().global.getIn(['network', 'name']);
 
+
+	const networkName = getState().global.getIn(['network', 'name']);
 	const passwordError = ValidateAccountHelper.validatePassword(password);
 
 	if (passwordError) {
@@ -179,7 +215,11 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 		let success = true;
 		let keys = [];
+
+		let isAccAdded = false;
+
 		if (getCrypto().isWIF(password)) {
+
 			const active = PrivateKey.fromWif(password).toPublicKey().toString();
 
 			const [accountId] = await getAccountRefsOfKey(active);
@@ -189,33 +229,67 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 				return false;
 			}
 
-			const account = await fetchChain(accountId);
-
-			if (dispatch(isAccountAdded(account.get('name')))) {
-				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Account already added'));
+			if (await dispatch(isPublicKeyAdded(accountId, active))) {
+				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'WIF already added'));
 				return false;
 			}
 
-			await getCrypto().importByWIF(networkName, password);
+
+			const account = await fetchChain(accountId);
+
+			const publicKeys = account.getIn(['active', 'key_auths']);
+
+			const activeKey = publicKeys.find((key) => key.get(0) === active);
+
+			if (!activeKey) {
+				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'WIF is not active key.'));
+				return false;
+			}
 
 			name = account.get('name');
-			const memo = account.getIn(['options', 'memo_key']);
-			keys = [active, active === memo ? memo : null];
+
+			await getCrypto().importByWIF(networkName, password);
+
+			if (dispatch(isAccountAdded(name))) {
+
+				isAccAdded = true;
+				await dispatch(addKeyToAccount(accountId, active));
+
+				return { name, isAccAdded };
+			}
+			keys = [active];
+
 		} else {
-			success = await dispatch(importByPassword(networkName, name, password));
+
+			const {
+				successStatus,
+				isAccAddedByPas,
+			} = await dispatch(importByPassword(networkName, name, password));
+
+			isAccAdded = isAccAddedByPas;
+			success = successStatus;
+
+			if (success && isAccAddedByPas) {
+
+				return { name, isAccAdded };
+			}
 
 			keys = [
 				getCrypto().getPublicKey(name, password, ACTIVE_KEY),
 				getCrypto().getPublicKey(name, password, MEMO_KEY),
 			];
+
 		}
 
 		if (success) {
+
 			await dispatch(addAccount(name, keys, networkName));
 		}
 
-		return success ? name : null;
+		return success ? { name, isAccAdded } : null;
+
 	} catch (err) {
+
 		dispatch(setValue(FORM_SIGN_IN,	'error', FormatHelper.formatError(err)));
 
 		return false;

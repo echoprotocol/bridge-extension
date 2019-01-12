@@ -51,6 +51,7 @@ import Listeners from '../services/listeners';
  * 	@param {String} field
  * 	@param {Any} value
  */
+
 export const set = (field, value) => (dispatch) =>
 	dispatch(GlobalReducer.actions.set({ field, value }));
 
@@ -116,10 +117,13 @@ export const isAccountAdded = (name) => (dispatch, getState) => {
  * 	@param {Array} keys
  */
 export const addAccount = (name, keys, networkName) => async (dispatch, getState) => {
+
+
 	try {
 		const account = await fetchChain(name);
 
 		let accounts = getState().global.get('accounts');
+
 		accounts =
 			accounts.set(networkName, accounts.get(networkName).map((i) => ({ ...i, active: false })));
 
@@ -136,6 +140,7 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
 		}));
 
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+
 		dispatch(set('accounts', accounts));
 
 		dispatch(initAccount({ name, icon, iconColor }));
@@ -143,6 +148,7 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
 };
+
 
 /**
  *  @method removeAccount
@@ -176,7 +182,11 @@ export const onLogout = (name) => async (dispatch, getState) => {
 
 		dispatch(removeBalances(id));
 
-		await Promise.all(keys.map((key) => dispatch(removeCryptoInfo(key))));
+		/* eslint-disable no-await-in-loop, no-plusplus */
+		for (let i = 0; i < keys.length; i++) {
+			await dispatch(removeCryptoInfo(keys[i]));
+		}
+		/* eslint-enable no-await-in-loop, no-plusplus */
 
 		accounts = accounts.set(networkName, accounts.get(networkName).filter((i) => i.name !== name));
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
@@ -514,4 +524,61 @@ export const changeAccountIcon = (icon, iconColor) => async (dispatch, getState)
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
+};
+
+
+/**
+ *  @method isPublicKeyAdded
+ *
+ *  Check is Public Key was Added
+ *
+ *  @param {String} accountId
+ *  @param {String} active
+ */
+
+export const isPublicKeyAdded = (accountId, active) => async (dispatch, getState) => {
+
+	const networkName = getState().global.getIn(['network', 'name']);
+	const accounts = getState().global.getIn(['accounts', networkName]);
+	const account = getState().global.get('account');
+
+	if (!account || (accounts.findIndex((i) => i.id === accountId) < 0)) {
+		return false;
+	}
+
+	const publicKeys = accounts.find((item) => item.id === accountId).keys;
+
+	return !!publicKeys.find((key) => key === active);
+};
+
+
+/**
+ *  @method addKeyToAccount
+ *
+ *  Add public key to account
+ *
+ * 	@param {String} accountId
+ *  @param {String} active
+ */
+export const addKeyToAccount = (accountId, active) => async (dispatch, getState) => {
+
+	const networkName = getState().global.getIn(['network', 'name']);
+	let accounts = getState().global.get('accounts');
+
+	accounts = accounts.set(networkName, accounts.get(networkName).map((account) => {
+
+		if (account.id === accountId && !account.keys.includes(active)) {
+			account.keys.push(active);
+		}
+
+		return {
+			...account,
+			keys: [...account.keys],
+		};
+
+	}));
+
+	await dispatch(setCryptoInfo('accounts', accounts.get(networkName).toJS()));
+	dispatch(set('accounts', accounts));
+
 };

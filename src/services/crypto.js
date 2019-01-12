@@ -89,6 +89,31 @@ class Crypto extends EventEmitter {
 	}
 
 	/**
+	 *  @method getWIFByPublicKey
+	 *
+	 *  Get key for backup page
+	 *
+	 *  @param {String} network
+	 *  @param {String} publicKey
+	 *
+	 *  @return {String} WIF
+	 */
+	async getWIFByPublicKey(networkName, publicKey) {
+		privateAES.required();
+
+		try {
+			const encryptedPrivateKey = await this.getInByNetwork(networkName, publicKey);
+			const aes = privateAES.get();
+			const privateKeyBuffer = aes.decryptHexToBuffer(encryptedPrivateKey);
+			const privateKey = PrivateKey.fromBuffer(privateKeyBuffer);
+			return privateKey.toWif();
+		} catch (err) {
+			return null;
+		}
+
+	}
+
+	/**
 	 *  @method isWIF
 	 *
 	 *  Check string is WIF.
@@ -132,15 +157,17 @@ class Crypto extends EventEmitter {
 	 *  @param {String} wif
 	 */
 	async importByWIF(networkName, wif) {
+
+
 		privateAES.required();
 
 		const privateKey = PrivateKey.fromWif(wif);
 		const aes = privateAES.get();
 		const encryptedPrivateKey = aes.encryptToHex(privateKey.toBuffer());
 		const publicKey = privateKey.toPublicKey();
-
 		await this.setInByNetwork(networkName, publicKey.toString(), encryptedPrivateKey);
 	}
+
 
 	/**
 	 *  @method importByPassword
@@ -155,6 +182,7 @@ class Crypto extends EventEmitter {
 	 *  @param {String} memoPublicKey
 	 */
 	async importByPassword(networkName, username, password, memoPublicKey) {
+
 		privateAES.required();
 
 		const privateKeyWIF = this.getPrivateKey(username, password);
@@ -326,6 +354,7 @@ class Crypto extends EventEmitter {
 		privateAES.required();
 
 		let networkData = await storage.get(networkName);
+
 		if (networkData) {
 			networkData = privateAES.get().decryptHexToBuffer(networkData);
 			networkData = JSON.parse(networkData.toString());
@@ -336,6 +365,7 @@ class Crypto extends EventEmitter {
 		networkData[field] = fieldData;
 		networkData = JSON.stringify(networkData);
 		networkData = privateAES.get().encryptToHex(Buffer.from(networkData));
+
 		await storage.set(networkName, networkData);
 	}
 
@@ -346,7 +376,7 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @param {String} networkName
 	 *  @param {String} field
-     *  @param {String} tmpfield - for decypt memo
+     *  @param {String?} tmpfield - for decypt memo
 	 */
 	async getInByNetwork(networkName, field, tmpfield) {
 		privateAES.required();

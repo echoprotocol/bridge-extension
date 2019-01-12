@@ -18,9 +18,9 @@ import {
 	NETWORK_ERROR_SEND_PATH,
 } from '../constants/RouterConstants';
 import { NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
-
+import { fetchChain } from '../api/ChainApi';
 import { setValue } from './FormActions';
-import { loadInfo } from './GlobalActions';
+import { loadInfo, set } from './GlobalActions';
 import { globals } from './SignActions';
 
 import FormatHelper from '../helpers/FormatHelper';
@@ -209,6 +209,47 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
 	}
 };
 
+
+/**
+ *  @method transitPublicKey
+ *
+ */
+export const transitPublicKey = () => async (dispatch, getState) => {
+
+
+	try {
+		const keys = [];
+		let wifs = [];
+		const networkName = getState().global.getIn(['network', 'name']);
+		const account = getState().global.get('account');
+
+		if (!account) {
+			return null;
+		}
+		const accountID = getState().global.getIn(['account', 'id']);
+
+		let accountChain = await fetchChain(accountID);
+		accountChain = accountChain.getIn(['active', 'key_auths']);
+
+
+		accountChain.forEach(((item) => {
+			const wif = getCrypto().getWIFByPublicKey(networkName, item.getIn([0]));
+			wifs.push(wif);
+		}));
+
+		wifs = await Promise.all(wifs);
+
+		accountChain.forEach(((item, i) => {
+			keys.push({ publicKey: item.getIn([0]), wif: wifs[i] });
+		}));
+
+		return keys;
+	} catch (err) {
+		dispatch(set('error', FormatHelper.formatError(err)));
+		return null;
+	}
+};
+
 /**
  *  @method removeCryptoInfo
  *
@@ -217,6 +258,7 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
  * 	@param {String} field
  */
 export const removeCryptoInfo = (field, networkName) => async (dispatch, getState) => {
+
 	const crypto = echoService.getCrypto();
 
 	try {
@@ -245,3 +287,4 @@ export const wipeCrypto = () => async (dispatch, getState) => {
 
 	history.push(CREATE_PIN_PATH);
 };
+

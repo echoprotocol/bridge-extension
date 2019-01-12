@@ -16,11 +16,15 @@
     font-size: 23px;
     color: #3E4850;
     line-height: 21px;
-    letter-spacing: 1px;
+	letter-spacing: 1px;
+	
     div {
         margin-bottom: 10px;
         font-family: FNMedium;
-    }
+	}
+	span + div {
+		margin: 10px 0 0;
+	}
 }
 .instruction-text {
     color: #596066;
