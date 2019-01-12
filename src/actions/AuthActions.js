@@ -242,17 +242,28 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			}
 
 			const account = await fetchChain(accountId);
+
+			const publicKeys = account.getIn(['active', 'key_auths']);
+
+			const activeKey = publicKeys.find((key) => {
+				return key.get(0) === active;
+			});
+
+			if (!activeKey) {
+				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'WIF is not active key.'));
+				return false;
+			}
+
 			name = account.get('name');
 
 			await getCrypto().importByWIF(networkName, password);
 
 			if (dispatch(isAccountAdded(name))) {
-
 				isAccAdded = true;
 				await dispatch(addKeyToAccount(accountId, active));
-
 				return { name, isAccAdded };
 			}
+
 			keys = [active];
 
 		} else {
@@ -266,7 +277,6 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			success = successStatus;
 
 			if (success && isAccAddedByPas) {
-
 				return { name, isAccAdded };
 			}
 
@@ -278,7 +288,6 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		}
 
 		if (success) {
-
 			await dispatch(addAccount(name, keys, networkName));
 		}
 
