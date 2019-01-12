@@ -245,9 +245,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 			const publicKeys = account.getIn(['active', 'key_auths']);
 
-			const activeKey = publicKeys.find((key) => {
-				return key.get(0) === active;
-			});
+			const activeKey = publicKeys.find((key) => key.get(0) === active);
 
 			if (!activeKey) {
 				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'WIF is not active key.'));
