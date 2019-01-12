@@ -6,9 +6,10 @@ import { fetchChain } from '../api/ChainApi';
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import operations from '../constants/TransactionConstants';
+import { CORE_SYMBOL } from '../constants/GlobalConstants';
+import { historyOperations } from '../constants/OperationConstants';
 
 import FormatHelper from '../helpers/FormatHelper';
-import { CORE_SYMBOL } from '../constants/GlobalConstants';
 
 import echoService from '../services/echo';
 
@@ -51,7 +52,7 @@ export const decryptNote = (index) => async (dispatch, getState) => new Promise(
  * 	@param {Object} data
  * 	@param {Object} result
  */
-const formatOperation = async (data, result) => {
+const formatOperation = async (data, result, accountName) => {
 	const type = data.getIn(['op', '0']);
 	const operation = data.getIn(['op', '1']);
 
@@ -61,8 +62,10 @@ const formatOperation = async (data, result) => {
 
 	const { name, options } = Object.values(operations).find((i) => i.value === type);
 
+	const typeOperation = historyOperations.find((item) => item.value === name);
+
 	result = result.set('id', data.get('id'))
-		.setIn(['transaction', 'type'], name)
+		.setIn(['transaction', 'type'], typeOperation ? typeOperation.type : 'Transaction')
 		.setIn(['transaction', 'typeName'], name)
 		.setIn(['transaction', 'date'], moment.utc(block.timestamp).local().format('DD MMM, HH:mm'))
 		.setIn(['transaction', 'value'], 0)
@@ -81,6 +84,17 @@ const formatOperation = async (data, result) => {
 		}
 	}
 
+	let numberSign = '-';
+
+	if (result.getIn(['content', 'receiver']) && result.getIn(['content', 'receiver']) === accountName) {
+		numberSign = '+';
+
+		if (result.getIn(['transaction', 'type']) === 'Sent') {
+			result = result.setIn(['transaction', 'type'], 'Recieved')
+				.setIn(['transaction', 'typeName'], 'Received');
+		}
+	}
+
 	if (options.value) {
 		result = result.setIn(['transaction', 'value'], operation.getIn(options.value.split('.')));
 	}
@@ -89,7 +103,9 @@ const formatOperation = async (data, result) => {
 		const request = operation.getIn(options.asset.split('.'));
 		const response = await fetchChain(request);
 
-		result = result.setIn(['transaction', 'value'], FormatHelper.formatAmount(result.getIn(['transaction', 'value']), response.get('precision')));
+		const resultValue = result.getIn(['transaction', 'value']) !== 0 ? `${numberSign} ${FormatHelper.formatAmount(result.getIn(['transaction', 'value']), response.get('precision'))}` :
+			FormatHelper.formatAmount(result.getIn(['transaction', 'value']), response.get('precision'));
+		result = result.setIn(['transaction', 'value'], resultValue);
 		result = result.setIn(['transaction', 'currency'], response.get('symbol'));
 	}
 
@@ -116,11 +132,12 @@ const formatHistory = (history) => async (dispatch, getState) => {
 
 	try {
 		const formattedHistory = getState().global.get('formattedHistory');
+		const accountName = getState().global.getIn(['account', 'name']);
 
 		let rows = history.map(async (row) => {
 			const id = row.get('id');
 
-			return formatOperation(row, formattedHistory.get(id) || new Map({}));
+			return formatOperation(row, formattedHistory.get(id) || new Map({}), accountName);
 		});
 
 		rows = await Promise.all(rows);

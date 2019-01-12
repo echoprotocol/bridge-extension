@@ -51,33 +51,35 @@ class Wallet extends React.Component {
 		});
 
 		const resultTokens = [];
-		tokens.mapEntries(([contractId, token]) => {
-			if (account.get('id') !== token.get('accountId')) {
+		tokens.mapEntries(([accountId, tokenArr]) => {
+			if (account.get('id') !== accountId) {
 				return null;
 			}
 
-			resultTokens.push(<li key={contractId}>
-				<a
-					role="button"
-					onClick={() => this.sendRedirect(contractId)}
-					tabIndex={0}
-					onKeyPress={() => this.sendRedirect(contractId)}
-				>
-					<div className="balance-info">
-						<span>{FormatHelper.formatAmount(token.get('balance'), token.get('precision'))}</span>
-						<span>{token.get('symbol')}</span>
-					</div>
-					<div className="token-info">
-						<span>ERC20</span>
-						<span>TOKEN</span>
-					</div>
-				</a>
-				<Button
-					className="btn-icon icon-closeBig"
-					onClick={() => this.props.removeToken(contractId)}
-				/>
+			tokenArr.mapEntries(([contractId, token]) => {
+				resultTokens.push(<li key={contractId}>
+					<a
+						role="button"
+						onClick={() => this.sendRedirect(contractId)}
+						tabIndex={0}
+						onKeyPress={() => this.sendRedirect(contractId)}
+					>
+						<div className="balance-info">
+							<span>{FormatHelper.formatAmount(token.get('balance'), token.get('precision'))}</span>
+							<span>{token.get('symbol')}</span>
+						</div>
+						<div className="token-info">
+							<span>ERC20</span>
+							<span>TOKEN</span>
+						</div>
+					</a>
+					<Button
+						className="btn-icon icon-closeBig"
+						onClick={() => this.props.removeToken(contractId)}
+					/>
 
-			</li>);
+				</li>);
+			});
 
 			return null;
 		});
@@ -140,8 +142,10 @@ class Wallet extends React.Component {
 			return null;
 		}
 
-		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size
-			+ tokens.filter((token) => account.get('id') === token.get('accountId')).size;
+		let tokensLength = tokens.get(account.get('id'));
+		tokensLength = tokensLength ? tokensLength.size : 0;
+
+		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size + tokensLength;
 
 		return (
 			<React.Fragment>
@@ -180,7 +184,7 @@ class Wallet extends React.Component {
 						<div className="page-action-wrap">
 							<div className="two-btn-wrap" >
 								<Link className="btn-transparent link" to={RECEIVE_PATH}>
-									<span className="btn-text">Recieve</span>
+									<span className="btn-text">Receive</span>
 								</Link>
 								<Link className="btn-in-light link" to={SEND_PATH}>
 									<span className="btn-text">Send</span>

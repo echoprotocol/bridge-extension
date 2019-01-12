@@ -154,6 +154,12 @@ class CurrencySelect extends React.Component {
 				} else if (row !== 0) {
 					this.refList[index][row - 1].focus();
 				} else if ((row === 0) && (index !== 0)) {
+					if (!this.refList[index - 1]) {
+						this.searchInput.focus();
+
+						e.preventDefault();
+						break;
+					}
 					this.refList[index - 1][this.refList[index - 1].length - 1].focus();
 				}
 
@@ -178,11 +184,20 @@ class CurrencySelect extends React.Component {
 					});
 				}
 				break;
-			case KEY_CODE_ARROW_DOWN:
-				this.refList[0][0].focus();
+			case KEY_CODE_ARROW_DOWN: {
+				const refsLength = this.refList.length;
+
+				for (let i = 0; i < refsLength; i += 1) {
+					if (this.refList[i]) {
+						this.refList[i][0].focus();
+						e.preventDefault();
+						break;
+					}
+				}
 
 				e.preventDefault();
 				break;
+			}
 			case KEY_CODE_ARROW_UP: {
 				const rowLength = this.refList[this.refList.length - 1].length - 1;
 				this.refList[this.refList.length - 1][rowLength].focus();
@@ -233,14 +248,16 @@ class CurrencySelect extends React.Component {
 		});
 
 		if (tokens) {
-			tokens.mapEntries(([contractId, token]) => {
-				if (token.get('accountId') !== account.get('id')) {
+			tokens.mapEntries(([accountId, tokensArr]) => {
+				if (accountId !== account.get('id')) {
 					return null;
 				}
 
-				tokensList.push({
-					text: token.get('symbol'),
-					value: contractId,
+				tokensArr.mapEntries(([contractId, token]) => {
+					tokensList.push({
+						text: token.get('symbol'),
+						value: contractId,
+					});
 				});
 
 				return null;
