@@ -234,7 +234,18 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 				return false;
 			}
 
+
 			const account = await fetchChain(accountId);
+
+			const publicKeys = account.getIn(['active', 'key_auths']);
+
+			const activeKey = publicKeys.find((key) => key.get(0) === active);
+
+			if (!activeKey) {
+				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'WIF is not active key.'));
+				return false;
+			}
+
 			name = account.get('name');
 
 			await getCrypto().importByWIF(networkName, password);
