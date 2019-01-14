@@ -13,7 +13,8 @@ import Navigator from '../components/Navigator';
 
 import { PIN_PATHS, SIGN_TRANSACTION_PATH } from '../constants/RouterConstants';
 
-const bridgeLogo = require('../assets/images/bridgeLogo.svg');
+import bridgeLogo from '../assets/images/bridge-logo-hor-bw.svg';
+
 
 class App extends React.Component {
 
@@ -27,7 +28,7 @@ class App extends React.Component {
 		if (PIN_PATHS.includes(pathname)) {
 			return (
 				<div className="header-bridge-image">
-					<img src={bridgeLogo} alt="Bridge" />
+					<img className="logo" src={bridgeLogo} alt="Bridge" />
 				</div>
 			);
 		}
