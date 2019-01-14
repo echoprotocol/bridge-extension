@@ -54,9 +54,19 @@
         }
 
         input {
-            padding-bottom: 5px;
+			padding-bottom: 10px;
         }
     }
+
+	.user-icon-wrap {
+		.content {
+			i {
+				&:before {
+					margin-left: 1px;
+				}
+			}
+		}
+	}
 
     .btn-in-light {
         width: 200px;
