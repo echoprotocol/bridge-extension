@@ -27,14 +27,20 @@ class Navbar extends React.PureComponent {
 	render() {
 		const { pathname } = this.props.locationRouter;
 		const { title, link } = this.renderTitle();
+		const { account } = this.props;
+
 
 		return (
 			!HIDE_NAVBAR_PATHS.includes(pathname) &&
 			<div className="navbar">
 				<ul>
-					<li className="btn-nav-wrap" >
-						<Button onClick={(e) => this.onClick(e)} className="icon-menu btn-nav" />
-					</li>
+					{
+						account ?
+							<li className="btn-nav-wrap" >
+								<Button onClick={(e) => this.onClick(e)} className="icon-menu btn-nav" />
+							</li> : null
+					}
+
 					{ title ? <li className="page-title">{title}</li> : null }
 					{
 						link ?
@@ -53,12 +59,18 @@ Navbar.propTypes = {
 	visibleSidebar: PropTypes.bool.isRequired,
 	locationRouter: PropTypes.any.isRequired,
 	sidebarToggle: PropTypes.func.isRequired,
+	account: PropTypes.object,
+};
+
+Navbar.defaultProps = {
+	account: null,
 };
 
 export default connect(
 	(state) => ({
 		visibleSidebar: state.global.get('visibleSidebar'),
 		locationRouter: state.router.location,
+		account: state.global.get('account'),
 	}),
 	(dispatch) => ({
 		sidebarToggle: (value) => dispatch(sidebarToggle(value)),
