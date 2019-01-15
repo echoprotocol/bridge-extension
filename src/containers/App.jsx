@@ -13,6 +13,9 @@ import Navigator from '../components/Navigator';
 
 import { PIN_PATHS, SIGN_TRANSACTION_PATH } from '../constants/RouterConstants';
 
+import bridgeLogo from '../assets/images/bridge-logo-hor-bw.svg';
+
+
 class App extends React.Component {
 
 	componentDidMount() {
@@ -25,7 +28,7 @@ class App extends React.Component {
 		if (PIN_PATHS.includes(pathname)) {
 			return (
 				<div className="header-bridge-image">
-					<span>Bridge</span>
+					<img className="logo" src={bridgeLogo} alt="Bridge" />
 				</div>
 			);
 		}

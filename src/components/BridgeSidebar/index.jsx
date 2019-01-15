@@ -9,10 +9,7 @@ import { sidebarToggle } from '../../actions/GlobalActions';
 import {
 	BACKUP_PATH,
 	CREATE_ACCOUNT_PATH,
-	RECEIVE_PATH,
-	SEND_PATH,
 	TRANSACTIONS_PATH,
-	WATCH_TOKEN_PATH,
 	WALLET_PATH,
 } from '../../constants/RouterConstants';
 
@@ -55,39 +52,13 @@ class BridgeSidebar extends React.PureComponent {
 					<nav className="sidebar-body">
 						<ul className="nav-list">
 							<li>
-								<div className="panel">
-									<Link
-										onClick={() => this.props.sidebarToggle(visibleSidebar)}
-										className="active"
-										to={WALLET_PATH}
-									>
-										<i className="icon-navWallet" />
-										<div className="nav-title">My wallet</div>
-									</Link>
-									<div className="panel-body">
-										<Link
-											onClick={() => this.props.sidebarToggle(visibleSidebar)}
-											to={SEND_PATH}
-										>
-													Send
-										</Link>
-
-										<Link
-											onClick={() => this.props.sidebarToggle(visibleSidebar)}
-											to={RECEIVE_PATH}
-										>
-													Receive
-										</Link>
-
-										<Link
-											onClick={() => this.props.sidebarToggle(visibleSidebar)}
-											to={WATCH_TOKEN_PATH}
-										>
-                                                    Watch token
-										</Link>
-
-									</div>
-								</div>
+								<Link
+									onClick={() => this.props.sidebarToggle(visibleSidebar)}
+									to={WALLET_PATH}
+								>
+									<i className="icon-navWallet" />
+									<div className="nav-title">My wallet</div>
+								</Link>
 							</li>
 							<li>
 								<Link
