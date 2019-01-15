@@ -281,7 +281,7 @@ class Send extends React.Component {
 									name="memo"
 									value={memo.value}
 									onChange={(e) => this.onChange(e)}
-									label="Note (optional)"
+									label="Note (Optional)"
 									error={!!memo.error}
 									errorText={memo.error}
 									disabled={loading}

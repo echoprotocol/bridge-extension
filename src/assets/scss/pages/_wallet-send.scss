@@ -62,5 +62,16 @@
         width: 200px;
         margin: 46px auto 25px;
         display: block;
-    }
+	}
+
+	.textarea-wrap {
+		&.filled .label {
+			top: -5px;
+		}
+
+		textarea:focus + .label {
+			top: -5px;
+		}
+
+	}
 }
