@@ -105,7 +105,7 @@ class Transactions extends React.Component {
 													<div className="transaction-element-content">
 														<div className="row">
 															<div className="left-block">Sender</div>
-															<div className="right-block" >{elem.getIn(['content', 'sender'])} </div>
+															<div className="right-block">{elem.getIn(['content', 'sender'])}</div>
 														</div>
 														<div className="row">
 															<div className="left-block">Receiver</div>
