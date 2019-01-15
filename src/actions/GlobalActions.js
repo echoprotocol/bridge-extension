@@ -292,18 +292,20 @@ export const loadInfo = () => async (dispatch, getState) => {
 		tokensDetails.push(Promise.all(tokenPromises));
 	});
 
-	const resTokensDetails = await Promise.all(tokensDetails);
+	Promise.all(tokensDetails).then((resTokensDetails) => {
+		if (resTokensDetails) {
+			stateTokens.mapEntries(([accountId, tokensArr], i) => {
+				tokensArr.mapEntries(([contractId], j) => {
+					stateTokens = stateTokens
+						.setIn([accountId, contractId, 'symbol'], resTokensDetails[i][j].symbol)
+						.setIn([accountId, contractId, 'precision'], resTokensDetails[i][j].precision)
+						.setIn([accountId, contractId, 'balance'], resTokensDetails[i][j].balance);
+				});
+			});
+		}
 
-	stateTokens.mapEntries(([accountId, tokensArr], i) => {
-		tokensArr.mapEntries(([contractId], j) => {
-			stateTokens = stateTokens
-				.setIn([accountId, contractId, 'symbol'], resTokensDetails[i][j].symbol)
-				.setIn([accountId, contractId, 'precision'], resTokensDetails[i][j].precision)
-				.setIn([accountId, contractId, 'balance'], resTokensDetails[i][j].balance);
-		});
+		dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }));
 	});
-
-	dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }));
 
 
 	const accounts = await dispatch(getCryptoInfo('accounts'));
