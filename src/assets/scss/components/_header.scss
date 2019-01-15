@@ -16,16 +16,10 @@
         align-items: center;
         justify-content: center;
 
-        span {
-            font-family: 'FNBook';
-            font-weight: 400;
-            letter-spacing: 0.6em;
-            font-size: 15px;
-            color: #3e434f;
-            text-transform: uppercase;
-            max-width: 96px;
-            width: 100%;
-            white-space: nowrap;
-        }
+
+		.logo {
+			max-width: 135px;
+			margin-bottom: 1px;
+		}
     }
 }

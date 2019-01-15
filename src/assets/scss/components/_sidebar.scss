@@ -36,23 +36,6 @@
         background-color: rgba(#324046,1);
         height: calc(100% - 150px);
         padding: 53px 32px 20px;
-        .panel {
-            margin-bottom: 10px;
-        }
-
-        .panel-body {
-            padding: 4px 0 0 54px;
-			a {
-				font-size: 16px;
-				color: #748283;
-				animation: fadeIn .5s;
-				height: 32px;
-				&:hover {
-					color: #ADB4BA;
-				}
-            }
-
-        }
     }
     &-user {
         display: flex;
@@ -87,7 +70,7 @@
 .nav-list {
     li {
 
-        &:not(:last-child):not(:first-child) {
+        &:not(:last-child) {
             margin-bottom: 9px;
         }
         a {
@@ -104,18 +87,13 @@
             i {
                 width: 30px;
                 height: 30px; 
-            }
+			}
+			
             &:hover,
             &:focus {
                 color: #d4dede;
 			}
-			&.active {
-				color: #59B597;
-				&:hover,
-				&:focus {
-					color: #71E4BE;
-				}
-			}
+
         }
     }
 }
