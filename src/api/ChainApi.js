@@ -7,7 +7,7 @@ import echoService from '../services/echo';
 import { connect } from '../actions/ChainStoreAction';
 import { loadInfo } from '../actions/GlobalActions';
 import GlobalReducer from '../reducers/GlobalReducer';
-import { CHAINSTORE_INIT_TIMEOUT, CORE_ID, WS_CLOSE_TIMEOUT } from '../constants/GlobalConstants';
+import { CHAINSTORE_INIT_TIMEOUT, CORE_ID, GET_TOKENS_TIMEOUT, WS_CLOSE_TIMEOUT } from '../constants/GlobalConstants';
 
 let CHAIN_SUBSCRIBE = null;
 
@@ -266,7 +266,26 @@ export const getTokenDetails = async (contractId = '1.16.7807', accountId = '1.2
 			));
 		});
 
-		const result = await Promise.all(tokenDetails);
+		const start = new Date().getTime();
+
+		let result = null;
+
+		await Promise.race([
+			Promise.all(tokenDetails).then((res) => {
+				result = res;
+				return (new Date().getTime() - start);
+			}),
+			new Promise((resolve, reject) => {
+				const timeoutId = setTimeout(() => {
+					clearTimeout(timeoutId);
+					reject(new Error('timeout close'));
+				}, GET_TOKENS_TIMEOUT);
+			}),
+		]);
+
+		if (!result) {
+			return null;
+		}
 
 		return {
 			balance: new BN(result[0], 16).toString(10),
