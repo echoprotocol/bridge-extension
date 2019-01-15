@@ -36,7 +36,7 @@ class WatchTokens extends React.Component {
 		const code = e.keyCode || e.which;
 
 		if (KEY_CODE_ENTER === code && contractId.value) {
-			this.props.addToken(contractId.value);
+			this.props.addToken(contractId.value.trim());
 		}
 	}
 
