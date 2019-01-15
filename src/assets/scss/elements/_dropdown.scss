@@ -102,8 +102,15 @@
 			&:hover {
 				margin: -1px;
 				opacity: 1;
-				width: 22px;
-				height: 22px;
+				width: 23px;
+				height: 23px;
+				i {
+					&:before {
+						width: 23px;
+						height: 23px;
+					}
+				}
+
 			}
 			&:active {
 				opacity: .7;
