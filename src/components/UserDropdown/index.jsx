@@ -8,10 +8,12 @@ import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { withRouter } from 'react-router';
 
-import { switchAccount, removeAccount } from '../../actions/GlobalActions';
+import { switchAccount } from '../../actions/GlobalActions';
+import { openModal } from '../../actions/ModalActions';
 
 import FormatHelper from '../../helpers/FormatHelper';
 
+import { MODAL_LOGOUT } from '../../constants/ModalConstants';
 import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
 import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
 
@@ -61,10 +63,8 @@ class UserDropdown extends React.PureComponent {
 		return true;
 	}
 
-	onRemoveAccount(e, name) {
-		e.stopPropagation();
-		e.preventDefault();
-		removeAccount(name);
+	onOpenLogout() {
+		this.props.openModal();
 	}
 
 	setDDMenuHeight() {
@@ -132,7 +132,7 @@ class UserDropdown extends React.PureComponent {
 						{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${CORE_SYMBOL}`}
 
 					</div>
-					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.name)} />
+					<Button className="btn-logout" onClick={(e) => this.onOpenLogout(e)} />
 				</MenuItem>
 			);
 
@@ -216,6 +216,7 @@ UserDropdown.propTypes = {
 	account: PropTypes.object,
 	networkName: PropTypes.string.isRequired,
 	switchAccount: PropTypes.func.isRequired,
+	openModal: PropTypes.func.isRequired,
 };
 
 UserDropdown.defaultProps = {
@@ -231,6 +232,7 @@ export default withRouter(connect(
 		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
+		openModal: () => dispatch(openModal(MODAL_LOGOUT)),
 		switchAccount: (name) => dispatch(switchAccount(name)),
 	}),
 )(UserDropdown));

@@ -21,7 +21,9 @@
     border $speed,
     color $speed;
     padding: 0;
-
+    -webkit-font-smoothing: antialiased;
+    -moz-osx-font-smoothing: grayscale;
+	
     &.disabled {
         pointer-events: none;
         border: 2px solid $colorDisabled;
@@ -190,7 +192,13 @@
     }
 
     &-transparent {
-        @extend %btn;
+		@extend %btn;
+
+		background-color: transparent;
+        color: #535e65;
+        border-radius: $angularMax;
+		border: 1px solid #c3c7cc;
+		
         &.link {
             &:not(.disabled):not(:active) {
                 display: flex;
@@ -204,10 +212,7 @@
                 justify-content: center;
             }
         }
-        background-color: transparent;
-        color: #535e65;
-        border-radius: $angularMax;
-        border: 1px solid #c3c7cc;
+
 
         &:not(.disabled) {
             &:hover {
@@ -230,7 +235,8 @@
                     #dde1e4
                 );
             }
-        }
+		}
+		
         &.compact {
             .btn-text {
                 display: block;
@@ -598,4 +604,23 @@
             }
         }
     }
+}
+
+.modal {
+	.btn {
+		&-transparent {
+			color: rgba(#fff, .7);
+
+			&:not(.disabled) {
+				&:not(:active) {
+					@include onBtnFocus (
+						$angularMax,
+						2px,
+						2px,
+						rgba(#fff, .15)
+					);
+				}
+			}
+		}
+	}
 }

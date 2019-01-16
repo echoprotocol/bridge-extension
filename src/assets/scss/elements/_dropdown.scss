@@ -427,13 +427,15 @@
             &:hover {
                 background-color: #2c3a40;
                 .icon {
-                    color: #899c9d;
+					color: #899c9d;
+					text-shadow: 0 0 #899c9d, 0 0 #899c9d;
                 }
             }
             .icon {
                 margin: 4px 5px 0 7px;
                 color: #495b5f;
-                font-size: 11px;
+				font-size: 11px;
+				text-shadow: 0 0 #495b5f;
             }
     
         }
