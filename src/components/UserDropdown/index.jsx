@@ -32,6 +32,7 @@ class UserDropdown extends React.PureComponent {
 		this.setDDMenuHeight();
 	}
 
+
 	componentWillReceiveProps(nextProps) {
 
 		if (!nextProps.account) {
@@ -42,6 +43,7 @@ class UserDropdown extends React.PureComponent {
 	}
 
 	componentDidUpdate() {
+		this.blur();
 		this.setDDMenuHeight();
 	}
 
@@ -90,6 +92,13 @@ class UserDropdown extends React.PureComponent {
 
 	closeDropDown() {
 		this.setState({ opened: false });
+	}
+
+	blur() {
+		// fix: has no acces to ref
+		if (!this.state.opened) {
+			document.getElementById('dropdown-user').blur();
+		}
 	}
 
 	renderList() {
