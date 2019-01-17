@@ -88,6 +88,14 @@
             -webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
 
+			&.active {
+				color: #61D3AD;
+				&:hover,
+				&:focus {
+					color: #71E4BE;
+				}
+			}
+
             i {
                 width: 30px;
                 height: 30px; 

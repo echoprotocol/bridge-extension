@@ -1,7 +1,7 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Sidebar, Button } from 'semantic-ui-react';
-import { Link, NavLink } from 'react-router-dom';
+import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { sidebarToggle } from '../../actions/GlobalActions';
@@ -59,37 +59,44 @@ class BridgeSidebar extends React.PureComponent {
 					<nav className="sidebar-body">
 						<ul className="nav-list">
 							<li>
-								<Link
+								<NavLink
+									exact
 									onClick={() => this.props.sidebarToggle(visibleSidebar)}
 									to={WALLET_PATH}
 								>
 									<i className="icon-navWallet" />
 									<div className="nav-title">My wallet</div>
-								</Link>
+								</NavLink>
 							</li>
 							<li>
-								<Link
+								<NavLink
+									exact
 									onClick={() => this.props.sidebarToggle(visibleSidebar)}
 									to={TRANSACTIONS_PATH}
 								>
 									<i className="icon-navHistory" />
 									<div className="nav-title">Transactions history</div>
-								</Link>
+								</NavLink>
 							</li>
 							<li>
-								<Link onClick={() => this.props.sidebarToggle(visibleSidebar)} to={BACKUP_PATH}>
+								<NavLink
+									exact
+									onClick={() => this.props.sidebarToggle(visibleSidebar)}
+									to={BACKUP_PATH}
+								>
 									<i className="icon-navBackup" />
 									<div className="nav-title">Backup account</div>
-								</Link>
+								</NavLink>
 							</li>
 							<li>
-								<Link
+								<NavLink
+									exact
 									onClick={() => this.props.sidebarToggle(visibleSidebar)}
 									to={ABOUT_PATH}
 								>
 									<i className="icon-navInfo" />
 									<div className="nav-title">About Bridge</div>
-								</Link>
+								</NavLink>
 							</li>
 						</ul>
 						<Button
