@@ -77,14 +77,10 @@ class BridgeSidebar extends React.PureComponent {
 								</Link>
 							</li>
 							<li>
-								<NavLink
-									exact
-									onClick={() => this.props.sidebarToggle(visibleSidebar)}
-									to={BACKUP_PATH}
-								>
+								<Link onClick={() => this.props.sidebarToggle(visibleSidebar)} to={BACKUP_PATH}>
 									<i className="icon-navBackup" />
 									<div className="nav-title">Backup account</div>
-								</NavLink>
+								</Link>
 							</li>
 							<li>
 								<Link
