@@ -180,7 +180,12 @@
             &:not(.disabled):not(.error) {
 
                 input {
-                    color: #3F4A52;
+					color: #3F4A52;	
+					&::placeholder {
+						color: rgba(#3F4A52, .4);
+						-webkit-font-smoothing: antialiased;
+						-moz-osx-font-smoothing: grayscale;
+					}
                 }
 
                 &:hover {
@@ -202,7 +207,9 @@
                 }
             }
 
-        }
+		}
+		
+
 
     }
     &-dark {
