@@ -101,9 +101,21 @@
 			opacity: 0.8;
 			&:hover {
 				margin: -1px;
-				opacity: 1;
 				width: 23px;
 				height: 23px;
+				opacity: 1;
+
+				& + .user-name {
+					margin-left: 11px;
+				}
+
+				i {
+					&:before {
+						width: 23px;
+						height: 23px;
+					}
+				}
+
 			}
 			&:active {
 				opacity: .7;
