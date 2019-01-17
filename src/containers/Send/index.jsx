@@ -177,11 +177,20 @@ class Send extends React.Component {
 		}
 	}
 
+	isSelectedToken(amount) {
+
+		if (amount) {
+			amount = amount.split('.');
+			return amount.splice(0, 2).join('.') !== '1.16';
+		}
+		return true;
+
+	}
+
 	render() {
 		const {
-			to, amount, fee, memo, account, loading, balances, assets, tokens,
+			to, amount, selectedBalance, fee, memo, account, loading, balances, assets, tokens,
 		} = this.props;
-
 		if (!account) {
 			return null;
 		}
@@ -203,89 +212,96 @@ class Send extends React.Component {
 						heightRelativeToParent="calc(100%)"
 					>
 						<div className="wallet-send-block">
-							<BridgeInput
-								name="From"
-								theme="input-light"
-								labelText="From"
-								value={account.get('name')}
-								defaultUp
-								readOnly
-								userIcon={{ icon: account.get('icon'), color: account.get('iconColor') }}
-								leftLabel
-								disabled
-							/>
-							<BridgeInput
-								autoFocus
-								name="to"
-								theme="input-light"
-								labelText="To"
-								defaultUp
-								placeholder="Receiver's name"
-								leftLabel
-								value={to.value}
-								onChange={(e) => this.onChange(e, true)}
-								error={!!to.error}
-								errorText={to.error}
-								onKeyPress={(e) => this.onKeyPress(e)}
-								disabled={loading}
-								ref={(r) => this.handleRef(r, 'to')}
-							/>
-							<BridgeInput
-								name="amount"
-								theme="input-light"
-								placeholder="0"
-								defaultUp
-								labelText="Amount"
-								leftLabel
-								innerDropdown={{
-									dropdownData: {
-										balances,
-										assets,
-										account,
-										tokens,
-									},
-									path: { form: FORM_SEND, field: 'selectedBalance' },
-								}}
-								value={amount.value}
-								onChange={(e) => this.onAmountChange(e)}
-								error={!!amount.error}
-								errorText={amount.error}
-								onKeyPress={(e) => this.onKeyPress(e)}
-								disabled={loading}
-								onBlur={(value) => this.onBlur(value)}
-								ref={(r) => this.handleRef(r, 'amount')}
-							/>
-							<BridgeInput
-								name="fee"
-								theme="input-light"
-								placeholder="0"
-								defaultUp
-								labelText="Fee"
-								leftLabel
-								innerDropdown={{
-									dropdownData: {
-										balances,
-										assets,
-										account,
-									},
-									path: { form: FORM_SEND, field: 'selectedFeeBalance' },
-								}}
-								value={fee.value.toString()}
-								disabled
-								error={!!fee.error}
-								errorText={fee.error}
-							/>
-							<div className="message-error">
-
-								<BridgeTextArea
-									name="memo"
-									value={memo.value}
-									onChange={(e) => this.onChange(e)}
-									label="Note (Optional)"
-									error={!!memo.error}
-									errorText={memo.error}
-									disabled={loading}
+							<div className="form-wrap">
+								<BridgeInput
+									name="From"
+									theme="input-light"
+									labelText="From"
+									value={account.get('name')}
+									defaultUp
+									readOnly
+									userIcon={{ icon: account.get('icon'), color: account.get('iconColor') }}
+									leftLabel
+									disabled
 								/>
+								<BridgeInput
+									autoFocus
+									name="to"
+									theme="input-light"
+									labelText="To"
+									defaultUp
+									placeholder="Receiver's name"
+									leftLabel
+									value={to.value}
+									onChange={(e) => this.onChange(e, true)}
+									error={!!to.error}
+									errorText={to.error}
+									onKeyPress={(e) => this.onKeyPress(e)}
+									disabled={loading}
+									ref={(r) => this.handleRef(r, 'to')}
+								/>
+								<BridgeInput
+									name="amount"
+									theme="input-light"
+									placeholder="0"
+									defaultUp
+									labelText="Amount"
+									leftLabel
+									innerDropdown={{
+										dropdownData: {
+											balances,
+											assets,
+											account,
+											tokens,
+										},
+										path: { form: FORM_SEND, field: 'selectedBalance' },
+									}}
+									value={amount.value}
+									onChange={(e) => this.onAmountChange(e)}
+									error={!!amount.error}
+									errorText={amount.error}
+									onKeyPress={(e) => this.onKeyPress(e)}
+									disabled={loading}
+									onBlur={(value) => this.onBlur(value)}
+									ref={(r) => this.handleRef(r, 'amount')}
+								/>
+
+								<BridgeInput
+									name="fee"
+									theme="input-light"
+									placeholder="0"
+									defaultUp
+									labelText="Fee"
+									leftLabel
+									innerDropdown={{
+										dropdownData: {
+											balances,
+											assets,
+											account,
+										},
+										path: { form: FORM_SEND, field: 'selectedFeeBalance' },
+									}}
+									value={fee.value.toString()}
+									disabled
+									error={!!fee.error}
+									errorText={fee.error}
+								/>
+
+								{
+									this.isSelectedToken(selectedBalance) ?
+										<div className="message-error">
+
+											<BridgeTextArea
+												name="memo"
+												value={memo.value}
+												onChange={(e) => this.onChange(e)}
+												label="Note (optional)"
+												error={!!memo.error}
+												errorText={memo.error}
+												disabled={loading}
+											/>
+										</div> : null
+								}
 							</div>
 							<Button
 								className={classnames('btn-in-light', { loading })}

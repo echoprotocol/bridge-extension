@@ -5,6 +5,7 @@ import classnames from 'classnames';
 
 class BridgeTextArea extends React.Component {
 
+
 	constructor(props) {
 		super(props);
 
@@ -13,7 +14,9 @@ class BridgeTextArea extends React.Component {
 			filled: false,
 		};
 	}
-
+	componentWillMount() {
+		this.setState({ filled: !!this.props.value });
+	}
 	onFocus() {
 		this.setState({ up: true });
 	}
