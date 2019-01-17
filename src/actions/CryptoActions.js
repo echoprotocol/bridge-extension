@@ -43,7 +43,8 @@ const changeCrypto = (params) => (dispatch) => {
  *
  * 	Lock crypto in GlobalReducer and redirect to unlock
  */
-const lockCrypto = () => (dispatch) => {
+export const lockCrypto = () => (dispatch) => {
+
 	dispatch(batchActions([
 		GlobalReducer.actions.set({ field: 'loading', value: false }),
 		GlobalReducer.actions.lock({

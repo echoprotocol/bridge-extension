@@ -1,10 +1,11 @@
 import React from 'react';
 import PropTypes from 'prop-types';
 import { Sidebar, Button } from 'semantic-ui-react';
-import { Link } from 'react-router-dom';
+import { Link, NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { sidebarToggle } from '../../actions/GlobalActions';
+import { lockCrypto } from '../../actions/CryptoActions';
 
 import {
 	BACKUP_PATH,
@@ -14,9 +15,15 @@ import {
 } from '../../constants/RouterConstants';
 
 import UserIcon from '../UserIcon';
+import LockIcon from '../../assets/images/icons/lock.svg';
 
 
 class BridgeSidebar extends React.PureComponent {
+
+	lock() {
+		this.props.sidebarToggle(this.props.visibleSidebar);
+		this.props.lock();
+	}
 
 	render() {
 		const { visibleSidebar, account } = this.props;
@@ -70,10 +77,14 @@ class BridgeSidebar extends React.PureComponent {
 								</Link>
 							</li>
 							<li>
-								<Link onClick={() => this.props.sidebarToggle(visibleSidebar)} to={BACKUP_PATH}>
+								<NavLink
+									exact
+									onClick={() => this.props.sidebarToggle(visibleSidebar)}
+									to={BACKUP_PATH}
+								>
 									<i className="icon-navBackup" />
 									<div className="nav-title">Backup account</div>
-								</Link>
+								</NavLink>
 							</li>
 							<li>
 								<Link
@@ -85,6 +96,13 @@ class BridgeSidebar extends React.PureComponent {
 								</Link>
 							</li>
 						</ul>
+						<Button
+							onClick={() => this.lock()}
+							className="btn-lock"
+						>
+							<img src={LockIcon} alt="lock app" />
+							Lock down
+						</Button>
 					</nav>
 					<Button
 						onClick={() => this.props.sidebarToggle(visibleSidebar)}
@@ -103,6 +121,7 @@ BridgeSidebar.propTypes = {
 	account: PropTypes.object,
 	visibleSidebar: PropTypes.bool.isRequired,
 	sidebarToggle: PropTypes.func.isRequired,
+	lock: PropTypes.func.isRequired,
 };
 
 BridgeSidebar.defaultProps = {
@@ -115,6 +134,7 @@ export default connect(
 		account: state.global.get('account'),
 	}),
 	(dispatch) => ({
+		lock: () => dispatch(lockCrypto()),
 		sidebarToggle: (value) => dispatch(sidebarToggle(value)),
 	}),
 )(BridgeSidebar);
