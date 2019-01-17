@@ -1,8 +1,8 @@
 import React from 'react';
-import packageJson from '../../../package.json';
+import info from '../../config/info';
 import bridgeRoundLogo from '../../assets/images/about/bridge-round-logo.svg';
 
-export default class About extends React.Component {
+class About extends React.Component {
 
 	render() {
 
@@ -24,7 +24,7 @@ export default class About extends React.Component {
 					> echo.org
 					</a>
 
-					<div className="about-version">Version {packageJson.version}</div>
+					<div className="about-version">Version {info.VERSION}</div>
 
 				</div>
 			</React.Fragment>
@@ -33,3 +33,5 @@ export default class About extends React.Component {
 	}
 
 }
+
+export default About;
