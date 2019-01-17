@@ -19,6 +19,7 @@ import {
 	SIGN_TRANSACTION_PATH,
 	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
+	ABOUT_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -36,6 +37,8 @@ import ErrorTransaction from './containers/Send/ErrorTransaction';
 import Backup from './containers/Backup';
 import WatchToken from './containers/WatchToken';
 import SignTransaction from './containers/SignTransaction';
+import About from './containers/About';
+
 
 import { required } from './components/Require';
 
@@ -63,6 +66,7 @@ export default class Routes extends React.Component {
 					<Route exact path={ERROR_SEND_PATH} component={required(ErrorTransaction)} />
 					<Route exact path={BACKUP_PATH} component={required(Backup)} />
 					<Route exact path={WATCH_TOKEN_PATH} component={required(WatchToken)} />
+					<Route exact path={ABOUT_PATH} component={required(About)} />
 
 				</div>
 			</App>
