@@ -1,5 +1,5 @@
 import React from 'react';
-import info from '../../config/info';
+import main from '../../config/main';
 import bridgeRoundLogo from '../../assets/images/about/bridge-round-logo.svg';
 
 class About extends React.Component {
@@ -24,7 +24,7 @@ class About extends React.Component {
 					> echo.org
 					</a>
 
-					<div className="about-version">Version {info.VERSION}</div>
+					<div className="about-version">Version {main.VERSION}</div>
 
 				</div>
 			</React.Fragment>
