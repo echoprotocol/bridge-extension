@@ -64,6 +64,11 @@
         display: block;
 	}
 
+	.form-wrap {
+		min-height: 290px;
+
+	}
+	
 	.textarea-wrap {
 		&.filled .label {
 			top: -5px;
@@ -72,6 +77,6 @@
 		textarea:focus + .label {
 			top: -5px;
 		}
-
 	}
+
 }
