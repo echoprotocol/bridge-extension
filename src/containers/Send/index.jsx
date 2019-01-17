@@ -265,6 +265,7 @@ class Send extends React.Component {
 									onBlur={(value) => this.onBlur(value)}
 									ref={(r) => this.handleRef(r, 'amount')}
 								/>
+
 								<BridgeInput
 									name="fee"
 									theme="input-light"
@@ -301,7 +302,6 @@ class Send extends React.Component {
 											/>
 										</div> : null
 								}
-
 							</div>
 							<Button
 								className={classnames('btn-in-light', { loading })}
