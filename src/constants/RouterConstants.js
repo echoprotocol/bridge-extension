@@ -31,6 +31,8 @@ export const SIGN_TRANSACTION_PATH = '/transaction/sign';
 
 export const POPUP_PATH = 'index.html?windowType=popup';
 
+export const ABOUT_PATH = '/about';
+
 export const EMPTY_PATH = '/';
 
 export const INDEX_PATH = WALLET_PATH;
