@@ -7,6 +7,7 @@ const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
 const webpack = require('webpack');
+const packageJson = require('./package.json');
 
 const HTMLWebpackPluginConfig = new HtmlWebpackPlugin({
 	template: `${__dirname}/src/assets/index.html`,
@@ -19,7 +20,7 @@ const extractSass = new ExtractTextPlugin({
 	filename: '[name].[hash].css',
 	disable: process.env.NODE_ENV === 'local',
 });
-const { version } = require('./package.json');
+
 
 const publicPath = process.env.EXTENSION ? './' : '/';
 const pathToPack = process.env.EXTENSION ? path.resolve('build/src') : path.resolve('dist');
@@ -101,11 +102,12 @@ module.exports = {
 		extractSass,
 		new webpack.DefinePlugin({
 			NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+			VERSION: JSON.stringify(packageJson.version),
 			EXTENSION: !!process.env.EXTENSION,
 		}),
 		new CopyWebpackPlugin([
 			{
-				from: 'config/manifest.json'
+				from: 'config/manifest.json',
 			},
 		]),
 		new ZipPlugin({
