@@ -165,7 +165,6 @@ class NetworkDropdown extends React.PureComponent {
 				id="dropdown-network"
 				onToggle={() => this.toggleDropdown()}
 				open={this.state.opened}
-				ref={(input) => { this.textInput = input; }}
 			>
 				<Dropdown.Toggle noCaret>
 					<div className={classnames('current-network', { connected })}>
