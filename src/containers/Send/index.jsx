@@ -178,8 +178,12 @@ class Send extends React.Component {
 	}
 
 	isSelectedToken(amount) {
-		amount = amount.split('.');
-		return amount.splice(0, 2).join('.') !== '1.16';
+
+		if (amount) {
+			amount = amount.split('.');
+			return amount.splice(0, 2).join('.') !== '1.16';
+		}
+		return true;
 
 	}
 
