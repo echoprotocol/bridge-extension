@@ -7,11 +7,8 @@
 }
 
 .icon-pageNetwork {
-    border-radius: 50%;
-    width: 28px;
-    height: 28px;
     margin: 0 auto auto;
-    font-size: 32px;
+    font-size: 36px;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -53,7 +50,7 @@
         flex-direction: column;
         justify-content: space-between;
         .page {
-            min-height: 332px;
+            min-height: 348px;
         }
 	}
 	.page-action-wrap {
