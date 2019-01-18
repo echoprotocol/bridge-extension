@@ -79,7 +79,7 @@ export const NETWORKS = [
 	{
 		name: 'devnet',
 		registrator: 'https://echo-tmp-wallet.pixelplex.io/faucet/registration',
-		url: 'wss://echo-devnet-node.pixelplex.io/ws',
+		url: 'ws://195.201.164.54:6311',
 	},
 ];
 
