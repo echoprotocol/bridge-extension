@@ -88,6 +88,7 @@ class UserIcon extends React.PureComponent {
 						aria-hidden="true"
 						className={classnames(`icon-${this.props.avatar}`)}
 					/> */}
+
 					<img src={`/images/${this.props.avatar}.svg`} alt="" />
 				</div>
 				{ this.props.animationChange ? this.renderAnimationChange() : null }
