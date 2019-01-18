@@ -21,7 +21,12 @@
             max-width: 22px;
             display: flex;
             align-items: center;
-            justify-content: center;
+			justify-content: center;
+			
+			img {
+				height: 22px;
+				width: 22px;
+			}
         }
         i {
 			font-size: 15px;

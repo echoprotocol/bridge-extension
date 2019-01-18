@@ -5,6 +5,24 @@ import { Button } from 'semantic-ui-react';
 
 import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants';
 
+/* eslint-disable no-unused-vars */
+import ava1 from '../../assets/images/avatars/ava1.svg';
+import ava2 from '../../assets/images/avatars/ava2.svg';
+import ava3 from '../../assets/images/avatars/ava3.svg';
+import ava4 from '../../assets/images/avatars/ava4.svg';
+import ava5 from '../../assets/images/avatars/ava5.svg';
+import ava6 from '../../assets/images/avatars/ava6.svg';
+import ava7 from '../../assets/images/avatars/ava7.svg';
+import ava8 from '../../assets/images/avatars/ava8.svg';
+import ava9 from '../../assets/images/avatars/ava9.svg';
+import ava10 from '../../assets/images/avatars/ava10.svg';
+import ava11 from '../../assets/images/avatars/ava11.svg';
+import ava12 from '../../assets/images/avatars/ava12.svg';
+import ava13 from '../../assets/images/avatars/ava13.svg';
+import ava14 from '../../assets/images/avatars/ava14.svg';
+import ava15 from '../../assets/images/avatars/ava15.svg';
+/* eslint-enable no-unused-vars */
+
 class UserIcon extends React.PureComponent {
 
 	onClick() {
@@ -66,10 +84,11 @@ class UserIcon extends React.PureComponent {
 				onKeyPress={(e) => this.onKeyPress(e)}
 			>
 				<div className="content">
-					<i
+					{/* <i
 						aria-hidden="true"
 						className={classnames(`icon-${this.props.avatar}`)}
-					/>
+					/> */}
+					<img src={`/images/${this.props.avatar}.svg`} alt="" />
 				</div>
 				{ this.props.animationChange ? this.renderAnimationChange() : null }
 				{ this.props.animationBack ? this.renderAnimationBack() : null }
