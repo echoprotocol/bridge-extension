@@ -5,7 +5,7 @@ import { NavLink } from 'react-router-dom';
 import { connect } from 'react-redux';
 
 import { sidebarToggle } from '../../actions/GlobalActions';
-import { lockCrypto } from '../../actions/CryptoActions';
+import { userLockCrypto } from '../../actions/CryptoActions';
 
 import {
 	BACKUP_PATH,
@@ -137,7 +137,7 @@ export default connect(
 		account: state.global.get('account'),
 	}),
 	(dispatch) => ({
-		lock: () => dispatch(lockCrypto()),
+		lock: () => dispatch(userLockCrypto()),
 		sidebarToggle: (value) => dispatch(sidebarToggle(value)),
 	}),
 )(BridgeSidebar);
