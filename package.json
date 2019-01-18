@@ -21,7 +21,7 @@
     "classnames": "^2.2.6",
     "config": "^1.30.0",
     "crypto-random-string": "^1.0.0",
-    "echojs-lib": "git+ssh://git@gitlab.pixelplex.by/645.echo/echojs/echojs-lib.git",
+    "echojs-lib": "^0.1.10",
     "echojs-ws": "^0.1.10",
     "events": "^3.0.0",
     "file-loader": "^1.1.11",

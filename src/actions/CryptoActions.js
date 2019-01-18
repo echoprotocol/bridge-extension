@@ -72,7 +72,11 @@ export const getCrypto = () => echoService.getCrypto();
  * 	@param {String} pin
  */
 export const unlockCrypto = (form, pin) => async (dispatch) => {
+
+
 	const crypto = echoService.getCrypto();
+
+	console.log(crypto);
 
 	const error = ValidatePinHelper.validatePin(pin);
 
