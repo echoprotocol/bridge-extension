@@ -1,5 +1,4 @@
 import echojslib from 'echojs-lib';
-import echojsws from 'echojs-ws';
 
 import { APP_ID } from '../src/constants/GlobalConstants';
 
@@ -87,5 +86,4 @@ window.echojslib = {
 	isEchoBridge: true,
 	extension,
 };
-window.echojsws = echojsws;
 window.addEventListener('message', onMessage, false);

@@ -1,5 +1,7 @@
 import { PrivateKey } from 'echojs-lib';
 
+import echoService from '../services/echo';
+
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 import FormatHelper from '../helpers/FormatHelper';
 
@@ -15,7 +17,7 @@ import {
 	createWallet,
 	validateImportAccountExist,
 } from '../api/WalletApi';
-import { fetchChain, getAccountRefsOfKey } from '../api/ChainApi';
+import { getAccountRefsOfKey } from '../api/ChainApi';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -125,11 +127,11 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 		return { successStatus: false, isAccAddedByPas };
 	}
 
-	const account = await fetchChain(name);
+	const account = await echoService.getChainLib().api.getAccountByName(name);
 	const active = getCrypto().getPublicKey(name, password);
 	const [accountId] = await getAccountRefsOfKey(active);
 
-	const keys = account.getIn(['active', 'key_auths']);
+	const keys = account.active.key_auths;
 
 	let hasKey = false;
 
@@ -158,7 +160,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 				networkName,
 				name,
 				password,
-				account.getIn(['options', 'memo_key']),
+				account.options.memo_key,
 			);
 
 			return { successStatus: true, isAccAddedByPas };
@@ -175,7 +177,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 		networkName,
 		name,
 		password,
-		account.getIn(['options', 'memo_key']),
+		account.options.memo_key,
 	);
 
 	return { successStatus: true, isAccAddedByPas };
@@ -235,9 +237,9 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			}
 
 
-			const account = await fetchChain(accountId);
+			const [account] = await echoService.getChainLib().api.getFullAccounts([accountId]);
 
-			const publicKeys = account.getIn(['active', 'key_auths']);
+			const publicKeys = account.active.key_auths;
 
 			const activeKey = publicKeys.find((key) => key.get(0) === active);
 
@@ -246,7 +248,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 				return false;
 			}
 
-			name = account.get('name');
+			name = account.name; // eslint-disable-line prefer-destructuring
 
 			await getCrypto().importByWIF(networkName, password);
 

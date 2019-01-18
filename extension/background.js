@@ -1,5 +1,4 @@
 /* eslint-disable no-nested-ternary */
-import echojs from 'echojs-ws';
 import chainjs from 'echojs-lib';
 import EventEmitter from '../libs/CustomAwaitEmitter';
 
@@ -31,6 +30,7 @@ import {
 	SUCCESS_SEND_PATH,
 } from '../src/constants/RouterConstants';
 import getTransaction from './transaction';
+import echoService from "../src/services/echo";
 
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
@@ -63,14 +63,15 @@ ChainStore.notifySubscribers = () => {
 /**
  * Create default socket
  */
-const createSocket = () => {
-	echojs.Apis.setAutoReconnect(false);
-
-	const instance = echojs.Apis.instance(NETWORKS[0].url, true, 4000);
-
-	instance.init_promise
-		.then(() => chainjs.ChainStore.init())
-		.then(() => {});
+const createSocket = async () => {
+	await chainjs.connect('ws://195.201.164.54:6311', {
+		connectionTimeout: 5000,
+		maxRetries: 5,
+		pingTimeout: 3000,
+		pingInterval: 3000,
+		debug: false,
+		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
+	});
 };
 
 
@@ -460,7 +461,6 @@ listeners.initBackgroundListeners(onResponse, onTransaction, onSend);
 
 createSocket();
 
-window.getWsLib = () => echojs;
 window.getChainLib = () => chainjs;
 window.getCrypto = () => crypto;
 window.getEmitter = () => emitter;

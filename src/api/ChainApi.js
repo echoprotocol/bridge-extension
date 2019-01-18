@@ -35,123 +35,113 @@ const getTypeByKey = (key) => {
 	return 'getBlock';
 };
 
-/**
- *  @method createInstance
- *
- * 	@param {String} url
- */
+// /**
+//  *  @method createInstance
+//  *
+//  * 	@param {String} url
+//  */
+//
+// const createInstance = (url) => {
+// 	const { Apis } = echoService.getWsLib();
+// 	return Apis.instance(
+// 		url,
+// 		true,
+// 		4000,
+// 		{ enableCrypto: false },
+// 	);
+// };
 
-const createInstance = (url) => {
-	const { Apis } = echoService.getWsLib();
-	return Apis.instance(
-		url,
-		true,
-		4000,
-		{ enableCrypto: false },
-	);
-};
+// /**
+//  *  @method checkConnection
+//  *
+//  * 	Call login for check connection
+//  *
+//  * 	@param {String} url
+//  */
+// export const checkConnection = (url) => async (dispatch, getState) => {
+// 	const { Apis, Manager } = echoService.getWsLib();
+// 	const manager = new Manager({ url, urls: [] });
+// 	let instance = Apis.instance();
+//
+// 	try {
+// 		if (instance.ws_rpc === null) {
+// 			instance = createInstance(url);
+// 		}
+// 		await manager.checkSingleUrlConnection(instance.ws_rpc);
+// 	} catch (err) {
+// 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
+// 		return false;
+// 	}
+//
+// 	const connected = getState().global.get('connected');
+//
+// 	if (!connected) {
+// 		await dispatch(connect());
+// 		await dispatch(loadInfo());
+// 	}
+//
+// 	return true;
+// };
 
-/**
- *  @method checkConnection
- *
- * 	Call login for check connection
- *
- * 	@param {String} url
- */
-export const checkConnection = (url) => async (dispatch, getState) => {
-	const { Apis, Manager } = echoService.getWsLib();
-	const manager = new Manager({ url, urls: [] });
-	let instance = Apis.instance();
-
-	try {
-		if (instance.ws_rpc === null) {
-			instance = createInstance(url);
-		}
-		await manager.checkSingleUrlConnection(instance.ws_rpc);
-	} catch (err) {
-		dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
-		return false;
-	}
-
-	const connected = getState().global.get('connected');
-
-	if (!connected) {
-		await dispatch(connect());
-		await dispatch(loadInfo());
-	}
-
-	return true;
-};
-
-/**
- * connect socket to address
- * @param {String} address
- * @param {Function} subscribeCb
- * @param {Boolean} isRecreate
- */
-export const connectToAddress = async (address, subscribeCb, isRecreate) => {
-	const { Apis } = echoService.getWsLib();
-	const { ChainStore } = echoService.getChainLib();
-	CHAIN_SUBSCRIBE = subscribeCb;
-
-	try {
-		let instance = Apis.instance();
-
-		if (instance.url !== address || (isRecreate && !instance.ws_rpc)) {
-			const start = new Date().getTime();
-
-			await Promise.race([
-				Apis.close().then(() => (new Date().getTime() - start)),
-				new Promise((resolve, reject) => {
-					const timeoutId = setTimeout(() => {
-						clearTimeout(timeoutId);
-						reject(new Error('timeout close'));
-					}, WS_CLOSE_TIMEOUT);
-				}),
-			]);
-
-			Apis.setAutoReconnect(false);
-
-			instance = createInstance(address);
-
-			await instance.init_promise;
-		}
-
-		const start = new Date().getTime();
-
-		await Promise.race([
-			ChainStore.init().then(() => (new Date().getTime() - start)),
-			new Promise((resolve, reject) => {
-				const timeoutId = setTimeout(() => {
-					clearTimeout(timeoutId);
-					reject(new Error('timeout chainstore'));
-				}, CHAINSTORE_INIT_TIMEOUT);
-			}),
-		]);
-
-		ChainStore.subscribe(CHAIN_SUBSCRIBE);
-	} catch (e) {
-		CHAIN_SUBSCRIBE = null;
-		throw e;
-	}
-};
+// /**
+//  * connect socket to address
+//  * @param {String} address
+//  * @param {Function} subscribeCb
+//  * @param {Boolean} isRecreate
+//  */
+// export const connectToAddress = async (address, subscribeCb, isRecreate) => {
+// 	const { Apis } = echoService.getWsLib();
+// 	const { ChainStore } = echoService.getChainLib();
+// 	CHAIN_SUBSCRIBE = subscribeCb;
+//
+// 	try {
+// 		let instance = Apis.instance();
+//
+// 		if (instance.url !== address || (isRecreate && !instance.ws_rpc)) {
+// 			const start = new Date().getTime();
+//
+// 			await Promise.race([
+// 				Apis.close().then(() => (new Date().getTime() - start)),
+// 				new Promise((resolve, reject) => {
+// 					const timeoutId = setTimeout(() => {
+// 						clearTimeout(timeoutId);
+// 						reject(new Error('timeout close'));
+// 					}, WS_CLOSE_TIMEOUT);
+// 				}),
+// 			]);
+//
+// 			Apis.setAutoReconnect(false);
+//
+// 			instance = createInstance(address);
+//
+// 			await instance.init_promise;
+// 		}
+//
+// 		const start = new Date().getTime();
+//
+// 		await Promise.race([
+// 			ChainStore.init().then(() => (new Date().getTime() - start)),
+// 			new Promise((resolve, reject) => {
+// 				const timeoutId = setTimeout(() => {
+// 					clearTimeout(timeoutId);
+// 					reject(new Error('timeout chainstore'));
+// 				}, CHAINSTORE_INIT_TIMEOUT);
+// 			}),
+// 		]);
+//
+// 		ChainStore.subscribe(CHAIN_SUBSCRIBE);
+// 	} catch (e) {
+// 		CHAIN_SUBSCRIBE = null;
+// 		throw e;
+// 	}
+// };
 
 /**
  * disconnect socket from address and clear lib cache
  * @param {String} address
  */
-export const disconnectFromAddress = async (address) => {
-	const { Apis } = echoService.getWsLib();
-	const { ChainStore } = echoService.getChainLib();
-	const instance = Apis.instance();
-	if (instance.url !== address) {
-		throw new Error('invalid address');
-	}
-
-	if (CHAIN_SUBSCRIBE) ChainStore.unsubscribe(CHAIN_SUBSCRIBE);
-	ChainStore.resetCache();
-
-	CHAIN_SUBSCRIBE = null;
+export const disconnectFromAddress = async () => {
+	await echoService.getChainLib().echo.disconnect();
 };
 
 /**

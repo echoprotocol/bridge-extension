@@ -2,8 +2,6 @@ import React from 'react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { GLOBAL_ID_1 } from '../../constants/GlobalConstants';
-
 class NetworkInfo extends React.PureComponent {
 
 	render() {
@@ -53,5 +51,5 @@ NetworkInfo.defaultProps = {
 
 export default connect((state) => ({
 	network: state.global.get('network'),
-	headBlock: state.blockchain.getIn(['objectsById', GLOBAL_ID_1, 'head_block_number']),
+	headBlock: state.global.get('headBlockNum'),
 }))(NetworkInfo);

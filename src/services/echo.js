@@ -1,7 +1,6 @@
 /* eslint-disable global-require */
 /* global EXTENSION */
 
-import echojs from 'echojs-ws';
 import chainlib from 'echojs-lib';
 import EventEmitter from '../../libs/CustomAwaitEmitter';
 
@@ -22,9 +21,9 @@ if (EXTENSION) {
 
 class Echo {
 
-	static getWsLib() {
-		return EXTENSION ? extension.extension.getBackgroundPage().getWsLib() : echojs;
-	}
+	// static getWsLib() {
+	// 	return EXTENSION ? extension.extension.getBackgroundPage().getWsLib() : echojs;
+	// }
 
 	static getChainLib() {
 		return EXTENSION ? extension.extension.getBackgroundPage().getChainLib() : chainlib;

@@ -337,9 +337,7 @@ export const loadInfo = () => async (dispatch, getState) => {
  */
 export const changeNetwork = (network) => async (dispatch, getState) => {
 	try {
-		const oldNetworkUrl = getState().global.getIn(['network', 'url']);
-
-		await dispatch(disconnect(oldNetworkUrl));
+		await dispatch(disconnect());
 
 		await storage.set('current_network', network);
 		await dispatch(connect());
