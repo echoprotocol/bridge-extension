@@ -104,10 +104,13 @@ class Transactions extends React.Component {
 												</Accordion.Title>
 												<Accordion.Content active={activeId === elem.get('id')}>
 													<div className="transaction-element-content">
-														<div className="row">
-															<div className="left-block">Sender</div>
-															<div className="right-block">{elem.getIn(['content', 'sender'])}</div>
-														</div>
+														{
+															accountName !== elem.getIn(['content', 'sender']) ?
+																<div className="row">
+																	<div className="left-block">Sender</div>
+																	<div className="right-block">{elem.getIn(['content', 'sender'])}</div>
+																</div> : null
+														}
 
 														{
 															elem.getIn(['content', 'receiver']) && accountName !== elem.getIn(['content', 'receiver']) ?
