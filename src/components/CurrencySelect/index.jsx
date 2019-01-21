@@ -370,46 +370,47 @@ class CurrencySelect extends React.Component {
 									>
 										{
 											dropdownData.map((elem, index) => (
-												<div
-													key={elem.id}
-													className="select-item"
-												>
-													{ elem.list.length ? <div className="title">{elem.title}</div> : '' }
-													<ul>
-														{
-															elem.list.map(({ text, value }, i) => (
-																<li key={Math.random()}>
-																	<a
-																		ref={(ref) => {
-																			if (ref) {
-																				if (!this.refList[index]) {
-																					this.refList[index] = [];
+												elem.list.length ?
+													<div
+														key={elem.id}
+														className="select-item"
+													>
+														<div className="title">{elem.title}</div>
+														<ul>
+															{
+																elem.list.map(({ text, value }, i) => (
+																	<li key={Math.random()}>
+																		<a
+																			ref={(ref) => {
+																				if (ref) {
+																					if (!this.refList[index]) {
+																						this.refList[index] = [];
+																					}
+																					this.refList[index][i] = ref;
 																				}
-																				this.refList[index][i] = ref;
+																			}}
+																			href=""
+																			className="dropdown-list-item"
+																			tabIndex={0}
+																			onKeyPress={
+																				(e) => {
+																					this.onItemKeyPress(e, text, value);
+																					e.preventDefault();
+																				}
 																			}
-																		}}
-																		href=""
-																		className="dropdown-list-item"
-																		tabIndex={0}
-																		onKeyPress={
-																			(e) => {
-																				this.onItemKeyPress(e, text, value);
+																			onKeyDown={(e) => this.onKeyDown(e, index, i)}
+																			onClick={(e) => {
+																				this.handleClick(text, value);
 																				e.preventDefault();
-																			}
-																		}
-																		onKeyDown={(e) => this.onKeyDown(e, index, i)}
-																		onClick={(e) => {
-																			this.handleClick(text, value);
-																			e.preventDefault();
-																		}}
-																	>
-																		{text}
-																	</a>
-																</li>
-															))
-														}
-													</ul>
-												</div>
+																			}}
+																		>
+																			{text}
+																		</a>
+																	</li>
+																))
+															}
+														</ul>
+													</div> : null
 											))
 										}
 									</CustomScroll>
