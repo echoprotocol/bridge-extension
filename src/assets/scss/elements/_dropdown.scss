@@ -105,17 +105,14 @@
 				height: 23px;
 				opacity: 1;
 
+				img {
+					width: 17px;
+					height: 17px;
+				}
+
 				& + .user-name {
 					margin-left: 11px;
 				}
-
-				i {
-					&:before {
-						width: 23px;
-						height: 23px;
-					}
-				}
-
 			}
 			&:active {
 				opacity: .7;

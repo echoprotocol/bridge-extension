@@ -17,6 +17,7 @@ import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
 import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
+import exit from '../../assets/images/icons/exit.svg';
 
 class UserDropdown extends React.PureComponent {
 
@@ -133,7 +134,9 @@ class UserDropdown extends React.PureComponent {
 						{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${CORE_SYMBOL}`}
 
 					</div>
-					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.name)} />
+					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.name)} >
+						<img src={exit} alt="" />
+					</Button>
 				</MenuItem>
 			);
 

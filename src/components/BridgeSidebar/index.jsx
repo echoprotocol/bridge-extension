@@ -15,6 +15,8 @@ import {
 
 import UserIcon from '../UserIcon';
 
+// import iconWallet from '../../assets/images/icons/navigation_wallet_grey.svg';
+
 
 class BridgeSidebar extends React.PureComponent {
 

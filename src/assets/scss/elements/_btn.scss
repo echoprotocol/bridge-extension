@@ -302,28 +302,30 @@
         background-color: transparent;
         border: 0;
         border-radius: 50%;
-        width: 33px;
-        height: 33px;
+        width: 32px;
+        height: 32px;
         color: rgba(#fff, .4);
-        transition: background-color $speed, color $speed;
-        cursor: pointer;
+		transition: background-color $speed, color $speed;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		padding: 0;
         &:hover {
             background-color: #3a4a4e;
             color: #fff;
         }
         &:active {
-            &:before {
+            img {
                 opacity: 0.3;
             }
         }
-
-        &:before {
-            content: $icon-exit;
-            font-size: 20px;
-            margin: 1px -1px 0 0;
-            display: block;
-            transition: opacity $speed;
-        }
+		img {
+			opacity: .7;
+			width: 20px;
+			margin: 0 -4px 0 0;
+			transition: opacity .2s;
+		}
     }
 
     &-round-close {

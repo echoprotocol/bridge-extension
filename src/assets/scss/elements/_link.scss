@@ -1,6 +1,6 @@
 %link {
     height: 22px;
-    transition: color $speed;
+    transition: color $speed, opacity .2s;
     display: flex;
     align-items: center;
     justify-content: center;
@@ -12,7 +12,8 @@
     &-return {
         @extend %link;
         font-family: FNBold;
-        color: #39494C;
+		color: #253738;
+		opacity: .7;
         min-width: 89px;
         text-transform: uppercase;
         cursor: pointer;
@@ -37,22 +38,15 @@
 				}
 			}
         }
-        i {
-            width: 12px;
-            height: 14px;
-            display: flex;
-            align-items: center;
-            margin-right: 10px;
-            & + .link-text {
-                    margin: 0 -5px 0 4px;
-            } 
+        img {
+            width: 20px;
+			margin-right: 10px;
+			
         }
         &:hover {
-            color: #626e70;
+            opacity: 1;
         }
     }
-
-    // Ссылка Return с иконкой  
 
     &.gray {
         border: 2px solid transparent;
