@@ -65,6 +65,7 @@ class Transactions extends React.Component {
 		});
 
 		const { activeId, note } = this.state;
+		const { accountName } = this.props;
 
 		return (
 			<React.Fragment>
@@ -107,10 +108,14 @@ class Transactions extends React.Component {
 															<div className="left-block">Sender</div>
 															<div className="right-block">{elem.getIn(['content', 'sender'])}</div>
 														</div>
-														<div className="row">
-															<div className="left-block">Receiver</div>
-															<div className="right-block">{elem.getIn(['content', 'receiver'])}</div>
-														</div>
+
+														{
+															elem.getIn(['content', 'receiver']) && accountName !== elem.getIn(['content', 'receiver']) ?
+																<div className="row">
+																	<div className="left-block">Receiver</div>
+																	<div className="right-block">{elem.getIn(['content', 'receiver'])}</div>
+																</div> : null
+														}
 														<div className="row">
 															<div className="left-block">Fee</div>
 															<div className="right-block">{elem.getIn(['content', 'fee'])}<span className="currency">{elem.getIn(['content', 'feeCurrency'])}</span></div>
@@ -142,6 +147,7 @@ class Transactions extends React.Component {
 Transactions.propTypes = {
 	history: PropTypes.object,
 	decryptNote: PropTypes.func.isRequired,
+	accountName: PropTypes.string.isRequired,
 };
 
 Transactions.defaultProps = {
@@ -151,6 +157,7 @@ Transactions.defaultProps = {
 export default withRouter(connect(
 	(state) => ({
 		history: state.global.get('formattedHistory'),
+		accountName: state.global.getIn(['account', 'name']),
 	}),
 	(dispatch) => ({
 		decryptNote: (memo) => dispatch(decryptNote(memo)),
