@@ -8,6 +8,7 @@ import { sidebarToggle } from '../../actions/GlobalActions';
 
 import { HEADER_TITLE } from '../../constants/GlobalConstants';
 import { HIDE_NAVBAR_PATHS } from '../../constants/RouterConstants';
+import Hamburger from '../../assets/images/icons/hamburger.svg';
 
 class Navbar extends React.PureComponent {
 
@@ -37,7 +38,9 @@ class Navbar extends React.PureComponent {
 					{
 						account ?
 							<li className="btn-nav-wrap" >
-								<Button onClick={(e) => this.onClick(e)} className="icon-menu btn-nav" />
+								<Button onClick={(e) => this.onClick(e)} className="btn-nav" >
+									<img src={Hamburger} alt="" />
+								</Button>
 							</li> : null
 					}
 

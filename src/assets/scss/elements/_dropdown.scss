@@ -90,7 +90,8 @@
     &.open {
         .dropdown-toggle {
             .ddDown {
-                transform: rotateX(180deg);
+				transform: rotateX(180deg);
+				margin: 2px 2px -2px;
             }
         }
 	}
@@ -149,19 +150,11 @@
             @include onToggleFocus(#4c5c60);
         }
     }
-	&.open {
-		.dropdown-toggle {
-            .ddDown {
-				margin-top: 2px;
-			}
-		}
-	}
 }
 
 .dropdown-network {
 
     margin-left: auto;
-
     .dropdown {
         &-toggle {
             font-family: FNMedium;

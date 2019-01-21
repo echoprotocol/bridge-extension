@@ -282,22 +282,20 @@
         background-color: transparent;
         width: 30px;
         height: 30px;
-        border: 0;
+		border: 0;
         cursor: pointer;
-        font-size: 12px;
-        color: #5c7071;
-        transition: color linear $speed;
-        -webkit-transform: translateZ(0);
-
-        &:hover,
+        transition: opacity .2s;
+		opacity: .7;
+		&:hover,
         &:focus {
-            color: #88a5a6;
-
+            opacity: 1;
         }
-
         &:active {
-            color: #506869;
+            opacity: .5;
         }
+		img {
+			width: 20px;
+		}
     }
 
     &-logout {
