@@ -20,7 +20,7 @@ import { NETWORKS } from '../../constants/GlobalConstants';
 import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
 
 import GlobalReducer from '../../reducers/GlobalReducer';
-
+import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
 
 class NetworkDropdown extends React.PureComponent {
 
@@ -160,7 +160,7 @@ class NetworkDropdown extends React.PureComponent {
 					<div className={classnames('current-network', { connected })}>
 						<span className="cut">{name}</span>
 					</div>
-					<i aria-hidden="true" className="dropdown icon" />
+					<img className="ddDown" src={downArrow} alt="" />
 				</Dropdown.Toggle>
 
 				<Dropdown.Menu >

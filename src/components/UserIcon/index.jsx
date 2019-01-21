@@ -84,11 +84,6 @@ class UserIcon extends React.PureComponent {
 				onKeyPress={(e) => this.onKeyPress(e)}
 			>
 				<div className="content">
-					{/* <i
-						aria-hidden="true"
-						className={classnames(`icon-${this.props.avatar}`)}
-					/> */}
-
 					<img src={`/images/${this.props.avatar}.svg`} alt="" />
 				</div>
 				{ this.props.animationChange ? this.renderAnimationChange() : null }

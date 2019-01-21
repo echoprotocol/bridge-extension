@@ -16,6 +16,7 @@ import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/Router
 import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
+import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
 
 class UserDropdown extends React.PureComponent {
 
@@ -163,8 +164,7 @@ class UserDropdown extends React.PureComponent {
 						color={account.get('iconColor')}
 						avatar={`ava${account.get('icon')}`}
 					/>
-
-					<i aria-hidden="true" className="dropdown icon" />
+					<img className="ddDown" src={downArrow} alt="" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu >
 					<div
