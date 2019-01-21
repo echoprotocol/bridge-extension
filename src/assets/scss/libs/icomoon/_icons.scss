@@ -131,8 +131,7 @@
     }
 }
 
-.icon-closeSmall,
-.btn-round-close {
+.icon-closeSmall {
     &:before {
         content: $icon-closeSmall; 
     }

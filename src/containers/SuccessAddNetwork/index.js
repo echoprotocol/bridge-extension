@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 
 import { IMPORT_ACCOUNT_PATH } from '../../constants/RouterConstants';
+import arrowLeft from '../../assets/images/icons/arrow_dark_left.svg';
 
 class SuccessAddNetwork extends React.Component {
 
@@ -51,12 +52,8 @@ class SuccessAddNetwork extends React.Component {
 		return (
 			<React.Fragment>
 				<div className="return-block">
-					<a
-						href="/"
-						className="link-return"
-						onClick={(e) => this.onClick(e)}
-					>
-						<i className="icon-return" />
+					<a href="/" className="link-return" onClick={(e) => this.onClick(e)}>
+						<img src={arrowLeft} alt="" />
 						<span className="link-text">Return</span>
 					</a>
 				</div>

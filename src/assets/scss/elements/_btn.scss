@@ -275,8 +275,16 @@
 	}
 
     &-noborder {
-        @extend %btn;
-        &:not(.disabled) {
+		@extend %btn;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+        background-color: transparent;
+        color: #3e494f;
+        border: 1px solid transparent;
+		border-radius: $angularMax;
+
+		&:not(.disabled) {
             @include onBtnFocus(
                  $angularMax,
                  2px,
@@ -284,10 +292,6 @@
                  #d0d5d7
             );
         }
-        background-color: transparent;
-        color: #3e494f;
-        border: 1px solid transparent;
-        border-radius: $angularMax;
         &:hover {
             color: #3b4952;
             background-color: #dfe2e4;
@@ -300,9 +304,9 @@
             border: 2px solid transparent;
         }
 
-        i {
-			margin-right: 13px;
-			margin-left: -6px;
+        img {
+			width: 20px;
+			margin: 0 4px 0 -4px;
         }
 
     }
@@ -361,28 +365,26 @@
     &-round-close {
         background-color: transparent;
         border-radius: 50%;
-        height: 23px;
-        width: 23px;
+        height: 22px;
+        width: 22px;
         border: 0;
-        color: #adb3b9;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 7px 0 -7px;
         transition: background-color $speed;
-        cursor: pointer;
+		cursor: pointer;
+		
+		img {
+			width: 20px;
+			opacity: .3;
+			transition: opacity $speed;
+		}
         &:hover {
-            background-color: #363f42;
-
-            &:before {
-                opacity: 1;
-            }
-        }
-        &:before {
-            display: block;
-            margin: 1px -1px 0 0;
-            opacity: 0.6;
-            transition: opacity $speed;
+			background-color: #363f42;
+			img {
+				opacity: 1;
+			}
         }
     }
     &-icon {
@@ -430,17 +432,21 @@
         align-items: center;
         justify-content: center;
         position: absolute;
-        // height: 25px;
         top: 0;
         right: 0;
-        transition: color $speed, background-color $speed;
+		transition: color $speed, background-color $speed;
+		
         &.compact {
             .btn-text {
-                letter-spacing: 2.3px;
                 font-size: 11px;
                 margin: 1px 0 0 0;
             }
-        }
+		}
+		
+		img {
+			margin-top: -1px;
+			width: 20px;
+		}
     }
 
 }

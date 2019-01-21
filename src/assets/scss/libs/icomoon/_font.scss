@@ -10,9 +10,7 @@
   }
   
 [class^="icon-"], [class*=" icon-"],
-.dropdown.icon,
-.btn-logout:before,
-.btn-round-close:before  {
+.dropdown.icon {
     font-family: '#{$icomoon-font-family}' !important;
     speak: none;
     font-style: normal;
