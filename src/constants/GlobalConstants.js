@@ -11,6 +11,7 @@ import {
 	ADD_NETWORK_PATH,
 	SUCCESS_ADD_NETWORK_PATH,
 	WATCH_TOKEN_PATH,
+	ABOUT_PATH,
 } from './RouterConstants';
 
 export const HEADER_TITLE = [
@@ -68,11 +69,15 @@ export const HEADER_TITLE = [
 		path: WATCH_TOKEN_PATH,
 		title: 'Watch token',
 	},
+	{
+		path: ABOUT_PATH,
+		title: 'About Bridge',
+	},
 ];
 
 export const NETWORKS = [
 	{
-		name: 'devnet',
+		name: 'Dev Network',
 		registrator: 'https://echo-tmp-wallet.pixelplex.io/faucet/registration',
 		url: 'wss://echo-devnet-node.pixelplex.io/ws',
 	},

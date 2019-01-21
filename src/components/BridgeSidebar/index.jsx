@@ -8,8 +8,8 @@ import { sidebarToggle } from '../../actions/GlobalActions';
 
 import {
 	BACKUP_PATH,
-	CREATE_ACCOUNT_PATH,
 	TRANSACTIONS_PATH,
+	ABOUT_PATH,
 	WALLET_PATH,
 } from '../../constants/RouterConstants';
 
@@ -78,7 +78,7 @@ class BridgeSidebar extends React.PureComponent {
 							<li>
 								<Link
 									onClick={() => this.props.sidebarToggle(visibleSidebar)}
-									to={CREATE_ACCOUNT_PATH}
+									to={ABOUT_PATH}
 								>
 									<i className="icon-navInfo" />
 									<div className="nav-title">About Bridge</div>
