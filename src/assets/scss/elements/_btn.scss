@@ -261,11 +261,16 @@
 		&:hover,
 		&:focus {
 			color: #D6DDDE;
+			img {
+				opacity: 1;
+			}
 		}
 
 		img {
 			width: 20px;
 			margin: 0 4px 0 0;
+			opacity: .4;
+			transition: opacity $speed;
 		}
 	}
 
@@ -303,6 +308,7 @@
     }
 
     &-nav {
+		display: flex;
         background-color: transparent;
         width: 30px;
         height: 30px;
@@ -382,11 +388,17 @@
     &-icon {
         background-color: transparent;
         border: 0;
-        color: #aeb4b8;
-        transition: color $speed;
-        cursor: pointer;
-        &:hover {
-            color: #363f42;
+		cursor: pointer;
+		img {
+			width: 20px;
+			opacity: .6;
+			transition: opacity $speed;
+		}
+		&:hover,
+		&:focus {
+			img {
+				opacity: 1;
+			}
         }
     }
     &-try {

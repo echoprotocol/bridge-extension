@@ -16,8 +16,7 @@ import {
 
 import UserIcon from '../UserIcon';
 import LockIcon from '../../assets/images/icons/lock.svg';
-
-// import iconWallet from '../../assets/images/icons/navigation_wallet_grey.svg';
+import IconClose from '../../assets/images/icons/cross_big.svg';
 
 
 class BridgeSidebar extends React.PureComponent {
@@ -41,9 +40,7 @@ class BridgeSidebar extends React.PureComponent {
 							className="btn-icon"
 							onClick={() => this.props.sidebarToggle(visibleSidebar)}
 							content={
-								<React.Fragment>
-									<i className="icon-closeBig" />
-								</React.Fragment>
+								<img src={IconClose} alt="" />
 							}
 						/>
 						{
@@ -66,7 +63,6 @@ class BridgeSidebar extends React.PureComponent {
 									onClick={() => this.props.sidebarToggle(visibleSidebar)}
 									to={WALLET_PATH}
 								>
-									<i className="icon-navWallet" />
 									<div className="nav-title">My wallet</div>
 								</NavLink>
 							</li>
@@ -76,7 +72,6 @@ class BridgeSidebar extends React.PureComponent {
 									onClick={() => this.props.sidebarToggle(visibleSidebar)}
 									to={TRANSACTIONS_PATH}
 								>
-									<i className="icon-navHistory" />
 									<div className="nav-title">Transactions history</div>
 								</NavLink>
 							</li>
@@ -86,7 +81,6 @@ class BridgeSidebar extends React.PureComponent {
 									onClick={() => this.props.sidebarToggle(visibleSidebar)}
 									to={BACKUP_PATH}
 								>
-									<i className="icon-navBackup" />
 									<div className="nav-title">Backup account</div>
 								</NavLink>
 							</li>
@@ -96,7 +90,6 @@ class BridgeSidebar extends React.PureComponent {
 									onClick={() => this.props.sidebarToggle(visibleSidebar)}
 									to={ABOUT_PATH}
 								>
-									<i className="icon-navInfo" />
 									<div className="nav-title">About Bridge</div>
 								</NavLink>
 							</li>
