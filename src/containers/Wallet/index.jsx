@@ -6,7 +6,6 @@ import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button } from 'semantic-ui-react';
-// import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import { sendRedirect, removeToken } from '../../actions/BalanceActions';
 

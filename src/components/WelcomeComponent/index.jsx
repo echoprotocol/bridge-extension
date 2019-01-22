@@ -52,8 +52,10 @@ class WelcomeComponent extends React.Component {
 								className="btn-noborder"
 								onClick={(e) => this.props.proceed(e)}
 							>
-								<img src={ArrowDown} alt="" />
-								<div className="btn-text">Proceed</div>
+								<div className="btn-text">
+									<img src={ArrowDown} alt="" />
+									Proceed
+								</div>
 							</Button>
 						</div>
 					</div>

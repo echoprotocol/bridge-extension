@@ -45,6 +45,15 @@
         }
         &:hover {
             opacity: 1;
+		}
+		
+		&.green {
+			color: #35E7BC;
+			&:not(.disabled) {
+				&:not(:active):focus:before {
+					border-color: rgba(#fff, .2);
+				}
+			}
         }
     }
 
@@ -67,47 +76,9 @@
 
         &:active {
             opacity: 0.5;
-        }
-    }
-    
-    &-return_icn {
-        font-family: FNBold;
-        display: inline-flex;
-        align-items: center;
-        text-transform: uppercase;  
-        font-size: 10px;
-        letter-spacing: 0.255em;
+		}
+		
 
-        .icon-return {
-            font-size: 16px;
-            margin-right: 10px;
-        }
-
-
-        &.green {
-            border: 2px solid transparent;
-            border-radius: 6px;
-            padding: 4px;
-            &:focus {
-                border-color: #434e52;
-            }
-            
-            color: #6db795;
-
-            &:hover {
-                color: #89e7bc;
-            }
-
-            &:active {
-                opacity: 0.5;
-            }
-
-            &.with-icon {
-                &:after {
-                    color: #6db795;
-                }
-            }
-        }
     }
 
     &-text {

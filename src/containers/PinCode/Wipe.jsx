@@ -11,6 +11,7 @@ import { wipeCrypto } from '../../actions/CryptoActions';
 import { setValue, clearForm } from '../../actions/FormActions';
 
 import CheckBox from '../../components/CheckBox';
+import arrowLeft from '../../assets/images/icons/arrow_emerald_left.svg';
 
 class Wipe extends React.Component {
 
@@ -31,14 +32,17 @@ class Wipe extends React.Component {
 
 		return (
 			<div className="no-restored-pin-container">
-				<div className="top-section">
+				<div className="return-block transparent">
 					<Link
-						className="link link-return_icn green"
+						className="link-return green"
 						to={UNLOCK_PATH}
 					>
-						<span className="icon-return" />
-						Return
+						<img src={arrowLeft} alt="" />
+						<div className="link-text">Return</div>
 					</Link>
+				</div>
+				<div className="top-section">
+
 					<div className="title">Your PIN number can not be restored.</div>
 					<div className="description">
 						<span>You can clear your account data from
