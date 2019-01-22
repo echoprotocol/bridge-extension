@@ -53,6 +53,7 @@ export const decryptNote = (index) => async (dispatch, getState) => new Promise(
  * 	@param {Object} result
  */
 const formatOperation = async (data, result, accountName) => {
+
 	const type = data.getIn(['op', '0']);
 	const operation = data.getIn(['op', '1']);
 
@@ -82,6 +83,14 @@ const formatOperation = async (data, result, accountName) => {
 		} else {
 			result = result.setIn(['content', 'receiver'], operation.get(options.subject[0]));
 		}
+	}
+
+	if (options.from) {
+
+		const request = operation.get(options.from);
+		const response = await fetchChain(request);
+
+		result = result.setIn(['content', 'sender'], response.get('name'));
 	}
 
 	let numberSign = '-';

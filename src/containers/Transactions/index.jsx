@@ -74,6 +74,7 @@ class Transactions extends React.Component {
 		});
 
 		const { activeId, note } = this.state;
+		const { accountName } = this.props;
 
 		return (
 			<React.Fragment>
@@ -113,10 +114,21 @@ class Transactions extends React.Component {
 												</Accordion.Title>
 												<Accordion.Content active={activeId === elem.get('id')}>
 													<div className="transaction-element-content">
-														<div className="row">
-															<div className="left-block">Receiver</div>
-															<div className="right-block">{elem.getIn(['content', 'receiver'])}</div>
-														</div>
+														{
+															accountName !== elem.getIn(['content', 'sender']) ?
+																<div className="row">
+																	<div className="left-block">Sender</div>
+																	<div className="right-block">{elem.getIn(['content', 'sender'])}</div>
+																</div> : null
+														}
+
+														{
+															elem.getIn(['content', 'receiver']) && accountName !== elem.getIn(['content', 'receiver']) ?
+																<div className="row">
+																	<div className="left-block">Receiver</div>
+																	<div className="right-block">{elem.getIn(['content', 'receiver'])}</div>
+																</div> : null
+														}
 														<div className="row">
 															<div className="left-block">Fee</div>
 															<div className="right-block">{elem.getIn(['content', 'fee'])}<span className="currency">{elem.getIn(['content', 'feeCurrency'])}</span></div>
@@ -148,6 +160,7 @@ class Transactions extends React.Component {
 Transactions.propTypes = {
 	history: PropTypes.object,
 	decryptNote: PropTypes.func.isRequired,
+	accountName: PropTypes.string.isRequired,
 };
 
 Transactions.defaultProps = {
@@ -157,6 +170,7 @@ Transactions.defaultProps = {
 export default withRouter(connect(
 	(state) => ({
 		history: state.global.get('formattedHistory'),
+		accountName: state.global.getIn(['account', 'name']),
 	}),
 	(dispatch) => ({
 		decryptNote: (memo) => dispatch(decryptNote(memo)),
