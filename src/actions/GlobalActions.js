@@ -344,6 +344,10 @@ export const changeNetwork = (network) => async (dispatch, getState) => {
 		await storage.set('current_network', network);
 		await dispatch(connect());
 		await dispatch(loadInfo());
+
+		const emitter = echoService.getEmitter();
+		emitter.emit('switchNetwork', network);
+
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}

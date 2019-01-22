@@ -22,6 +22,7 @@ function setupInjection() {
 
 }
 
+// eslint-disable-next-line no-unused-expressions
 EXTENSION && setupInjection();
 
 /**
@@ -47,6 +48,7 @@ const onResponse = (res, origin = '*') => {
  */
 const onMessage = (event) => {
 	const { data } = event;
+
 	if (data.target !== 'content' || !data.appId || data.appId !== APP_ID) return;
 
 	try {

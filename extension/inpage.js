@@ -5,6 +5,8 @@ import { APP_ID } from '../src/constants/GlobalConstants';
 
 const requestQueue = [];
 
+// const networkSubscribers = [];
+
 /**
  * On content script message
  * @param event
@@ -77,7 +79,36 @@ const getAccounts = () => {
 	return result;
 };
 
+/**
+ * Get Network on init
+ * @returns {Promise}
+ */
+const getNetwork = () => {
+
+	const id = Date.now();
+	const result = new Promise((resolve, reject) => {
+
+		const cb = ({ data }) => {
+			if (data.res.error) {
+				reject(data.res.error);
+			} else {
+				resolve(data.res);
+			}
+		};
+
+		requestQueue.push({ id, cb });
+		window.postMessage({
+			method: 'network', id, target: 'content', appId: APP_ID,
+		}, '*');
+
+	});
+
+	return result;
+
+};
+
 const extension = {
+	getNetwork: () => getNetwork(),
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
 };
@@ -89,3 +120,4 @@ window.echojslib = {
 };
 window.echojsws = echojsws;
 window.addEventListener('message', onMessage, false);
+

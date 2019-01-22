@@ -149,6 +149,16 @@ const resolveAccounts = async () => {
 	}
 
 };
+let currentNetwork = '';
+/**
+ * Get user account if unlocked
+ * @returns {Promise.<*>}
+ */
+const getNetwork = async (id, sendResponse) => {
+
+	const network = (await storage.get('current_network')) || NETWORKS[0];
+	return sendResponse({ id, res: network.name });
+};
 
 /**
  * On content script request
@@ -200,6 +210,11 @@ const onMessage = (request, sender, sendResponse) => {
 			triggerPopup();
 		}
 
+
+	} else if (request.method === 'network') {
+		console.log(request.method, 'bg');
+
+		getNetwork(id, sendResponse);
 
 	}
 
@@ -455,8 +470,14 @@ export const onSend = async (options, networkName) => {
 	return null;
 };
 
+export const onSwitchNetwork = async (network) => {
+	currentNetwork = network;
+	console.log(network);
+};
+
+
 const listeners = new Listeners(emitter, crypto);
-listeners.initBackgroundListeners(onResponse, onTransaction, onSend);
+listeners.initBackgroundListeners(onResponse, onTransaction, onSend, onSwitchNetwork);
 
 createSocket();
 
