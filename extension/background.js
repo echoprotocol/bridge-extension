@@ -43,6 +43,8 @@ const requestQueue = [];
 let lastTransaction = null;
 const { ChainStore } = chainjs;
 
+let subscriberResponse = null;
+
 ChainStore.notifySubscribers = () => {
 	// Dispatch at most only once every x milliseconds
 	if (!ChainStore.dispatched) {
@@ -149,16 +151,7 @@ const resolveAccounts = async () => {
 	}
 
 };
-let currentNetwork = '';
-/**
- * Get user account if unlocked
- * @returns {Promise.<*>}
- */
-const getNetwork = async (id, sendResponse) => {
 
-	const network = (await storage.get('current_network')) || NETWORKS[0];
-	return sendResponse({ id, res: network.name });
-};
 
 /**
  * On content script request
@@ -171,11 +164,19 @@ const onMessage = (request, sender, sendResponse) => {
 
 	request = JSON.parse(JSON.stringify(request));
 
-	if (!request.method || !request.id || !request.appId || request.appId !== APP_ID) return false;
+	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
+
+	if (request.method === 'networkSubscribe') {
+		subscriberResponse = sendResponse;
+		return true;
+	}
+
+	if (!request.id) return false;
 
 	const { id } = request;
 
 	lastRequestType = request.method;
+
 
 	if (request.method === 'confirm' && request.data) {
 
@@ -209,12 +210,6 @@ const onMessage = (request, sender, sendResponse) => {
 		} else {
 			triggerPopup();
 		}
-
-
-	} else if (request.method === 'network') {
-		console.log(request.method, 'bg');
-
-		getNetwork(id, sendResponse);
 
 	}
 
@@ -471,8 +466,7 @@ export const onSend = async (options, networkName) => {
 };
 
 export const onSwitchNetwork = async (network) => {
-	currentNetwork = network;
-	console.log(network);
+	subscriberResponse({ subscriber: true, res: network });
 };
 
 

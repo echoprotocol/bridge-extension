@@ -5,13 +5,31 @@ import { APP_ID } from '../src/constants/GlobalConstants';
 
 const requestQueue = [];
 
-// const networkSubscribers = [];
+const networkSubscribers = [];
+
+/**
+ * subscribe to switch network
+ * @param subscriberCb
+ */
+const subscribe = (subscriberCb) => {
+	if (subscriberCb) { networkSubscribers.push(subscriberCb); }
+	window.postMessage({
+		method: 'networkSubscribe', target: 'content', appId: APP_ID,
+	}, '*');
+};
 
 /**
  * On content script message
  * @param event
  */
 const onMessage = (event) => {
+
+	if (event.data.subscriber) {
+		networkSubscribers.forEach((cb) => cb());
+		subscribe();
+		return;
+	}
+
 	const { id, target, appId } = event.data;
 
 	if (!id || target !== 'inpage' || !appId || appId !== APP_ID) return;
@@ -21,6 +39,7 @@ const onMessage = (event) => {
 
 	requestQueue.splice(requestIndex, 1)[0].cb(event);
 };
+
 
 /**
  * Send custom transaction
@@ -79,44 +98,18 @@ const getAccounts = () => {
 	return result;
 };
 
-/**
- * Get Network on init
- * @returns {Promise}
- */
-const getNetwork = () => {
-
-	const id = Date.now();
-	const result = new Promise((resolve, reject) => {
-
-		const cb = ({ data }) => {
-			if (data.res.error) {
-				reject(data.res.error);
-			} else {
-				resolve(data.res);
-			}
-		};
-
-		requestQueue.push({ id, cb });
-		window.postMessage({
-			method: 'network', id, target: 'content', appId: APP_ID,
-		}, '*');
-
-	});
-
-	return result;
-
-};
 
 const extension = {
-	getNetwork: () => getNetwork(),
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
+	subscribe: () => subscribe(),
 };
 
 window.echojslib = {
 	...echojslib,
 	isEchoBridge: true,
 	extension,
+	subscribe,
 };
 window.echojsws = echojsws;
 window.addEventListener('message', onMessage, false);

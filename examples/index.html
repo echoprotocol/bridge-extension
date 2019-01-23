@@ -7,11 +7,6 @@
 	<body>
 		<h1>Examples</h1>
 
-		<div style="padding-bottom: 15px;">
-			<h4>Network:</h4>
-			<div id="network"></div>
-		</div>
-
 		<!-- Accounts (current network) -->
 		<div style="padding-bottom: 15px;">
 			<h4>Accounts</h4>
@@ -116,6 +111,9 @@
 		<!---->
 	</body>
 	<script>
+		window.echojslib.subscribe(() => {
+			console.log("subscriber");
+		});
 		$(document).ready(function() {
 			$("#accounts-click").click(function(e) {
 				window.echojslib.extension
@@ -205,15 +203,6 @@
 						);
 					});
 			});
-
-			window.echojslib.extension
-				.getNetwork()
-				.then(result => {
-					jQuery("#network").html(result);
-				})
-				.catch(err => {
-					jQuery("#network").html(err);
-				});
 		});
 	</script>
 </html>
