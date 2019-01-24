@@ -77,8 +77,8 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		}
 		const wif = getCrypto().generateWIF();
 
-		// const echoRandKey = keyPairFromSeed(random(32_SIZE));
-		// const echoRandPrivateKey = Buffer.from(echoRandKey.privateKey).toString('hex');
+		// const echoRandKeyBuffer = keyPairFromSeed(random(32_SIZE));
+		// const echoRandPrivateKey = Buffer.from(echoRandKeyBuffer.privateKey).toString('hex');
 		// const echoRandPublicKey = Buffer.from(echoRandKey.publicKey).toString('hex');
 		// const echoRandKey = `DET${bs58.encrypt(echoRandPublicKey)}`;
 
