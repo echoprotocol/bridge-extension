@@ -7,7 +7,7 @@ import history from '../history';
 
 import { setFormError, toggleLoading } from './FormActions';
 import { disconnect, connect } from './ChainStoreAction';
-import { initAssetsBalances, removeBalances } from './BalanceActions';
+import { getTokenDetails, initAssetsBalances, removeBalances } from './BalanceActions';
 import { globals, loadRequests } from './SignActions';
 
 import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
@@ -35,8 +35,6 @@ import {
 	NETWORK_ERROR_SEND_PATH,
 } from '../constants/RouterConstants';
 import { FORM_ADD_NETWORK } from '../constants/FormConstants';
-
-import { fetchChain, getTokenDetails } from '../api/ChainApi';
 
 import storage from '../services/storage';
 import BalanceReducer from '../reducers/BalanceReducer';
@@ -80,10 +78,10 @@ export const initAccount = ({ name, icon, iconColor }) => async (dispatch) => {
 	dispatch(set('loading', true));
 
 	try {
-		const account = await fetchChain(name);
+		const account = await echoService.getChainLib().api.getAccountByName(name);
 
 		dispatch(set('account', new Map({
-			id: account.get('id'), name, icon, iconColor,
+			id: account.id, name, icon, iconColor,
 		})));
 
 		await dispatch(initAssetsBalances());
@@ -118,9 +116,8 @@ export const isAccountAdded = (name) => (dispatch, getState) => {
  */
 export const addAccount = (name, keys, networkName) => async (dispatch, getState) => {
 
-
 	try {
-		const account = await fetchChain(name);
+		const account = await echoService.getChainLib().api.getAccountByName(name);
 
 		let accounts = getState().global.get('accounts');
 
@@ -136,7 +133,7 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
 		}
 
 		accounts = accounts.set(networkName, accounts.get(networkName).push({
-			id: account.get('id'), active: true, icon, iconColor, name, keys,
+			id: account.id, active: true, icon, iconColor, name, keys,
 		}));
 
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
@@ -335,7 +332,7 @@ export const loadInfo = () => async (dispatch, getState) => {
  *
  * 	@param {Object} network
  */
-export const changeNetwork = (network) => async (dispatch, getState) => {
+export const changeNetwork = (network) => async (dispatch) => {
 	try {
 		await dispatch(disconnect());
 
@@ -465,7 +462,7 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
  *  @param {Boolean} isRecreate - when trying to manual reconnect
  */
 export const globalInit = (isRecreate) => async (dispatch) => {
-	await dispatch(connect(!!isRecreate));
+	await dispatch(connect());
 
 	if (isRecreate) {
 		await dispatch(loadInfo());

@@ -1,4 +1,4 @@
-import { Aes, PrivateKey } from 'echojs-lib';
+import { aes, PrivateKey } from 'echojs-lib';
 import random from 'crypto-random-string';
 
 import storage from './storage';
@@ -40,12 +40,12 @@ class AesStorage {
 
 		if (encrypted) {
 			try {
-				decrypted = Aes.decryptWithChecksum(privateKey, publicKey, '', Buffer.from(encrypted, 'hex'));
+				decrypted = aes.decryptWithChecksum(privateKey, publicKey, null, Buffer.from(encrypted, 'hex'));
 			} catch (err) {
 				throw new Error('Enter valid PIN');
 			}
 		} else {
-			encrypted = Aes.encryptWithChecksum(privateKey, publicKey, '', decrypted);
+			encrypted = aes.encryptWithChecksum(privateKey, publicKey, null, decrypted);
 			await storage.set('randomKey', encrypted.toString('hex'));
 		}
 
@@ -108,7 +108,7 @@ class AesStorage {
 		this.emitter = emitter;
 
 		const randomSeed = await this.getRandomSeed(pin);
-		this.aes = Aes.fromSeed(randomSeed);
+		this.aes = aes.fromSeed(randomSeed);
 		this.emitter('unlocked');
 
 		this.timeout();

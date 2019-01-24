@@ -5,7 +5,6 @@ import BN from 'bignumber.js';
 import history from '../history';
 
 import { getOperationFee } from '../api/WalletApi';
-import { fetchChain, lookupAccounts } from '../api/ChainApi';
 
 import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
@@ -24,7 +23,6 @@ import {
 	CLOSE_STATUS,
 	OPEN_STATUS,
 	POPUP_WINDOW_TYPE,
-	ACCOUNTS_LOOKUP_LIMIT,
 	COMPLETE_STATUS,
 } from '../constants/GlobalConstants';
 import { operationKeys, operationTypes } from '../constants/OperationConstants';
@@ -45,7 +43,7 @@ export const globals = {
  */
 const checkTransactionAccount = async (toAccount) => {
 	try {
-		const toAccountResult = await lookupAccounts(toAccount, ACCOUNTS_LOOKUP_LIMIT);
+		const toAccountResult = await echoService.getChainLib().api.lookupAccounts(toAccount);
 
 		if (!toAccountResult.find((i) => i[0] === toAccount)) {
 			return 'Account \'to\' not found';
@@ -237,7 +235,7 @@ const checkTransactionFee = (options, transaction) => async (dispatch, getState)
 	let valueAssetId = '';
 
 	if (options.type === operationTypes.contract.name.toLowerCase() && transaction.value) {
-		const core = await fetchChain(CORE_ID);
+		const core = await echoService.getChainLib().api.getObject(CORE_ID);
 
 		valueAssetId = transaction.asset_id || core;
 	} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
@@ -264,7 +262,7 @@ const checkTransactionFee = (options, transaction) => async (dispatch, getState)
 
 	balance = balance.get('balance');
 
-	if (valueAssetId.get('id') === transaction.fee.asset.get('id')) {
+	if (valueAssetId.id === transaction.fee.asset.get('id')) {
 		let value = '';
 
 		if (options.type === operationTypes.contract.name.toLowerCase()) {
@@ -300,16 +298,16 @@ const checkTransactionFee = (options, transaction) => async (dispatch, getState)
  */
 export const getTransactionFee = async (options) => {
 	const { fee } = options;
-	const core = await fetchChain(CORE_ID);
+	const core = await echoService.getChainLib().api.getObject(CORE_ID);
 
 	let amount = await getOperationFee(options.type, formatToSend(options.type, options), core);
 
 	if (fee.asset.get('id') !== CORE_ID) {
 		const price = new BN(fee.asset.getIn(['options', 'core_exchange_rate', 'quote', 'amount']))
 			.div(fee.asset.getIn(['options', 'core_exchange_rate', 'base', 'amount']))
-			.times(10 ** (core.get('precision') - fee.asset.get('precision')));
+			.times(10 ** (core.precision - fee.asset.get('precision')));
 
-		amount = new BN(amount).div(10 ** core.get('precision'));
+		amount = new BN(amount).div(10 ** core.precision);
 		amount = price.times(amount).times(10 ** fee.asset.get('precision'));
 	}
 
@@ -332,7 +330,7 @@ const getFetchedObjects = async (fetchList, id) => {
 
 	try {
 		return Promise.all(fetchList.map(async ([key, value]) => {
-			const result = await fetchChain(value);
+			const result = await echoService.getChainLib().api.getObject(value);
 			return { [key]: result };
 		}));
 	} catch (err) {
@@ -412,10 +410,10 @@ const setTransaction = ({ id, options }) => async (dispatch) => {
 	const errorFee = await dispatch(checkTransactionFee(options, transaction));
 
 	if (transaction.value) {
-		const core = await fetchChain(CORE_ID);
+		const core = await echoService.getChainLib().api.getObject(CORE_ID);
 
 		transaction.value = transaction.asset_id ? transaction.value / (10 ** transaction.asset_id.get('precision')) :
-			transaction.value / (10 ** core.get('precision'));
+			transaction.value / (10 ** core.precision);
 	}
 
 	if (errorFee) {
@@ -704,7 +702,7 @@ export const cancelTransaction = (id) => (dispatch) => {
  * 	@param {String} name
  */
 export const switchTransactionAccount = (name) => async (dispatch, getState) => {
-	const account = await fetchChain(name);
+	const account = await echoService.getChainLib().api.getAccountByName(name);
 	const transaction = getState().global.getIn(['sign', 'current']);
 	const key = operationKeys[transaction.get('options').type];
 

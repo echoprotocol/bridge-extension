@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import chainjs from 'echojs-lib';
+import echo, { Transaction } from 'echojs-lib';
 import EventEmitter from '../libs/CustomAwaitEmitter';
 
 import Crypto from '../src/services/crypto';
@@ -30,7 +30,6 @@ import {
 	SUCCESS_SEND_PATH,
 } from '../src/constants/RouterConstants';
 import getTransaction from './transaction';
-import echoService from "../src/services/echo";
 
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
@@ -41,34 +40,16 @@ const accountsRequests = [];
 
 const requestQueue = [];
 let lastTransaction = null;
-const { ChainStore } = chainjs;
 
-ChainStore.notifySubscribers = () => {
-	// Dispatch at most only once every x milliseconds
-	if (!ChainStore.dispatched) {
-		ChainStore.dispatched = true;
-		ChainStore.timeout = setTimeout(() => {
-			ChainStore.dispatched = false;
-			ChainStore.subscribers.forEach((callback) => {
-				try {
-					callback();
-				} catch (e) {
-					ChainStore.unsubscribe(callback);
-				}
-
-			});
-		}, ChainStore.dispatchFrequency);
-	}
-};
 /**
  * Create default socket
  */
 const createSocket = async () => {
-	await chainjs.connect('ws://195.201.164.54:6311', {
-		connectionTimeout: 5000,
-		maxRetries: 5,
-		pingTimeout: 3000,
-		pingInterval: 3000,
+	await echo.connect('ws://195.201.164.54:6311', {
+		connectionTimeout: 10000,
+		maxRetries: 20,
+		pingTimeout: 10000,
+		pingInterval: 10000,
 		debug: false,
 		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
 	});
@@ -315,8 +296,7 @@ const sendTransaction = async (transaction, networkName) => {
 	const indexPublicKey = keyPromises.findIndex((key) => !!key);
 
 	const pKey = publicKeys.getIn([indexPublicKey, 0]);
-	const { TransactionBuilder } = chainjs;
-	let tr = new TransactionBuilder();
+	let tr = new Transaction();
 	tr = await crypto.sign(networkName, tr, pKey);
 
 	if (memo) {
@@ -330,8 +310,8 @@ const sendTransaction = async (transaction, networkName) => {
 		);
 	}
 
-	tr.add_type_operation(type, options);
-	await tr.set_required_fees(options.fee.asset_id);
+	tr.addOperation(type, options);
+	await tr.setRequiredFees(options.fee.asset_id);
 
 	return tr.broadcast();
 };
@@ -461,7 +441,7 @@ listeners.initBackgroundListeners(onResponse, onTransaction, onSend);
 
 createSocket();
 
-window.getChainLib = () => chainjs;
+window.getChainLib = () => echo;
 window.getCrypto = () => crypto;
 window.getEmitter = () => emitter;
 window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }));

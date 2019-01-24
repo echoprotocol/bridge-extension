@@ -1,4 +1,4 @@
-import { ChainValidation } from 'echojs-lib';
+import { validators } from 'echojs-lib';
 
 class ValidateAccountHelper {
 
@@ -8,11 +8,11 @@ class ValidateAccountHelper {
 			return 'Account name should not be empty';
 		}
 
-		if (ChainValidation.is_account_name_error(accountName)) {
-			return ChainValidation.is_account_name_error(accountName);
+		if (validators.checkAccountName(accountName)) {
+			return validators.checkAccountName(accountName);
 		}
 
-		if (!ChainValidation.is_cheap_name(accountName)) {
+		if (!validators.checkCheapName(accountName)) {
 			return 'Enter a name containing least one dash, a number or no vowels';
 		}
 

@@ -1,5 +1,4 @@
 import BN from 'bignumber.js';
-import { Aes, PrivateKey, TransactionHelper } from 'echojs-lib';
 
 import echoService from '../src/services/echo';
 
@@ -9,13 +8,15 @@ import { formatToSend, getFetchMap } from '../src/services/operation';
 
 
 export const getTrOperationFee = async (type, transaction, core) => {
+	const { Transaction, aes, PrivateKey } = await echoService.getChainLib();
+
 	const options = JSON.parse(JSON.stringify(transaction));
 
 	if (options.memo) {
-		const nonce = TransactionHelper.unique_nonce_uint64();
+		const nonce = null;
 		const pKey = PrivateKey.fromWif(MEMO_FEE_KEYS.WIF);
 
-		const message = Aes.encryptWithChecksum(
+		const message = aes.encryptWithChecksum(
 			pKey,
 			MEMO_FEE_KEYS.PUBLIC_MEMO_TO,
 			nonce,
@@ -30,14 +31,13 @@ export const getTrOperationFee = async (type, transaction, core) => {
 		};
 	}
 
-	const { TransactionBuilder } = await echoService.getChainLib();
-	const tr = new TransactionBuilder();
-	tr.add_type_operation(type, options);
+	const tr = new Transaction();
+	tr.addOperation(type, options);
 
 	const start = new Date().getTime();
 
 	await Promise.race([
-		tr.set_required_fees(core.get('id')).then(() => (new Date().getTime() - start)),
+		tr.setRequiredFees(core.get('id')).then(() => (new Date().getTime() - start)),
 		new Promise((resolve, reject) => {
 			const timeoutId = setTimeout(() => {
 				clearTimeout(timeoutId);
@@ -46,47 +46,7 @@ export const getTrOperationFee = async (type, transaction, core) => {
 		}),
 	]);
 
-	return tr.operations[0][1].fee.amount;
-};
-
-/**
- * return method name by key type
- * @param {String} key
- * @returns {String}
- */
-const getTypeByKey = (key) => {
-	const { ChainValidation } = echoService.getChainLib();
-	if (ChainValidation.is_object_id(key)) {
-		if (key.search('1.2') === 0) {
-			return 'getAccount';
-		} else if (key.search('1.3') === 0) {
-			return 'getAsset';
-		}
-		return 'getObject';
-	} else if (ChainValidation.is_account_name(key)) {
-		return 'getAccount';
-	}
-	const keyNumber = Number(key);
-	if (!Number.isSafeInteger(keyNumber) || keyNumber < 1) throw new Error('Key should be id or account name or block number.');
-	return 'getBlock';
-};
-
-/**
- * fetch object from chain
- * @param {String} key
- * @returns {Object}
- */
-export const trFetchChain = async (key) => {
-	const { ChainStore } = echoService.getChainLib();
-	const method = getTypeByKey(key);
-
-	try {
-		const value = await ChainStore.FetchChain(method, key);
-
-		return value;
-	} catch (e) {
-		throw e;
-	}
+	return tr._operations[0][1].fee.amount; // eslint-disable-line no-underscore-dangle
 };
 
 /**
@@ -98,7 +58,7 @@ export const trFetchChain = async (key) => {
  */
 const getTransactionFee = async (options) => {
 	const { fee } = options;
-	const core = await trFetchChain(CORE_ID);
+	const core = await echoService.getChainLib().api.getObject(CORE_ID);
 
 	let amount = await getTrOperationFee(options.type, formatToSend(options.type, options), core);
 
@@ -120,7 +80,7 @@ const getTransactionFee = async (options) => {
 const getFetchedObjects = async (fetchList) => {
 	try {
 		return Promise.all(fetchList.map(async ([key, value]) => {
-			const result = await trFetchChain(value);
+			const result = await echoService.getChainLib().api.getObject(value);
 			return { [key]: result };
 		}));
 	} catch (err) {

@@ -6,8 +6,6 @@ import BalanceReducer from '../reducers/BalanceReducer';
 
 import { initAssetsBalances, updateTokens } from './BalanceActions';
 
-import { disconnectFromAddress } from '../api/ChainApi';
-
 import echoService from '../services/echo';
 
 import { NETWORKS } from '../constants/GlobalConstants';
@@ -31,7 +29,7 @@ export const subscribe = () => (dispatch) => {
  * connect socket current network
  * @returns {Function}
  */
-export const connect = (isRecreate) => async (dispatch) => {
+export const connect = () => async (dispatch) => {
 	dispatch(batchActions([
 		GlobalReducer.actions.set({ field: 'loading', value: true }),
 		GlobalReducer.actions.set({ field: 'connected', value: false }),
@@ -53,31 +51,12 @@ export const connect = (isRecreate) => async (dispatch) => {
 			dispatch(GlobalReducer.actions.set({ field: 'networks', value: new List(networks) }));
 		}
 
-		// const subscribeCb = () => dispatch(subscribe());
-
-		// resetInterval();
-		//
-		// INTERVAL_LOGIN_CALL = setInterval((() => {
-		// 	dispatch(checkConnection(network.url));
-		// }), LOGIN_INTERVAL);
-
-		await echoService.getChainLib().connect('ws://195.201.164.54:6311', {
-			connectionTimeout: 5000,
-			maxRetries: 5,
-			pingTimeout: 3000,
-			pingInterval: 3000,
-			debug: false,
-			apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
-		});
-
 		echoService.getChainLib().subscriber.setGlobalSubscribe(() => dispatch(subscribe()));
 
-		// await connectToAddress(network.url, subscribeCb, isRecreate);
 
-		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
-
-		// await fetchChain(GLOBAL_ID_1);
-		// await fetchChain(GLOBAL_ID_0);
+		if (echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
+			dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
+		}
 	} catch (err) {
 		dispatch(batchActions([
 			GlobalReducer.actions.set({
@@ -98,9 +77,7 @@ export const connect = (isRecreate) => async (dispatch) => {
  */
 export const disconnect = () => async (dispatch) => {
 	try {
-		// resetInterval();
-
-		await disconnectFromAddress();
+		await echoService.getChainLib().disconnect();
 		dispatch(batchActions([
 			BalanceReducer.actions.reset(),
 			GlobalReducer.actions.set({ field: 'connected', value: false }),

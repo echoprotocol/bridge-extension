@@ -97,6 +97,7 @@ class UserDropdown extends React.PureComponent {
 		const {
 			balances, assets, accounts, account: activeAccount, networkName,
 		} = this.props;
+
 		const asset = assets.get(CORE_ID);
 		const accountsNetwork = accounts.get(networkName);
 

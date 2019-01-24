@@ -25,6 +25,7 @@ if (windowType === POPUP_WINDOW_TYPE) {
 	setWindowType(POPUP_WINDOW_TYPE);
 }
 
+
 ReactDOM.render(
 	<Provider store={store}>
 		{/* ConnectedRouter will use the store from Provider automatically */}

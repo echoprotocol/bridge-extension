@@ -1,4 +1,4 @@
-import { Aes, PrivateKey, TransactionHelper } from 'echojs-lib';
+import { aes as aesLib, PrivateKey, TransactionHelper } from 'echojs-lib';
 import random from 'crypto-random-string';
 
 import EventEmitter from '../../libs/CustomAwaitEmitter';
@@ -251,7 +251,7 @@ class Crypto extends EventEmitter {
 		const privateKeyBuffer = aes.decryptHexToBuffer(encryptedPrivateKey);
 		const privateKey = PrivateKey.fromBuffer(privateKeyBuffer);
 
-		transaction.add_signer(privateKey);
+		transaction.addSigner(privateKey);
 		return transaction;
 	}
 
@@ -288,7 +288,7 @@ class Crypto extends EventEmitter {
 			from: fromMemoKey,
 			to: toMemoKey,
 			nonce,
-			message: Aes.encryptWithChecksum(privateKey, toMemoKey, nonce, memo),
+			message: aesLib.encryptWithChecksum(privateKey, toMemoKey, nonce, memo),
 		};
 	}
 
@@ -321,7 +321,7 @@ class Crypto extends EventEmitter {
 			return null;
 		}
 
-		return Aes.decryptWithChecksum(
+		return aesLib.decryptWithChecksum(
 			privateKey,
 			publicKey === memo.get('from') ? memo.get('to') : memo.get('from'),
 			memo.get('nonce'),

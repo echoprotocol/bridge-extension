@@ -4,6 +4,8 @@ import { batchDispatchMiddleware } from 'redux-batched-actions';
 
 import { routerMiddleware, routerReducer } from 'react-router-redux';
 
+import { echoReducer } from 'echojs-lib';
+
 import reducers from './reducers';
 import history from './history';
 
@@ -16,6 +18,7 @@ const store = createStore(
 	combineReducers({
 		...reducers,
 		router: routerReducer,
+		echoCache: echoReducer(),
 	}), {},
 	compose(
 		applyMiddleware(thunk),
