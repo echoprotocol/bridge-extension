@@ -116,6 +116,10 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		}
 		const wif = getCrypto().generateWIF();
 
+		const echoRandKey = getCrypto().generateEchoRandKey();
+
+		console.log(echoRandKey);
+
 		// const echoRandKeyBuffer = keyPairFromSeed(random(32_SIZE));
 		// const echoRandPrivateKey = Buffer.from(echoRandKeyBuffer.privateKey).toString('hex');
 		// const echoRandPublicKey = Buffer.from(echoRandKey.publicKey).toString('hex');

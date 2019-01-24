@@ -1,12 +1,12 @@
-import { aes as aesLib, PrivateKey, TransactionHelper } from 'echojs-lib';
+import { aes as aesLib, PrivateKey, TransactionHelper, Ed25519 } from 'echojs-lib';
 import random from 'crypto-random-string';
-
+import bs58 from 'bs58';
 import EventEmitter from '../../libs/CustomAwaitEmitter';
 import AesStorage from './aesStorage';
 
 import storage from './storage';
 
-import { RANDOM_SIZE, ACTIVE_KEY, MEMO_KEY } from '../constants/GlobalConstants';
+import { RANDOM_SIZE, ACTIVE_KEY, MEMO_KEY, RANDOM_ECHORANDKEY_SIZE } from '../constants/GlobalConstants';
 
 const privateAES = new AesStorage();
 
@@ -144,6 +144,31 @@ class Crypto extends EventEmitter {
 		const privateKey = PrivateKey.fromSeed(random(RANDOM_SIZE));
 
 		return privateKey.toWif();
+	}
+
+	/**
+	 *  @method generateEchoRandKey
+	 *
+	 * 	Generate random string and private key from this seed.
+	 *
+	 *  @return {String} echoRandKey
+	 */
+	generateEchoRandKey() {
+		privateAES.required();
+
+		try {
+			const EchoRandKeyBuffer = Ed25519
+				.keyPairFromSeed(Buffer.from(random(RANDOM_ECHORANDKEY_SIZE)));
+			// const echoRandPrivateKey = Buffer // выдать юзеру чтобы запомнил его ???
+			// .from(EchoRandKeyBuffer.secretKey).toString('hex');
+			const echoRandPublicKey = Buffer.from(EchoRandKeyBuffer.publicKey, 'hex');
+			const echoRandKey = `DET${bs58.encrypt(echoRandPublicKey)}`;
+			return echoRandKey;
+		} catch (error) {
+			return null;
+		}
+
+
 	}
 
 	/**

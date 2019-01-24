@@ -73,19 +73,13 @@ export const getCrypto = () => echoService.getCrypto();
  */
 export const unlockCrypto = (form, pin) => async (dispatch) => {
 
-
 	const crypto = echoService.getCrypto();
-
-	console.log(crypto);
-
 	const error = ValidatePinHelper.validatePin(pin);
-
 
 	if (error) {
 		dispatch(setValue(form, 'error', error));
 		return false;
 	}
-
 
 	try {
 		dispatch(setValue(form, 'loading', true));
@@ -219,7 +213,6 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
  *
  */
 export const transitPublicKey = () => async (dispatch, getState) => {
-
 
 	try {
 		const keys = [];
