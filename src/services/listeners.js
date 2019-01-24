@@ -4,6 +4,9 @@ import { requestHandler, trResponseHandler, windowRequestHandler } from '../acti
 import { sendHandler } from '../actions/BalanceActions';
 import { onLogout } from '../actions/GlobalActions';
 import { getCrypto, lockResponse, unlockResponse } from '../actions/CryptoActions';
+import { onStatusConnected } from '../actions/ChainStoreAction';
+
+import { CONNECT_STATUS, DISCONNECT_STATUS } from '../constants/GlobalConstants';
 
 class Listeners {
 
@@ -23,6 +26,7 @@ class Listeners {
 			dispatch(onLogout(name));
 		this.lockResponse = () => dispatch(lockResponse());
 		this.unlockResponse = () => dispatch(unlockResponse());
+		this.onStatusConnected = (status) => dispatch(onStatusConnected(status));
 
 		this.emitter.on('windowRequest', this.windowRequestHandler);
 		this.emitter.on('request', this.requestHandler);
@@ -31,6 +35,9 @@ class Listeners {
 		this.emitter.on('sendResponse', this.sendHandler);
 
 		this.emitter.on('logout', this.onLogout);
+
+		this.emitter.on(CONNECT_STATUS, () => this.onStatusConnected(CONNECT_STATUS));
+		this.emitter.on(DISCONNECT_STATUS, () => this.onStatusConnected(DISCONNECT_STATUS));
 
 		this.crypto.on('locked', this.lockResponse);
 		this.crypto.on('unlocked', this.unlockResponse);
@@ -46,6 +53,8 @@ class Listeners {
 		this.emitter.removeListener('trResponse', this.trResponseHandler);
 		this.emitter.removeListener('sendResponse', this.sendHandler);
 		this.emitter.removeListener('logout', this.onLogout);
+		this.emitter.removeListener(CONNECT_STATUS, this.onStatusConnected);
+		this.emitter.removeListener(DISCONNECT_STATUS, this.onStatusConnected);
 
 		this.crypto.removeListener('locked', this.lockResponse);
 		this.crypto.removeListener('unlocked', this.unlockResponse);

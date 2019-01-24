@@ -19,6 +19,7 @@ import {
 	DISCONNECT_STATUS,
 	APPROVED_STATUS,
 	BROADCAST_LIMIT,
+	CONNECT_STATUS,
 } from '../src/constants/GlobalConstants';
 import FormatHelper from '../src/helpers/FormatHelper';
 import { operationKeys } from '../src/constants/OperationConstants';
@@ -41,6 +42,25 @@ const accountsRequests = [];
 const requestQueue = [];
 let lastTransaction = null;
 
+const connectSubscribe = (status) => {
+	try {
+		switch (status) {
+			case CONNECT_STATUS:
+				emitter.emit('connect');
+				break;
+			case DISCONNECT_STATUS:
+				emitter.emit('disconnect');
+				break;
+			default:
+				return null;
+		}
+	} catch (e) {
+		return null;
+	}
+
+	return null;
+};
+
 /**
  * Create default socket
  */
@@ -53,6 +73,10 @@ const createSocket = async () => {
 		debug: false,
 		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
 	});
+
+	echo.subscriber.setStatusSubscribe(CONNECT_STATUS, () => connectSubscribe(CONNECT_STATUS));
+
+	echo.subscriber.setStatusSubscribe(DISCONNECT_STATUS, () => connectSubscribe(DISCONNECT_STATUS));
 };
 
 
