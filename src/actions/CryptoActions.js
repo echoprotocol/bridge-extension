@@ -44,6 +44,7 @@ const changeCrypto = (params) => (dispatch) => {
  * 	Lock crypto in GlobalReducer and redirect to unlock
  */
 const lockCrypto = () => (dispatch) => {
+
 	dispatch(batchActions([
 		GlobalReducer.actions.set({ field: 'loading', value: false }),
 		GlobalReducer.actions.lock({
@@ -292,3 +293,7 @@ export const wipeCrypto = () => async (dispatch, getState) => {
 	history.push(CREATE_PIN_PATH);
 };
 
+export const userLockCrypto = () => () => {
+	const crypto = echoService.getCrypto();
+	crypto.lock();
+};

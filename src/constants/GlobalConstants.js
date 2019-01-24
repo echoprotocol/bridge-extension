@@ -77,7 +77,7 @@ export const HEADER_TITLE = [
 
 export const NETWORKS = [
 	{
-		name: 'devnet',
+		name: 'Dev Network',
 		registrator: 'https://echo-tmp-wallet.pixelplex.io/faucet/registration',
 		url: 'ws://195.201.164.54:6311',
 	},
