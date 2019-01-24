@@ -2,48 +2,24 @@ import { Map, List } from 'immutable';
 import { batchActions } from 'redux-batched-actions';
 
 import GlobalReducer from '../reducers/GlobalReducer';
-import BlockchainReducer from '../reducers/BlockchainReducer';
 import BalanceReducer from '../reducers/BalanceReducer';
 
 import { initAssetsBalances, updateTokens } from './BalanceActions';
 
-import { fetchChain, connectToAddress, disconnectFromAddress, checkConnection } from '../api/ChainApi';
-
 import echoService from '../services/echo';
 
-import { NETWORKS, GLOBAL_ID_1, GLOBAL_ID_0, LOGIN_INTERVAL } from '../constants/GlobalConstants';
-import ChainStoreCacheNames from '../constants/ChainStoreConstants';
+import { NETWORKS } from '../constants/GlobalConstants';
 
 import storage from '../services/storage';
 
 import FormatHelper from '../helpers/FormatHelper';
 import { updateHistory } from './HistoryActions';
 
-let INTERVAL_LOGIN_CALL = null;
-
-/**
- * @method resetInterval
- * Reset interval of login calls
- * @returns {Function}
- */
-const resetInterval = () => {
-	if (INTERVAL_LOGIN_CALL) {
-		clearInterval(INTERVAL_LOGIN_CALL);
-	}
-};
-
 /**
  * copy object from ChainStore lib to redux every time when triggered, check connection
  * @returns {Function}
  */
 export const subscribe = () => (dispatch) => {
-	const { ChainStore } = echoService.getChainLib();
-	ChainStoreCacheNames.forEach(({ origin, custom: field }) => {
-		const value = ChainStore[origin];
-
-		dispatch(BlockchainReducer.actions.set({ field, value }));
-	});
-
 	dispatch(initAssetsBalances());
 	dispatch(updateTokens());
 	dispatch(updateHistory());
@@ -53,7 +29,7 @@ export const subscribe = () => (dispatch) => {
  * connect socket current network
  * @returns {Function}
  */
-export const connect = (isRecreate) => async (dispatch) => {
+export const connect = () => async (dispatch) => {
 	dispatch(batchActions([
 		GlobalReducer.actions.set({ field: 'loading', value: true }),
 		GlobalReducer.actions.set({ field: 'connected', value: false }),
@@ -75,20 +51,12 @@ export const connect = (isRecreate) => async (dispatch) => {
 			dispatch(GlobalReducer.actions.set({ field: 'networks', value: new List(networks) }));
 		}
 
-		const subscribeCb = () => dispatch(subscribe());
+		echoService.getChainLib().subscriber.setGlobalSubscribe(() => dispatch(subscribe()));
 
-		resetInterval();
 
-		INTERVAL_LOGIN_CALL = setInterval((() => {
-			dispatch(checkConnection(network.url));
-		}), LOGIN_INTERVAL);
-
-		await connectToAddress(network.url, subscribeCb, isRecreate);
-
-		dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
-
-		await fetchChain(GLOBAL_ID_1);
-		await fetchChain(GLOBAL_ID_0);
+		if (echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
+			dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
+		}
 	} catch (err) {
 		dispatch(batchActions([
 			GlobalReducer.actions.set({
@@ -107,13 +75,10 @@ export const connect = (isRecreate) => async (dispatch) => {
  * @param {String} address
  * @returns {Function}
  */
-export const disconnect = (address) => async (dispatch) => {
+export const disconnect = () => async (dispatch) => {
 	try {
-		resetInterval();
-
-		await disconnectFromAddress(address);
+		await echoService.getChainLib().disconnect();
 		dispatch(batchActions([
-			BlockchainReducer.actions.disconnect(),
 			BalanceReducer.actions.reset(),
 			GlobalReducer.actions.set({ field: 'connected', value: false }),
 		]));

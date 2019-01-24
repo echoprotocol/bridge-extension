@@ -1,5 +1,6 @@
 import _ from 'lodash';
 import BN from 'bignumber.js';
+import utf8 from 'utf8';
 
 class FormatHelper {
 
@@ -43,6 +44,24 @@ class FormatHelper {
 
 	static capitalize(str) {
 		return `${str[0].toUpperCase()}${str.slice(1)}`;
+	}
+
+	static toUtf8(hex) {
+		let str = '';
+
+		for (let i = 0; i < hex.length; i += 2) {
+			const code = parseInt(hex.substr(i, 2), 16);
+			if (code !== 0) {
+				str += String.fromCharCode(code);
+			}
+		}
+		let result = str;
+		try {
+			result = utf8.decode(str);
+		} catch (error) {
+			result = str;
+		}
+		return result;
 	}
 
 }

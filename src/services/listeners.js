@@ -1,7 +1,5 @@
 import echoService from './echo';
 
-import { getChainSubscribe } from '../api/ChainApi';
-
 import { requestHandler, trResponseHandler, windowRequestHandler } from '../actions/SignActions';
 import { sendHandler } from '../actions/BalanceActions';
 import { onLogout } from '../actions/GlobalActions';
@@ -43,11 +41,6 @@ class Listeners {
 	}
 
 	removeListeners() {
-		if (getChainSubscribe()) {
-			const { ChainStore } = echoService.getChainLib();
-			ChainStore.unsubscribe(getChainSubscribe());
-		}
-
 		this.emitter.removeListener('request', this.requestHandler);
 		this.emitter.removeListener('windowRequest', this.windowRequestHandler);
 		this.emitter.removeListener('trResponse', this.trResponseHandler);

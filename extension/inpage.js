@@ -1,5 +1,4 @@
-import echojslib from 'echojs-lib';
-import echojsws from 'echojs-ws';
+import echo from 'echojs-lib';
 
 import { APP_ID } from '../src/constants/GlobalConstants';
 
@@ -83,9 +82,8 @@ const extension = {
 };
 
 window.echojslib = {
-	...echojslib,
+	...echo,
 	isEchoBridge: true,
 	extension,
 };
-window.echojsws = echojsws;
 window.addEventListener('message', onMessage, false);

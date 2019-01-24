@@ -18,7 +18,6 @@ import {
 	NETWORK_ERROR_SEND_PATH,
 } from '../constants/RouterConstants';
 import { NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
-import { fetchChain } from '../api/ChainApi';
 import { setValue } from './FormActions';
 import { loadInfo, set } from './GlobalActions';
 import { globals } from './SignActions';
@@ -233,19 +232,19 @@ export const transitPublicKey = () => async (dispatch, getState) => {
 		}
 		const accountID = getState().global.getIn(['account', 'id']);
 
-		let accountChain = await fetchChain(accountID);
-		accountChain = accountChain.getIn(['active', 'key_auths']);
+		const [accountChain] = (await echoService.getChainLib().api.getAccounts([accountID]))
+			.active.key_auths;
 
 
 		accountChain.forEach(((item) => {
-			const wif = getCrypto().getWIFByPublicKey(networkName, item.getIn([0]));
+			const wif = getCrypto().getWIFByPublicKey(networkName, item[0]);
 			wifs.push(wif);
 		}));
 
 		wifs = await Promise.all(wifs);
 
 		accountChain.forEach(((item, i) => {
-			keys.push({ publicKey: item.getIn([0]), wif: wifs[i] });
+			keys.push({ publicKey: item[0], wif: wifs[i] });
 		}));
 
 		return keys;

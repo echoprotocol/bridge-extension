@@ -3,7 +3,7 @@ import { Map, List, OrderedMap } from 'immutable';
 import _ from 'lodash';
 
 const DEFAULT_LOCKED_FIELDS = Map({
-	account: null,
+	account: new Map(),
 	accounts: new Map(),
 });
 

@@ -1,5 +1,7 @@
 import { PrivateKey } from 'echojs-lib';
 
+import echoService from '../services/echo';
+
 import ValidateAccountHelper from '../helpers/ValidateAccountHelper';
 import FormatHelper from '../helpers/FormatHelper';
 
@@ -10,12 +12,7 @@ import { getCrypto } from './CryptoActions';
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
 import { ACTIVE_KEY, MEMO_KEY } from '../constants/GlobalConstants';
 
-import {
-	validateAccountExist,
-	createWallet,
-	validateImportAccountExist,
-} from '../api/WalletApi';
-import { fetchChain, getAccountRefsOfKey } from '../api/ChainApi';
+import { createWallet } from '../api/WalletApi';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -30,6 +27,48 @@ import GlobalReducer from '../reducers/GlobalReducer';
 const toggleLoading = (form, value) => (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value }));
 	dispatch(setValue(form, 'loading', value));
+};
+
+const validateAccountExist = async (
+	accountName,
+	requestsCount = 0,
+) => {
+
+	if (requestsCount === 10) {
+		return {
+			example: '',
+			error: 'Account with such name already exists.',
+		};
+	}
+
+	const result = await echoService.getChainLib().api.lookupAccounts(accountName);
+
+	if (result.find((i) => i[0] === accountName)) {
+
+		const matches = accountName.match(/\d+$/);
+		if (matches) {
+			accountName =
+				accountName.substr(0, matches.index) + (parseInt(matches[0], 10) + 1);
+		} else {
+			accountName += 1;
+		}
+
+		const { example, error } = await validateAccountExist(
+			accountName,
+			requestsCount += 1,
+		);
+
+		return { example, error };
+	}
+
+	if (requestsCount === 0) {
+		accountName = null;
+	}
+
+	return {
+		example: accountName,
+		error: accountName && 'Account with such name already exists.',
+	};
 };
 
 /**
@@ -103,6 +142,18 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 };
 
+const validateImportAccountExist = async (
+	accountName,
+	networkName,
+) => {
+	const result = await echoService.getChainLib().api.lookupAccounts(accountName);
+
+	if (!result.find((i) => i[0] === accountName)) {
+
+		return `This account does not exist on ${networkName}`;
+	}
+	return null;
+};
 
 /**
  *  @method importByPassword
@@ -130,11 +181,11 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 		return { successStatus: false, isAccAddedByPas };
 	}
 
-	const account = await fetchChain(name);
+	const account = await echoService.getChainLib().api.getAccountByName(name);
 	const active = getCrypto().getPublicKey(name, password);
-	const [accountId] = await getAccountRefsOfKey(active);
+	const [[accountId]] = await echoService.getChainLib().api.getKeyReferences(active);
 
-	const keys = account.getIn(['active', 'key_auths']);
+	const keys = account.active.key_auths;
 
 	let hasKey = false;
 
@@ -163,7 +214,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 				networkName,
 				name,
 				password,
-				account.getIn(['options', 'memo_key']),
+				account.options.memo_key,
 			);
 
 			return { successStatus: true, isAccAddedByPas };
@@ -180,7 +231,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 		networkName,
 		name,
 		password,
-		account.getIn(['options', 'memo_key']),
+		account.options.memo_key,
 	);
 
 	return { successStatus: true, isAccAddedByPas };
@@ -227,7 +278,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 			const active = PrivateKey.fromWif(password).toPublicKey().toString();
 
-			const [accountId] = await getAccountRefsOfKey(active);
+			const [[accountId]] = await echoService.getChainLib().api.getKeyReferences([active]);
 
 			if (!accountId) {
 				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid WIF'));
@@ -240,18 +291,18 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			}
 
 
-			const account = await fetchChain(accountId);
+			const [account] = await echoService.getChainLib().api.getAccounts([accountId]);
 
-			const publicKeys = account.getIn(['active', 'key_auths']);
+			const publicKeys = account.active.key_auths;
 
-			const activeKey = publicKeys.find((key) => key.get(0) === active);
+			const activeKey = publicKeys.find((key) => key[0] === active);
 
 			if (!activeKey) {
 				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'WIF is not active key.'));
 				return false;
 			}
 
-			name = account.get('name');
+			name = account.name; // eslint-disable-line prefer-destructuring
 
 			await getCrypto().importByWIF(networkName, password);
 
@@ -294,7 +345,6 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		return success ? { name, isAccAdded } : null;
 
 	} catch (err) {
-
 		dispatch(setValue(FORM_SIGN_IN,	'error', FormatHelper.formatError(err)));
 
 		return false;

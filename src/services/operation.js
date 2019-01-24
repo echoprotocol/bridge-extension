@@ -83,16 +83,38 @@ export const formatToShow = (type, options) => {
 
 		switch (value.type) {
 			case 'account_id':
-				obj[key] = options[key].get('name') || options[key].get('id');
+				if (typeof options[key].get === 'function') {
+					obj[key] = options[key].get('name') || options[key].get('id');
+
+					break;
+				}
+
+				obj[key] = options[key].name || options[key].id;
 				break;
 			case 'asset_id':
-				obj[key] = options[key].get('symbol');
+				if (typeof options[key].get === 'function') {
+					obj[key] = options[key].get('symbol');
+
+					break;
+				}
+
+				obj[key] = options[key].symbol;
 				break;
 			case 'asset_object':
+				if (typeof options[key].asset.get === 'function') {
+					obj[key] = FormatHelper.formatAmount(
+						options[key].amount,
+						options[key].asset.get('precision'),
+						options[key].asset.get('symbol'),
+					);
+
+					break;
+				}
+
 				obj[key] = FormatHelper.formatAmount(
 					options[key].amount,
-					options[key].asset.get('precision'),
-					options[key].asset.get('symbol'),
+					options[key].asset.precision,
+					options[key].asset.symbol,
 				);
 				break;
 			default: obj[key] = options[key];
@@ -126,12 +148,24 @@ export const formatToSend = (type, options) => {
 					obj[key] = options[key].get('id');
 					break;
 				}
-				obj[key] = options[key];
+				obj[key] = options[key].id;
+				// obj[key] = options[key];
 				break;
 			case 'asset_id':
+				if (typeof options[key].get !== 'function') {
+					obj[key] = options[key].id;
+					break;
+				}
 				obj[key] = options[key].get('id');
 				break;
 			case 'asset_object':
+				if (typeof options[key].asset.get !== 'function') {
+					obj[key] = {
+						amount: options[key].amount,
+						asset_id: options[key].asset.id,
+					};
+					break;
+				}
 				obj[key] = {
 					amount: options[key].amount,
 					asset_id: options[key].asset.get('id'),
