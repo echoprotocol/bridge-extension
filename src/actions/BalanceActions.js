@@ -127,7 +127,7 @@ export const initAssetsBalances = () => async (dispatch, getState) => {
 	let balances = stateBalances;
 	let assets = stateAssets;
 
-	const objectsById = getState().echoCache.get('objectsById');
+	const objectsById = getState().blockchain.get('objectsById');
 
 	objectsById.forEach((object) => {
 		if (validators.isAccountBalanceId(object.get('id'))) {
