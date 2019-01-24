@@ -135,7 +135,6 @@ const createNotification = (title = '', message = '') => {
  */
 const resolveAccounts = async () => {
 
-
 	const network = (await storage.get('current_network')) || NETWORKS[0];
 
 	try {

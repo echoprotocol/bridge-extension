@@ -730,8 +730,7 @@ const checkBlockTransactions = async (blockNum, count, tokens) => {
  * 	@param {Object} tokens
  */
 const isBlockChanged = (tokens) => async (dispatch, getState) => {
-	const blockNum = (await echoService.getChainLib().api.getObject(GLOBAL_ID_1))[0]
-		.head_block_number;
+	const blockNum = (await echoService.getChainLib().api.getObject(GLOBAL_ID_1)).head_block_number;
 
 	const stateBlockNum = getState().global.get('headBlockNum');
 

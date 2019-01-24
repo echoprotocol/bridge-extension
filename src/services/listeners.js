@@ -4,7 +4,7 @@ import { requestHandler, trResponseHandler, windowRequestHandler } from '../acti
 import { sendHandler } from '../actions/BalanceActions';
 import { onLogout } from '../actions/GlobalActions';
 import { getCrypto, lockResponse, unlockResponse } from '../actions/CryptoActions';
-import { onStatusConnected } from '../actions/ChainStoreAction';
+import { onStatusConnected, resetSubscribers } from '../actions/ChainStoreAction';
 
 import { CONNECT_STATUS, DISCONNECT_STATUS } from '../constants/GlobalConstants';
 
@@ -48,6 +48,8 @@ class Listeners {
 	}
 
 	removeListeners() {
+		resetSubscribers();
+
 		this.emitter.removeListener('request', this.requestHandler);
 		this.emitter.removeListener('windowRequest', this.windowRequestHandler);
 		this.emitter.removeListener('trResponse', this.trResponseHandler);

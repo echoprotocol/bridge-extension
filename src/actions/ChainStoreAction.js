@@ -9,7 +9,7 @@ import { initAssetsBalances, updateTokens } from './BalanceActions';
 
 import echoService from '../services/echo';
 
-import {CONNECT_STATUS, DISCONNECT_STATUS, NETWORKS} from '../constants/GlobalConstants';
+import { CONNECT_STATUS, NETWORKS } from '../constants/GlobalConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 
 import storage from '../services/storage';
@@ -95,6 +95,10 @@ export const disconnect = () => async (dispatch) => {
 			value: FormatHelper.formatError(err),
 		}));
 	}
+};
+
+export const resetSubscribers = () => {
+	echoService.getChainLib().subscriber.reset();
 };
 
 export const onStatusConnected = (status) => (dispatch) => {
