@@ -228,20 +228,19 @@ export const transitPublicKey = () => async (dispatch, getState) => {
 		}
 		const accountID = getState().global.getIn(['account', 'id']);
 
-		const [accountChain] = (await echoService.getChainLib().api.getAccounts([accountID]))
+		const [accountChain] = (await echoService.getChainLib().api.getAccounts([accountID]))[0]
 			.active.key_auths;
 
-
-		accountChain.forEach(((item) => {
-			const wif = getCrypto().getWIFByPublicKey(networkName, item[0]);
+		for (let i = 0; i < accountChain.length - 1; i += 1) {
+			const wif = getCrypto().getWIFByPublicKey(networkName, accountChain[i]);
 			wifs.push(wif);
-		}));
+		}
 
 		wifs = await Promise.all(wifs);
 
-		accountChain.forEach(((item, i) => {
-			keys.push({ publicKey: item[0], wif: wifs[i] });
-		}));
+		for (let i = 0; i < accountChain.length - 1; i += 1) {
+			keys.push({ publicKey: accountChain[i], wif: wifs[i] });
+		}
 
 		return keys;
 	} catch (err) {

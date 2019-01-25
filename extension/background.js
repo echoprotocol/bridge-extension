@@ -74,6 +74,16 @@ const createSocket = async () => {
 		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
 	});
 
+	echo.subscriber.setGlobalSubscribe(() => {
+		try {
+			emitter.emit('globalSubscribe');
+		} catch (e) {
+			return null;
+		}
+
+		return null;
+	});
+
 	echo.subscriber.setStatusSubscribe(CONNECT_STATUS, () => connectSubscribe(CONNECT_STATUS));
 
 	echo.subscriber.setStatusSubscribe(DISCONNECT_STATUS, () => connectSubscribe(DISCONNECT_STATUS));

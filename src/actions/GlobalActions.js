@@ -461,17 +461,12 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
  *
  *  @param {Boolean} isRecreate - when trying to manual reconnect
  */
-export const globalInit = (isRecreate) => async (dispatch) => {
+export const globalInit = () => async (dispatch) => {
 	await dispatch(connect());
 
-	if (isRecreate) {
-		await dispatch(loadInfo());
-		return null;
-	}
+	await dispatch(loadInfo());
 
 	await dispatch(initCrypto());
-
-	return null;
 };
 
 /**

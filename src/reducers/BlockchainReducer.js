@@ -4,6 +4,7 @@ import { Map } from 'immutable';
 const DEFAULT_FIELDS = Map({
 	objectsById: new Map(),
 	accountsByName: new Map(),
+	fullAccounts: new Map(),
 });
 
 export default createModule({

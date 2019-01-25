@@ -685,10 +685,7 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
  * 	@param {Object} tokens
  */
 const checkBlockTransactions = async (blockNum, count, tokens) => {
-	const { ChainStore } = echoService.getChainLib();
-
-
-	const block = await ChainStore.getBlock(blockNum);
+	const block = await echoService.getChainLib().getBlock(blockNum);
 
 	if (block.transactions.length) {
 		for (let tr = 0; tr < block.transactions.length; tr += 1) {
