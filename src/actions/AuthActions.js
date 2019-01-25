@@ -115,9 +115,14 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 		const echoRandKey = getCrypto().generateEchoRandKey();
 
-
 		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
+
+		console.log('echoRandKey: ', echoRandKey);
+		console.log('key: ', key);
+
 		await echoService.getChainLib().api.registerAccount(name, key, key, key, echoRandKey);
+		const ac = await echoService.getChainLib().api.getFullAccounts([name]);
+		console.log('ac: ', ac);
 
 		await getCrypto().importByWIF(networkName, wif);
 
