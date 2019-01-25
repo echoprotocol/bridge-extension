@@ -12,8 +12,6 @@ import { getCrypto } from './CryptoActions';
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
 import { ACTIVE_KEY, MEMO_KEY } from '../constants/GlobalConstants';
 
-import { createWallet } from '../api/WalletApi';
-
 import GlobalReducer from '../reducers/GlobalReducer';
 
 /**
@@ -103,7 +101,6 @@ export const createAccount = (name) => async (dispatch, getState) => {
 	try {
 		getCrypto().pauseLockTimeout();
 
-		const registrator = getState().global.getIn(['network', 'registrator']);
 		const networkName = getState().global.getIn(['network', 'name']);
 
 		dispatch(toggleLoading(FORM_SIGN_UP, true));
@@ -115,8 +112,6 @@ export const createAccount = (name) => async (dispatch, getState) => {
 			return null;
 		}
 		const wif = getCrypto().generateWIF();
-
-		await createWallet(registrator, name, wif);
 
 		await getCrypto().importByWIF(networkName, wif);
 

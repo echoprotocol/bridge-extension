@@ -78,7 +78,6 @@ export const HEADER_TITLE = [
 export const NETWORKS = [
 	{
 		name: 'Dev Network',
-		registrator: 'https://echo-tmp-wallet.pixelplex.io/faucet/registration',
 		url: 'ws://195.201.164.54:6311',
 	},
 ];
@@ -113,7 +112,6 @@ export const KEY_CODE_SPACE = 32;
 export const KEY_CODE_TAB = 9;
 export const KEY_CODE_ARROW_UP = 38;
 export const KEY_CODE_ARROW_DOWN = 40;
-export const ACCOUNTS_LOOKUP_LIMIT = 50;
 export const ICONS_COUNT = 15;
 export const ICON_COLORS_COUNT = 7;
 export const BASE_ICON = 1;
@@ -121,11 +119,8 @@ export const BASE_ICON_COLOR = 'green';
 export const POPUP_WINDOW_TYPE = 'popup';
 export const MAX_NOTE_LENGTH = 200 * 1000;
 
-export const LOGIN_INTERVAL = 30 * 1000;
-export const CHAINSTORE_INIT_TIMEOUT = 10 * 1000;
 export const BROADCAST_LIMIT = 20 * 1000;
 export const SET_TR_FEE_TIMEOUT = 3 * 1000;
-export const WS_CLOSE_TIMEOUT = 3 * 1000;
 export const GET_TOKENS_TIMEOUT = 3 * 1000;
 
 export const MEMO_FEE_KEYS = {

@@ -37,10 +37,6 @@ const DEFAULT_FORM_FIELDS = {
 			value: '',
 			error: null,
 		},
-		registrator: {
-			value: '',
-			error: null,
-		},
 	}),
 	[FORM_WIPE]: Map({
 		checked: false,

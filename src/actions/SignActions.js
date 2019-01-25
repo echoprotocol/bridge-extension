@@ -4,7 +4,7 @@ import BN from 'bignumber.js';
 
 import history from '../history';
 
-import { getOperationFee } from '../api/WalletApi';
+import getOperationFee from '../api/WalletApi';
 
 import echoService from '../services/echo';
 import { validateOperation, getFetchMap, formatToSend } from '../services/operation';

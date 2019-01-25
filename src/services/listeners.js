@@ -64,10 +64,11 @@ class Listeners {
 		this.crypto.removeListener('unlocked', this.unlockResponse);
 	}
 
-	initBackgroundListeners(onResponse, onTransaction, onSend) {
+	initBackgroundListeners(onResponse, onTransaction, onSend, tryConnect) {
 		this.emitter.on('response', onResponse);
 		this.emitter.on('trRequest', onTransaction);
 		this.emitter.on('sendRequest', onSend);
+		this.emitter.on('tryConnect', tryConnect);
 	}
 
 }

@@ -95,6 +95,14 @@ export const disconnect = () => async (dispatch) => {
 	}
 };
 
+export const tryToConnect = () => async (dispatch) => {
+	await dispatch(disconnect());
+
+	const emitter = echoService.getEmitter();
+
+	emitter.emit('tryConnect');
+};
+
 export const onStatusConnected = (status) => (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'connected', value: status === CONNECT_STATUS }));
 };

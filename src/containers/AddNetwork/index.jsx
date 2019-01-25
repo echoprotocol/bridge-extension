@@ -20,17 +20,15 @@ class AddNetwork extends React.Component {
 
 		this.nameRef = null;
 		this.addressRef = null;
-		this.registratorRef = null;
 	}
 
 	componentDidUpdate(prevProps) {
-		const { name: prevName, address: prevAddress, registrator: prevRegistrator } = prevProps;
-		const { name, address, registrator } = this.props;
+		const { name: prevName, address: prevAddress } = prevProps;
+		const { name, address } = this.props;
 
 		if (
 			(name.value !== prevName.value)
 			|| (address.value !== prevAddress.value)
-			|| (registrator.value !== prevRegistrator.value)
 		) {
 			return false;
 		}
@@ -39,8 +37,6 @@ class AddNetwork extends React.Component {
 			this.nameRef.focus();
 		} else if (address.error && this.addressRef) {
 			this.addressRef.focus();
-		} else if (registrator.error && this.registratorRef) {
-			this.registratorRef.focus();
 		}
 
 		return true;
@@ -74,11 +70,10 @@ class AddNetwork extends React.Component {
 
 	isButtonDisabled() {
 		const {
-			address, name, registrator,
+			address, name,
 		} = this.props;
 
-		return !!(!address.value || !name.value || !registrator.value
-			|| address.error || name.error || registrator.error);
+		return !!(!address.value || !name.value || address.error || name.error);
 	}
 
 	handleRef(ref, type) {
@@ -89,7 +84,7 @@ class AddNetwork extends React.Component {
 
 	renderForm() {
 		const {
-			address, name, registrator, loading,
+			address, name, loading,
 		} = this.props;
 
 		return (
@@ -126,17 +121,6 @@ class AddNetwork extends React.Component {
 							value={address.value}
 							onChange={(e) => this.onChange(e)}
 							ref={(r) => this.handleRef(r, 'address')}
-						/>
-						<BridgeInput
-							error={!!registrator.error}
-							disabled={loading}
-							name="registrator"
-							theme="input-light"
-							labelText="Faucet (URL or IP)"
-							errorText={registrator.error}
-							value={registrator.value}
-							onChange={(e) => this.onChange(e)}
-							ref={(r) => this.handleRef(r, 'registrator')}
 						/>
 					</div>
 				</div>
@@ -188,7 +172,6 @@ AddNetwork.propTypes = {
 	loading: PropTypes.bool,
 	address: PropTypes.object.isRequired,
 	name: PropTypes.object.isRequired,
-	registrator: PropTypes.object.isRequired,
 	setFormValue: PropTypes.func.isRequired,
 	addNetwork: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
@@ -203,7 +186,6 @@ export default withRouter(connect(
 	(state) => ({
 		address: state.form.getIn([FORM_ADD_NETWORK, 'address']),
 		name: state.form.getIn([FORM_ADD_NETWORK, 'name']),
-		registrator: state.form.getIn([FORM_ADD_NETWORK, 'registrator']),
 		loading: state.form.getIn([FORM_ADD_NETWORK, 'loading']),
 	}),
 	(dispatch) => ({
