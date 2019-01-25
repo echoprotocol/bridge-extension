@@ -7,34 +7,8 @@ import {
 
 import echoService from '../services/echo';
 
-export const createWallet = async (registrator, account, wif) => {
-	const publicKey = PrivateKey.fromWif(wif).toPublicKey().toString();
 
-	let response = await fetch(registrator, {
-		method: 'post',
-		mode: 'cors',
-		headers: {
-			Accept: 'application/json',
-			'Content-type': 'application/json',
-		},
-		body: JSON.stringify({
-			name: account,
-			owner_key: publicKey,
-			active_key: publicKey,
-			memo_key: publicKey,
-		}),
-	});
-
-	response = await response.json();
-
-	if (!response || (response && response.errors)) {
-		return response.errors.join();
-	}
-
-	return null;
-};
-
-export const getOperationFee = async (type, transaction, core) => {
+const getOperationFee = async (type, transaction, core) => {
 	const options = JSON.parse(JSON.stringify(transaction));
 
 	if (options.memo) {
@@ -74,3 +48,6 @@ export const getOperationFee = async (type, transaction, core) => {
 
 	return tr._operations[0][1].fee.amount; // eslint-disable-line no-underscore-dangle
 };
+
+export { getOperationFee as default };
+

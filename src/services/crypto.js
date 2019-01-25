@@ -1,4 +1,4 @@
-import { aes as aesLib, PrivateKey, TransactionHelper, Ed25519 } from 'echojs-lib';
+import { aes as aesLib, PrivateKey, TransactionHelper, ED25519 } from 'echojs-lib';
 import random from 'crypto-random-string';
 import bs58 from 'bs58';
 import EventEmitter from '../../libs/CustomAwaitEmitter';
@@ -155,14 +155,12 @@ class Crypto extends EventEmitter {
 	 */
 	generateEchoRandKey() {
 		privateAES.required();
-
 		try {
-			const EchoRandKeyBuffer = Ed25519
+			const EchoRandKeyBuffer = ED25519
 				.keyPairFromSeed(Buffer.from(random(RANDOM_ECHORANDKEY_SIZE)));
-			// const echoRandPrivateKey = Buffer // выдать юзеру чтобы запомнил его ???
-			// .from(EchoRandKeyBuffer.secretKey).toString('hex');
 			const echoRandPublicKey = Buffer.from(EchoRandKeyBuffer.publicKey, 'hex');
-			const echoRandKey = `DET${bs58.encrypt(echoRandPublicKey)}`;
+			const echoRandKey = `DET${bs58.encode(echoRandPublicKey)}`;
+
 			return echoRandKey;
 		} catch (error) {
 			return null;

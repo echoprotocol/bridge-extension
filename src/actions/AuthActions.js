@@ -12,7 +12,7 @@ import { getCrypto } from './CryptoActions';
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
 import { ACTIVE_KEY, MEMO_KEY } from '../constants/GlobalConstants';
 
-import { createWallet } from '../api/WalletApi';
+// import { createWallet } from '../api/WalletApi';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -29,7 +29,7 @@ const toggleLoading = (form, value) => (dispatch) => {
 	dispatch(setValue(form, 'loading', value));
 };
 
-const validateAccountExist = async (
+export const validateAccountExist = async (
 	accountName,
 	requestsCount = 0,
 ) => {
@@ -82,7 +82,7 @@ const validateAccountExist = async (
  */
 export const createAccount = (name) => async (dispatch, getState) => {
 	let error = null;
-	let example = '';
+	const example = '';
 
 	dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
 
@@ -103,36 +103,29 @@ export const createAccount = (name) => async (dispatch, getState) => {
 	try {
 		getCrypto().pauseLockTimeout();
 
-		const registrator = getState().global.getIn(['network', 'registrator']);
+		// const registrator = getState().global.getIn(['network', 'registrator']);
 		const networkName = getState().global.getIn(['network', 'name']);
 
 		dispatch(toggleLoading(FORM_SIGN_UP, true));
 
-		({ error, example } = await validateAccountExist(name));
+		const emitter = echoService.getEmitter();
+		emitter.emit('createWallet', name);
 
-		if (error) {
-			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
-			return null;
-		}
 		const wif = getCrypto().generateWIF();
 
 		const echoRandKey = getCrypto().generateEchoRandKey();
 
-		console.log(echoRandKey);
 
-		// const echoRandKeyBuffer = keyPairFromSeed(random(32_SIZE));
-		// const echoRandPrivateKey = Buffer.from(echoRandKeyBuffer.privateKey).toString('hex');
-		// const echoRandPublicKey = Buffer.from(echoRandKey.publicKey).toString('hex');
-		// const echoRandKey = `DET${bs58.encrypt(echoRandPublicKey)}`;
-
-		await createWallet(registrator, name, wif);
+		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
+		await echoService.getChainLib().api.registerAccount(name, key, key, key, echoRandKey);
 
 		await getCrypto().importByWIF(networkName, wif);
 
-		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
+		console.log('before add account');
+
 
 		await dispatch(addAccount(name, [key, key], networkName));
-
+		console.log('after add account');
 		return wif;
 
 	} catch (err) {
@@ -146,6 +139,20 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 };
 
+/**
+ *  @method offerName
+ *
+ * 	Create account through account name
+ *
+ * 	@param {String} name
+ *
+ * 	@return {String} wif
+ */
+export const offerName = (error, example) => async (dispatch) => {
+	dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
+};
+
+
 const validateImportAccountExist = async (
 	accountName,
 	networkName,
@@ -158,6 +165,7 @@ const validateImportAccountExist = async (
 	}
 	return null;
 };
+
 
 /**
  *  @method importByPassword

@@ -4,6 +4,7 @@ import { requestHandler, trResponseHandler, windowRequestHandler } from '../acti
 import { sendHandler } from '../actions/BalanceActions';
 import { onLogout } from '../actions/GlobalActions';
 import { getCrypto, lockResponse, unlockResponse } from '../actions/CryptoActions';
+import { offerName } from '../actions/AuthActions';
 
 class Listeners {
 
@@ -23,6 +24,8 @@ class Listeners {
 			dispatch(onLogout(name));
 		this.lockResponse = () => dispatch(lockResponse());
 		this.unlockResponse = () => dispatch(unlockResponse());
+		this.offerName = (error, example) => dispatch(offerName(error, example));
+
 
 		this.emitter.on('windowRequest', this.windowRequestHandler);
 		this.emitter.on('request', this.requestHandler);
@@ -31,6 +34,7 @@ class Listeners {
 		this.emitter.on('sendResponse', this.sendHandler);
 
 		this.emitter.on('logout', this.onLogout);
+		this.emitter.on('offerName', this.offerName);
 
 		this.crypto.on('locked', this.lockResponse);
 		this.crypto.on('unlocked', this.unlockResponse);
@@ -46,15 +50,17 @@ class Listeners {
 		this.emitter.removeListener('trResponse', this.trResponseHandler);
 		this.emitter.removeListener('sendResponse', this.sendHandler);
 		this.emitter.removeListener('logout', this.onLogout);
+		this.emitter.removeListener('offerName', this.offerName);
 
 		this.crypto.removeListener('locked', this.lockResponse);
 		this.crypto.removeListener('unlocked', this.unlockResponse);
 	}
 
-	initBackgroundListeners(onResponse, onTransaction, onSend) {
+	initBackgroundListeners(onResponse, onTransaction, onSend, onCreateWallet) {
 		this.emitter.on('response', onResponse);
 		this.emitter.on('trRequest', onTransaction);
 		this.emitter.on('sendRequest', onSend);
+		this.emitter.on('createWallet', onCreateWallet);
 	}
 
 }
