@@ -80,6 +80,9 @@ export const initAccount = ({ name, icon, iconColor }) => async (dispatch) => {
 	try {
 		const account = await echoService.getChainLib().api.getAccountByName(name);
 
+		console.log('accountjjjj', account.id);
+
+
 		dispatch(set('account', new Map({
 			id: account.id, name, icon, iconColor,
 		})));
