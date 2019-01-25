@@ -84,7 +84,7 @@ export default connect(
 		pathname: state.router.location.pathname,
 	}),
 	(dispatch) => {
-		const initApp = () => dispatch(globalInit(false));
+		const initApp = () => dispatch(globalInit());
 		const initListeners = () => dispatch(init());
 
 		return { initApp, initListeners };

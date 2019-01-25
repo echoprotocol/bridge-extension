@@ -1,3 +1,33 @@
+
+
+// export const createWallet = async (registrator, account, wif) => {
+// 	const publicKey = PrivateKey.fromWif(wif).toPublicKey().toString();
+
+// 	let response = await fetch(registrator, {
+// 		method: 'post',
+// 		mode: 'cors',
+// 		headers: {
+// 			Accept: 'application/json',
+// 			'Content-type': 'application/json',
+// 		},
+// 		body: JSON.stringify({
+// 			name: account,
+// 			owner_key: publicKey,
+// 			active_key: publicKey,
+// 			memo_key: publicKey,
+// 		}),
+// 	});
+
+// 	response = await response.json();
+
+// 	if (!response || (response && response.errors)) {
+// 		return response.errors.join();
+// 	}
+
+// 	return null;
+// };
+
+
 import { aes, PrivateKey } from 'echojs-lib';
 
 import {

@@ -1,6 +1,5 @@
 import moment from 'moment';
 import { Map, OrderedMap } from 'immutable';
-import _ from 'lodash';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -56,13 +55,13 @@ const formatOperation = async (data, result, accountName) => {
 	const type = data.getIn(['op', '0']);
 	const operation = data.getIn(['op', '1']);
 
-	const block = await echoService.getChainLib().api.getObject(data.get('block_num'));
+	const block = await echoService.getChainLib().api.getBlock(data.get('block_num'));
 
 	const feeAsset = await echoService.getChainLib().api.getObject(operation.getIn(['fee', 'asset_id']));
 
 	const { name, options } = Object.values(operations).find((i) => i.value === type);
 
-	const typeOperation = historyOperations.find((item) => item.value === name);
+	const typeOperation = historyOperations.find((item) => item.value.includes(name));
 
 	result = result.set('id', data.get('id'))
 		.setIn(['transaction', 'type'], typeOperation ? typeOperation.type : 'Transaction')
@@ -87,9 +86,9 @@ const formatOperation = async (data, result, accountName) => {
 	if (options.from) {
 
 		const request = operation.get(options.from);
-		const response = await fetchChain(request);
+		const response = await echoService.getChainLib().api.getObject(request);
 
-		result = result.setIn(['content', 'sender'], response.get('name'));
+		result = result.setIn(['content', 'sender'], response.name);
 	}
 
 	let numberSign = '-';
@@ -109,6 +108,7 @@ const formatOperation = async (data, result, accountName) => {
 
 	if (options.asset) {
 		const request = operation.getIn(options.asset.split('.'));
+
 		const response = await echoService.getChainLib().api.getObject(request);
 
 		const resultValue = result.getIn(['transaction', 'value']) !== 0 ? `${numberSign} ${FormatHelper.formatAmount(result.getIn(['transaction', 'value']), response.precision)}` :
@@ -180,20 +180,29 @@ export const updateHistory = () => async (dispatch, getState) => {
 	}
 
 	const stateHistory = getState().global.get('history');
-	const historyAccount = (await echoService.getChainLib().api.getFullAccounts([accountName]))[0]
-		.history;
 
-	if (!_.isEqual(stateHistory, historyAccount)) {
-		dispatch(GlobalReducer.actions.set({ field: 'history', value: historyAccount }));
-		dispatch(formatHistory(historyAccount));
-	}
+	try {
+		const currentAccountId = getState().global.getIn(['account', 'id']);
+		const history = getState().blockchain.getIn(['fullAccounts', currentAccountId, 'history']);
 
-	const assets = getState().balance.get('assets');
+		if (history !== stateHistory) {
+			dispatch(GlobalReducer.actions.set({ field: 'history', value: history }));
 
-	const isChanged = await isAssetsChanged(assets);
+			dispatch(formatHistory(history));
+		}
 
-	if (isChanged) {
-		dispatch(formatHistory(historyAccount));
+		const assets = getState().balance.get('assets');
+
+		const isChanged = await isAssetsChanged(assets);
+
+		if (isChanged) {
+			dispatch(formatHistory(history));
+		}
+	} catch (err) {
+		dispatch(GlobalReducer.actions.set({
+			field: 'error',
+			value: FormatHelper.formatError(err),
+		}));
 	}
 
 	return true;

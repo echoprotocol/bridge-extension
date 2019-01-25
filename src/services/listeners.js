@@ -4,7 +4,13 @@ import { requestHandler, trResponseHandler, windowRequestHandler } from '../acti
 import { sendHandler } from '../actions/BalanceActions';
 import { onLogout } from '../actions/GlobalActions';
 import { getCrypto, lockResponse, unlockResponse } from '../actions/CryptoActions';
+
 import { offerName } from '../actions/AuthActions';
+
+import { onStatusConnected, subscribe } from '../actions/ChainStoreAction';
+
+import { CONNECT_STATUS, DISCONNECT_STATUS } from '../constants/GlobalConstants';
+
 
 class Listeners {
 
@@ -24,8 +30,11 @@ class Listeners {
 			dispatch(onLogout(name));
 		this.lockResponse = () => dispatch(lockResponse());
 		this.unlockResponse = () => dispatch(unlockResponse());
+
 		this.offerName = (error, example) => dispatch(offerName(error, example));
 
+		this.onStatusConnected = (status) => dispatch(onStatusConnected(status));
+		this.onGlobalSubscribe = () => dispatch(subscribe());
 
 		this.emitter.on('windowRequest', this.windowRequestHandler);
 		this.emitter.on('request', this.requestHandler);
@@ -35,6 +44,11 @@ class Listeners {
 
 		this.emitter.on('logout', this.onLogout);
 		this.emitter.on('offerName', this.offerName);
+
+		this.emitter.on(CONNECT_STATUS, () => this.onStatusConnected(CONNECT_STATUS));
+		this.emitter.on(DISCONNECT_STATUS, () => this.onStatusConnected(DISCONNECT_STATUS));
+
+		this.emitter.on('globalSubscribe', this.onGlobalSubscribe);
 
 		this.crypto.on('locked', this.lockResponse);
 		this.crypto.on('unlocked', this.unlockResponse);
@@ -51,6 +65,9 @@ class Listeners {
 		this.emitter.removeListener('sendResponse', this.sendHandler);
 		this.emitter.removeListener('logout', this.onLogout);
 		this.emitter.removeListener('offerName', this.offerName);
+		this.emitter.removeListener(CONNECT_STATUS, this.onStatusConnected);
+		this.emitter.removeListener(DISCONNECT_STATUS, this.onStatusConnected);
+		this.emitter.removeListener('globalSubscribe', this.onGlobalSubscribe);
 
 		this.crypto.removeListener('locked', this.lockResponse);
 		this.crypto.removeListener('unlocked', this.unlockResponse);

@@ -1,12 +1,3 @@
-const ChainStoreCacheNames = [
-	{
-		origin: 'objects_by_id',
-		custom: 'objectsById',
-	},
-	{
-		origin: 'accounts_by_name',
-		custom: 'accountsByName',
-	},
-];
+const ChainStoreCacheNames = ['objectsById', 'accountsByName', 'fullAccounts'];
 
 export default ChainStoreCacheNames;

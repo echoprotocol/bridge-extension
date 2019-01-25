@@ -9,7 +9,7 @@ import { initAssetsBalances, updateTokens } from './BalanceActions';
 
 import echoService from '../services/echo';
 
-import { NETWORKS } from '../constants/GlobalConstants';
+import { CONNECT_STATUS, NETWORKS } from '../constants/GlobalConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 
 import storage from '../services/storage';
@@ -22,7 +22,7 @@ import { updateHistory } from './HistoryActions';
  * @returns {Function}
  */
 export const subscribe = () => (dispatch) => {
-	ChainStoreCacheNames.forEach(({ custom: field }) => {
+	ChainStoreCacheNames.forEach((field) => {
 		const value = echoService.getChainLib().cache[field];
 
 		dispatch(BlockchainReducer.actions.set({ field, value }));
@@ -59,9 +59,6 @@ export const connect = () => async (dispatch) => {
 			dispatch(GlobalReducer.actions.set({ field: 'networks', value: new List(networks) }));
 		}
 
-		echoService.getChainLib().subscriber.setGlobalSubscribe(() => dispatch(subscribe()));
-
-
 		if (echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
 			dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 		}
@@ -96,4 +93,8 @@ export const disconnect = () => async (dispatch) => {
 			value: FormatHelper.formatError(err),
 		}));
 	}
+};
+
+export const onStatusConnected = (status) => (dispatch) => {
+	dispatch(GlobalReducer.actions.set({ field: 'connected', value: status === CONNECT_STATUS }));
 };

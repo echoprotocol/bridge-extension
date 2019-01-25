@@ -121,11 +121,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 		await getCrypto().importByWIF(networkName, wif);
 
-		console.log('before add account');
-
-
 		await dispatch(addAccount(name, [key, key], networkName));
-		console.log('after add account');
 		return wif;
 
 	} catch (err) {

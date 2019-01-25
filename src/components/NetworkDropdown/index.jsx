@@ -63,7 +63,7 @@ class NetworkDropdown extends React.PureComponent {
 
 		if (currentNetworkName === name) {
 			if (!connected) {
-				this.props.tryToConnect(true);
+				this.props.tryToConnect();
 			}
 			this.closeDropDown();
 			return false;
@@ -229,7 +229,7 @@ export default withRouter(connect(
 		deleteNetwork: (network) => dispatch(deleteNetwork(network)),
 		setGlobalLoad: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
 		switchAccountNetwork: (name, network) => dispatch(switchAccountNetwork(name, network)),
-		tryToConnect: (isRecreate) => dispatch(globalInit(isRecreate)),
+		tryToConnect: () => dispatch(globalInit()),
 	}),
 )(NetworkDropdown));
 

@@ -92,7 +92,7 @@ export const historyOperations = [
 		type: 'Account',
 	},
 	{
-		value: 'Contract created',
+		value: ['Contract created', 'Call contract', 'Contract transfer'],
 		type: 'Contract',
 	},
 ];

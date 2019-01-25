@@ -95,6 +95,7 @@ export const OPEN_STATUS = 'open';
 export const COMPLETE_STATUS = 'complete';
 export const ERROR_STATUS = 'error';
 export const DISCONNECT_STATUS = 'disconnect';
+export const CONNECT_STATUS = 'connect';
 
 export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
 
