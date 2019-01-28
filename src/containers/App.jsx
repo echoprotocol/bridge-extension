@@ -9,7 +9,7 @@ import { Dimmer, Sidebar } from 'semantic-ui-react';
 import { globalInit, initListeners as init } from '../actions/GlobalActions';
 
 import Navigator from '../components/Navigator';
-
+import Modals from '../components/Modals';
 
 import { PIN_PATHS, SIGN_TRANSACTION_PATH } from '../constants/RouterConstants';
 
@@ -46,6 +46,7 @@ class App extends React.Component {
 				<Sidebar.Pushable>
 					{ this.renderHeader(pathname) }
 					{children}
+					<Modals />
 				</Sidebar.Pushable>
 				{
 					loading ?

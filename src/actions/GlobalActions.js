@@ -246,6 +246,7 @@ export const switchAccount = (name) => async (dispatch, getState) => {
  */
 export const loadInfo = () => async (dispatch, getState) => {
 
+
 	const networks = getState().global.get('networks');
 	let accountsNetworks = new Map();
 
@@ -356,10 +357,12 @@ export const addNetwork = () => async (dispatch, getState) => {
 
 		const address = form.get('address');
 		const name = form.get('name');
+		const registrator = form.get('registrator');
 
 		const network = {
 			url: address.value.trim(),
 			name: name.value.trim(),
+			registrator: registrator.value.trim(),
 		};
 
 		let nameError = ValidateNetworkHelper.validateNetworkName(network.name);
@@ -378,7 +381,13 @@ export const addNetwork = () => async (dispatch, getState) => {
 			dispatch(setFormError(FORM_ADD_NETWORK, 'address', addressError));
 		}
 
-		if (nameError || addressError) { return null; }
+		const registratorError = ValidateNetworkHelper.validateNetworkRegistrator(network.registrator);
+
+		if (registratorError) {
+			dispatch(setFormError(FORM_ADD_NETWORK, 'registrator', registratorError));
+		}
+
+		if (nameError || addressError || registratorError) { return null; }
 
 		networks = networks.push(network);
 		await storage.set('custom_networks', networks.toJSON());
@@ -452,6 +461,8 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
  */
 export const globalInit = () => async (dispatch) => {
 	await dispatch(connect());
+
+	await dispatch(loadInfo());
 
 	await dispatch(initCrypto());
 };
