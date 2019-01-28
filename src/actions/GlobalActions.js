@@ -80,9 +80,6 @@ export const initAccount = ({ name, icon, iconColor }) => async (dispatch) => {
 	try {
 		const account = await echoService.getChainLib().api.getAccountByName(name);
 
-		console.log('accountjjjj', account.id);
-
-
 		dispatch(set('account', new Map({
 			id: account.id, name, icon, iconColor,
 		})));
@@ -121,8 +118,6 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
 
 	try {
 		const account = await echoService.getChainLib().api.getAccountByName(name);
-		console.log('account ', account);
-
 		let accounts = getState().global.get('accounts');
 
 		accounts =
@@ -140,13 +135,9 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
 			id: account.id, active: true, icon, iconColor, name, keys,
 		}));
 
-		console.log('1) accounts: ', accounts);
-
-
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
 
 		dispatch(set('accounts', accounts));
-		console.log('2) accounts: ', accounts);
 		dispatch(initAccount({ name, icon, iconColor }));
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));

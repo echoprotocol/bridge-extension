@@ -13,6 +13,7 @@ import { RECEIVE_PATH, SEND_PATH, WATCH_TOKEN_PATH } from '../../constants/Route
 
 import FormatHelper from '../../helpers/FormatHelper';
 import IconClose from '../../assets/images/icons/cross_dark_big.svg';
+import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 class Wallet extends React.Component {
 
@@ -24,7 +25,7 @@ class Wallet extends React.Component {
 		const resultBalances = balances.map((balance) => {
 			const asset = assets.get(balance.get('asset_type'));
 
-			if (!asset || account.get('id') !== balance.get('owner')) {
+			if (!assets || account.get('id') !== balance.get('owner')) {
 				return null;
 			}
 
@@ -49,6 +50,18 @@ class Wallet extends React.Component {
 
 			);
 		});
+
+
+		if (!balances.find((v) => account.get('id') === v.get('owner') && v.get('asset_type') === CORE_ID)) {
+			resultBalances.push(<li>
+				<Link to={SEND_PATH}>
+					<div className="balance-info">
+						<span>0</span>
+						<span>{CORE_SYMBOL}</span>
+					</div>
+				</Link>
+			</li>);
+		}
 
 		const resultTokens = [];
 		tokens.mapEntries(([accountId, tokenArr]) => {
@@ -86,6 +99,7 @@ class Wallet extends React.Component {
 
 			return null;
 		});
+
 
 		return resultBalances.concat(resultTokens);
 	}
@@ -173,7 +187,7 @@ class Wallet extends React.Component {
 							>
 								<ul className={classnames(
 									'wallet-list',
-									{ one: balancesCount === 1 },
+									{ one: balancesCount <= 1 },
 									{ two: balancesCount === 2 },
 									{ three: balancesCount === 3 },
 								)}
@@ -184,6 +198,7 @@ class Wallet extends React.Component {
 								</ul>
 							</CustomScroll>
 						</div>
+
 						<div className="page-action-wrap">
 							<div className="two-btn-wrap" >
 								<Link className="btn-transparent link" to={RECEIVE_PATH}>

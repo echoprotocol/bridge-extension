@@ -112,17 +112,13 @@ class UserDropdown extends React.PureComponent {
 		const asset = assets.get(CORE_ID);
 		const accountsNetwork = accounts.get(networkName);
 
-		if (!activeAccount || !asset || !accountsNetwork) {
+		if (!activeAccount || !accountsNetwork) {
 			return null;
 		}
 
 		return accountsNetwork.map((account, i) => {
 
 			const userBalance = balances.find((value) => ((value.get('owner') === account.id) && (value.get('asset_type') === CORE_ID)));
-
-			if (!userBalance) {
-				return null;
-			}
 
 			return (
 				<MenuItem
@@ -140,10 +136,13 @@ class UserDropdown extends React.PureComponent {
 						avatar={`ava${account.icon}`}
 					/>
 					<div className="user-name">{account.name}</div>
-					<div className={classnames('user-balance', { positive: !!userBalance.get('balance') })}>
-						{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${CORE_SYMBOL}`}
 
-					</div>
+					{userBalance ?
+						<div className={classnames('user-balance', { positive: !!userBalance.get('balance') })}>
+							{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${CORE_SYMBOL}`}
+						</div> : <div className="user-balance">0 {CORE_SYMBOL}</div>
+					}
+
 					<Button className="btn-logout" onClick={(e) => this.onRemoveAccount(e, account.name)} >
 						<img src={exit} alt="" />
 					</Button>
@@ -155,6 +154,7 @@ class UserDropdown extends React.PureComponent {
 
 	render() {
 		const { account, accounts } = this.props;
+
 
 		if (!account) {
 			return null;
