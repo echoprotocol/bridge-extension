@@ -107,3 +107,13 @@
         left: 0;
     }
 }
+.settings-wrap {
+	.user-icon-wrap {
+		&.big {
+			img {
+				width: 32px;
+				margin-bottom: 20px;
+			}
+		}
+	}
+}

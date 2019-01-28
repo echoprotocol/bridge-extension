@@ -12,6 +12,7 @@ import { addNetwork } from '../../actions/GlobalActions';
 import { FORM_ADD_NETWORK } from '../../constants/FormConstants';
 
 import BridgeInput from '../../components/BridgeInput';
+import arrowLeft from '../../assets/images/icons/arrow_dark_left.svg';
 
 class AddNetwork extends React.Component {
 
@@ -160,7 +161,7 @@ class AddNetwork extends React.Component {
 			<React.Fragment>
 				<div className="return-block">
 					<a href="/" className="link-return" onClick={(e) => this.onClick(e)}>
-						<i className="icon-return" />
+						<img src={arrowLeft} alt="" />
 						<span className="link-text">Return</span>
 					</a>
 				</div>

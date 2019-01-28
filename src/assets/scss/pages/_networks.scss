@@ -3,7 +3,10 @@
     display: flex;
     align-items: center;
     background-color: #dfe2e4;
-    padding: 0 20px;
+	padding: 0 20px;
+	&.transparent {
+		background-color: transparent;
+	}
 }
 
 .icon-pageNetwork {

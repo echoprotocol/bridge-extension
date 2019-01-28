@@ -19,6 +19,7 @@ import BridgeTextArea from '../../components/BridgeTextArea';
 
 import ValidateSendHelper from '../../helpers/ValidateSendHelper';
 import ValidateTransactionHelper from '../../helpers/ValidateTransactionHelper';
+import arrowLeft from '../../assets/images/icons/arrow_dark_left.svg';
 
 class Send extends React.Component {
 
@@ -199,7 +200,7 @@ class Send extends React.Component {
 			<React.Fragment>
 				<div className="return-block">
 					<Link to={INDEX_PATH} className="link-return">
-						<i className="icon-return" />
+						<img src={arrowLeft} alt="" />
 						<span className="link-text">Return</span>
 					</Link>
 				</div>
