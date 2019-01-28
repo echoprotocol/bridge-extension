@@ -34,7 +34,6 @@ class Listeners {
 		this.emitter.on('trResponse', this.trResponseHandler);
 
 		this.emitter.on('sendResponse', this.sendHandler);
-
 		this.emitter.on('logout', this.onLogout);
 
 		this.emitter.on(CONNECT_STATUS, () => this.onStatusConnected(CONNECT_STATUS));
@@ -64,11 +63,11 @@ class Listeners {
 		this.crypto.removeListener('unlocked', this.unlockResponse);
 	}
 
-	initBackgroundListeners(onResponse, onTransaction, onSend, tryConnect) {
+	initBackgroundListeners(onResponse, onTransaction, onSend, onSwitchNetwork) {
 		this.emitter.on('response', onResponse);
 		this.emitter.on('trRequest', onTransaction);
 		this.emitter.on('sendRequest', onSend);
-		this.emitter.on('tryConnect', tryConnect);
+		this.emitter.on('switchNetwork', onSwitchNetwork);
 	}
 
 }

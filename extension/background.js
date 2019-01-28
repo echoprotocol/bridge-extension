@@ -41,6 +41,7 @@ const accountsRequests = [];
 
 const requestQueue = [];
 let lastTransaction = null;
+let subscriberResponse = null;
 
 const connectSubscribe = (status) => {
 	try {
@@ -64,8 +65,9 @@ const connectSubscribe = (status) => {
 /**
  * Create default socket
  */
-const createSocket = async () => {
-	await echo.connect(NETWORKS[0].url, {
+const createSocket = async (url) => {
+	url = url || NETWORKS[0].url;
+	await echo.connect(url, {
 		connectionTimeout: 5000,
 		maxRetries: 3,
 		pingTimeout: 1000,
@@ -86,7 +88,8 @@ const createSocket = async () => {
 
 	echo.subscriber.setStatusSubscribe(CONNECT_STATUS, () => connectSubscribe(CONNECT_STATUS));
 
-	echo.subscriber.setStatusSubscribe(DISCONNECT_STATUS, () => connectSubscribe(DISCONNECT_STATUS));
+	echo.subscriber
+		.setStatusSubscribe(DISCONNECT_STATUS, () => connectSubscribe(DISCONNECT_STATUS));
 };
 
 
@@ -165,6 +168,7 @@ const resolveAccounts = async () => {
 
 };
 
+
 /**
  * On content script request
  * @param request
@@ -176,11 +180,19 @@ const onMessage = (request, sender, sendResponse) => {
 
 	request = JSON.parse(JSON.stringify(request));
 
-	if (!request.method || !request.id || !request.appId || request.appId !== APP_ID) return false;
+	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
+
+	if (request.method === 'networkSubscribe') {
+		subscriberResponse = sendResponse;
+		return true;
+	}
+
+	if (!request.id) return false;
 
 	const { id } = request;
 
 	lastRequestType = request.method;
+
 
 	if (request.method === 'confirm' && request.data) {
 
@@ -214,7 +226,6 @@ const onMessage = (request, sender, sendResponse) => {
 		} else {
 			triggerPopup();
 		}
-
 
 	}
 
@@ -469,8 +480,15 @@ export const onSend = async (options, networkName) => {
 	return null;
 };
 
+export const onSwitchNetwork = async (network) => {
+	await createSocket(network.url);
+
+	subscriberResponse({ subscriber: true, res: network });
+};
+
+
 const listeners = new Listeners(emitter, crypto);
-listeners.initBackgroundListeners(onResponse, onTransaction, onSend, createSocket);
+listeners.initBackgroundListeners(onResponse, onTransaction, onSend, onSwitchNetwork);
 
 createSocket();
 

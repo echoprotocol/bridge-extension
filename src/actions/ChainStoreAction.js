@@ -83,6 +83,7 @@ export const connect = () => async (dispatch) => {
 export const disconnect = () => async (dispatch) => {
 	try {
 		await echoService.getChainLib().disconnect();
+
 		dispatch(batchActions([
 			BalanceReducer.actions.reset(),
 			GlobalReducer.actions.set({ field: 'connected', value: false }),
@@ -93,14 +94,6 @@ export const disconnect = () => async (dispatch) => {
 			value: FormatHelper.formatError(err),
 		}));
 	}
-};
-
-export const tryToConnect = () => async (dispatch) => {
-	await dispatch(disconnect());
-
-	const emitter = echoService.getEmitter();
-
-	emitter.emit('tryConnect');
 };
 
 export const onStatusConnected = (status) => (dispatch) => {

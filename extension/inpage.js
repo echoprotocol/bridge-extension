@@ -4,11 +4,31 @@ import { APP_ID } from '../src/constants/GlobalConstants';
 
 const requestQueue = [];
 
+const networkSubscribers = [];
+
+/**
+ * subscribe to switch network
+ * @param subscriberCb
+ */
+const subscribe = (subscriberCb) => {
+	if (subscriberCb) { networkSubscribers.push(subscriberCb); }
+	window.postMessage({
+		method: 'networkSubscribe', target: 'content', appId: APP_ID,
+	}, '*');
+};
+
 /**
  * On content script message
  * @param event
  */
 const onMessage = (event) => {
+
+	if (event.data.subscriber) {
+		networkSubscribers.forEach((cb) => cb());
+		subscribe();
+		return;
+	}
+
 	const { id, target, appId } = event.data;
 
 	if (!id || target !== 'inpage' || !appId || appId !== APP_ID) return;
@@ -18,6 +38,7 @@ const onMessage = (event) => {
 
 	requestQueue.splice(requestIndex, 1)[0].cb(event);
 };
+
 
 /**
  * Send custom transaction
@@ -76,14 +97,18 @@ const getAccounts = () => {
 	return result;
 };
 
+
 const extension = {
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
+	subscribe: () => subscribe(),
 };
 
 window.echojslib = {
 	...echo,
 	isEchoBridge: true,
 	extension,
+	subscribe,
 };
 window.addEventListener('message', onMessage, false);
+
