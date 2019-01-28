@@ -9,13 +9,12 @@ import PropTypes from 'prop-types';
 import { decryptNote } from '../../actions/HistoryActions';
 
 import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
-/* eslint-disable no-unused-vars */
-import picAccount from '../../assets/images/icons/picAccount.svg';
-import picContract from '../../assets/images/icons/picContract.svg';
-import picRecieved from '../../assets/images/icons/picRecieved.svg';
-import picSent from '../../assets/images/icons/picSent.svg';
-import picTransaction from '../../assets/images/icons/picTransaction.svg';
-/* eslint-enable no-unused-vars */
+
+import '../../assets/images/icons/picAccount.svg';
+import '../../assets/images/icons/picRecieved.svg';
+import '../../assets/images/icons/picSent.svg';
+import '../../assets/images/icons/picTransaction.svg';
+
 
 class Transactions extends React.Component {
 
