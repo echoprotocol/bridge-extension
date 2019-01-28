@@ -19,7 +19,8 @@
             content: "";
             opacity: .07;
             background-position: center;
-            background-image: url(../images/sidebarBg.jpg);
+			background-image: url(../images/sidebarBg.jpg);
+			background-repeat: no-repeat;
             z-index: -1;
         }
         .btn-icon {
@@ -35,7 +36,10 @@
     &-body {
         background-color: rgba(#324046,1);
         height: calc(100% - 150px);
-        padding: 53px 32px 20px;
+		padding: 83px 36px 52px;
+		display: flex;
+		flex-direction: column;
+		justify-content: space-between;
     }
     &-user {
         display: flex;
@@ -71,7 +75,7 @@
     li {
 
         &:not(:last-child) {
-            margin-bottom: 9px;
+            margin-bottom: 7px;
         }
         a {
             color: #6d7f80;
@@ -83,6 +87,14 @@
             transition: color $speed;
             -webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
+
+			&.active {
+				color: #61D3AD;
+				&:hover,
+				&:focus {
+					color: #71E4BE;
+				}
+			}
 
             i {
                 width: 30px;

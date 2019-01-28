@@ -249,7 +249,31 @@
         }
     }
 
+	&-lock {
+		cursor: pointer;
+		display: flex;
+		align-items: center;
+		background-color: transparent;
+		color: #7E9090;
+		font-size: 13px;
+		font-family: FNMedium;
+		border: 0;
+		transition: color $speed;
+		padding: 0;
+		letter-spacing: .6px;
+		-webkit-font-smoothing: antialiased;
+		-moz-osx-font-smoothing: grayscale;
 
+		&:hover,
+		&:focus {
+			color: #D6DDDE;
+		}
+
+		img {
+			width: 20px;
+			margin: 0 4px 0 0;
+		}
+	}
 
     &-noborder {
         @extend %btn;
