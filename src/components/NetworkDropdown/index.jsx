@@ -26,7 +26,6 @@ class NetworkDropdown extends React.PureComponent {
 
 	constructor(props) {
 		super(props);
-
 		this.state = {
 			menuHeight: null,
 			opened: false,
@@ -35,10 +34,12 @@ class NetworkDropdown extends React.PureComponent {
 
 	componentDidMount() {
 		this.setDDMenuHeight();
+
 	}
 
 	componentDidUpdate() {
 		this.setDDMenuHeight();
+		this.blur();
 	}
 
 	onDeleteNetwork(e, name) {
@@ -53,7 +54,9 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	onChangeNetwork(name) {
+
 		const { network, networks, connected } = this.props;
+
 
 		if (!network) {
 			return false;
@@ -121,6 +124,13 @@ class NetworkDropdown extends React.PureComponent {
 
 	closeDropDown() {
 		this.setState({ opened: false });
+	}
+
+	blur() {
+		// fix: has no acces to ref
+		if (!this.state.opened) {
+			document.getElementById('dropdown-network').blur();
+		}
 	}
 
 	toggleDropdown() {
