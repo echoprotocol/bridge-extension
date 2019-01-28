@@ -12,8 +12,6 @@ import { getCrypto } from './CryptoActions';
 import { FORM_SIGN_UP, FORM_SIGN_IN } from '../constants/FormConstants';
 import { ACTIVE_KEY, MEMO_KEY } from '../constants/GlobalConstants';
 
-// import { createWallet } from '../api/WalletApi';
-
 import GlobalReducer from '../reducers/GlobalReducer';
 
 /**

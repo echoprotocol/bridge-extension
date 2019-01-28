@@ -15,7 +15,6 @@ class NetworkInfo extends React.PureComponent {
 			return null;
 		}
 
-		const registrator = network.get('registrator');
 		const url = network.get('url');
 
 		return (
@@ -23,10 +22,6 @@ class NetworkInfo extends React.PureComponent {
 				<li>
 					<div>Block</div>
 					<div>{headBlock}</div>
-				</li>
-				<li>
-					<div>Faucet</div>
-					<div>{registrator}</div>
 				</li>
 				<li>
 					<div>Address</div>

@@ -37,7 +37,6 @@ import {
 
 import echoService from '../services/echo';
 
-
 const getOperationFee = async (type, transaction, core) => {
 	const options = JSON.parse(JSON.stringify(transaction));
 
@@ -79,5 +78,4 @@ const getOperationFee = async (type, transaction, core) => {
 	return tr._operations[0][1].fee.amount; // eslint-disable-line no-underscore-dangle
 };
 
-export { getOperationFee as default };
-
+export default getOperationFee;

@@ -34,7 +34,7 @@ export function required(Component) {
 				return;
 			}
 
-			if (!isLogin) {
+			if (!isLogin.size) {
 				this.props.history.push(CREATE_ACCOUNT_PATH);
 				return;
 			}
@@ -52,7 +52,7 @@ export function required(Component) {
 			const { isLogin, isLocked, isSign } = this.props;
 			const { pathname } = this.props.history.location;
 
-			if (isLocked || !isLogin) {
+			if (isLocked || !isLogin.size) {
 				return null;
 			}
 
@@ -70,21 +70,20 @@ export function required(Component) {
 	}
 
 	RequiredComponent.propTypes = {
-		isLogin: PropTypes.bool,
+		isLogin: PropTypes.object.isRequired,
 		isLocked: PropTypes.bool,
 		isSign: PropTypes.bool,
 		dispatch: PropTypes.func.isRequired,
 	};
 
 	RequiredComponent.defaultProps = {
-		isLogin: false,
 		isLocked: true,
 		isSign: true,
 	};
 
 	return connect((state) => ({
 		isLocked: state.global.getIn(['crypto', 'isLocked']),
-		isLogin: !!state.global.get('account'),
+		isLogin: state.global.get('account'),
 		isSign: !!state.global.getIn(['sign', 'current']),
 	}))(RequiredComponent);
 

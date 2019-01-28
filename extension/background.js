@@ -67,11 +67,11 @@ const connectSubscribe = (status) => {
  * Create default socket
  */
 const createSocket = async () => {
-	await echo.connect('ws://195.201.164.54:6311', {
-		connectionTimeout: 10000,
-		maxRetries: 20,
-		pingTimeout: 10000,
-		pingInterval: 10000,
+	await echo.connect(NETWORKS[0].url, {
+		connectionTimeout: 5000,
+		maxRetries: 3,
+		pingTimeout: 1000,
+		pingInterval: 2000,
 		debug: false,
 		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
 	});
@@ -471,7 +471,6 @@ export const onSend = async (options, networkName) => {
 	return null;
 };
 
-
 export const onCreateWallet = async (userName) => {
 	let error = null;
 	let example = '';
@@ -488,7 +487,7 @@ export const onCreateWallet = async (userName) => {
 };
 
 const listeners = new Listeners(emitter, crypto);
-listeners.initBackgroundListeners(onResponse, onTransaction, onSend, onCreateWallet);
+listeners.initBackgroundListeners(onResponse, onTransaction, onSend, onCreateWallet, createSocket);
 createSocket();
 
 window.getChainLib = () => echo;

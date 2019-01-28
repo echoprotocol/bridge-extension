@@ -34,16 +34,4 @@ export default class ValidateAccountHelper {
 		return null;
 	}
 
-	static validateNetworkRegistrator(registrator) {
-		if (!registrator) {
-			return 'Network registrator should not be empty';
-		}
-
-		if (!(/^http:\/\/|^https:\/\//i).test(registrator)) {
-			return 'It should be start with \'http://\' or \'https://\'';
-		}
-
-		return null;
-	}
-
 }
