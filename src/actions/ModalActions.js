@@ -1,7 +1,8 @@
 import ModalReducer from './../reducers/ModalReducer';
 
-export const openModal = (type) => (dispatch) => {
-	dispatch(ModalReducer.actions.open({ type }));
+
+export const openModal = (type, field, value) => (dispatch) => {
+	dispatch(ModalReducer.actions.open({ type, field, value }));
 };
 
 export const closeModal = (type) => (dispatch) => {

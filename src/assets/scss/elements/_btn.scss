@@ -267,17 +267,30 @@
 		&:hover,
 		&:focus {
 			color: #D6DDDE;
+			img {
+				opacity: 1;
+			}
 		}
 
 		img {
 			width: 20px;
 			margin: 0 4px 0 0;
+			opacity: .4;
+			transition: opacity $speed;
 		}
 	}
 
     &-noborder {
-        @extend %btn;
-        &:not(.disabled) {
+		@extend %btn;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+        background-color: transparent;
+        color: #3e494f;
+        border: 1px solid transparent;
+		border-radius: $angularMax;
+
+		&:not(.disabled) {
             @include onBtnFocus(
                  $angularMax,
                  2px,
@@ -285,10 +298,6 @@
                  #d0d5d7
             );
         }
-        background-color: transparent;
-        color: #3e494f;
-        border: 1px solid transparent;
-        border-radius: $angularMax;
         &:hover {
             color: #3b4952;
             background-color: #dfe2e4;
@@ -301,98 +310,113 @@
             border: 2px solid transparent;
         }
 
-        i {
-			margin-right: 13px;
-			margin-left: -6px;
+		.btn-text {
+			position: absolute;
+			top: 0;
+			left: 0;
+			right: 0;
+			bottom: 0;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+		}
+        img {
+			width: 20px;
+			margin: 0 4px 0 -4px;
         }
 
     }
 
     &-nav {
+		display: flex;
         background-color: transparent;
         width: 30px;
         height: 30px;
-        border: 0;
+		border: 0;
         cursor: pointer;
-        font-size: 12px;
-        color: #5c7071;
-        transition: color linear $speed;
-        -webkit-transform: translateZ(0);
-
-        &:hover,
+        transition: opacity .2s;
+		opacity: .7;
+		&:hover,
         &:focus {
-            color: #88a5a6;
-
+            opacity: 1;
         }
-
         &:active {
-            color: #506869;
+            opacity: .5;
         }
+		img {
+			width: 20px;
+		}
     }
 
     &-logout {
         background-color: transparent;
         border: 0;
         border-radius: 50%;
-        width: 33px;
-        height: 33px;
+        width: 32px;
+        height: 32px;
         color: rgba(#fff, .4);
-        transition: background-color $speed, color $speed;
-        cursor: pointer;
+		transition: background-color $speed, color $speed;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		cursor: pointer;
+		padding: 0;
         &:hover {
             background-color: #3a4a4e;
             color: #fff;
         }
         &:active {
-            &:before {
+            img {
                 opacity: 0.3;
             }
         }
-
-        &:before {
-            content: $icon-exit;
-            font-size: 20px;
-            margin: 1px -1px 0 0;
-            display: block;
-            transition: opacity $speed;
-        }
+		img {
+			opacity: .7;
+			width: 20px;
+			margin: 0 -4px 0 0;
+			transition: opacity .2s;
+		}
     }
 
     &-round-close {
         background-color: transparent;
         border-radius: 50%;
-        height: 23px;
-        width: 23px;
+        height: 22px;
+        width: 22px;
         border: 0;
-        color: #adb3b9;
         display: flex;
         align-items: center;
         justify-content: center;
         margin: 0 7px 0 -7px;
         transition: background-color $speed;
-        cursor: pointer;
+		cursor: pointer;
+		
+		img {
+			width: 20px;
+			opacity: .3;
+			transition: opacity $speed;
+		}
         &:hover {
-            background-color: #363f42;
-
-            &:before {
-                opacity: 1;
-            }
-        }
-        &:before {
-            display: block;
-            margin: 1px -1px 0 0;
-            opacity: 0.6;
-            transition: opacity $speed;
+			background-color: #363f42;
+			img {
+				opacity: 1;
+			}
         }
     }
     &-icon {
         background-color: transparent;
         border: 0;
-        color: #aeb4b8;
-        transition: color $speed;
-        cursor: pointer;
-        &:hover {
-            color: #363f42;
+		cursor: pointer;
+		img {
+			width: 20px;
+			opacity: .6;
+			transition: opacity $speed;
+		}
+		&:hover,
+		&:focus {
+			img {
+				opacity: 1;
+			}
         }
     }
     &-try {
@@ -424,17 +448,21 @@
         align-items: center;
         justify-content: center;
         position: absolute;
-        // height: 25px;
         top: 0;
         right: 0;
-        transition: color $speed, background-color $speed;
+		transition: color $speed, background-color $speed;
+		
         &.compact {
             .btn-text {
-                letter-spacing: 2.3px;
                 font-size: 11px;
                 margin: 1px 0 0 0;
             }
-        }
+		}
+		
+		img {
+			margin-top: -1px;
+			width: 20px;
+		}
     }
 
 }
@@ -447,7 +475,6 @@
     display: flex;
     height: 25px;
     justify-content: flex-end;
-    transform: width $speed;
     border: 0;
     border-radius: $angularMax;
     transition: width $speed / 2;
@@ -471,11 +498,13 @@
     }
     &.copied {
         width: 226px;
-    }
-
-    &:after {
-        border-radius: $angularMax;
-        content: "\e913";
+	}
+	&:before,
+	&:after {
+		position: absolute;
+	}
+	&:before {
+		content: "\e913";
         font-family: '#{$icomoon-font-family}';
         speak: none;
         font-style: normal;
@@ -484,22 +513,30 @@
         text-transform: none;
         line-height: 1;
         -webkit-font-smoothing: antialiased;
-        -moz-osx-font-smoothing: grayscale;
+		-moz-osx-font-smoothing: grayscale;
+		font-size: 14px;
+		left: 0;
+		z-index: 1;
+		width: 30px;
+		top: 0;
+		bottom: 0;
+		display: flex;
+		align-items: center;
+		justify-content: center;
+		color: #b4b8bc;
+	}
+    &:after {
+        border-radius: $angularMax;
+        content: '';
         position: absolute;
         right: 0;
         left: 0;
         bottom: 0;
         top: 0;
-        height: 23px;
         background-color: #efeff0;
         border: 1px solid #efeff0;
-        display: flex;
-        align-items: center;
-        justify-content: flex-start;
-        color: #b4b8bc;
-        padding-left: 6px;
-        font-size: 15px;
-    }
+	}
+	
 }
 
 .one-btn-wrap {

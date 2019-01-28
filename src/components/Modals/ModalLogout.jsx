@@ -4,7 +4,7 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import FocusTrap from 'focus-trap-react';
 
-import { removeAccount } from '../../actions/GlobalActions';
+import { onLogout } from '../../actions/GlobalActions';
 import { closeModal } from '../../actions/ModalActions';
 
 import { MODAL_LOGOUT } from '../../constants/ModalConstants';
@@ -18,7 +18,7 @@ class ModalLogout extends React.Component {
 
 	onConfirm(name) {
 
-		removeAccount(name);
+		this.props.onLogout(name);
 		this.props.closeModal();
 	}
 
@@ -26,7 +26,7 @@ class ModalLogout extends React.Component {
 		const { show } = this.props;
 		if (show) {
 			const {
-				account,
+				accountName,
 			} = this.props;
 			return (
 				<div className="modal modal-overlay">
@@ -34,14 +34,14 @@ class ModalLogout extends React.Component {
 
 						<div className="modal-body">
 							<h3 className="modal-title">Logout</h3>
-							<div className="modal-info">You are about to log out from account {account.get('name')}</div>
+							<div className="modal-info">You are about to log out from account {accountName}</div>
 						</div>
 						<div className="modal-actions">
 							<div className="two-btn-wrap" >
 
 								<Button
 									className="btn-in-dark"
-									onClick={() => this.onConfirm(account.get('name'))}
+									onClick={() => this.onConfirm(accountName)}
 									content="Confirm"
 								/>
 								<Button
@@ -64,21 +64,23 @@ class ModalLogout extends React.Component {
 
 ModalLogout.propTypes = {
 	show: PropTypes.bool,
-	account: PropTypes.object,
+	accountName: PropTypes.string,
 	closeModal: PropTypes.func.isRequired,
+	onLogout: PropTypes.func.isRequired,
 };
 
 ModalLogout.defaultProps = {
 	show: false,
-	account: null,
+	accountName: null,
 };
 
 export default connect(
 	(state) => ({
 		show: state.modal.getIn([MODAL_LOGOUT, 'show']),
-		account: state.global.get('account'),
+		accountName: state.modal.getIn([MODAL_LOGOUT, 'accountName']),
 	}),
 	(dispatch) => ({
+		onLogout: (name) => dispatch(onLogout(name)),
 		closeModal: () => dispatch(closeModal(MODAL_LOGOUT)),
 	}),
 )(ModalLogout);

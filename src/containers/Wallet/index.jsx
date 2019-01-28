@@ -6,13 +6,13 @@ import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button } from 'semantic-ui-react';
-// import { Dropdown, MenuItem } from 'react-bootstrap';
 
 import { sendRedirect, removeToken } from '../../actions/BalanceActions';
 
 import { RECEIVE_PATH, SEND_PATH, WATCH_TOKEN_PATH } from '../../constants/RouterConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
+import IconClose from '../../assets/images/icons/cross_dark_big.svg';
 
 class Wallet extends React.Component {
 
@@ -74,8 +74,11 @@ class Wallet extends React.Component {
 						</div>
 					</a>
 					<Button
-						className="btn-icon icon-closeBig"
+						className="btn-icon"
 						onClick={() => this.props.removeToken(contractId)}
+						content={
+							<img src={IconClose} alt="" />
+						}
 					/>
 
 				</li>);

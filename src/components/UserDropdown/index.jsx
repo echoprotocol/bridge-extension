@@ -18,6 +18,8 @@ import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/Router
 import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
+import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
+import exit from '../../assets/images/icons/exit.svg';
 
 class UserDropdown extends React.PureComponent {
 
@@ -34,6 +36,7 @@ class UserDropdown extends React.PureComponent {
 		this.setDDMenuHeight();
 	}
 
+
 	componentWillReceiveProps(nextProps) {
 
 		if (!nextProps.account) {
@@ -44,6 +47,7 @@ class UserDropdown extends React.PureComponent {
 	}
 
 	componentDidUpdate() {
+		this.blur();
 		this.setDDMenuHeight();
 	}
 
@@ -63,8 +67,11 @@ class UserDropdown extends React.PureComponent {
 		return true;
 	}
 
-	onOpenLogout() {
-		this.props.openModal();
+	onOpenLogout(e, value) {
+		e.stopPropagation();
+		e.preventDefault();
+		this.closeDropDown();
+		this.props.openModal(value);
 	}
 
 	setDDMenuHeight() {
@@ -90,6 +97,13 @@ class UserDropdown extends React.PureComponent {
 
 	closeDropDown() {
 		this.setState({ opened: false });
+	}
+
+	blur() {
+		// fix: has no acces to ref
+		if (!this.state.opened) {
+			document.getElementById('dropdown-user').blur();
+		}
 	}
 
 	renderList() {
@@ -132,7 +146,10 @@ class UserDropdown extends React.PureComponent {
 						{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${CORE_SYMBOL}`}
 
 					</div>
-					<Button className="btn-logout" onClick={(e) => this.onOpenLogout(e)} />
+					<Button className="btn-logout" onClick={(e) => this.onOpenLogout(e, account.name)} >
+						<img src={exit} alt="" />
+					</Button>
+
 				</MenuItem>
 			);
 
@@ -163,8 +180,7 @@ class UserDropdown extends React.PureComponent {
 						color={account.get('iconColor')}
 						avatar={`ava${account.get('icon')}`}
 					/>
-
-					<i aria-hidden="true" className="dropdown icon" />
+					<img className="ddDown" src={downArrow} alt="" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu >
 					<div
@@ -232,7 +248,7 @@ export default withRouter(connect(
 		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
-		openModal: () => dispatch(openModal(MODAL_LOGOUT)),
+		openModal: (value) => dispatch(openModal(MODAL_LOGOUT, 'accountName', value)),
 		switchAccount: (name) => dispatch(switchAccount(name)),
 	}),
 )(UserDropdown));

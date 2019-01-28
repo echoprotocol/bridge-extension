@@ -64,7 +64,10 @@
 
         .transaction {
             &-type {
-                color: #434c53;
+				color: #434c53;
+				img {
+					opacity: 1;
+				}
             }
             &-date {
                 color: #434c53;
@@ -76,14 +79,10 @@
         }
 
         .bottom-block {
-            .icon {
-                &-dropdown {
-                    &:before {
-                        color: #434c53;
-                    }
-                }
-            }
-        }
+            .ddDown {
+				opacity: 1;
+			}
+		}
     }
 
     &:active {
@@ -118,24 +117,15 @@
     .bottom-block {
         position: relative;
         z-index: 2;
-
-        .icon {
-            &-dropdown {
-                position: absolute;
-                right: 0;
-                top: 50%;
-                transform: translateY(-50%);
-                font-size: 11px;
-
-                &:before {
-                    content: "\e901";
-                    transition: all .2s ease-out;
-                    color: #c3c8c9;
-                    display: block;
-                    transform-origin: center;
-                }
-            }
-        }
+		
+        .ddDown {
+			position: absolute;
+			right: -5px;
+			bottom: 0px;
+			width: 20px;
+			opacity: .7;
+			transition: opacity .2s;
+		}
     }
 
     .transaction {
@@ -146,44 +136,15 @@
             color: #808b94;
             display: flex;
             align-items: flex-end;
-            letter-spacing: .3px;
-            transition: all .2s ease-out;
+			letter-spacing: .3px;
+            transition: color .2s;
 
-            .icon-PicAccount {
-                &:before {
-                    content: "\e92a";
-                    font-size: 19px;
-                    margin-right: 5px;
-                }
-            }
-            .icon-PicContract {
-                &:before {
-                    content: "\e92b";
-                    font-size: 20px;
-                    margin-right: 3px;
-                }
-            }
-            .icon-PicRecieved {
-                &:before {
-                    content: "\e92c";
-                    font-size: 22px;
-                    margin-right: 1px;                
-                }
-            }
-            .icon-PicSent {
-                &:before {
-                    content: "\e92d";
-                    font-size: 21px;
-                    margin-right: 3px;
-                }
-            }
-            .icon-PicTransaction {
-                &:before {
-                    content: "\e92e";
-                    font-size: 19px;
-                    margin-right: 6px;
-                }
-            }
+			img {
+				width: 20px;
+				opacity: .7;
+				margin: 0 5px 0 0;
+				transition: opacity .2s;
+			}
 
         }
         &-date {

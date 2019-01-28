@@ -8,58 +8,46 @@
     background-color: transparent;
     padding: 0;
     border: 0;
-    [class*="icon-ava"] {
-		color: #3f4c4e;
-		&:before {
-			display: block;
-		}
-    }
+
+	.content {
+		display: flex;
+		align-items: center;
+		justify-content: center;
+	}
     &.small {
         .content {
             height: 22px;
             width: 22px;
-            max-width: 22px;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-        }
-        i {
-			font-size: 15px;
-			&:before {
-				height: 22px;
-				width: 22px;
-				position: absolute;
-				right: 0;
-				left: 0;
-				top: 0;
-				bottom: 0;
-				display: flex;
-				align-items: center;
-				justify-content: center;
+			img {
+				width: 16px;
 			}
+        }
+	}
+	
+    &.medium {
+		.content { 
+			width: 42px;
+			height: 42px;
+		}
+		img {
+			width: 32px;
+		}
+	}
+	
+    &.big {
+        width: 86px;
+		height: 86px;
+		img {
+			width: 40px;
+			margin-bottom: 2px;
 		}
     }
 
-    &.big {
-        min-width: 86px;
-        max-width: 86px;
-        height: 86px;
-        [class*="icon-ava"] {
-            font-size: 32px;
-        }
-    }
 
-    &.medium {
-        min-width: 41px;
-        height: 41px;
-        [class*="icon-ava"] {
-            font-size: 28px;
-        }
-    }
 
     &.select {
-        min-width: 61px;
-        height: 61px;
+        min-width: 60px;
+        height: 60px;
         cursor: pointer;
         transition:
             background-color $speed,
@@ -68,37 +56,37 @@
         border: 1px solid transparent;
 
         .content {
-            pointer-events: none;
-            i {
-				pointer-events: none;
-				font-size: 36px;
-				color: rgba(#3f4c4e, .3);
-				transition: color $speed;
-            }
-        }
+			pointer-events: none;
+			img {
+				width: 36px;
+				opacity: .3;
+				transition: opacity $speed;
+			}
+		}
+		&:hover,
+		&:focus {
+			.content {
+				img {
+					opacity: .7;
+				}
+			}
+
+		}
         &.active {
             box-shadow:
                 0 -3px 6px rgba(#3f4c4e,0.06),
                 0 3px 6px rgba(#3f4c4e,0.06);
             background-color: #fff;
-            i {
-                color: #3f4c4e;
-            }
-            &:hover {
-                i {
-                    color: #3f4c4e;
-                }
-            }
+			.content {
+                img {
+                    opacity: 1;
+				}
+			}
         }
         &:hover,
         &:focus {
             &:not(.active) {
                 border: 1px solid #b7bdbf;
-				.content {
-					i {
-						color: rgba(#3f4c4e, .6);
-					}
-				}
             }
         }
     }

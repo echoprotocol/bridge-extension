@@ -14,6 +14,7 @@ import BridgeInput from '../../components/BridgeInput';
 import { watchToken } from '../../actions/BalanceActions';
 import { clearForm, setFormValue } from '../../actions/FormActions';
 import { KEY_CODE_ENTER } from '../../constants/GlobalConstants';
+import arrowLeft from '../../assets/images/icons/arrow_dark_left.svg';
 
 class WatchTokens extends React.Component {
 
@@ -56,7 +57,7 @@ class WatchTokens extends React.Component {
 						to={WALLET_PATH}
 						className="link-return"
 					>
-						<i className="icon-return" />
+						<img src={arrowLeft} alt="" />
 						<span className="link-text">Return</span>
 					</Link>
 				</div>

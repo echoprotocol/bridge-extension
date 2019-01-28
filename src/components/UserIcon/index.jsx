@@ -5,6 +5,22 @@ import { Button } from 'semantic-ui-react';
 
 import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants';
 
+import '../../assets/images/avatars/ava1.svg';
+import '../../assets/images/avatars/ava2.svg';
+import '../../assets/images/avatars/ava3.svg';
+import '../../assets/images/avatars/ava4.svg';
+import '../../assets/images/avatars/ava5.svg';
+import '../../assets/images/avatars/ava6.svg';
+import '../../assets/images/avatars/ava7.svg';
+import '../../assets/images/avatars/ava8.svg';
+import '../../assets/images/avatars/ava9.svg';
+import '../../assets/images/avatars/ava10.svg';
+import '../../assets/images/avatars/ava11.svg';
+import '../../assets/images/avatars/ava12.svg';
+import '../../assets/images/avatars/ava13.svg';
+import '../../assets/images/avatars/ava14.svg';
+import '../../assets/images/avatars/ava15.svg';
+
 class UserIcon extends React.PureComponent {
 
 	onClick() {
@@ -66,10 +82,7 @@ class UserIcon extends React.PureComponent {
 				onKeyPress={(e) => this.onKeyPress(e)}
 			>
 				<div className="content">
-					<i
-						aria-hidden="true"
-						className={classnames(`icon-${this.props.avatar}`)}
-					/>
+					<img src={`/images/${this.props.avatar}.svg`} alt="" />
 				</div>
 				{ this.props.animationChange ? this.renderAnimationChange() : null }
 				{ this.props.animationBack ? this.renderAnimationBack() : null }
