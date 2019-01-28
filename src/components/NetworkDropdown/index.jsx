@@ -20,7 +20,8 @@ import { NETWORKS } from '../../constants/GlobalConstants';
 import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
 
 import GlobalReducer from '../../reducers/GlobalReducer';
-
+import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
+import Cross from '../../assets/images/icons/cross_small.svg';
 
 class NetworkDropdown extends React.PureComponent {
 
@@ -116,7 +117,15 @@ class NetworkDropdown extends React.PureComponent {
 				eventKey={i + eventKey}
 				active={n.name === name}
 			>
-				{custom && <Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(e, n.name)} />}
+				{custom &&
+					<Button
+						className="btn-round-close"
+						onClick={(e) => this.onDeleteNetwork(e, n.name)}
+						content={
+							<img src={Cross} alt="" />
+						}
+					/>
+				}
 				<span className="title">{n.name}</span>
 			</MenuItem>
 		));
@@ -170,7 +179,7 @@ class NetworkDropdown extends React.PureComponent {
 					<div className={classnames('current-network', { connected })}>
 						<span className="cut">{name}</span>
 					</div>
-					<i aria-hidden="true" className="dropdown icon" />
+					<img className="ddDown" src={downArrow} alt="" />
 				</Dropdown.Toggle>
 
 				<Dropdown.Menu >

@@ -1,13 +1,14 @@
 .no-restored-pin-container {
-    padding-top: 14px;
+    padding-top: 5px;
 
+	.return-block {
+		padding: 0 24px;
+	}
     .top-section {
         padding-left: 30px;
         padding-right: 30px;
 
-        .link {
-            margin-left: -8px;
-        }
+
 
     }
 
@@ -15,11 +16,10 @@
         font-family: FNMedium;
         font-size: 18px;
         color: #fff;
-        margin-top: 42px;
+        margin-top: 32px;
         line-height: 24px;
         margin-bottom: 25px;
         letter-spacing: 0.015em;
-
         letter-spacing: 0.6px;
     }
 
@@ -46,12 +46,8 @@
         justify-content: flex-start;
 
         padding-top: 25px;
-
         padding-left: 32px;
         padding-right: 29px;
-
-
-        // background-color: #31393d;
         background-color: #29363b; // NEW
 
         section {

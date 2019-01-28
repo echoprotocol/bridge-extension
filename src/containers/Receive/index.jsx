@@ -3,6 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import BridgeBtnCopy from '../../components/BridgeBtnCopy';
+import arrowLeft from '../../assets/images/icons/arrow_dark_left.svg';
 
 class Receive extends React.Component {
 
@@ -22,7 +23,7 @@ class Receive extends React.Component {
 			<React.Fragment>
 				<div className="return-block">
 					<a href="/" className="link-return" onClick={(e) => this.onClick(e)}>
-						<i className="icon-return" />
+						<img src={arrowLeft} alt="" />
 						<span className="link-text">Return</span>
 					</a>
 				</div>

@@ -75,14 +75,16 @@
          }
 
          .btn-copy-wrap {
-            width: 155px;
-
+            width: 156px;
+			&:before {
+				width: 40px;
+			}
             &.copied {
                 width: 190px;
             }
 
              .btn-copy {
-                 width: 155px;
+                 width: 156px;
 
                  .btn-text {
                      font-size: 10px;

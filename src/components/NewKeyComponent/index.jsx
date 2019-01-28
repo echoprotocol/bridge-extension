@@ -3,6 +3,7 @@ import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
 import UserIcon from '../UserIcon';
+import ArrowDown from '../../assets/images/icons/arrow_dark_bot.svg';
 
 class NewKeyComponent extends React.Component {
 
@@ -35,13 +36,12 @@ class NewKeyComponent extends React.Component {
 							<Button
 								className="btn-noborder"
 								onClick={(e) => this.props.proceed(e)}
-								content={
-									<div className="btn-text">
-										<i className="icon-arrowDown" />
-										Proceed
-									</div>
-								}
-							/>
+							>
+								<div className="btn-text">
+									<img src={ArrowDown} alt="" />
+									Proceed
+								</div>
+							</Button>
 						</div>
 					</div>
 				</div>
