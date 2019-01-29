@@ -30,12 +30,12 @@ class CurrencySelect extends React.Component {
 		this.refList = [];
 
 		const { symbolsList, tokensList } = this.getSymbols();
+
 		let symbolValue = '';
 
 		if (props.path.field === 'selectedBalance' && props.selectedBalance) {
 			const list = ValidateTransactionHelper.validateContractId(props.selectedBalance) ?
 				symbolsList : tokensList;
-
 			symbolValue = list.find((val) => val.value === props.selectedBalance).text;
 		}
 
@@ -116,6 +116,7 @@ class CurrencySelect extends React.Component {
 	}
 
 	onChange(e) {
+
 		this.setState({
 			search: e.target.value,
 		});
@@ -305,6 +306,7 @@ class CurrencySelect extends React.Component {
 	render() {
 		const {
 			currentVal, search, opened, searchList,
+
 		} = this.state;
 
 		if (!searchList) {
@@ -315,7 +317,9 @@ class CurrencySelect extends React.Component {
 			{
 				id: 0,
 				title: 'Assets',
-				list: searchList.symbolsList,
+				list: searchList.symbolsList.length ?
+					searchList.symbolsList :
+					searchList.symbolsList.push({ text: 'ECHO', value: '' }),
 			},
 			{
 				id: 1,
