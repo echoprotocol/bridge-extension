@@ -1,0 +1,55 @@
+.modal {
+	position: absolute;
+	z-index: 999;
+	right: 0;
+	left: 0;
+	top: 0;
+	bottom: 0;
+
+	display: flex;
+	flex-direction: column;
+	align-items: center;
+	justify-content: center;
+
+	animation: fadeIn .15s;
+	
+
+	&-content {
+		height: 100%;
+		padding: 124px 0;
+	}
+
+	&-body {
+		width: 305px;
+		height: 100%;
+		display: flex;
+		flex-direction: column;
+		justify-content: center;
+		align-items: center;
+		padding: 0 0 60px;
+		color: #fff;
+		-webkit-font-smoothing: antialiased
+	}
+
+	&-title {
+		font-family: FNBook;
+		font-size: 20px;
+		letter-spacing: 1px;
+	}
+	&-info {
+		font-size: 15px;
+		text-align: center;
+		padding: 40px 5px 0;
+		line-height: 20px;
+		font-family: FNBook;
+		letter-spacing: .2px;
+	}
+	
+
+}
+.modal-overlay {
+	background-color: rgba(#344046, .95);
+}
+
+
+

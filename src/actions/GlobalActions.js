@@ -40,7 +40,6 @@ import { fetchChain, getTokenDetails } from '../api/ChainApi';
 
 import storage from '../services/storage';
 import BalanceReducer from '../reducers/BalanceReducer';
-import echoService from '../services/echo';
 import Listeners from '../services/listeners';
 
 /**
@@ -149,19 +148,6 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
 	}
 };
 
-
-/**
- *  @method removeAccount
- *
- * 	Remove account
- *
- * 	@param {String} name
- */
-export const removeAccount = (name) => {
-	const emitter = echoService.getEmitter();
-
-	emitter.emit('logout', name);
-};
 
 /**
  *  @method onLogout

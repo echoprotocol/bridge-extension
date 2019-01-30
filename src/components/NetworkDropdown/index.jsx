@@ -20,13 +20,13 @@ import { NETWORKS } from '../../constants/GlobalConstants';
 import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
 
 import GlobalReducer from '../../reducers/GlobalReducer';
-
+import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
+import Cross from '../../assets/images/icons/cross_small.svg';
 
 class NetworkDropdown extends React.PureComponent {
 
 	constructor(props) {
 		super(props);
-
 		this.state = {
 			menuHeight: null,
 			opened: false,
@@ -35,10 +35,12 @@ class NetworkDropdown extends React.PureComponent {
 
 	componentDidMount() {
 		this.setDDMenuHeight();
+
 	}
 
 	componentDidUpdate() {
 		this.setDDMenuHeight();
+		this.blur();
 	}
 
 	onDeleteNetwork(e, name) {
@@ -53,7 +55,9 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	onChangeNetwork(name) {
+
 		const { network, networks, connected } = this.props;
+
 
 		if (!network) {
 			return false;
@@ -113,7 +117,15 @@ class NetworkDropdown extends React.PureComponent {
 				eventKey={i + eventKey}
 				active={n.name === name}
 			>
-				{custom && <Button className="btn-round-close" onClick={(e) => this.onDeleteNetwork(e, n.name)} />}
+				{custom &&
+					<Button
+						className="btn-round-close"
+						onClick={(e) => this.onDeleteNetwork(e, n.name)}
+						content={
+							<img src={Cross} alt="" />
+						}
+					/>
+				}
 				<span className="title">{n.name}</span>
 			</MenuItem>
 		));
@@ -121,6 +133,13 @@ class NetworkDropdown extends React.PureComponent {
 
 	closeDropDown() {
 		this.setState({ opened: false });
+	}
+
+	blur() {
+		// fix: has no acces to ref
+		if (!this.state.opened) {
+			document.getElementById('dropdown-network').blur();
+		}
 	}
 
 	toggleDropdown() {
@@ -160,7 +179,7 @@ class NetworkDropdown extends React.PureComponent {
 					<div className={classnames('current-network', { connected })}>
 						<span className="cut">{name}</span>
 					</div>
-					<i aria-hidden="true" className="dropdown icon" />
+					<img className="ddDown" src={downArrow} alt="" />
 				</Dropdown.Toggle>
 
 				<Dropdown.Menu >

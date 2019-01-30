@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import { Button } from 'semantic-ui-react';
 import classnames from 'classnames';
 import { CopyToClipboard } from 'react-copy-to-clipboard';
+import iconCopy from '../../assets/images/icons/copy.svg';
 
 class BridgeBtnCopy extends React.Component {
 
@@ -31,7 +32,7 @@ class BridgeBtnCopy extends React.Component {
 					content={
 						<React.Fragment>
 							<div className={classnames('btn-copy', { compact: this.props.compact })} >
-								<i className="icon-copiedBtn" />
+								<img src={iconCopy} alt="" />
 								<span className="btn-text">{this.state.copied ? (btnTextWif ? 'WIF is copied' : 'Copied to clipboard') : (btnTextWif ? 'Copy WIF' : 'Copy to clipboard')}</span>
 							</div>
 						</React.Fragment>

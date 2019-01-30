@@ -20,6 +20,7 @@ import CustomMenu from './CustomMenu';
 import { setValue } from '../../actions/FormActions';
 import { setAssetFormValue } from '../../actions/BalanceActions';
 import ValidateTransactionHelper from '../../helpers/ValidateTransactionHelper';
+import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
 
 class CurrencySelect extends React.Component {
 
@@ -337,9 +338,10 @@ class CurrencySelect extends React.Component {
 				>
 					<Dropdown.Toggle
 						onClick={() => this.toggleDropdown()}
-						noCaret={resultList.length === 1 && !opened}
+						noCaret
 					>
 						<span className="val">{currentVal || 'ECHO'}</span>
+						{resultList.length === 1 && !opened ? null : <img className="ddDown" src={downArrow} alt="" /> }
 					</Dropdown.Toggle>
 					<CustomMenu bsRole="menu">
 						<div className="menu-container">

@@ -8,6 +8,14 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { decryptNote } from '../../actions/HistoryActions';
 
+import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
+
+import '../../assets/images/icons/picAccount.svg';
+import '../../assets/images/icons/picRecieved.svg';
+import '../../assets/images/icons/picSent.svg';
+import '../../assets/images/icons/picTransaction.svg';
+
+
 class Transactions extends React.Component {
 
 	constructor(props) {
@@ -88,6 +96,7 @@ class Transactions extends React.Component {
 													<div className="transaction-element">
 														<div className="top-block">
 															<div className="transaction-type">
+																<img src={`/images/pic${elem.getIn(['transaction', 'type'])}.svg`} alt="" />
 																<div className={`icon-Pic${elem.getIn(['transaction', 'type'])}`} />
 																{elem.getIn(['transaction', 'typeName'])}
 															</div>
@@ -98,7 +107,7 @@ class Transactions extends React.Component {
 																{elem.getIn(['transaction', 'value'])}
 																<span className="currency">{elem.getIn(['transaction', 'currency'])}</span>
 															</div>
-															<div className="icon icon-dropdown" />
+															<img className="ddDown" src={downArrow} alt="" />
 														</div>
 													</div>
 												</Accordion.Title>
