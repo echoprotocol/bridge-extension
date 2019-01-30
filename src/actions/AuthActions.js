@@ -80,7 +80,7 @@ export const validateAccountExist = async (
  */
 export const createAccount = (name) => async (dispatch, getState) => {
 	let error = null;
-	const example = '';
+	let example = '';
 
 	dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
 
@@ -105,8 +105,14 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 		dispatch(toggleLoading(FORM_SIGN_UP, true));
 
-		const emitter = echoService.getEmitter();
-		emitter.emit('createWallet', name);
+		// const emitter = echoService.getEmitter();
+		// emitter.emit('createWallet', name);
+
+		({ error, example } = await validateAccountExist(name));
+		if (error) {
+			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
+			return null;
+		}
 
 		const wif = getCrypto().generateWIF();
 

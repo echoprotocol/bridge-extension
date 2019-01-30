@@ -2,8 +2,7 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { Button } from 'semantic-ui-react';
-
-import { KEY_CODE_ENTER, KEY_CODE_SPACE } from '../../constants/GlobalConstants';
+import { KEY_CODE_ENTER, KEY_CODE_SPACE, BASE_ICON } from '../../constants/GlobalConstants';
 
 import '../../assets/images/avatars/ava1.svg';
 import '../../assets/images/avatars/ava2.svg';
@@ -37,6 +36,13 @@ class UserIcon extends React.PureComponent {
 		}
 	}
 
+	getImgUrl(avatar) {
+		if (avatar === 'avaundefined') {
+			return `/images/avanpm${BASE_ICON}.svg`;
+		}
+		return `/images/${avatar}.svg`;
+	}
+
 	renderAnimationChange() {
 		return (
 			<React.Fragment>
@@ -64,6 +70,7 @@ class UserIcon extends React.PureComponent {
 		);
 	}
 
+
 	render() {
 		return (
 			<Button
@@ -82,7 +89,10 @@ class UserIcon extends React.PureComponent {
 				onKeyPress={(e) => this.onKeyPress(e)}
 			>
 				<div className="content">
-					<img src={`/images/${this.props.avatar}.svg`} alt="" />
+					<img
+						src={this.getImgUrl(this.props.avatar)}
+						alt={this.props.avatar}
+					/>
 				</div>
 				{ this.props.animationChange ? this.renderAnimationChange() : null }
 				{ this.props.animationBack ? this.renderAnimationBack() : null }
@@ -95,7 +105,7 @@ class UserIcon extends React.PureComponent {
 }
 
 UserIcon.propTypes = {
-	avatar: PropTypes.string.isRequired,
+	avatar: PropTypes.string,
 	color: PropTypes.string,
 	size: PropTypes.string,
 	animationChange: PropTypes.bool,
@@ -107,6 +117,7 @@ UserIcon.propTypes = {
 
 };
 UserIcon.defaultProps = {
+	avatar: 'ava1',
 	color: 'green',
 	size: 'small',
 	animationChange: false,

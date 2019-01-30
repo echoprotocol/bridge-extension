@@ -31,7 +31,6 @@ import {
 	SUCCESS_SEND_INDEX_PATH,
 	SUCCESS_SEND_PATH,
 } from '../src/constants/RouterConstants';
-import { validateAccountExist } from '../src/actions/AuthActions';
 import getTransaction from './transaction';
 
 const notificationManager = new NotificationManager();
@@ -471,23 +470,9 @@ export const onSend = async (options, networkName) => {
 	return null;
 };
 
-export const onCreateWallet = async (userName) => {
-	let error = null;
-	let example = '';
-
-	({ error, example } = await validateAccountExist(userName));
-
-	if (error) {
-		emitter.emit('offerName', error, example);
-		return null;
-	}
-
-	return null;
-
-};
 
 const listeners = new Listeners(emitter, crypto);
-listeners.initBackgroundListeners(onResponse, onTransaction, onSend, onCreateWallet, createSocket);
+listeners.initBackgroundListeners(onResponse, onTransaction, onSend, createSocket);
 createSocket();
 
 window.getChainLib = () => echo;
