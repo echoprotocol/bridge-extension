@@ -69,6 +69,7 @@ const checkTransactionAccount = async (toAccount) => {
  * 	@param {Object} account
  */
 const validateTransfer = (options, account) => async (dispatch, getState) => {
+	console.log(options);
 	if (options.to) {
 		const accountError = await checkTransactionAccount(options.to);
 
@@ -509,6 +510,7 @@ export const removeTransactionWindow = (id, isClose) => async (dispatch, getStat
  * 	@param {Object} options
  */
 export const requestHandler = (id, options) => async (dispatch, getState) => {
+	console.log(id, options);
 	const emitter = echoService.getEmitter();
 
 	const isLocked = getState().global.getIn(['crypto', 'isLocked']);
@@ -693,6 +695,31 @@ export const cancelTransaction = (id) => (dispatch) => {
 	return null;
 
 };
+
+// export const signTr = (id, operations) => (dispatch) =>{
+// 	// set tr to redux
+//
+// 	const tr = echoService.getChainLib().createTransaction();
+//
+// 	operations.forEach((op) => tr._operations.push(op));
+// 	console.log(tr);
+//
+// 	dispatch(GlobalReducer.actions.setIn({
+// 		field: 'sign',
+// 		params: {
+// 			current: new Map({
+// 				id: _operations[0][0],
+// 				options: _operations,
+// 			}),
+// 		},
+// 	}));
+// };
+//
+// export const approve = () => (dispatch, getState) => {
+// 	const tr = echoService.getChainLib().createTransaction();
+//
+// 	emitter.emit('trResponse', )
+// }
 
 /**
  *  @method switchTransactionAccount

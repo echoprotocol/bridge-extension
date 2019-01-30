@@ -111,10 +111,18 @@
 		<!---->
 	</body>
 	<script>
-		window.echojslib.subscribe(() => {
-			console.log("subscriber");
-		});
 		$(document).ready(function() {
+			setTimeout(() => {
+				window.echo.connect('ws://195.201.164.54:6311', {
+					connectionTimeout: 5000,
+					maxRetries: 10,
+					pingTimeout: 1000,
+					pingInterval: 2000,
+					debug: false,
+					apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
+				});
+			}, 1000);
+
 			$("#accounts-click").click(function(e) {
 				window.echojslib.extension
 					.getAccounts()
@@ -149,19 +157,26 @@
 						asset_id: jQuery("#transfer-fee-asset")[0].value
 					};
 				}
+				const tr = window.echo.createTransaction();
+				tr.addOperation(transaction.type, {
+					from: '1.2.16',
+					to: '1.2.456',
+					amount: { asset_id: '1.3.2', amount: 30 },
+				});
+				tr.signWithBridge();
 
-				window.echojslib.extension
-					.sendTransaction(transaction)
-					.then(result => {
-						jQuery("#transfer-info").html(
-							`<p>RESULT: ${JSON.stringify(result)}</p>`
-						);
-					})
-					.catch(err => {
-						jQuery("#transfer-info").html(
-							`<p>ERROR: ${JSON.stringify(err)}</p>`
-						);
-					});
+				// window.echojslib.extension
+				// 	.sendTransaction(transaction)
+				// 	.then(result => {
+				// 		jQuery("#transfer-info").html(
+				// 			`<p>RESULT: ${JSON.stringify(result)}</p>`
+				// 		);
+				// 	})
+				// 	.catch(err => {
+				// 		jQuery("#transfer-info").html(
+				// 			`<p>ERROR: ${JSON.stringify(err)}</p>`
+				// 		);
+				// 	});
 			});
 
 			$("#contract-click").click(function(e) {

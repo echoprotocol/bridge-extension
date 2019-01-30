@@ -255,6 +255,10 @@ class Crypto extends EventEmitter {
 		return transaction;
 	}
 
+	getAes() {
+		return privateAES.get();
+	}
+
 	/**
 	 *  @method encryptMemo
 	 *

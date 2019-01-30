@@ -1,6 +1,8 @@
-import echo from 'echojs-lib';
+import echo, { Transaction } from 'echojs-lib';
 
 import { APP_ID } from '../src/constants/GlobalConstants';
+
+import SignTransaction from './SignTransaction';
 
 const requestQueue = [];
 
@@ -97,15 +99,77 @@ const getAccounts = () => {
 	return result;
 };
 
+Transaction.prototype.signWithBridge = function () {
+	// const signTransaction = new SignTransaction();
+
+	// const cb = () => signTransaction.sign();
+
+	const id = Date.now();
+
+	const result = new Promise((resolve, reject) => {
+
+		const cb = ({ data }) => {
+
+			if (data.signatures.error) {
+				reject(data.res.error);
+			} else {
+				resolve(data.signatures);
+			}
+		};
+
+		requestQueue.push({ id, cb });
+
+		const operations = JSON.stringify(this._operations);
+
+		window.postMessage({
+			method: 'transaction', data: operations, id, target: 'content', appId: APP_ID,
+		}, '*');
+
+	});
+
+	return result;
+};
+
+// const signWithBridge = async () => {
+// 	const tr = window.getChainLib().createTransaction();
+// 	const signTr = new SignTransaction(tr);
+// 	await signTr.sign();
+// 	tr.addOperation(options.type, options);
+//
+// 	const id = Date.now();
+//
+// 	const cb = (signs) => broadcastTr(signs, tr);
+//
+// 	requestQueue.push({ id, cb });
+// 	window.postMessage({
+// 		method: 'confirm', data: options, id, target: 'content', appId: APP_ID,
+// 	}, '*');
+//
+// 	// const result = new Promise((resolve, reject) => {
+// 	// 	const cb = ({ data }) => {
+// 	//
+// 	// 		const { status, text, resultBroadcast } = data;
+// 	//
+// 	// 		if (status === 'approved') {
+// 	// 			resolve({ status, resultBroadcast });
+// 	// 		} else {
+// 	// 			reject(text || status);
+// 	// 		}
+// 	// 	};
+// 	//
+// 	//
+// 	// });
+// };
 
 const extension = {
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
 	subscribe: () => subscribe(),
 };
-
+window.echo = echo;
 window.echojslib = {
 	...echo,
+	connect: echo.connect,
 	isEchoBridge: true,
 	extension,
 	subscribe,

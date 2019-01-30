@@ -28,6 +28,7 @@ class Listeners {
 		this.unlockResponse = () => dispatch(unlockResponse());
 		this.onStatusConnected = (status) => dispatch(onStatusConnected(status));
 		this.onGlobalSubscribe = () => dispatch(subscribe());
+		// this.sign = (id, options) => dispatch(signTr(id, options));
 
 		this.emitter.on('windowRequest', this.windowRequestHandler);
 		this.emitter.on('request', this.requestHandler);
@@ -43,6 +44,8 @@ class Listeners {
 
 		this.crypto.on('locked', this.lockResponse);
 		this.crypto.on('unlocked', this.unlockResponse);
+
+		// this.emitter.on('transaction', this.sign);
 
 		window.onunload = () => {
 			this.removeListeners();

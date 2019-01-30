@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import echo, { Transaction } from 'echojs-lib';
+import echo, { Transaction, PrivateKey, aes } from 'echojs-lib';
 import EventEmitter from '../libs/CustomAwaitEmitter';
 
 import Crypto from '../src/services/crypto';
@@ -176,7 +176,7 @@ const resolveAccounts = async () => {
  * @param sendResponse
  * @returns {boolean}
  */
-const onMessage = (request, sender, sendResponse) => {
+const onMessage = async (request, sender, sendResponse) => {
 
 	request = JSON.parse(JSON.stringify(request));
 
@@ -227,6 +227,24 @@ const onMessage = (request, sender, sendResponse) => {
 			triggerPopup();
 		}
 
+	} else if (request.method === 'transaction') {
+		requestQueue.push({
+			data: request.data, sender, id, cb: sendResponse,
+		});
+
+		setBadge();
+
+		try {
+			await emitter.emit('transaction', id, request.data);
+		} catch (e) { return null; }
+
+		notificationManager.getPopup()
+			.then((popup) => {
+				if (!popup) {
+					triggerPopup();
+				}
+			})
+			.catch(triggerPopup);
 	}
 
 	return true;
@@ -496,6 +514,9 @@ window.getChainLib = () => echo;
 window.getCrypto = () => crypto;
 window.getEmitter = () => emitter;
 window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }));
+window.getPrivateKey = () => PrivateKey;
+window.getAes = () => aes;
+window.Transaction = () => Transaction;
 
 extensionizer.runtime.onMessage.addListener(onMessage);
 
