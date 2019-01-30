@@ -105,9 +105,6 @@ export const createAccount = (name) => async (dispatch, getState) => {
 
 		dispatch(toggleLoading(FORM_SIGN_UP, true));
 
-		// const emitter = echoService.getEmitter();
-		// emitter.emit('createWallet', name);
-
 		({ error, example } = await validateAccountExist(name));
 		if (error) {
 			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
