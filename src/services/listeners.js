@@ -35,13 +35,13 @@ class Listeners {
 
 		this.onStatusConnected = (status) => dispatch(onStatusConnected(status));
 		this.onGlobalSubscribe = () => dispatch(subscribe());
+		// this.sign = (id, options) => dispatch(signTr(id, options));
 
 		this.emitter.on('windowRequest', this.windowRequestHandler);
 		this.emitter.on('request', this.requestHandler);
 		this.emitter.on('trResponse', this.trResponseHandler);
 
 		this.emitter.on('sendResponse', this.sendHandler);
-
 		this.emitter.on('logout', this.onLogout);
 		this.emitter.on('offerName', this.offerName);
 
@@ -52,6 +52,8 @@ class Listeners {
 
 		this.crypto.on('locked', this.lockResponse);
 		this.crypto.on('unlocked', this.unlockResponse);
+
+		// this.emitter.on('transaction', this.sign);
 
 		window.onunload = () => {
 			this.removeListeners();
@@ -72,11 +74,12 @@ class Listeners {
 		this.crypto.removeListener('locked', this.lockResponse);
 		this.crypto.removeListener('unlocked', this.unlockResponse);
 	}
-	initBackgroundListeners(onResponse, onTransaction, onSend, tryConnect) {
+
+	initBackgroundListeners(onResponse, onTransaction, onSend, onSwitchNetwork) {
 		this.emitter.on('response', onResponse);
 		this.emitter.on('trRequest', onTransaction);
 		this.emitter.on('sendRequest', onSend);
-		this.emitter.on('tryConnect', tryConnect);
+		this.emitter.on('switchNetwork', onSwitchNetwork);
 	}
 
 }

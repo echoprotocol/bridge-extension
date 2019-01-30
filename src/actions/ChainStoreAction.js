@@ -59,6 +59,18 @@ export const connect = () => async (dispatch) => {
 			dispatch(GlobalReducer.actions.set({ field: 'networks', value: new List(networks) }));
 		}
 
+		// await echo.connect(NETWORKS[0].url, {
+		// 	connectionTimeout: 5000,
+		// 	maxRetries: 3,
+		// 	pingTimeout: 1000,
+		// 	pingInterval: 2000,
+		// 	debug: false,
+		// 	apis: ['database', 'network_broadcast', 'history',
+		// 	'registration', 'asset', 'login', 'network_node'],
+		// });
+		//
+		// echo.subscriber.setGlobalSubscribe(() => dispatch(subscribe()));
+
 		if (echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
 			dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 		}
@@ -83,6 +95,7 @@ export const connect = () => async (dispatch) => {
 export const disconnect = () => async (dispatch) => {
 	try {
 		await echoService.getChainLib().disconnect();
+
 		dispatch(batchActions([
 			BalanceReducer.actions.reset(),
 			GlobalReducer.actions.set({ field: 'connected', value: false }),
@@ -93,14 +106,6 @@ export const disconnect = () => async (dispatch) => {
 			value: FormatHelper.formatError(err),
 		}));
 	}
-};
-
-export const tryToConnect = () => async (dispatch) => {
-	await dispatch(disconnect());
-
-	const emitter = echoService.getEmitter();
-
-	emitter.emit('tryConnect');
 };
 
 export const onStatusConnected = (status) => (dispatch) => {

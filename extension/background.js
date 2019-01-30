@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
-import echo, { Transaction } from 'echojs-lib';
+import echo, { Transaction, PrivateKey, aes } from 'echojs-lib';
+import { throttle } from 'lodash';
 import EventEmitter from '../libs/CustomAwaitEmitter';
 
 import Crypto from '../src/services/crypto';
@@ -42,6 +43,7 @@ const accountsRequests = [];
 
 const requestQueue = [];
 let lastTransaction = null;
+let subscriberResponse = null;
 
 const connectSubscribe = (status) => {
 	try {
@@ -65,17 +67,19 @@ const connectSubscribe = (status) => {
 /**
  * Create default socket
  */
-const createSocket = async () => {
-	await echo.connect(NETWORKS[0].url, {
+const createSocket = async (url) => {
+	url = url || NETWORKS[0].url;
+	await echo.connect(url, {
 		connectionTimeout: 5000,
-		maxRetries: 3,
-		pingTimeout: 1000,
-		pingInterval: 2000,
+		maxRetries: 999999999,
+		pingTimeout: 7000,
+		pingInterval: 7000,
 		debug: false,
 		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
 	});
 
-	echo.subscriber.setGlobalSubscribe(() => {
+	echo.subscriber.setGlobalSubscribe(throttle(() => {
+
 		try {
 			emitter.emit('globalSubscribe');
 		} catch (e) {
@@ -83,11 +87,12 @@ const createSocket = async () => {
 		}
 
 		return null;
-	});
+	}, 300));
 
 	echo.subscriber.setStatusSubscribe(CONNECT_STATUS, () => connectSubscribe(CONNECT_STATUS));
 
-	echo.subscriber.setStatusSubscribe(DISCONNECT_STATUS, () => connectSubscribe(DISCONNECT_STATUS));
+	echo.subscriber
+		.setStatusSubscribe(DISCONNECT_STATUS, () => connectSubscribe(DISCONNECT_STATUS));
 };
 
 
@@ -166,6 +171,7 @@ const resolveAccounts = async () => {
 
 };
 
+
 /**
  * On content script request
  * @param request
@@ -173,15 +179,23 @@ const resolveAccounts = async () => {
  * @param sendResponse
  * @returns {boolean}
  */
-const onMessage = (request, sender, sendResponse) => {
+const onMessage = async (request, sender, sendResponse) => {
 
 	request = JSON.parse(JSON.stringify(request));
 
-	if (!request.method || !request.id || !request.appId || request.appId !== APP_ID) return false;
+	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
+
+	if (request.method === 'networkSubscribe') {
+		subscriberResponse = sendResponse;
+		return true;
+	}
+
+	if (!request.id) return false;
 
 	const { id } = request;
 
 	lastRequestType = request.method;
+
 
 	if (request.method === 'confirm' && request.data) {
 
@@ -216,7 +230,24 @@ const onMessage = (request, sender, sendResponse) => {
 			triggerPopup();
 		}
 
+	} else if (request.method === 'transaction') {
+		requestQueue.push({
+			data: request.data, sender, id, cb: sendResponse,
+		});
 
+		setBadge();
+
+		try {
+			await emitter.emit('transaction', id, request.data);
+		} catch (e) { return null; }
+
+		notificationManager.getPopup()
+			.then((popup) => {
+				if (!popup) {
+					triggerPopup();
+				}
+			})
+			.catch(triggerPopup);
 	}
 
 	return true;
@@ -471,14 +502,24 @@ export const onSend = async (options, networkName) => {
 };
 
 
+export const onSwitchNetwork = async (network) => {
+	await createSocket(network.url);
+
+	subscriberResponse({ subscriber: true, res: network });
+};
+
 const listeners = new Listeners(emitter, crypto);
-listeners.initBackgroundListeners(onResponse, onTransaction, onSend, createSocket);
+listeners.initBackgroundListeners(onResponse, onTransaction, onSend, onSwitchNetwork);
+
 createSocket();
 
 window.getChainLib = () => echo;
 window.getCrypto = () => crypto;
 window.getEmitter = () => emitter;
 window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }));
+window.getPrivateKey = () => PrivateKey;
+window.getAes = () => aes;
+window.Transaction = () => Transaction;
 
 extensionizer.runtime.onMessage.addListener(onMessage);
 

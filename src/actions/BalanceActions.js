@@ -557,30 +557,32 @@ export const getTokenDetails = async (contractId, accountId) => {
 	}
 };
 
-export const isAssetsChanged = async (assets) => {
-
-	if (!assets.size) {
-		return false;
-	}
-
-	let assetArr = [];
-
-	assets.forEach((asset) => {
-		assetArr.push(echoService.getChainLib().api.getObject(asset.get('id')));
-	});
-
-	assetArr = await Promise.all(assetArr);
-
-	let isChanged = false;
-
-	assetArr.forEach((asset) => {
-		if (asset !== assets.get(asset.id)) {
-			isChanged = true;
-		}
-	});
-
-	return isChanged;
-};
+// TODO::
+// export const isAssetsChanged = async (assets) => {
+//
+// 	if (!assets.size) {
+// 		return false;
+// 	}
+//
+// 	let assetArr = [];
+//
+// 	assets.forEach((asset) => {
+// 		assetArr.push(echoService.getChainLib().api.getObject(asset.get('id')));
+// 	});
+//
+// 	assetArr = await Promise.all(assetArr);
+//
+// 	let isChanged = false;
+//
+// 	assetArr.forEach((asset) => {
+// 		console.log(asset, assets.get(asset.id));
+// 		if (assets.get(asset.id) && !assets.get(asset.id).equals(fromJS(asset))) {
+// 			isChanged = true;
+// 		}
+// 	});
+//
+// 	return isChanged;
+// };
 
 /**
  *  @method watchToken

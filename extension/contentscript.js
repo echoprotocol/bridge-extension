@@ -22,6 +22,7 @@ function setupInjection() {
 
 }
 
+// eslint-disable-next-line no-unused-expressions
 EXTENSION && setupInjection();
 
 /**
@@ -36,6 +37,7 @@ const onResponse = (res, origin = '*') => {
 
 	res.target = 'inpage';
 	res.appId = APP_ID;
+
 	window.postMessage(res, origin);
 
 	return null;
@@ -46,7 +48,9 @@ const onResponse = (res, origin = '*') => {
  * @param event
  */
 const onMessage = (event) => {
+
 	const { data } = event;
+
 	if (data.target !== 'content' || !data.appId || data.appId !== APP_ID) return;
 
 	try {

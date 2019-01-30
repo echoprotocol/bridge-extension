@@ -330,13 +330,27 @@ export const loadInfo = () => async (dispatch, getState) => {
  *
  * 	@param {Object} network
  */
-export const changeNetwork = (network) => async (dispatch) => {
+export const changeNetwork = (network) => async (dispatch, getState) => {
 	try {
-		await dispatch(disconnect());
+		if (echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
+			await dispatch(disconnect());
+		}
 
-		await storage.set('current_network', network);
+		const currentNetwork = getState().global.get('network');
+
+		const emitter = echoService.getEmitter();
+		await emitter.emit('switchNetwork', network || {
+			name: currentNetwork.name,
+			url: currentNetwork.url,
+		});
+
+		if (network) {
+			await storage.set('current_network', network);
+		}
+
 		await dispatch(connect());
 		await dispatch(loadInfo());
+
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}

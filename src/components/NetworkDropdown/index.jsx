@@ -14,7 +14,6 @@ import {
 	deleteNetwork,
 	switchAccountNetwork,
 } from '../../actions/GlobalActions';
-import { tryToConnect } from '../../actions/ChainStoreAction';
 
 import { NETWORKS } from '../../constants/GlobalConstants';
 import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
@@ -248,7 +247,7 @@ export default withRouter(connect(
 		deleteNetwork: (network) => dispatch(deleteNetwork(network)),
 		setGlobalLoad: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
 		switchAccountNetwork: (name, network) => dispatch(switchAccountNetwork(name, network)),
-		tryToConnect: () => dispatch(tryToConnect()),
+		tryToConnect: () => dispatch(changeNetwork()),
 	}),
 )(NetworkDropdown));
 
