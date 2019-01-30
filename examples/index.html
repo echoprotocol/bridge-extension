@@ -111,9 +111,16 @@
 		<!---->
 	</body>
 	<script>
-		window.echojslib.subscribe(() => {
-			console.log("subscriber");
-		});
+		window.echojslib
+			.subscribeSwitchNetwork(() => {
+				console.log("subscriber: ");
+			})
+			.then(result => {
+				console.log("result: ", result);
+			})
+			.catch(err => {
+				console.log("err: ", err);
+			});
 		$(document).ready(function() {
 			$("#accounts-click").click(function(e) {
 				window.echojslib.extension

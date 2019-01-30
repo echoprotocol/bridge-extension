@@ -43,7 +43,7 @@ const requestQueue = [];
 let lastTransaction = null;
 const { ChainStore } = chainjs;
 
-let subscriberResponse = null;
+const networkSubscribers = [];
 
 ChainStore.notifySubscribers = () => {
 	// Dispatch at most only once every x milliseconds
@@ -160,14 +160,22 @@ const resolveAccounts = async () => {
  * @param sendResponse
  * @returns {boolean}
  */
-const onMessage = (request, sender, sendResponse) => {
+const onMessage = async (request, sender, sendResponse) => {
 
 	request = JSON.parse(JSON.stringify(request));
 
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
+	if (request.method === 'getNetwork') {
+
+		return sendResponse(({ subscriber: true, res: 'hiiisds' }));
+	}
+
 	if (request.method === 'networkSubscribe') {
-		subscriberResponse = sendResponse;
+		const network = await storage.get('current_network');
+		console.log('onMessage (bg) network: ', network);
+		request.cb(network);
+		networkSubscribers.push(sendResponse);
 		return true;
 	}
 
@@ -465,8 +473,16 @@ export const onSend = async (options, networkName) => {
 	return null;
 };
 
-export const onSwitchNetwork = async (network) => {
-	subscriberResponse({ subscriber: true, res: network });
+export const onSwitchNetwork = (network) => {
+	networkSubscribers.forEach((cb) => {
+		try {
+			cb({ subscriber: true, res: network });
+		} catch (error) {
+			networkSubscribers.splice(networkSubscribers.indexOf(cb), 1);
+			onSwitchNetwork(network);
+		}
+
+	});
 };
 
 

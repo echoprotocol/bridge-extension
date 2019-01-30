@@ -8,14 +8,20 @@ const requestQueue = [];
 const networkSubscribers = [];
 
 /**
- * subscribe to switch network
+ * subscribeSwitchNetwork to switch network
  * @param subscriberCb
  */
-const subscribe = (subscriberCb) => {
-	if (subscriberCb) { networkSubscribers.push(subscriberCb); }
-	window.postMessage({
-		method: 'networkSubscribe', target: 'content', appId: APP_ID,
-	}, '*');
+const subscribeSwitchNetwork = (subscriberCb) => {
+	const result = new Promise((resolve) => {
+		const cb = ({ data }) => {
+			resolve(data.url);
+		};
+		if (subscriberCb) { networkSubscribers.push(subscriberCb); }
+		window.postMessage({
+			method: 'networkSubscribe', target: 'content', appId: APP_ID, cb,
+		}, '*');
+	});
+	return result;
 };
 
 /**
@@ -26,7 +32,7 @@ const onMessage = (event) => {
 
 	if (event.data.subscriber) {
 		networkSubscribers.forEach((cb) => cb());
-		subscribe();
+		subscribeSwitchNetwork();
 		return;
 	}
 
@@ -102,14 +108,14 @@ const getAccounts = () => {
 const extension = {
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
-	subscribe: () => subscribe(),
+	subscribeSwitchNetwork: () => subscribeSwitchNetwork(),
 };
 
 window.echojslib = {
 	...echojslib,
 	isEchoBridge: true,
 	extension,
-	subscribe,
+	subscribeSwitchNetwork,
 };
 window.echojsws = echojsws;
 window.addEventListener('message', onMessage, false);
