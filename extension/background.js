@@ -162,6 +162,7 @@ const resolveAccounts = async () => {
  */
 const onMessage = async (request, sender, sendResponse) => {
 
+
 	request = JSON.parse(JSON.stringify(request));
 
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
@@ -172,9 +173,7 @@ const onMessage = async (request, sender, sendResponse) => {
 	}
 
 	if (request.method === 'networkSubscribe') {
-		const network = await storage.get('current_network');
-		console.log('onMessage (bg) network: ', network);
-		request.cb(network);
+		console.log('3: onMessage -> networkSubscribe', request.method);
 		networkSubscribers.push(sendResponse);
 		return true;
 	}
@@ -474,6 +473,7 @@ export const onSend = async (options, networkName) => {
 };
 
 export const onSwitchNetwork = (network) => {
+	console.log('bg: onSwitchNetwork -> network', network);
 	networkSubscribers.forEach((cb) => {
 		try {
 			cb({ subscriber: true, res: network });

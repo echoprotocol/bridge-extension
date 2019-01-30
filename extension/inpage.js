@@ -7,21 +7,18 @@ const requestQueue = [];
 
 const networkSubscribers = [];
 
+
 /**
  * subscribeSwitchNetwork to switch network
  * @param subscriberCb
  */
+
 const subscribeSwitchNetwork = (subscriberCb) => {
-	const result = new Promise((resolve) => {
-		const cb = ({ data }) => {
-			resolve(data.url);
-		};
-		if (subscriberCb) { networkSubscribers.push(subscriberCb); }
-		window.postMessage({
-			method: 'networkSubscribe', target: 'content', appId: APP_ID, cb,
-		}, '*');
-	});
-	return result;
+	console.log('2: subscribeSwitchNetwork -> subscriberCb', subscriberCb);
+	if (subscriberCb) { networkSubscribers.push(subscriberCb); }
+	window.postMessage({
+		method: 'networkSubscribe', target: 'content', appId: APP_ID,
+	}, '*');
 };
 
 /**
@@ -31,7 +28,7 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 const onMessage = (event) => {
 
 	if (event.data.subscriber) {
-		networkSubscribers.forEach((cb) => cb());
+		networkSubscribers.forEach((cb) => cb(event));
 		subscribeSwitchNetwork();
 		return;
 	}
