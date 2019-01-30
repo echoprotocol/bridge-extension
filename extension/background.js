@@ -125,14 +125,23 @@ const createNotification = (title = '', message = '') => {
 		title,
 	});
 };
+
+/**
+ * Get current network
+ * @returns {Promise.<*>}
+ */
+const getNetwork = async () => {
+	const network = await storage.get('current_network') || NETWORKS[0];
+	return network;
+};
+
 /**
  * Get user account if unlocked
  * @returns {Promise.<*>}
  */
 const resolveAccounts = async () => {
 
-
-	const network = (await storage.get('current_network')) || NETWORKS[0];
+	const network = getNetwork();
 
 	try {
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
@@ -160,20 +169,20 @@ const resolveAccounts = async () => {
  * @param sendResponse
  * @returns {boolean}
  */
-const onMessage = async (request, sender, sendResponse) => {
-
+const onMessage = (request, sender, sendResponse) => {
 
 	request = JSON.parse(JSON.stringify(request));
 
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
 	if (request.method === 'getNetwork') {
-
-		return sendResponse(({ subscriber: true, res: 'hiiisds' }));
+		getNetwork().then((rezult) => {
+			sendResponse(({ subscriber: true, res: JSON.parse(JSON.stringify(rezult)) }));
+		});
+		return true;
 	}
 
 	if (request.method === 'networkSubscribe') {
-		console.log('3: onMessage -> networkSubscribe', request.method);
 		networkSubscribers.push(sendResponse);
 		return true;
 	}
@@ -473,11 +482,12 @@ export const onSend = async (options, networkName) => {
 };
 
 export const onSwitchNetwork = (network) => {
-	console.log('bg: onSwitchNetwork -> network', network);
 	networkSubscribers.forEach((cb) => {
 		try {
+
 			cb({ subscriber: true, res: network });
 		} catch (error) {
+
 			networkSubscribers.splice(networkSubscribers.indexOf(cb), 1);
 			onSwitchNetwork(network);
 		}
