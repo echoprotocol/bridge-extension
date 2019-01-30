@@ -464,7 +464,7 @@ export default {
 		name: 'Contract transfer',
 		options: {
 			from: 'from',
-			subject: 'to',
+			subject: ['to', null],
 			value: 'amount.amount',
 			asset: 'amount.asset_id',
 		},

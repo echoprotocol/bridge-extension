@@ -1,5 +1,6 @@
 import moment from 'moment';
 import { Map, OrderedMap } from 'immutable';
+import { validators } from 'echojs-lib';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
@@ -11,7 +12,7 @@ import FormatHelper from '../helpers/FormatHelper';
 
 import echoService from '../services/echo';
 
-import { isAssetsChanged } from './BalanceActions';
+// import { isAssetsChanged } from './BalanceActions';
 
 /**
  *  @method decryptNote
@@ -75,6 +76,7 @@ const formatOperation = async (data, result, accountName) => {
 	if (options.subject) {
 		if (options.subject[1]) {
 			const request = operation.get(options.subject[0]);
+
 			const response = await echoService.getChainLib().api.getObject(request);
 
 			result = result.setIn(['content', 'receiver'], response[options.subject[1]]);
@@ -86,9 +88,14 @@ const formatOperation = async (data, result, accountName) => {
 	if (options.from) {
 
 		const request = operation.get(options.from);
-		const response = await echoService.getChainLib().api.getObject(request);
 
-		result = result.setIn(['content', 'sender'], response.name);
+		if (!validators.isContractId(request)) {
+			const response = await echoService.getChainLib().api.getObject(request);
+			result = result.setIn(['content', 'sender'], response.name);
+		} else {
+			result = result.setIn(['content', 'sender'], request);
+		}
+
 	}
 
 	let numberSign = '-';
@@ -136,19 +143,30 @@ const formatOperation = async (data, result, accountName) => {
  * 	@param {Object} history
  */
 const formatHistory = (history) => async (dispatch, getState) => {
+
 	if (!history || !history.size) { return; }
 
 	try {
 		const formattedHistory = getState().global.get('formattedHistory');
 		const accountName = getState().global.getIn(['account', 'name']);
 
-		let rows = history.map(async (row) => {
+		const arr = history.toArray();
+
+		const rows = [];
+
+		for (let j = 0; j < arr.length; j += 1) {
+			const row = arr[j];
 			const id = row.get('id');
+			const map = formattedHistory.get(id) || new Map({});
 
-			return formatOperation(row, formattedHistory.get(id) || new Map({}), accountName);
-		});
-
-		rows = await Promise.all(rows);
+			try {
+				/* eslint-disable no-await-in-loop */
+				const result = await formatOperation(row, map, accountName);
+				rows.push(result);
+			} catch (e) {
+				console.log('Error formatHistory:', e);
+			}
+		}
 
 		let ordered = new OrderedMap({});
 
@@ -185,20 +203,21 @@ export const updateHistory = () => async (dispatch, getState) => {
 		const currentAccountId = getState().global.getIn(['account', 'id']);
 		const history = getState().blockchain.getIn(['fullAccounts', currentAccountId, 'history']);
 
-		if (history !== stateHistory) {
+		if (!history.equals(stateHistory)) {
 			dispatch(GlobalReducer.actions.set({ field: 'history', value: history }));
-
 			dispatch(formatHistory(history));
 		}
+		// TODO::
+		// const assets = getState().balance.get('assets');
 
-		const assets = getState().balance.get('assets');
+		// const isChanged = await isAssetsChanged(assets);
+		// console.log('isChanged', isChanged);
+		// if (isChanged) {
+		// 	dispatch(formatHistory(history));
+		// }
 
-		const isChanged = await isAssetsChanged(assets);
-
-		if (isChanged) {
-			dispatch(formatHistory(history));
-		}
 	} catch (err) {
+		console.log('err', err);
 		dispatch(GlobalReducer.actions.set({
 			field: 'error',
 			value: FormatHelper.formatError(err),

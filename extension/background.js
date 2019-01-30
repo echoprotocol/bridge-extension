@@ -1,5 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import echo, { Transaction, PrivateKey, aes } from 'echojs-lib';
+import { throttle } from 'lodash';
 import EventEmitter from '../libs/CustomAwaitEmitter';
 
 import Crypto from '../src/services/crypto';
@@ -69,14 +70,15 @@ const createSocket = async (url) => {
 	url = url || NETWORKS[0].url;
 	await echo.connect(url, {
 		connectionTimeout: 5000,
-		maxRetries: 3,
-		pingTimeout: 1000,
-		pingInterval: 2000,
+		maxRetries: 999999999,
+		pingTimeout: 7000,
+		pingInterval: 7000,
 		debug: false,
 		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
 	});
 
-	echo.subscriber.setGlobalSubscribe(() => {
+	echo.subscriber.setGlobalSubscribe(throttle(() => {
+
 		try {
 			emitter.emit('globalSubscribe');
 		} catch (e) {
@@ -84,7 +86,7 @@ const createSocket = async (url) => {
 		}
 
 		return null;
-	});
+	}, 300));
 
 	echo.subscriber.setStatusSubscribe(CONNECT_STATUS, () => connectSubscribe(CONNECT_STATUS));
 
