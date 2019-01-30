@@ -12,7 +12,7 @@ import { clearForm, setFormError, setFormValue } from '../../actions/FormActions
 
 import { INDEX_PATH } from '../../constants/RouterConstants';
 import { FORM_SEND } from '../../constants/FormConstants';
-import { KEY_CODE_ENTER } from '../../constants/GlobalConstants';
+import { KEY_CODE_ENTER, CORE_ID } from '../../constants/GlobalConstants';
 
 import BridgeInput from '../../components/BridgeInput';
 import BridgeTextArea from '../../components/BridgeTextArea';
@@ -123,7 +123,12 @@ class Send extends React.Component {
 			precision = tokens.getIn([account.get('id'), selectedBalance, 'precision']);
 			symbol = tokens.getIn([account.get('id'), selectedBalance, 'symbol']);
 		}
-		const asset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
+		let balance = balances.getIn([selectedBalance, 'asset_type']);
+		if (!balance) {
+			balance = CORE_ID;
+		}
+
+		const asset = assets.get(balance);
 
 		const { value: validatedValue, error, warning } =
 			ValidateSendHelper.amountInput(value, {
@@ -192,6 +197,7 @@ class Send extends React.Component {
 		const {
 			to, amount, selectedBalance, fee, memo, account, loading, balances, assets, tokens,
 		} = this.props;
+
 		if (!account) {
 			return null;
 		}
@@ -341,7 +347,7 @@ Send.propTypes = {
 Send.defaultProps = {
 	account: null,
 	loading: false,
-	selectedBalance: null,
+	selectedBalance: '1.3.0',
 };
 
 export default connect(
@@ -362,7 +368,7 @@ export default connect(
 		setFormValue: (field, value) => dispatch(setFormValue(FORM_SEND, field, value)),
 		setFormError: (field, value) => dispatch(setFormError(FORM_SEND, field, value)),
 		setFeeFormValue: () => dispatch(setFeeFormValue()),
-		send: (balance) => dispatch(send(balance)),
+		send: () => dispatch(send()),
 		clearForm: () => dispatch(clearForm(FORM_SEND)),
 	}),
 )(Send);

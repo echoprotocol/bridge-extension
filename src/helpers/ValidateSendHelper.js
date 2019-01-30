@@ -40,6 +40,11 @@ class ValidateSendHelper {
 	}
 
 	static validateAmount(value, { symbol, precision, balance }) {
+
+		if (!precision || !symbol || !balance) {
+			return 'Insufficient funds';
+		}
+
 		if (!Math.floor(value * (10 ** precision))) {
 			return `Amount should be more than 0 (${symbol} precision is ${precision} symbols)`;
 		}
