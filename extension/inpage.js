@@ -2,7 +2,7 @@ import echo, { Transaction } from 'echojs-lib';
 
 import { APP_ID } from '../src/constants/GlobalConstants';
 
-import SignTransaction from './SignTransaction';
+// import SignTransaction from './SignTransaction';
 
 const requestQueue = [];
 

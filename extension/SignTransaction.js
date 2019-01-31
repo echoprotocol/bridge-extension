@@ -1,4 +1,4 @@
-import {EXPIRATION_MAX_LAG_SECONDS, GLOBAL_ID_1} from '../src/constants/GlobalConstants';
+import { EXPIRATION_MAX_LAG_SECONDS, GLOBAL_ID_1 } from '../src/constants/GlobalConstants';
 
 class SignTransaction {
 

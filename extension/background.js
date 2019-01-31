@@ -190,13 +190,14 @@ const resolveAccounts = async () => {
  * @param sendResponse
  * @returns {boolean}
  */
-const onMessage = async (request, sender, sendResponse) => {
+const onMessage = (request, sender, sendResponse) => {
 
 	request = JSON.parse(JSON.stringify(request));
 
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
 	if (request.method === 'getNetwork') {
+
 		getNetwork().then((rezult) => {
 			sendResponse(({ subscriber: true, res: JSON.parse(JSON.stringify(rezult)) }));
 		});
@@ -256,7 +257,7 @@ const onMessage = async (request, sender, sendResponse) => {
 		setBadge();
 
 		try {
-			await emitter.emit('transaction', id, request.data);
+			emitter.emit('transaction', id, request.data);
 		} catch (e) { return null; }
 
 		notificationManager.getPopup()
@@ -521,6 +522,7 @@ export const onSend = async (options, networkName) => {
 
 export const onSwitchNetwork = async (network) => {
 	await createSocket(network.url);
+	console.log('onSwitchNetwork (bg): ', networkSubscribers);
 
 	networkSubscribers.forEach((cb) => {
 		try {
