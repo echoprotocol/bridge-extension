@@ -7,7 +7,7 @@ cache:
   paths:
   - node_modules/
 
-eslint:
+lint.test:
   stage: lint
   script:
     - npm i
@@ -15,21 +15,21 @@ eslint:
   tags:
     - pp-projects
 
-build_development:
+build.develop:
   stage: build
   script:
     - cd /home/devuser/DevProjects/649.bridge/extension
-    - git pull origin development
+    - git pull origin develop
     - npm i
     - npm run build-dev
   only:
-    - development
+    - develop
   environment:
     name: development
   tags:
     - pp-projects
 
-build_artifacts:
+artifacts.build:
   stage: artifacts
   script:
     - npm run build-ext
@@ -37,22 +37,20 @@ build_artifacts:
     paths:
       - build/zip/echo_bridge.zip
   only:
-    - development
-    - stage
-  environment:
-    name: development
+    - develop
+    - master
   tags:
     - pp-projects
 
-build_stage:
+build.master:
   stage: build
   script:
     - cd /home/devuser/Projects/649.bridge/extension
-    - git pull origin stage
+    - git pull origin master
     - npm install
     - npm run build-stage
   only:
-    - stage
+    - master
   environment:
     name: stage
   tags:
