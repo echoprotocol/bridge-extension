@@ -40,7 +40,6 @@ import { FORM_ADD_NETWORK } from '../constants/FormConstants';
 
 import storage from '../services/storage';
 import BalanceReducer from '../reducers/BalanceReducer';
-import echoService from '../services/echo';
 import Listeners from '../services/listeners';
 
 /**
