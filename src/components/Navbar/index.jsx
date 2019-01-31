@@ -36,7 +36,7 @@ class Navbar extends React.PureComponent {
 			<div className="navbar">
 				<ul>
 					{
-						account ?
+						account && account.size ?
 							<li className="btn-nav-wrap" >
 								<Button onClick={(e) => this.onClick(e)} className="btn-nav" >
 									<img src={Hamburger} alt="" />
