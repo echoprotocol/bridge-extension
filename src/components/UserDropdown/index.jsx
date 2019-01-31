@@ -140,9 +140,9 @@ class UserDropdown extends React.PureComponent {
 					/>
 					<div className="user-name">{account.name}</div>
 
-					{ userBalance ?
+					{ userBalance && asset ?
 						<div className={classnames('user-balance', { positive: !!userBalance.get('balance') })}>
-							{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol')) || `0 ${CORE_SYMBOL}`}
+							{FormatHelper.formatAmount(userBalance.get('balance'), asset.get('precision'), asset.get('symbol'))}
 						</div> : <div className="user-balance">0 {CORE_SYMBOL}</div>
 					}
 
