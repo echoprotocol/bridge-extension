@@ -38,7 +38,7 @@ class UserIcon extends React.PureComponent {
 
 	getImgUrl(avatar) {
 		if (avatar === 'avaundefined') {
-			return `/images/avanpm${BASE_ICON}.svg`;
+			return `/images/ava${BASE_ICON}.svg`;
 		}
 		return `/images/${avatar}.svg`;
 	}
