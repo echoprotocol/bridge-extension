@@ -521,26 +521,19 @@ export const onSend = async (options, networkName) => {
 	return null;
 };
 
-<<<<<<< HEAD
-
 export const onSwitchNetwork = async (network) => {
 	await createSocket(network.url);
 
-	subscriberResponse({ subscriber: true, res: network });
-=======
-export const onSwitchNetwork = (network) => {
 	networkSubscribers.forEach((cb) => {
 		try {
 
 			cb({ subscriber: true, res: network });
 		} catch (error) {
-
 			networkSubscribers.splice(networkSubscribers.indexOf(cb), 1);
-			onSwitchNetwork(network);
 		}
 
 	});
->>>>>>> 27f5ee2d08412a845e810549bb9a135736b944fe
+
 };
 
 const listeners = new Listeners(emitter, crypto);
