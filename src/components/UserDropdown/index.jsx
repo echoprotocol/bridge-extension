@@ -101,7 +101,7 @@ class UserDropdown extends React.PureComponent {
 
 	blur() {
 		// fix: has no acces to ref
-		if (!this.state.opened) {
+		if (!this.state.opened && document.getElementById('dropdown-user')) {
 			document.getElementById('dropdown-user').blur();
 		}
 	}

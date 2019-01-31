@@ -43,7 +43,10 @@ const accountsRequests = [];
 
 const requestQueue = [];
 let lastTransaction = null;
-let subscriberResponse = null;
+
+const { ChainStore } = chainjs;
+
+const networkSubscribers = [];
 
 const connectSubscribe = (status) => {
 	try {
@@ -145,13 +148,23 @@ const createNotification = (title = '', message = '') => {
 		title,
 	});
 };
+
+/**
+ * Get current network
+ * @returns {Promise.<*>}
+ */
+const getNetwork = async () => {
+	const network = await storage.get('current_network') || NETWORKS[0];
+	return network;
+};
+
 /**
  * Get user account if unlocked
  * @returns {Promise.<*>}
  */
 const resolveAccounts = async () => {
 
-	const network = (await storage.get('current_network')) || NETWORKS[0];
+	const network = getNetwork();
 
 	try {
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
@@ -185,8 +198,15 @@ const onMessage = async (request, sender, sendResponse) => {
 
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
+	if (request.method === 'getNetwork') {
+		getNetwork().then((rezult) => {
+			sendResponse(({ subscriber: true, res: JSON.parse(JSON.stringify(rezult)) }));
+		});
+		return true;
+	}
+
 	if (request.method === 'networkSubscribe') {
-		subscriberResponse = sendResponse;
+		networkSubscribers.push(sendResponse);
 		return true;
 	}
 
@@ -501,11 +521,26 @@ export const onSend = async (options, networkName) => {
 	return null;
 };
 
+<<<<<<< HEAD
 
 export const onSwitchNetwork = async (network) => {
 	await createSocket(network.url);
 
 	subscriberResponse({ subscriber: true, res: network });
+=======
+export const onSwitchNetwork = (network) => {
+	networkSubscribers.forEach((cb) => {
+		try {
+
+			cb({ subscriber: true, res: network });
+		} catch (error) {
+
+			networkSubscribers.splice(networkSubscribers.indexOf(cb), 1);
+			onSwitchNetwork(network);
+		}
+
+	});
+>>>>>>> 27f5ee2d08412a845e810549bb9a135736b944fe
 };
 
 const listeners = new Listeners(emitter, crypto);

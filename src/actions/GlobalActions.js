@@ -15,6 +15,8 @@ import FormatHelper from '../helpers/FormatHelper';
 
 import GlobalReducer from '../reducers/GlobalReducer';
 
+import echoService from '../services/echo';
+
 import {
 	ACCOUNT_COLORS,
 	BASE_ICON,

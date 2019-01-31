@@ -9,12 +9,17 @@ const requestQueue = [];
 const networkSubscribers = [];
 
 /**
- * subscribe to switch network
+ * subscribeSwitchNetwork to switch network
  * @param subscriberCb
  */
-const subscribe = (subscriberCb) => {
-	if (subscriberCb) { networkSubscribers.push(subscriberCb); }
-	window.postMessage({
+const subscribeSwitchNetwork = (subscriberCb) => {
+	if (subscriberCb) {
+		networkSubscribers.push(subscriberCb);
+		return window.postMessage({
+			method: 'getNetwork', target: 'content', appId: APP_ID,
+		}, '*');
+	}
+	return window.postMessage({
 		method: 'networkSubscribe', target: 'content', appId: APP_ID,
 	}, '*');
 };
@@ -26,8 +31,9 @@ const subscribe = (subscriberCb) => {
 const onMessage = (event) => {
 
 	if (event.data.subscriber) {
-		networkSubscribers.forEach((cb) => cb());
-		subscribe();
+
+		networkSubscribers.forEach((cb) => cb(event.data.res));
+		subscribeSwitchNetwork();
 		return;
 	}
 
@@ -164,7 +170,7 @@ Transaction.prototype.signWithBridge = function () {
 const extension = {
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
-	subscribe: () => subscribe(),
+	subscribeSwitchNetwork: () => subscribeSwitchNetwork(),
 };
 window.echo = echo;
 window.echojslib = {
@@ -172,7 +178,7 @@ window.echojslib = {
 	connect: echo.connect,
 	isEchoBridge: true,
 	extension,
-	subscribe,
+	subscribeSwitchNetwork,
 };
 window.addEventListener('message', onMessage, false);
 

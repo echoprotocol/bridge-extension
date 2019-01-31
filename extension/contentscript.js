@@ -11,7 +11,9 @@ function setupInjection() {
 		const scriptTag = document.createElement('script');
 
 		scriptTag.src = extensionizer.extension.getURL('inpage.js');
-		scriptTag.onload = function () { this.parentNode.removeChild(this); };
+		scriptTag.onload = function () {
+			this.parentNode.removeChild(this);
+		};
 		const container = document.head || document.documentElement;
 
 		container.insertBefore(scriptTag, container.children[0]);
