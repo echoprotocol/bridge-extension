@@ -30,13 +30,12 @@ class Navbar extends React.PureComponent {
 		const { title, link } = this.renderTitle();
 		const { account } = this.props;
 
-
 		return (
 			!HIDE_NAVBAR_PATHS.includes(pathname) &&
 			<div className="navbar">
 				<ul>
 					{
-						account ?
+						account.size ?
 							<li className="btn-nav-wrap" >
 								<Button onClick={(e) => this.onClick(e)} className="btn-nav" >
 									<img src={Hamburger} alt="" />

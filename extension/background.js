@@ -44,8 +44,6 @@ const accountsRequests = [];
 const requestQueue = [];
 let lastTransaction = null;
 
-const { ChainStore } = chainjs;
-
 const networkSubscribers = [];
 
 const connectSubscribe = (status) => {
