@@ -112,14 +112,11 @@
 	</body>
 	<script>
 		window.onload = function() {
-			window.echojslib.subscribeSwitchNetwork(data => {
-				console.log("subscriber: ", data);
-			});
-		};
 
-		$(document).ready(function() {
-			setTimeout(() => {
-				window.echo.connect(
+			window.echojslib.extension.subscribeSwitchNetwork(data => {
+				console.log("subscriber: ", data);
+
+				window.echojslib.connect(
 					"ws://195.201.164.54:6311",
 					{
 						connectionTimeout: 5000,
@@ -138,7 +135,13 @@
 						]
 					}
 				);
-			}, 1000);
+
+			});
+			window.echojslib.extension.subscribeSwitchNetwork('');
+		};
+
+
+		$(document).ready(function() {
 
 			$("#accounts-click").click(function(e) {
 				window.echojslib.extension

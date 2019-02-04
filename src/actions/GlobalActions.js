@@ -338,7 +338,6 @@ export const changeNetwork = (network) => async (dispatch, getState) => {
 		}
 
 		const currentNetwork = getState().global.get('network');
-
 		const emitter = echoService.getEmitter();
 		await emitter.emit('switchNetwork', network || {
 			name: currentNetwork.name,

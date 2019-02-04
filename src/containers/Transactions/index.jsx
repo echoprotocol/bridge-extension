@@ -14,7 +14,7 @@ import '../../assets/images/icons/picAccount.svg';
 import '../../assets/images/icons/picRecieved.svg';
 import '../../assets/images/icons/picSent.svg';
 import '../../assets/images/icons/picTransaction.svg';
-
+import '../../assets/images/icons/picContract.svg';
 
 class Transactions extends React.Component {
 

@@ -7,7 +7,7 @@ import { connect } from 'react-redux';
 import { sidebarToggle } from '../../actions/GlobalActions';
 
 import { HEADER_TITLE } from '../../constants/GlobalConstants';
-import { HIDE_NAVBAR_PATHS } from '../../constants/RouterConstants';
+import { HIDE_NAVBAR_PATHS, NETWORK_PATH } from '../../constants/RouterConstants';
 import Hamburger from '../../assets/images/icons/hamburger.svg';
 
 class Navbar extends React.PureComponent {
@@ -17,6 +17,15 @@ class Navbar extends React.PureComponent {
 		this.props.sidebarToggle(this.props.visibleSidebar);
 	}
 
+
+	isNetworkInfoPage(network) {
+		const { pathname } = this.props.locationRouter;
+		if (NETWORK_PATH !== pathname) {
+			return false;
+		}
+		return !!network;
+	}
+
 	renderTitle() {
 		const { pathname, search } = this.props.locationRouter;
 
@@ -24,26 +33,27 @@ class Navbar extends React.PureComponent {
 
 		return item || {};
 	}
-
 	render() {
 		const { pathname } = this.props.locationRouter;
 		const { title, link } = this.renderTitle();
-		const { account } = this.props;
-
+		const { accounts, networkInfo } = this.props;
 		return (
 			!HIDE_NAVBAR_PATHS.includes(pathname) &&
 			<div className="navbar">
 				<ul>
 					{
-						account && account.size ?
+						(accounts && accounts.size) ?
 							<li className="btn-nav-wrap" >
 								<Button onClick={(e) => this.onClick(e)} className="btn-nav" >
 									<img src={Hamburger} alt="" />
 								</Button>
 							</li> : null
 					}
-
-					{ title ? <li className="page-title">{title}</li> : null }
+					{
+						this.isNetworkInfoPage(networkInfo.name) ?
+							<li className="page-title">{networkInfo.name} info</li>
+							: title && <li className="page-title">{title}</li>
+					}
 					{
 						link ?
 							<li className="link-nav">
@@ -61,20 +71,24 @@ Navbar.propTypes = {
 	visibleSidebar: PropTypes.bool.isRequired,
 	locationRouter: PropTypes.any.isRequired,
 	sidebarToggle: PropTypes.func.isRequired,
-	account: PropTypes.object,
+	accounts: PropTypes.object,
+	networkInfo: PropTypes.object,
 };
 
 Navbar.defaultProps = {
-	account: null,
+	accounts: null,
+	networkInfo: {},
 };
 
 export default connect(
 	(state) => ({
 		visibleSidebar: state.global.get('visibleSidebar'),
 		locationRouter: state.router.location,
-		account: state.global.get('account'),
+		accounts: state.global.getIn(['accounts', state.global.getIn(['network', 'name'])]),
+		networkInfo: state.global.get('networkInfo'),
 	}),
 	(dispatch) => ({
 		sidebarToggle: (value) => dispatch(sidebarToggle(value)),
 	}),
 )(Navbar);
+

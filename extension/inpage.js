@@ -1,4 +1,5 @@
-import echo, { Transaction } from 'echojs-lib';
+import echo, { Transaction, constants } from 'echojs-lib';
+import lodash from 'lodash';
 
 import { APP_ID } from '../src/constants/GlobalConstants';
 
@@ -13,6 +14,7 @@ const networkSubscribers = [];
  * @param subscriberCb
  */
 const subscribeSwitchNetwork = (subscriberCb) => {
+
 	if (subscriberCb) {
 		networkSubscribers.push(subscriberCb);
 		return window.postMessage({
@@ -170,15 +172,19 @@ Transaction.prototype.signWithBridge = function () {
 const extension = {
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
-	subscribeSwitchNetwork: () => subscribeSwitchNetwork(),
+	subscribeSwitchNetwork: (subscriberCb) => {
+
+		if (!lodash.isFunction(subscriberCb)) {
+			throw new Error('Is not a function')
+		}
+
+		subscribeSwitchNetwork(subscriberCb)
+	},
 };
-window.echo = echo;
-window.echojslib = {
-	...echo,
-	connect: echo.connect,
-	isEchoBridge: true,
-	extension,
-	subscribeSwitchNetwork,
-};
+window.echojslib = echo;
+window.echojslib.isEchoBridge = true;
+window.echojslib.extension = extension;
+window.echojslib.constants = constants;
+
 window.addEventListener('message', onMessage, false);
 

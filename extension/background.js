@@ -21,6 +21,10 @@ import {
 	APPROVED_STATUS,
 	BROADCAST_LIMIT,
 	CONNECT_STATUS,
+	PING_INTERVAL,
+	PING_TIMEOUT,
+	CONNECTION_TIMEOUT,
+	MAX_RETRIES,
 } from '../src/constants/GlobalConstants';
 import FormatHelper from '../src/helpers/FormatHelper';
 import { operationKeys } from '../src/constants/OperationConstants';
@@ -44,7 +48,7 @@ const accountsRequests = [];
 const requestQueue = [];
 let lastTransaction = null;
 
-const networkSubscribers = [];
+let networkSubscribers = [];
 
 const connectSubscribe = (status) => {
 	try {
@@ -67,33 +71,47 @@ const connectSubscribe = (status) => {
 
 /**
  * Create default socket
+ * @param {String?} url
+ * @return {Promise.<void>}
  */
 const createSocket = async (url) => {
+
+	if (!url) {
+		const network = await getNetwork();
+		url = network.url;
+	}
+
 	url = url || NETWORKS[0].url;
-	await echo.connect(url, {
-		connectionTimeout: 5000,
-		maxRetries: 999999999,
-		pingTimeout: 7000,
-		pingInterval: 7000,
-		debug: false,
-		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
-	});
 
-	echo.subscriber.setGlobalSubscribe(throttle(() => {
+	try {
+		await echo.connect(url, {
+			connectionTimeout: CONNECTION_TIMEOUT,
+			maxRetries: MAX_RETRIES,
+			pingTimeout: PING_TIMEOUT,
+			pingInterval: PING_INTERVAL,
+			debug: false,
+			apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
+		});
+		connectSubscribe(CONNECT_STATUS);
+		echo.subscriber.setGlobalSubscribe(throttle(() => {
 
-		try {
-			emitter.emit('globalSubscribe');
-		} catch (e) {
+			try {
+				emitter.emit('globalSubscribe');
+			} catch (e) {
+				return null;
+			}
+
 			return null;
-		}
+		}, 300));
 
-		return null;
-	}, 300));
+		echo.subscriber.setStatusSubscribe(CONNECT_STATUS, () => connectSubscribe(CONNECT_STATUS));
 
-	echo.subscriber.setStatusSubscribe(CONNECT_STATUS, () => connectSubscribe(CONNECT_STATUS));
+		echo.subscriber
+			.setStatusSubscribe(DISCONNECT_STATUS, () => connectSubscribe(DISCONNECT_STATUS));
+	} catch (e) {
+		connectSubscribe(DISCONNECT_STATUS);
+	}
 
-	echo.subscriber
-		.setStatusSubscribe(DISCONNECT_STATUS, () => connectSubscribe(DISCONNECT_STATUS));
 };
 
 
@@ -162,7 +180,7 @@ const getNetwork = async () => {
  */
 const resolveAccounts = async () => {
 
-	const network = getNetwork();
+	const network = await getNetwork();
 
 	try {
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
@@ -198,8 +216,8 @@ const onMessage = (request, sender, sendResponse) => {
 
 	if (request.method === 'getNetwork') {
 
-		getNetwork().then((rezult) => {
-			sendResponse(({ subscriber: true, res: JSON.parse(JSON.stringify(rezult)) }));
+		getNetwork().then((result) => {
+			sendResponse(({ subscriber: true, res: JSON.parse(JSON.stringify(result)) }));
 		});
 		return true;
 	}
@@ -521,18 +539,26 @@ export const onSend = async (options, networkName) => {
 };
 
 export const onSwitchNetwork = async (network) => {
-	await createSocket(network.url);
-	console.log('onSwitchNetwork (bg): ', networkSubscribers);
 
-	networkSubscribers.forEach((cb) => {
-		try {
+	try {
+		await createSocket(network.url);
+	} catch (e) {
+		console.log('onSwitchNetwork Error', e);
+	} finally {
 
-			cb({ subscriber: true, res: network });
-		} catch (error) {
-			networkSubscribers.splice(networkSubscribers.indexOf(cb), 1);
-		}
+		console.log('onSwitchNetwork (bg): ', networkSubscribers);
 
-	});
+		networkSubscribers = networkSubscribers.filter((cb) => {
+			try {
+				cb({ subscriber: true, res: network });
+				return false;
+			} catch (error) {
+				return false;
+			}
+
+		});
+
+	}
 
 };
 

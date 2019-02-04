@@ -41,8 +41,18 @@ class Wallet extends React.Component {
 						onKeyPress={() => this.sendRedirect(balanceId)}
 					>
 						<div className="balance-info">
-							<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
-							<span>{asset.get('symbol')}</span>
+							{
+								asset ?
+									<React.Fragment>
+										<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
+										<span>{asset.get('symbol')}</span>
+									</React.Fragment>
+									:
+									<React.Fragment>
+										<span>0</span>
+										<span>ECHO</span>
+									</React.Fragment>
+							}
 						</div>
 					</a>
 
