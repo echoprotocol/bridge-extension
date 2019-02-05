@@ -73,7 +73,6 @@ class WatchTokens extends React.Component {
 										name="contractId"
 										autoFocus
 										leftLabel
-										defaultUp
 										theme="input-light"
 										labelText="Contract ID"
 										value={contractId.value}
