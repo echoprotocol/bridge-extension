@@ -24,12 +24,13 @@
             z-index: -1;
         }
         .btn-icon {
-            padding: 12px 4px;
-            font-size: 18px;
-            &:hover,
-            &:focus {
-                color: #d4dede;
-            }
+			padding: 0;
+			height: 40px;
+			width: 40px;
+			display: flex;
+			align-items: center;
+			justify-content: center;
+			margin: 0 0 0 -6px;
         }
 
     }

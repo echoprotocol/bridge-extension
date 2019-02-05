@@ -1,5 +1,5 @@
 %link {
-    height: 22px;
+
     transition: color $speed, opacity .2s;
     display: flex;
     align-items: center;
@@ -11,7 +11,9 @@
 
     &-return {
         @extend %link;
-        font-family: FNBold;
+		font-family: FNBold;
+		padding: 5px 10px;
+		margin-left: -8px;
 		color: #253738;
 		opacity: .7;
         min-width: 89px;
