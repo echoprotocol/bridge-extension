@@ -217,7 +217,7 @@ export const updateHistory = () => async (dispatch, getState) => {
 		// }
 
 	} catch (err) {
-		console.log('err', err);
+		console.log('Update history error', err);
 		dispatch(GlobalReducer.actions.set({
 			field: 'error',
 			value: FormatHelper.formatError(err),

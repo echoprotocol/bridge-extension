@@ -1,21 +1,22 @@
 /* eslint-disable no-empty */
 import { Map, List } from 'immutable';
 import BN from 'bignumber.js';
+import { batchActions } from 'redux-batched-actions';
 
 import history from '../history';
 
 import getOperationFee from '../api/WalletApi';
 
 import echoService from '../services/echo';
-import { validateOperation, getFetchMap, formatToSend } from '../services/operation';
+import { formatToSend } from '../services/operation';
 
-import FormatHelper from '../helpers/FormatHelper';
 import {
+	ERROR_SEND_PATH,
 	INDEX_PATH,
 	NETWORK_ERROR_SEND_PATH,
 	NOT_RETURNED_PATHS,
+	SUCCESS_SEND_PATH,
 } from '../constants/RouterConstants';
-import ValidateTransactionHelper from '../helpers/ValidateTransactionHelper';
 import {
 	CANCELED_STATUS,
 	ERROR_STATUS,
@@ -23,271 +24,17 @@ import {
 	CLOSE_STATUS,
 	OPEN_STATUS,
 	POPUP_WINDOW_TYPE,
-	COMPLETE_STATUS,
+	COMPLETE_STATUS, SIGN_STATUS,
 } from '../constants/GlobalConstants';
-import { operationKeys, operationTypes } from '../constants/OperationConstants';
 
 import GlobalReducer from '../reducers/GlobalReducer';
+
+import SignTransaction from '../../extension/SignTransaction';
+import { operationFields, operationTypes } from '../constants/OperationConstants';
 
 export const globals = {
 	WINDOW_TYPE: null,
 	IS_LOADING: false,
-};
-
-/**
- *  @method checkTransactionAccount
- *
- * 	Is account-receiver exists
- *
- * 	@param {String} toAccount
- */
-const checkTransactionAccount = async (toAccount) => {
-	try {
-		const toAccountResult = await echoService.getChainLib().api.lookupAccounts(toAccount);
-
-		if (!toAccountResult.find((i) => i[0] === toAccount)) {
-			return 'Account \'to\' not found';
-		}
-	} catch (err) {
-		return FormatHelper.formatError(err);
-	}
-
-	return null;
-};
-
-/**
- *  @method validateTransfer
- *
- * 	Validate transfer operation fields
- *
- * 	@param {Object} options
- * 	@param {Object} options.amount - Amount and asset id
- * 	@param {Object} options.fee - Amount and asset id
- * 	@param {String} options.from
- * 	@param {String} options.to
- * 	@param {String} options.type
- * 	@param {Object} account
- */
-const validateTransfer = (options, account) => async (dispatch, getState) => {
-	console.log(options);
-	if (options.to) {
-		const accountError = await checkTransactionAccount(options.to);
-
-		if (accountError) {
-			return accountError;
-		}
-	}
-
-	const balances = getState().balance.get('balances');
-
-	const amountIdError = ValidateTransactionHelper.validateAssetId(
-		options.amount.asset_id,
-		balances,
-		account,
-	);
-
-	if (amountIdError) {
-		return 'Amount asset id not found';
-	}
-
-	if (options.fee) {
-		if (options.amount.asset_id !== options.fee.asset_id) {
-			const feeIdError = ValidateTransactionHelper.validateAssetId(
-				options.fee.asset_id,
-				balances,
-				account,
-			);
-
-			if (feeIdError) {
-				return 'Fee asset id not found';
-			}
-		}
-	}
-
-	if (options.amount.amount) {
-		const amountError = ValidateTransactionHelper.validateAmount(options.amount.amount);
-
-		if (amountError) {
-			return amountError;
-		}
-	}
-
-	return null;
-};
-
-/**
- *  @method validateContract
- *
- * 	Validate contract operation fields
- *
- * 	@param {Object} options
- * 	@param {String} options.asset_id
- * 	@param {String} options.code
- * 	@param {Object} options.fee - Fee and asset id
- * 	@param {String} options.receiver
- * 	@param {String} options.registrar
- * 	@param {String} options.type
- * 	@param {String} options.value
- * 	@param {Object} account
- */
-const validateContract = (options, account) => (dispatch, getState) => {
-	if (options.receiver) {
-		const contractIdError = ValidateTransactionHelper.validateContractId(options.receiver);
-
-		if (contractIdError) {
-			return contractIdError;
-		}
-	}
-
-	const balances = getState().balance.get('balances');
-
-	if (options.asset_id) {
-		const amountIdError = ValidateTransactionHelper.validateAssetId(
-			options.asset_id,
-			balances,
-			account,
-		);
-
-		if (amountIdError) {
-			return 'Amount asset id not found';
-		}
-	}
-
-	if (options.fee) {
-		if (options.asset_id !== options.fee.asset_id) {
-			const feeIdError = ValidateTransactionHelper.validateAssetId(
-				options.fee.asset_id,
-				balances,
-				account,
-			);
-
-			if (feeIdError) {
-				return 'Fee asset id not found';
-			}
-		}
-	}
-
-	if (options.value) {
-		const amountError = ValidateTransactionHelper.validateAmount(options.value);
-
-		if (amountError) {
-			return amountError;
-		}
-	}
-
-	if (options.code) {
-		const codeError = ValidateTransactionHelper.validateCode(options.code);
-
-		if (codeError) {
-			return codeError;
-		}
-	}
-
-	return null;
-};
-
-/**
- *  @method validateTransaction
- *
- * 	Validate transaction operation
- *
- * 	@param {Object} options
- */
-const validateTransaction = (options) => async (dispatch, getState) => {
-	let error = validateOperation(options);
-
-	if (error) {
-		return error;
-	}
-
-	const networkName = getState().global.getIn(['network', 'name']);
-	const accounts = getState().global.getIn(['accounts', networkName]);
-	const account = options[operationKeys[options.type]];
-
-	const accountResult = accounts.find((a) => [a.id, a.name].includes(account));
-
-	if (!accountResult) {
-		return 'Account not found';
-	}
-
-	switch (options.type) {
-		case operationTypes.transfer.name.toLowerCase():
-			error = await dispatch(validateTransfer(options, accountResult));
-			break;
-		case operationTypes.contract.name.toLowerCase():
-			error = dispatch(validateContract(options, accountResult));
-			break;
-		default:
-			return 'Operation type not found';
-	}
-
-	return error;
-};
-
-/**
- *  @method checkTransactionFee
- *
- * 	Validate operation fee
- *
- * 	@param {Object} options
- * 	@param {Object} transaction
- */
-const checkTransactionFee = (options, transaction) => async (dispatch, getState) => {
-	let valueAssetId = '';
-
-	if (options.type === operationTypes.contract.name.toLowerCase() && transaction.value) {
-		const core = await echoService.getChainLib().api.getObject(CORE_ID);
-
-		valueAssetId = transaction.asset_id || core;
-	} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
-		valueAssetId = transaction.amount.asset;
-	}
-
-	if (!valueAssetId) {
-		return null;
-	}
-
-	const balances = getState().balance.get('balances');
-	const accountId = getState().global.getIn(['account', 'id']);
-
-	if (!accountId) {
-		return 'Account not available';
-	}
-
-	let balance = balances
-		.find((val) => val.get('owner') === accountId && val.get('asset_type') === transaction.fee.asset.get('id'));
-
-	if (!balance) {
-		return 'Fee asset is not found';
-	}
-
-	balance = balance.get('balance');
-
-	if (valueAssetId.id === transaction.fee.asset.get('id')) {
-		let value = '';
-
-		if (options.type === operationTypes.contract.name.toLowerCase()) {
-			({ value } = transaction);
-		} else if (options.type === operationTypes.transfer.name.toLowerCase()) {
-			value = transaction.amount.amount;
-		}
-
-
-		if (!value) {
-			return null;
-		}
-
-		const total = new BN(value).plus(transaction.fee.amount);
-
-		if (total.gt(balance)) {
-			return 'Insufficient funds for fee';
-		}
-	} else if (new BN(transaction.fee.amount).gt(balance)) {
-		return 'Insufficient funds for fee';
-
-	}
-
-	return null;
 };
 
 /**
@@ -319,123 +66,6 @@ export const getTransactionFee = async (options) => {
 };
 
 /**
- *  @method getFetchedObjects
- *
- * 	Get fetched objects
- *
- * 	@param {Array} fetchList
- * 	@param {String} id
- */
-const getFetchedObjects = async (fetchList, id) => {
-	const emitter = echoService.getEmitter();
-
-	try {
-		return Promise.all(fetchList.map(async ([key, value]) => {
-			const result = await echoService.getChainLib().api.getObject(value);
-			return { [key]: result };
-		}));
-	} catch (err) {
-		const error = FormatHelper.formatError(err);
-		try {
-			emitter.emit('response', error, id, ERROR_STATUS);
-		} catch (e) {}
-
-
-		return null;
-	}
-};
-
-/**
- *  @method setTransaction
- *
- * 	Set transaction data to redux store
- *
- * 	@param {String} id
- * 	@param {Object} options
- */
-const setTransaction = ({ id, options }) => async (dispatch) => {
-	const emitter = echoService.getEmitter();
-
-	const transaction = JSON.parse(JSON.stringify(options));
-	transaction.fee = transaction.fee || { amount: 0, asset_id: CORE_ID };
-
-	const fetchList = Object.entries(getFetchMap(options.type, transaction));
-
-	let fetched = await getFetchedObjects(fetchList, id);
-
-	if (!fetched) {
-		return null;
-	}
-
-	fetched = fetched.reduce((obj, item) => ({ ...obj, ...item }), {});
-
-	const arrTemp = [];
-	Object.entries(fetched).forEach(([key, value]) => { if (!value) { arrTemp.push(key); } });
-
-	if (arrTemp.length) {
-		try {
-			emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
-		} catch (e) {
-
-		}
-
-		return null;
-	}
-
-	Object.keys(transaction).forEach((key) => {
-		if (['amount', 'fee'].includes(key)) {
-			transaction[key].asset = fetched[key];
-			delete transaction[key].asset_id;
-			return null;
-		}
-
-		if (fetched[key]) {
-			transaction[key] = fetched[key];
-		}
-
-		return null;
-	});
-
-	if (transaction.amount) {
-		transaction.amount.amount = parseInt(transaction.amount.amount, 10);
-	} else if (transaction.value) {
-		transaction.value = parseInt(transaction.value, 10);
-	}
-
-	try {
-		transaction.fee = await getTransactionFee(transaction);
-	} catch (err) {
-		return err;
-	}
-
-	const errorFee = await dispatch(checkTransactionFee(options, transaction));
-
-	if (transaction.value) {
-		const core = await echoService.getChainLib().api.getObject(CORE_ID);
-
-		transaction.value = transaction.asset_id ? transaction.value / (10 ** transaction.asset_id.get('precision')) :
-			transaction.value / (10 ** core.precision);
-	}
-
-	if (errorFee) {
-		try {
-			emitter.emit('response', `${arrTemp} incorrect`, id, ERROR_STATUS);
-		} catch (e) {
-
-		}
-
-		return null;
-	}
-
-	dispatch(GlobalReducer.actions.setIn({
-		field: 'sign',
-		params: { current: new Map({ id, options: transaction }) },
-	}));
-
-	return null;
-};
-
-/**
  *  @method closePopup
  *
  * 	Close popup incoming transaction
@@ -451,29 +81,65 @@ export const closePopup = (status) => {
 
 };
 
-/**
- *  @method removeTransaction
- *
- * 	Remove transaction data from redux store
- *
- * 	@param {String} id
- * 	@param {Boolean} isClose
- */
-export const removeTransaction = (id, isClose) => (dispatch, getState) => {
-	const sign = getState().global.get('sign');
-	const transactions = sign.get('transactions').filter((tr) => tr.id !== id);
+const getFetchedData = async (options) => {
+	const type = Object.entries(operationTypes).find(([, v]) => v.code === options[0][0]);
+	let opts = JSON.parse(JSON.stringify(options));
 
-	dispatch(GlobalReducer.actions.setIn({
-		field: 'sign',
-		params: { transactions, current: null },
-	}));
-
-	if (!transactions.size && isClose) {
-		closePopup();
-		history.push(INDEX_PATH);
-	} else if (transactions.size) {
-		dispatch(setTransaction(transactions.get(0)));
+	if (!type) {
+		return null;
 	}
+
+	const typeParams = operationFields[type[0]];
+
+	const { api } = echoService.getChainLib();
+	let requests = [];
+	[[, opts]] = opts;
+
+	Object.entries(typeParams).forEach(([key, value]) => {
+		if (!opts[key]) {
+			return null;
+		}
+
+		if (value.hasProperties) {
+			requests.push(api.getObject(opts[key][value.hasProperties]));
+
+			return null;
+		} else if (value.field) {
+			if (key === 'memo') {
+				requests.push(Buffer.from(opts[key][value.field], 'hex').toString());
+			} else {
+				requests.push(opts[key][value.field]);
+			}
+
+			return null;
+		}
+
+		requests.push(api.getObject(opts[key]));
+
+		return null;
+	});
+
+	requests = await Promise.all(requests);
+
+	Object.entries(typeParams).forEach(([key, value], index) => {
+		if (!opts[key]) {
+			return null;
+		}
+
+		if (value.hasProperties) {
+			opts[key][value.hasProperties] = requests[index];
+
+			return null;
+		}
+
+		opts[key] = requests[index];
+
+		return null;
+	});
+
+	[opts.type] = type;
+
+	return opts;
 };
 
 /**
@@ -484,15 +150,95 @@ export const removeTransaction = (id, isClose) => (dispatch, getState) => {
  * 	@param {String} id
  * 	@param {Boolean} isClose
  */
-export const removeTransactionWindow = (id, isClose) => async (dispatch, getState) => {
+export const removeTransaction = (id, isClose) => async (dispatch, getState) => {
 	const sign = getState().global.get('sign');
 	const transactions = sign.get('transactions').filter((tr) => tr.id !== id);
 
-	if (!transactions.size && isClose) {
-		closePopup();
+	if (transactions.size) {
+		dispatch(GlobalReducer.actions.setIn({
+			field: 'sign',
+			params: {
+				current: new Map({
+					id: transactions.get(0).id,
+					options: transactions.get(0).options,
+				}),
+			},
+		}));
+	} else {
+		if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
+			closePopup();
+		}
+
+		if (isClose) {
+			closePopup();
+			history.push(INDEX_PATH);
+		}
+
+		dispatch(GlobalReducer.actions.setIn({
+			field: 'sign',
+			params: {
+				current: null,
+			},
+		}));
+	}
+
+	const dataToShow = await getFetchedData(transactions.get(0).options);
+
+	dispatch(batchActions([
+		GlobalReducer.actions.setIn({
+			field: 'sign',
+			params: { transactions },
+		}),
+		GlobalReducer.actions.setIn({
+			field: 'sign',
+			params: {
+				dataToShow: new Map(dataToShow),
+			},
+		}),
+	]));
+
+	// if (!transactions.size && isClose) {
+	// 	closePopup();
+	// 	history.push(INDEX_PATH);
+	// } else if (transactions.size) {
+	// 	dispatch(setTransaction(transactions.get(0)));
+	// }
+};
+
+/**
+ *  @method removeTransaction
+ *
+ * 	Remove transaction data from redux store
+ *
+ * 	@param {String} id
+ */
+export const removeTransactionWindow = (id, status) => async (dispatch, getState) => {
+	const sign = getState().global.get('sign');
+	const transactions = sign.get('transactions').filter((tr) => tr.id !== id);
+
+	if (!transactions.size) {
+		closePopup(status);
 		history.push(INDEX_PATH);
 	} else if (transactions.size) {
-		await dispatch(setTransaction(transactions.get(0)));
+		const dataToShow = await getFetchedData(transactions.get(0).options);
+
+		dispatch(batchActions([
+			GlobalReducer.actions.setIn({
+				field: 'sign',
+				params: {
+					current: new Map({
+						id: transactions.get(0).id,
+						options: transactions.get(0).options,
+					}),
+				},
+			}),
+			GlobalReducer.actions.setIn({
+				field: 'sign',
+				params: {
+					dataToShow: new Map(dataToShow),
+				},
+			}),
+		]));
 	}
 
 	dispatch(GlobalReducer.actions.setIn({
@@ -510,7 +256,6 @@ export const removeTransactionWindow = (id, isClose) => async (dispatch, getStat
  * 	@param {Object} options
  */
 export const requestHandler = (id, options) => async (dispatch, getState) => {
-	console.log(id, options);
 	const emitter = echoService.getEmitter();
 
 	const isLocked = getState().global.getIn(['crypto', 'isLocked']);
@@ -527,16 +272,25 @@ export const requestHandler = (id, options) => async (dispatch, getState) => {
 		return null;
 	}
 
-	const error = await dispatch(validateTransaction(options));
-	if (error) {
-		emitter.emit('response', `${error}`, id, ERROR_STATUS);
-		return null;
-	}
+	// const error = await dispatch(validateTransaction(options));
+	// if (error) {
+	// 	emitter.emit('response', `${error}`, id, ERROR_STATUS);
+	// 	return null;
+	// }
 
 	const transactions = getState().global.getIn(['sign', 'transactions']);
 
 	if (!transactions.size) {
-		await dispatch(setTransaction({ id, options }));
+		dispatch(GlobalReducer.actions.setIn({
+			field: 'sign',
+			params: {
+				current: new Map({
+					id,
+					options,
+				}),
+			},
+		}));
+		// await dispatch(setTransaction({ id, options }));
 	}
 
 	dispatch(GlobalReducer.actions.setIn({
@@ -555,9 +309,9 @@ export const requestHandler = (id, options) => async (dispatch, getState) => {
  * 	@param {Number} id
  * 	@param {String} windowType
  */
-export const windowRequestHandler = (id, windowType) => async (dispatch) => {
+export const windowRequestHandler = (id, windowType, status) => async (dispatch) => {
 	if (globals.WINDOW_TYPE !== windowType) {
-		dispatch(removeTransactionWindow(id));
+		await dispatch(removeTransactionWindow(id, status));
 	}
 };
 
@@ -571,13 +325,13 @@ export const windowRequestHandler = (id, windowType) => async (dispatch) => {
  * 	@param {Object} path
  * 	@param {String} windowType
  */
-export const trResponseHandler = (status, id, path, windowType) => (dispatch) => {
+export const trResponseHandler = (status, id, path, windowType) => async (dispatch) => {
 	if (path === NETWORK_ERROR_SEND_PATH) {
 		dispatch(GlobalReducer.actions.set({ field: 'connected', value: false }));
 	}
 
 	if (windowType === globals.WINDOW_TYPE) {
-		dispatch(removeTransaction(id));
+		await dispatch(removeTransaction(id));
 
 		if (path) {
 			history.push(path);
@@ -592,43 +346,36 @@ export const trResponseHandler = (status, id, path, windowType) => (dispatch) =>
  *
  * 	Load transactions data from query to redux store
  */
-export const loadRequests = () => async (dispatch, getState) => {
-	const emitter = echoService.getEmitter();
-
-	const connected = getState().global.get('connected');
-	const requests = echoService.getRequests();
-
-	const transactionIds = await Promise.all(requests.map(async ({ id, options }) => {
-		const err = connected ? (await dispatch(validateTransaction(options))) : 'Network error';
-
-		if (err) {
-			try {
-				emitter.emit('response', `${err}`, id, ERROR_STATUS);
-			} catch (e) {}
-
-			return id;
-		}
-
-		return null;
-	}));
-
-	const transactions = requests.filter(({ id }) => !transactionIds.includes(id));
-
-	if (!transactions.length) {
-		return null;
-	}
-
+export const loadRequests = () => async (dispatch) => {
 	const { pathname } = history.location;
+	const requests = JSON.parse(JSON.stringify(echoService.getRequests()));
 
-	dispatch(GlobalReducer.actions.set({
-		field: 'sign',
-		value: new Map({
-			goTo: !NOT_RETURNED_PATHS.includes(pathname) ? pathname : null,
-			transactions: new List(transactions),
+	const dataToShow = await getFetchedData(requests[0].options);
+
+	dispatch(batchActions([
+		GlobalReducer.actions.set({
+			field: 'sign',
+			value: new Map({
+				goTo: !NOT_RETURNED_PATHS.includes(pathname) ? pathname : null,
+				transactions: new List(requests),
+			}),
 		}),
-	}));
-
-	await dispatch(setTransaction(transactions[0]));
+		GlobalReducer.actions.setIn({
+			field: 'sign',
+			params: {
+				current: new Map({
+					id: requests[0].id,
+					options: requests[0].options,
+				}),
+			},
+		}),
+		GlobalReducer.actions.setIn({
+			field: 'sign',
+			params: {
+				dataToShow: new Map(dataToShow),
+			},
+		}),
+	]));
 
 	return null;
 };
@@ -679,7 +426,7 @@ export const approveTransaction = (transaction) => async (dispatch, getState) =>
  *
  * 	@param {String} id
  */
-export const cancelTransaction = (id) => (dispatch) => {
+export const cancelTransaction = (id) => async (dispatch) => {
 	const emitter = echoService.getEmitter();
 
 	try {
@@ -687,7 +434,7 @@ export const cancelTransaction = (id) => (dispatch) => {
 
 		emitter.emit('windowRequest', id, globals.WINDOW_TYPE);
 
-		dispatch(removeTransaction(id, true));
+		await dispatch(removeTransaction(id, true));
 	} catch (e) {
 		return null;
 	}
@@ -696,55 +443,126 @@ export const cancelTransaction = (id) => (dispatch) => {
 
 };
 
-// export const signTr = (id, operations) => (dispatch) =>{
-// 	// set tr to redux
-//
-// 	const tr = echoService.getChainLib().createTransaction();
-//
-// 	operations.forEach((op) => tr._operations.push(op));
-// 	console.log(tr);
-//
-// 	dispatch(GlobalReducer.actions.setIn({
-// 		field: 'sign',
-// 		params: {
-// 			current: new Map({
-// 				id: _operations[0][0],
-// 				options: _operations,
-// 			}),
-// 		},
-// 	}));
-// };
-//
-// export const approve = () => (dispatch, getState) => {
-// 	const tr = echoService.getChainLib().createTransaction();
-//
-// 	emitter.emit('trResponse', )
-// }
-
 /**
- *  @method switchTransactionAccount
+ * @method signTr
  *
- * 	Switch account when extension waits for decision-making
+ * Save current transaction data to redux
  *
- * 	@param {String} name
+ * @param {Object} operations
+ * @param {String} id
  */
-export const switchTransactionAccount = (name) => async (dispatch, getState) => {
-	const account = await echoService.getChainLib().api.getAccountByName(name);
-	const transaction = getState().global.getIn(['sign', 'current']);
-	const key = operationKeys[transaction.get('options').type];
+export const signTr = (id, operations) => (dispatch) => {
 
 	dispatch(GlobalReducer.actions.setIn({
 		field: 'sign',
 		params: {
 			current: new Map({
-				id: transaction.get('id'),
-				options: {
-					...transaction.get('options'),
-					[key]: account,
-				},
+				id: operations[0][0],
+				options: operations,
 			}),
 		},
 	}));
+};
+
+/**
+ * @method approve
+ *
+ * Approve sign transaction
+ *
+ * @param {Object} operations
+ * @param {String} id
+ *
+ * @returns {Object}
+ */
+export const approve = (operations, id) => async (dispatch, getState) => {
+	const emitter = echoService.getEmitter();
+
+	try {
+		if (
+			!operations
+			|| !operations[0]
+			|| [undefined, null].includes(operations[0][0])
+			|| !operations[0][1]
+		) {
+			throw new Error('Invalid operations data');
+		}
+
+		if (!echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
+			throw new Error('Network error');
+		}
+
+		const tr = echoService.getChainLib().createTransaction();
+
+		const signTransaction = new SignTransaction();
+
+		const currentAccount = getState().global.get('signAccount');
+
+		emitter.emit('windowRequest', id, globals.WINDOW_TYPE, SIGN_STATUS);
+
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
+
+		dispatch(removeTransaction(id));
+
+		const networkName = getState().global.getIn(['network', 'name']);
+
+		// get account active keys
+		const accountKeys = (await echoService.getChainLib().api.getAccountByName(currentAccount.get('name')))
+			.active.key_auths;
+
+		const keyPromises =
+			await Promise.all(accountKeys.map((key) => echoService.getCrypto().getInByNetwork(
+				networkName,
+				key[0],
+			)));
+
+		const indexPublicKey = keyPromises.findIndex((key) => !!key);
+
+		// get private key
+		const privateKey = await echoService.getCrypto().getSignPrivateKey(
+			networkName,
+			accountKeys[indexPublicKey][0],
+		);
+
+		// if its transfer and has memo
+		if (operations[0][1].memo) {
+			operations[0][1].memo = await echoService.getCrypto().encryptMemo(
+				networkName,
+				operations[0][1].memo.from,
+				operations[0][1].memo.to,
+				Buffer.from(operations[0][1].memo.message, 'hex').toString(),
+				operations[0][1].memo.nonce,
+			);
+		}
+
+		if (operations[0][1].from) {
+			operations[0][1].from = currentAccount.get('id');
+		} else if (operations[0][1].registrar) {
+			operations[0][1].registrar = currentAccount.get('id');
+		}
+
+		// SIGN
+		const signData = await signTransaction.sign(
+			tr,
+			privateKey,
+			[[operations[0][0], operations[0][1]]],
+		);
+
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+
+		history.push(SUCCESS_SEND_PATH);
+
+		emitter.emit('trSignResponse', signData, globals.WINDOW_TYPE);
+	} catch (err) {
+		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+
+		dispatch(removeTransaction(id));
+
+		emitter.emit('response', `Error: ${err}`, id, ERROR_STATUS);
+
+		emitter.emit('windowRequest', id, globals.WINDOW_TYPE);
+
+		history.push(ERROR_SEND_PATH);
+	}
 };
 
 export const setWindowType = (type) => {

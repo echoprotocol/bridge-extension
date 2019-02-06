@@ -1,6 +1,6 @@
 import FormatHelper from '../helpers/FormatHelper';
 
-import { operationFields } from '../constants/OperationConstants';
+import { operationFields, operationFieldsSend } from '../constants/OperationConstants';
 
 /**
  *  @method validateOperation
@@ -134,7 +134,7 @@ export const formatToShow = (type, options) => {
  *  @param {Object} options
  */
 export const formatToSend = (type, options) => {
-	const operation = operationFields[type];
+	const operation = operationFieldsSend[type];
 
 	return Object.entries(operation).reduce((obj, [key, value]) => {
 		if (!options[key]) {
@@ -159,17 +159,31 @@ export const formatToSend = (type, options) => {
 				obj[key] = options[key].get('id');
 				break;
 			case 'asset_object':
-				if (typeof options[key].asset.get !== 'function') {
+				if (options[key].asset) {
+					if (typeof options[key].asset.get !== 'function') {
+						obj[key] = {
+							amount: options[key].amount,
+							asset_id: options[key].asset.id,
+						};
+						break;
+					}
 					obj[key] = {
 						amount: options[key].amount,
-						asset_id: options[key].asset.id,
+						asset_id: options[key].asset.get('id'),
 					};
-					break;
+				} else {
+					if (typeof options[key].asset_id.get !== 'function') {
+						obj[key] = {
+							amount: options[key].amount,
+							asset_id: options[key].asset_id.id,
+						};
+						break;
+					}
+					obj[key] = {
+						amount: options[key].amount,
+						asset_id: options[key].asset_id.get('id'),
+					};
 				}
-				obj[key] = {
-					amount: options[key].amount,
-					asset_id: options[key].asset.get('id'),
-				};
 				break;
 			default: obj[key] = options[key];
 		}

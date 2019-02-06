@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import echo, { Transaction, PrivateKey, aes } from 'echojs-lib';
 import { throttle } from 'lodash';
+
 import EventEmitter from '../libs/CustomAwaitEmitter';
 
 import Crypto from '../src/services/crypto';
@@ -18,15 +19,13 @@ import {
 	ERROR_STATUS,
 	COMPLETE_STATUS,
 	DISCONNECT_STATUS,
-	APPROVED_STATUS,
 	BROADCAST_LIMIT,
 	CONNECT_STATUS,
 	PING_INTERVAL,
 	PING_TIMEOUT,
 	CONNECTION_TIMEOUT,
-	MAX_RETRIES,
+	MAX_RETRIES, SIGN_STATUS,
 } from '../src/constants/GlobalConstants';
-import FormatHelper from '../src/helpers/FormatHelper';
 import { operationKeys } from '../src/constants/OperationConstants';
 
 import { formatToSend } from '../src/services/operation';
@@ -34,9 +33,7 @@ import {
 	ERROR_SEND_PATH,
 	NETWORK_ERROR_SEND_PATH,
 	SUCCESS_SEND_INDEX_PATH,
-	SUCCESS_SEND_PATH,
 } from '../src/constants/RouterConstants';
-import getTransaction from './transaction';
 
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
@@ -49,6 +46,8 @@ const requestQueue = [];
 let lastTransaction = null;
 
 let networkSubscribers = [];
+
+let popupId = null;
 
 const connectSubscribe = (status) => {
 	try {
@@ -78,7 +77,7 @@ const createSocket = async (url) => {
 
 	if (!url) {
 		const network = await getNetwork();
-		url = network.url;
+		({ url } = network);
 	}
 
 	url = url || NETWORKS[0].url;
@@ -236,14 +235,16 @@ const onMessage = (request, sender, sendResponse) => {
 
 	if (request.method === 'confirm' && request.data) {
 
+		const operations = JSON.parse(request.data);
+
 		requestQueue.push({
-			data: request.data, sender, id, cb: sendResponse,
+			data: operations, sender, id, cb: sendResponse,
 		});
 
 		setBadge();
 
 		try {
-			emitter.emit('request', id, request.data);
+			emitter.emit('request', id, operations);
 		} catch (e) { return null; }
 
 		notificationManager.getPopup()
@@ -267,24 +268,6 @@ const onMessage = (request, sender, sendResponse) => {
 			triggerPopup();
 		}
 
-	} else if (request.method === 'transaction') {
-		requestQueue.push({
-			data: request.data, sender, id, cb: sendResponse,
-		});
-
-		setBadge();
-
-		try {
-			emitter.emit('transaction', id, request.data);
-		} catch (e) { return null; }
-
-		notificationManager.getPopup()
-			.then((popup) => {
-				if (!popup) {
-					triggerPopup();
-				}
-			})
-			.catch(triggerPopup);
 	}
 
 	return true;
@@ -309,7 +292,7 @@ const onPinUnlock = () => {
  * @param id
  * @returns null
  */
-const removeTransaction = (err, id) => {
+const removeTransaction = (id) => {
 	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
 	if (requestIndex === -1) return null;
 
@@ -334,27 +317,54 @@ export const onResponse = (err, id, status) => {
 			closePopup();
 		}
 
-		removeTransaction(err, id);
+		removeTransaction(id);
+
 
 		return null;
 	}
 
 	if ([CANCELED_STATUS, ERROR_STATUS].includes(status)) {
-		removeTransaction(err, id);
+		removeTransaction(id);
 	}
 
-	if (lastTransaction) {
-		lastTransaction.cb({ id, status, text: err });
-	}
+	// if (lastTransaction) {
+	// 	console.log(1, lastTransaction);
+	// 	lastTransaction.cb({ id, status, text: err });
+	// }
 
 	if (COMPLETE_STATUS !== status) {
 		createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
 	}
 
+	if (requestQueue.length === 1 && SIGN_STATUS === status) {
+		closePopup();
+	}
+
 	if (
-		(requestQueue.length === 0 && [COMPLETE_STATUS, ERROR_STATUS].includes(status))
+		(requestQueue.length === 0 && COMPLETE_STATUS === status)
         || DISCONNECT_STATUS === status
 	) closePopup();
+
+	return null;
+};
+
+/**
+ * @method trSignResponse
+ *
+ * @param {Object} signData
+ *
+ * @returns {null}
+ */
+export const trSignResponse = (signData) => {
+	if (signData === ERROR_STATUS) {
+		removeTransaction(requestQueue[0].id);
+		return null;
+	}
+
+	({ popupId } = notificationManager);
+	const dataToSend = JSON.stringify(signData);
+	requestQueue[0].cb({ id: requestQueue[0].id, signData: dataToSend });
+	removeTransaction(requestQueue[0].id);
 
 	return null;
 };
@@ -376,6 +386,7 @@ const onFirstInstall = (details) => {
 	}
 };
 
+
 /**
  *  @method sendTransaction
  *
@@ -389,121 +400,37 @@ const sendTransaction = async (transaction, networkName) => {
 	const account = transaction[operationKeys[type]];
 	const options = formatToSend(type, transaction);
 
-	const publicKeys = account.getIn(['active', 'key_auths']);
-
+	const publicKeys = account.active.key_auths;
 
 	const keyPromises =
-        await Promise.all(publicKeys.map((key) => crypto.getInByNetwork(networkName, key.get(0))));
+        await Promise.all(publicKeys.map((key) => crypto.getInByNetwork(networkName, key[0])));
 
 	const indexPublicKey = keyPromises.findIndex((key) => !!key);
 
-	const pKey = publicKeys.getIn([indexPublicKey, 0]);
-	let tr = new Transaction();
-	tr = await crypto.sign(networkName, tr, pKey);
+	const pKey = await crypto.getSignPrivateKey(networkName, publicKeys[indexPublicKey][0]);
 
 	if (memo) {
 		const { to } = transaction;
 
 		options.memo = await crypto.encryptMemo(
 			networkName,
-			account.getIn(['options', 'memo_key']),
-			to.getIn(['options', 'memo_key']),
+			account.options.memo_key,
+			to.options.memo_key,
 			memo,
 		);
 	}
 
-	tr.addOperation(type, options);
-	await tr.setRequiredFees(options.fee.asset_id);
+	let tr = echo.createTransaction();
+
+	tr = tr.addOperation(type, options);
+
+	await tr.sign(pKey);
 
 	return tr.broadcast();
 };
 
-/**
- *  @method onTransaction
- *
- * 	On transaction approve emitter request
- *
- * 	@param {Number} id
- * 	@param {String} networkName
- * 	@param {Number} balance
- * 	@param {String} windowType
- */
-export const onTransaction = async (id, networkName, balance, windowType) => {
-	const currentTransactionCb = lastTransaction.cb;
-	const { popupId } = notificationManager;
-
-	const transaction = await getTransaction({ id, options: lastTransaction.data, balance });
-
-	let path = SUCCESS_SEND_PATH;
-	let resultBroadcast = null;
-
-	try {
-		const start = new Date().getTime();
-
-		await Promise.race([
-			sendTransaction(transaction, networkName).then((result) => {
-				resultBroadcast = result;
-			}, (err) => {
-				resultBroadcast = err;
-
-				path = ERROR_SEND_PATH;
-
-				throw new Error(err);
-			}).finally(() => new Date().getTime() - start),
-			new Promise((resolve, reject) => {
-				const timeoutId = setTimeout(() => {
-					clearTimeout(timeoutId);
-					reject(new Error('Send transaction timeout'));
-				}, BROADCAST_LIMIT);
-			}),
-		]);
-	} catch (err) {
-		resultBroadcast = err;
-		currentTransactionCb({
-			id,
-			status: ERROR_STATUS,
-			text: FormatHelper.formatError(err),
-			resultBroadcast,
-		});
-
-		createNotification('Transaction', `${ERROR_STATUS} ${FormatHelper.formatError(err).toLowerCase()}`);
-
-		if (FormatHelper.formatError(err) === 'Send transaction timeout') {
-			path = NETWORK_ERROR_SEND_PATH;
-		}
-
-		try {
-			if (popupId !== notificationManager.popupId) {
-				emitter.emit('trResponse', ERROR_STATUS, id, null, windowType);
-			} else {
-				emitter.emit('trResponse', ERROR_STATUS, id, path, windowType);
-			}
-		} catch (e) { return null; }
-
-		return null;
-	}
-
-	currentTransactionCb({
-		id,
-		status: APPROVED_STATUS,
-		text: null,
-		resultBroadcast,
-	});
-
-	createNotification('Transaction', `${APPROVED_STATUS}`);
-
-	try {
-		if (popupId !== notificationManager.popupId) {
-			emitter.emit('trResponse', APPROVED_STATUS, id, null, windowType);
-		} else {
-			emitter.emit('trResponse', APPROVED_STATUS, id, path, windowType);
-		}
-	} catch (e) { return null; }
-
-	return null;
-};
-
 export const onSend = async (options, networkName) => {
+	options = JSON.parse(JSON.stringify(options));
 	let path = SUCCESS_SEND_INDEX_PATH;
 
 	try {
@@ -512,6 +439,7 @@ export const onSend = async (options, networkName) => {
 		await Promise.race([
 			sendTransaction(options, networkName)
 				.then(() => {}, (err) => {
+					console.log('Broadcast error', err);
 					if (err) { path = ERROR_SEND_PATH; }
 				}).finally(() => new Date().getTime() - start),
 			new Promise((resolve, reject) => {
@@ -522,6 +450,7 @@ export const onSend = async (options, networkName) => {
 			}),
 		]);
 	} catch (err) {
+		console.log('Broadcast error', err);
 		path = NETWORK_ERROR_SEND_PATH;
 
 		try {
@@ -563,7 +492,12 @@ export const onSwitchNetwork = async (network) => {
 };
 
 const listeners = new Listeners(emitter, crypto);
-listeners.initBackgroundListeners(onResponse, onTransaction, onSend, onSwitchNetwork);
+listeners.initBackgroundListeners(
+	onResponse,
+	onSend,
+	onSwitchNetwork,
+	trSignResponse,
+);
 
 createSocket();
 

@@ -1,6 +1,7 @@
-import { aes as aesLib, PrivateKey, TransactionHelper, ED25519 } from 'echojs-lib';
+import { aes as aesLib, PrivateKey, ED25519 } from 'echojs-lib';
 import random from 'crypto-random-string';
 import bs58 from 'bs58';
+import secureRandom from 'secure-random';
 import EventEmitter from '../../libs/CustomAwaitEmitter';
 import AesStorage from './aesStorage';
 
@@ -8,7 +9,27 @@ import storage from './storage';
 
 import { RANDOM_SIZE, ACTIVE_KEY, MEMO_KEY, RANDOM_ECHORANDKEY_SIZE } from '../constants/GlobalConstants';
 
+const { Long } = require('bytebuffer');
+
 const privateAES = new AesStorage();
+
+let uniqueNonceEntropy = null;
+
+export const uniqueNonceUint64 = () => {
+	const entropy = ((() => {
+		if (uniqueNonceEntropy === null) {
+			return parseInt(secureRandom.randomUint8Array(1)[0], 10);
+		}
+
+		return (uniqueNonceEntropy + 1) % 256;
+	})());
+
+	uniqueNonceEntropy = entropy;
+
+	let long = Long.fromNumber(Date.now());
+	long = long.shiftLeft(8).or(Long.fromNumber(entropy));
+	return long.toString();
+};
 
 class Crypto extends EventEmitter {
 
@@ -278,8 +299,18 @@ class Crypto extends EventEmitter {
 		return transaction;
 	}
 
-	getAes() {
-		return privateAES.get();
+	async getSignPrivateKey(networkName, publicKeyString) {
+		privateAES.required();
+
+		const encryptedPrivateKey = await this.getInByNetwork(networkName, publicKeyString);
+
+		if (!encryptedPrivateKey) {
+			throw new Error('Key not found.');
+		}
+
+		const aes = privateAES.get();
+		const privateKeyBuffer = aes.decryptHexToBuffer(encryptedPrivateKey);
+		return PrivateKey.fromBuffer(privateKeyBuffer);
 	}
 
 	/**
@@ -291,10 +322,11 @@ class Crypto extends EventEmitter {
 	 *  @param {String} fromMemoKey
 	 *  @param {String} toMemoKey
 	 *  @param {String} memo
+	 *  @param {String} nonceSign
 	 *
 	 *  @return {Object} encryptedMemo
 	 */
-	async encryptMemo(networkName, fromMemoKey, toMemoKey, memo) {
+	async encryptMemo(networkName, fromMemoKey, toMemoKey, memo, nonceSign) {
 		privateAES.required();
 
 		const encryptedPrivateKey = await this.getInByNetwork(networkName, fromMemoKey);
@@ -309,7 +341,7 @@ class Crypto extends EventEmitter {
 
 		memo = Buffer.from(memo, 'utf-8');
 
-		const nonce = TransactionHelper.unique_nonce_uint64();
+		const nonce = nonceSign || uniqueNonceUint64();
 
 		return {
 			from: fromMemoKey,

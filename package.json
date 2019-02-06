@@ -1,7 +1,7 @@
 {
   "name": "echo-bridge",
   "description": "Echo Bridge",
-  "version": "1.3.1",
+  "version": "1.4.0",
   "scripts": {
     "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8081",
     "build": "cross-env NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
@@ -19,10 +19,11 @@
     "babel-runtime": "^6.26.0",
     "bignumber.js": "^7.2.1",
     "bs58": "^4.0.1",
+    "bytebuffer": "^5.0.1",
     "classnames": "^2.2.6",
     "config": "^1.30.0",
     "crypto-random-string": "^1.0.0",
-    "echojs-lib": "^0.1.10",
+    "echojs-lib": "git+ssh://git@gitlab.pixelplex.by/645.echo/echojs/echojs-lib.git",
     "events": "^3.0.0",
     "file-loader": "^1.1.11",
     "focus-trap-react": "^4.0.1",
@@ -50,6 +51,7 @@
     "redux-batched-actions": "^0.4.1",
     "redux-modules": "^1.1.0",
     "redux-thunk": "^2.3.0",
+    "secure-random": "^1.1.1",
     "semantic-ui-react": "^0.78.3",
     "uglifyjs-webpack-plugin": "^1.2.2",
     "utf8": "^3.0.0"

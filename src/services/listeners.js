@@ -1,6 +1,6 @@
 import echoService from './echo';
 
-import { requestHandler, trResponseHandler, windowRequestHandler } from '../actions/SignActions';
+import { requestHandler, signTr, trResponseHandler, windowRequestHandler } from '../actions/SignActions';
 import { sendHandler } from '../actions/BalanceActions';
 import { onLogout } from '../actions/GlobalActions';
 import { getCrypto, lockResponse, unlockResponse } from '../actions/CryptoActions';
@@ -20,8 +20,8 @@ class Listeners {
 	}
 
 	initListeners(dispatch) {
-		this.windowRequestHandler = (id, windowType) =>
-			dispatch(windowRequestHandler(id, windowType));
+		this.windowRequestHandler = (id, windowType, status) =>
+			dispatch(windowRequestHandler(id, windowType, status));
 		this.requestHandler = (id, options) => dispatch(requestHandler(id, options));
 		this.trResponseHandler = (status, id, path, windowType) =>
 			dispatch(trResponseHandler(status, id, path, windowType));
@@ -35,7 +35,7 @@ class Listeners {
 
 		this.onStatusConnected = (status) => dispatch(onStatusConnected(status));
 		this.onGlobalSubscribe = () => dispatch(subscribe());
-		// this.sign = (id, options) => dispatch(signTr(id, options));
+		this.sign = (id, options) => dispatch(signTr(id, options));
 
 		this.emitter.on('windowRequest', this.windowRequestHandler);
 		this.emitter.on('request', this.requestHandler);
@@ -53,7 +53,7 @@ class Listeners {
 		this.crypto.on('locked', this.lockResponse);
 		this.crypto.on('unlocked', this.unlockResponse);
 
-		// this.emitter.on('transaction', this.sign);
+		this.emitter.on('transaction', this.sign);
 
 		window.onunload = () => {
 			this.removeListeners();
@@ -70,16 +70,17 @@ class Listeners {
 		this.emitter.removeListener(CONNECT_STATUS, this.onStatusConnected);
 		this.emitter.removeListener(DISCONNECT_STATUS, this.onStatusConnected);
 		this.emitter.removeListener('globalSubscribe', this.onGlobalSubscribe);
+		this.emitter.removeListener('transaction', this.sign);
 
 		this.crypto.removeListener('locked', this.lockResponse);
 		this.crypto.removeListener('unlocked', this.unlockResponse);
 	}
 
-	initBackgroundListeners(onResponse, onTransaction, onSend, onSwitchNetwork) {
+	initBackgroundListeners(onResponse, onSend, onSwitchNetwork, trSignResponse) {
 		this.emitter.on('response', onResponse);
-		this.emitter.on('trRequest', onTransaction);
 		this.emitter.on('sendRequest', onSend);
 		this.emitter.on('switchNetwork', onSwitchNetwork);
+		this.emitter.on('trSignResponse', trSignResponse);
 	}
 
 }

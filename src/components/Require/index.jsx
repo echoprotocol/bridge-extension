@@ -71,6 +71,7 @@ export function required(Component) {
 
 	RequiredComponent.propTypes = {
 		isLogin: PropTypes.object.isRequired,
+		history: PropTypes.object.isRequired,
 		isLocked: PropTypes.bool,
 		isSign: PropTypes.bool,
 		dispatch: PropTypes.func.isRequired,

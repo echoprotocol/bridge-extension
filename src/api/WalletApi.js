@@ -1,43 +1,10 @@
-
-
-// export const createWallet = async (registrator, account, wif) => {
-// 	const publicKey = PrivateKey.fromWif(wif).toPublicKey().toString();
-
-// 	let response = await fetch(registrator, {
-// 		method: 'post',
-// 		mode: 'cors',
-// 		headers: {
-// 			Accept: 'application/json',
-// 			'Content-type': 'application/json',
-// 		},
-// 		body: JSON.stringify({
-// 			name: account,
-// 			owner_key: publicKey,
-// 			active_key: publicKey,
-// 			memo_key: publicKey,
-// 		}),
-// 	});
-
-// 	response = await response.json();
-
-// 	if (!response || (response && response.errors)) {
-// 		return response.errors.join();
-// 	}
-
-// 	return null;
-// };
-
-
 import { aes, PrivateKey } from 'echojs-lib';
 
-import {
-	MEMO_FEE_KEYS,
-	SET_TR_FEE_TIMEOUT,
-} from '../constants/GlobalConstants';
+import { MEMO_FEE_KEYS } from '../constants/GlobalConstants';
 
 import echoService from '../services/echo';
 
-const getOperationFee = async (type, transaction, core) => {
+const getOperationFee = async (type, transaction) => {
 	const options = JSON.parse(JSON.stringify(transaction));
 
 	if (options.memo) {
@@ -59,21 +26,15 @@ const getOperationFee = async (type, transaction, core) => {
 		};
 	}
 
-	const tr = echoService.getChainLib().createTransaction();
+	let tr = echoService.getChainLib().createTransaction();
 
-	tr.addOperation(type, options);
+	if (type === 48) {
+		options.fee = undefined;
+	}
 
-	const start = new Date().getTime();
+	tr = tr.addOperation(type, options);
 
-	await Promise.race([
-		tr.setRequiredFees(core.id).then(() => (new Date().getTime() - start)),
-		new Promise((resolve, reject) => {
-			const timeoutId = setTimeout(() => {
-				clearTimeout(timeoutId);
-				reject(new Error('Timeout set required fees'));
-			}, SET_TR_FEE_TIMEOUT);
-		}),
-	]);
+	tr = await tr.setRequiredFees();
 
 	return tr._operations[0][1].fee.amount; // eslint-disable-line no-underscore-dangle
 };

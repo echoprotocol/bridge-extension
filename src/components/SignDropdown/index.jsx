@@ -5,15 +5,14 @@ import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
 import { withRouter } from 'react-router';
-
-import { formatToShow } from '../../services/operation';
-import { switchTransactionAccount } from '../../actions/SignActions';
+import { Map } from 'immutable';
 
 import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
-import { operationKeys } from '../../constants/OperationConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
 import UserIcon from '../UserIcon';
+
+import GlobalReducer from '../../reducers/GlobalReducer';
 
 class SignDropdown extends React.PureComponent {
 
@@ -35,20 +34,17 @@ class SignDropdown extends React.PureComponent {
 	}
 
 	onSelect(name) {
-		const { accounts } = this.props;
-		const options = this.props.transaction.get('options');
+		const { accounts, account } = this.props;
 
 		if (!accounts.find((i) => i.name === name)) {
 			return;
 		}
 
-		const show = formatToShow(options.type, options);
-		const accountKey = operationKeys[options.type];
-		const account = accounts.find((a) => a.name === show[accountKey]);
+		const accountToChange = accounts.find((value) => name === value.name);
 
-		if (account.name === name) { return; }
+		if (account.get('name') === accountToChange.name) { return; }
 
-		this.props.switchAccount(name);
+		this.props.set('signAccount', new Map(accountToChange));
 	}
 
 	setDDMenuHeight() {
@@ -94,7 +90,7 @@ class SignDropdown extends React.PureComponent {
 
 			return (
 				<MenuItem
-					active={activeAccount.name === account.name}
+					active={activeAccount.get('name') === account.name}
 					tabIndex="-1"
 					key={account.name}
 					eventKey={i}
@@ -124,15 +120,11 @@ class SignDropdown extends React.PureComponent {
 	}
 
 	render() {
-		const { transaction, accounts, loading } = this.props;
+		const {
+			transaction, accounts, loading, account,
+		} = this.props;
 
 		if (!transaction || !accounts) { return null; }
-
-		const options = transaction.get('options');
-
-		const show = formatToShow(options.type, options);
-		const accountKey = operationKeys[options.type];
-		const account = accounts.find((a) => a.name === show[accountKey]);
 
 		const menuHeight = {
 			height: `${this.state.menuHeight}px`,
@@ -149,8 +141,8 @@ class SignDropdown extends React.PureComponent {
 				<Dropdown.Toggle noCaret>
 
 					<UserIcon
-						color={account.iconColor}
-						avatar={`ava${account.icon}`}
+						color={account.get('iconColor')}
+						avatar={`ava${account.get('icon')}`}
 					/>
 
 					<i aria-hidden="true" className="dropdown icon" />
@@ -184,15 +176,17 @@ SignDropdown.propTypes = {
 	loading: PropTypes.bool,
 	transaction: PropTypes.object,
 	accounts: PropTypes.object,
+	account: PropTypes.object,
 	balances: PropTypes.object.isRequired,
 	assets: PropTypes.object.isRequired,
-	switchAccount: PropTypes.func.isRequired,
+	set: PropTypes.func.isRequired,
 };
 
 SignDropdown.defaultProps = {
 	loading: false,
 	transaction: null,
 	accounts: null,
+	account: null,
 };
 
 export default withRouter(connect(
@@ -205,8 +199,9 @@ export default withRouter(connect(
 			'accounts',
 			state.global.getIn(['network', 'name']),
 		]),
+		account: state.global.get('signAccount'),
 	}),
 	(dispatch) => ({
-		switchAccount: (name) => dispatch(switchTransactionAccount(name)),
+		set: (field, value) => dispatch(GlobalReducer.actions.set({ field, value })),
 	}),
 )(SignDropdown));

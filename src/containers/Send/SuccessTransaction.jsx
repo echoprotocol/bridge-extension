@@ -12,9 +12,9 @@ import { INDEX_PATH } from '../../constants/RouterConstants';
 class SuccessTransaction extends React.PureComponent {
 
 	onClick() {
-		closePopup();
-
 		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE && !this.props.transaction) {
+			closePopup();
+
 			return null;
 		}
 
@@ -30,12 +30,14 @@ class SuccessTransaction extends React.PureComponent {
 	}
 
 	render() {
+		const { index } = query.parse(this.props.location.search);
+
 		return (
 			<div className="transaction-status-wrap success">
 				<div className="transaction-status-body">
 					<div className="title">Success</div>
 					<div className="description">
-                        Your transaction has been successfully<br /> sent
+                        Your transaction has been successfully<br /> { index ? 'sent' : 'signed' }
 					</div>
 				</div>
 				<div className="page-action-wrap">

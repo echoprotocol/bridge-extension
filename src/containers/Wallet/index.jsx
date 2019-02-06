@@ -61,18 +61,6 @@ class Wallet extends React.Component {
 			);
 		});
 
-
-		if (!balances.find((v) => account.get('id') === v.get('owner') && v.get('asset_type') === CORE_ID)) {
-			resultBalances.push(<li>
-				<Link to={SEND_PATH}>
-					<div className="balance-info">
-						<span>0</span>
-						<span>{CORE_SYMBOL}</span>
-					</div>
-				</Link>
-			</li>);
-		}
-
 		const resultTokens = [];
 		tokens.mapEntries(([accountId, tokenArr]) => {
 			if (account.get('id') !== accountId) {
@@ -172,7 +160,22 @@ class Wallet extends React.Component {
 		let tokensLength = tokens.get(account.get('id'));
 		tokensLength = tokensLength ? tokensLength.size : 0;
 
-		const balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size + tokensLength;
+		let balancesCount = balances.filter((value) => account.get('id') === value.get('owner')).size + tokensLength;
+
+		const balancesToShow = this.getBalances();
+
+		if (!balances.find((v) => account.get('id') === v.get('owner') && v.get('asset_type') === CORE_ID)) {
+			balancesCount += 1;
+
+			balancesToShow.unshift(<li key={Math.random()}>
+				<Link to={SEND_PATH}>
+					<div className="balance-info">
+						<span>0</span>
+						<span>{CORE_SYMBOL}</span>
+					</div>
+				</Link>
+			</li>);
+		}
 
 		return (
 			<React.Fragment>
@@ -203,7 +206,7 @@ class Wallet extends React.Component {
 								)}
 								>
 									{
-										this.getBalances()
+										balancesToShow
 									}
 								</ul>
 							</CustomScroll>

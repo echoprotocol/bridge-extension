@@ -1,23 +1,23 @@
+/* eslint-disable react/jsx-closing-tag-location */
 import React from 'react';
 import { connect } from 'react-redux';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
+import { Map } from 'immutable';
 
 import UserIcon from '../../components/UserIcon';
 
 import {
-	approveTransaction,
+	approve,
 	cancelTransaction,
 	globals,
 } from '../../actions/SignActions';
 
-import { formatToShow } from '../../services/operation';
-
-import { operationKeys, operationTypes } from '../../constants/OperationConstants';
 import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
-
+import GlobalReducer from '../../reducers/GlobalReducer';
+import { operationFields } from '../../constants/OperationConstants';
 import FormatHelper from '../../helpers/FormatHelper';
 
 class SignTransaction extends React.Component {
@@ -29,31 +29,102 @@ class SignTransaction extends React.Component {
 			} else {
 				this.props.history.push(NETWORK_ERROR_SEND_PATH);
 			}
+
+			return null;
 		}
+
+		const options = this.props.transaction.get('options');
+		const account = this.props.accounts
+			.find((value) => [options[0][1].from, options[0][1].registrar].includes(value.id));
+		this.props.set('signAccount', new Map(account));
+
+		return null;
 	}
 
 	onApprove() {
-		this.props.approve(this.props.transaction);
+		this.props.approve(this.props.transaction.get('options'), this.props.transaction.get('id'));
 	}
 
 	onCancel() {
 		this.props.cancel(this.props.transaction.get('id'));
 	}
 
-	render() {
-		const {
-			transaction, accounts, loading,
-		} = this.props;
+	getOptions() {
+		const { transactionShow } = this.props;
 
-		if (!transaction) {
+		if (!transactionShow) {
 			return null;
 		}
 
-		const options = transaction.get('options');
+		const typeParams = operationFields[transactionShow.get('type')];
 
-		const show = formatToShow(options.type, options);
-		const accountKey = operationKeys[options.type];
-		const account = accounts.find((a) => a.name === show[accountKey]);
+		const mapShow = [];
+
+		transactionShow.mapEntries(([key, value]) => {
+			if (!value) {
+				return null;
+			}
+
+			if (typeParams[key]) {
+				switch (typeParams[key].type) {
+					case 'asset_object':
+						mapShow.push(<div className="line">
+							<div className="key">{FormatHelper.capitalize(key)}</div>
+							<div className="value">
+								{
+									FormatHelper.formatAmount(
+										value.amount,
+										value.asset_id.precision,
+										value.asset_id.symbol,
+									)
+								}
+							</div>
+						</div>);
+
+						break;
+					case 'account_id':
+						mapShow.push(<div className="line">
+							<div className="key">{FormatHelper.capitalize(key)}</div>
+							<div className="value">
+								{value.name}
+							</div>
+						</div>);
+
+						break;
+					default:
+						mapShow.push(<div className="line">
+							<div className="key">{FormatHelper.capitalize(key === 'memo' ? 'note' : key)}</div>
+							<div className="value">
+								{value}
+							</div>
+						</div>);
+						break;
+				}
+
+				return null;
+			}
+
+			mapShow.push(<div className="line">
+				<div className="key">{FormatHelper.capitalize(key)}</div>
+				<div className="value">
+					{value}
+				</div>
+			</div>);
+
+			return null;
+		});
+
+		return mapShow;
+	}
+
+	render() {
+		const {
+			transaction, account, loading, transactionShow,
+		} = this.props;
+
+		if (!transaction || !account || !transactionShow) {
+			return null;
+		}
 
 		return (
 			<div className="incoming-transaction-wrap">
@@ -72,25 +143,18 @@ class SignTransaction extends React.Component {
 								<div className="title">Wallet</div>
 								<div className="incoming-transaction-user">
 									<UserIcon
-										avatar={`ava${account.icon}`}
-										color={account.iconColor}
+										avatar={`ava${account.get('icon')}`}
+										color={account.get('iconColor')}
 									/>
 									<div className="name">
-										{account.name}
+										{account.get('name')}
 									</div>
 								</div>
 							</div> : null
 					}
 					<div className="transaction-info">
 						{
-							Object.entries(show).map(([key, value]) => (
-								<div className="line" key={key}>
-									<div className="key">{FormatHelper.capitalize(key)}</div>
-									<div className="value">
-										{key === 'type' ? operationTypes[value].name : value}
-									</div>
-								</div>
-							))
+							this.getOptions()
 						}
 						{
 							/*
@@ -141,15 +205,20 @@ class SignTransaction extends React.Component {
 SignTransaction.propTypes = {
 	loading: PropTypes.bool,
 	transaction: PropTypes.any,
+	transactionShow: PropTypes.any,
 	accounts: PropTypes.object,
+	account: PropTypes.object,
 	history: PropTypes.object.isRequired,
 	approve: PropTypes.func.isRequired,
 	cancel: PropTypes.func.isRequired,
+	set: PropTypes.func.isRequired,
 };
 
 SignTransaction.defaultProps = {
 	transaction: null,
+	transactionShow: null,
 	accounts: null,
+	account: null,
 	loading: false,
 };
 
@@ -157,13 +226,16 @@ export default connect(
 	(state) => ({
 		loading: state.global.get('loading'),
 		transaction: state.global.getIn(['sign', 'current']),
+		transactionShow: state.global.getIn(['sign', 'dataToShow']),
 		accounts: state.global.getIn([
 			'accounts',
 			state.global.getIn(['network', 'name']),
 		]),
+		account: state.global.get('signAccount'),
 	}),
 	(dispatch) => ({
-		approve: (transaction) => dispatch(approveTransaction(transaction)),
+		approve: (options, id) => dispatch(approve(options, id)),
 		cancel: (transaction) => dispatch(cancelTransaction(transaction)),
+		set: (field, value) => dispatch(GlobalReducer.actions.set({ field, value })),
 	}),
 )(SignTransaction);

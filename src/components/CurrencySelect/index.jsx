@@ -306,7 +306,6 @@ class CurrencySelect extends React.Component {
 	render() {
 		const {
 			currentVal, search, opened, searchList,
-
 		} = this.state;
 
 		if (!searchList) {
@@ -317,9 +316,7 @@ class CurrencySelect extends React.Component {
 			{
 				id: 0,
 				title: 'Assets',
-				list: searchList.symbolsList.length ?
-					searchList.symbolsList :
-					searchList.symbolsList.push({ text: 'ECHO', value: '' }),
+				list: searchList.symbolsList,
 			},
 			{
 				id: 1,
@@ -327,6 +324,10 @@ class CurrencySelect extends React.Component {
 				list: searchList.tokensList,
 			},
 		];
+
+		if (!dropdownData[0].list.find((value) => value.text === CORE_SYMBOL)) {
+			dropdownData[0].list.unshift({ text: 'ECHO', value: '' });
+		}
 
 		const resultList = dropdownData.reduce((result, value) => result.concat(value.list), []);
 

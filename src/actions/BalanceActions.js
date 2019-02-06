@@ -10,7 +10,7 @@ import { getCryptoInfo, setCryptoInfo } from './CryptoActions';
 import { set } from './GlobalActions';
 
 import { FORM_SEND, FORM_WATCH_TOKEN } from '../constants/FormConstants';
-import { CORE_ID, GET_TOKENS_TIMEOUT, GLOBAL_ID_1 } from '../constants/GlobalConstants';
+import { CORE_ID, GET_TOKENS_TIMEOUT, GLOBAL_ID_1, NATHAN_ACCOUNT_ID } from '../constants/GlobalConstants';
 import { ERROR_SEND_PATH, WALLET_PATH, SEND_PATH } from '../constants/RouterConstants';
 
 import echoService from '../services/echo';
@@ -23,72 +23,6 @@ import BalanceReducer from '../reducers/BalanceReducer';
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import history from '../history';
-
-// /**
-//  *  @method initAssetsBalances
-//  *
-//  * 	Initialization user's assets
-//  *
-//  */
-// export const initAssetsBalances = () => async (dispatch, getState) => {
-//
-// 	const balancesPromises = [];
-// 	const assetsPromises = [];
-// 	const balancesState = getState().balance;
-// 	const stateAssets = balancesState.get('assets');
-// 	const stateBalances = balancesState.get('balances');
-//
-// 	const accounts = getState().global.get('accounts');
-// 	const activeNetworkName = getState().global.getIn(['network', 'name']);
-//
-// 	if (!accounts.get(activeNetworkName)) {
-// 		return false;
-// 	}
-//
-// 	const allPromises = accounts.get(activeNetworkName).map(async (account) => {
-//
-// 		const userBalances = (await echoService.getChainLib().api.getFullAccounts([account.name]))[0]
-// 			.balances;
-// 		console.log(await echoService.getChainLib().api.getObjects(Object.values(userBalances)));
-//
-// 		Object.values(userBalances)
-// 			.forEach((value) => balancesPromises.push(echoService.getChainLib().api.getObject(value)));
-// 		Object.keys(userBalances)
-// 			.forEach((value) => assetsPromises.push(echoService.getChainLib().api.getObject(value)));
-//
-// 		const balancesPromise = Promise.all(balancesPromises);
-// 		const assetsPromise = Promise.all(assetsPromises);
-//
-// 		return Promise.all([balancesPromise, assetsPromise]);
-//
-// 	});
-//
-// 	const balancesAssets = await Promise.all(allPromises);
-//
-// 	let balances = stateBalances;
-// 	let assets = stateAssets;
-//
-// 	balancesAssets.forEach(([balancesResult, assetsResult]) => {
-//
-// 		balancesResult.forEach((value) => {
-// 			balances = balances.set(value.id, value);
-// 		});
-// 		assetsResult.forEach((value) => {
-// 			assets = assets.set(value.id, value);
-// 		});
-//
-// 	});
-//
-// 	if ((stateAssets !== assets) || (stateBalances !== balances)) {
-// 		dispatch(BalanceReducer.actions.setAssets({
-// 			balances,
-// 			assets,
-// 		}));
-// 	}
-//
-// 	return true;
-//
-// };
 
 /**
  *  @method initAssetsBalances
@@ -287,7 +221,6 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 				asset: amountAsset,
 			},
 			fee: {
-				amount: 0,
 				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
 			},
 			from: fromAccount,
@@ -304,19 +237,21 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 		const code = getTransferCode(toAccount.id, new BN(amount).times(10 ** precision));
 		const receiver = await echoService.getChainLib().api.getObject(selectedBalance);
 		options = {
-			asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
 			code,
 			fee: {
 				amount: 0,
 				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
 			},
-			receiver,
+			callee: receiver,
 			registrar: fromAccount,
-			type: 'contract',
-			value: 0,
+			type: 48,
+			value: {
+				amount: 0,
+				asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+			},
 		};
 
-		if (!options.asset_id || !options.fee.asset || !options.registrar) {
+		if (!options.value.asset_id || !options.fee.asset || !options.registrar) {
 			return false;
 		}
 	}
@@ -393,25 +328,34 @@ export const send = () => async (dispatch, getState) => {
 	let options = {};
 
 	if (isToken) {
-		const code = getTransferCode(toAccount.get('id'), new BN(amount).times(10 ** token.get('precision')));
+		const code = getTransferCode(toAccount.id, new BN(amount).times(10 ** token.get('precision')));
 		const receiver = await echoService.getChainLib().api.getObject(selectedBalance);
+		let coreAsset = assets.get(balances.getIn([selectedFeeBalance, 'asset_type']));
+
+		if (!coreAsset) {
+			await echoService.getChainLib().api.getObject(CORE_ID, true);
+			coreAsset = getState().blockchain.getIn(['objectsById', '1.3.0']);
+		}
+
 		options = {
-			asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
 			code,
 			fee: {
 				amount: fee.value || 0,
-				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+				asset: coreAsset,
 			},
-			receiver,
+			callee: receiver,
 			registrar: fromAccount,
-			type: 'contract',
-			value: 0,
+			type: 48,
+			value: {
+				asset_id: coreAsset,
+				amount: 0,
+			},
 		};
 	} else {
 
 		options = {
 			amount: {
-				amount,
+				amount: parseFloat(amount),
 				asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
 			},
 			fee: {
@@ -425,7 +369,7 @@ export const send = () => async (dispatch, getState) => {
 		};
 	}
 
-	if (!fee.value) {
+	if (!options.fee.amount) {
 		options.fee = await getTransactionFee(options);
 	}
 
@@ -457,10 +401,11 @@ export const send = () => async (dispatch, getState) => {
 	}
 
 	if (isToken) {
-		options.value = 0;
+		options.value.amount = 0;
 		options.fee.amount *= 10 ** options.fee.asset.get('precision');
 	} else {
 		options.amount.amount = parseInt(options.amount.amount * (10 ** options.amount.asset.get('precision')), 10);
+		options.fee.amount *= 10 ** options.fee.asset.get('precision');
 	}
 
 	const activeNetworkName = getState().global.getIn(['network', 'name']);
@@ -523,7 +468,7 @@ export const getTokenDetails = async (contractId, accountId) => {
 			tokenDetails
 				.push(echoService.getChainLib()
 					.api
-					.callContractNoChangingState(contractId, accountId, CORE_ID, methodId));
+					.callContractNoChangingState(contractId, NATHAN_ACCOUNT_ID, CORE_ID, methodId));
 		});
 
 		const start = new Date().getTime();
@@ -687,7 +632,7 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
  * 	@param {Object} tokens
  */
 const checkBlockTransactions = async (blockNum, count, tokens) => {
-	const block = await echoService.getChainLib().getBlock(blockNum);
+	const block = await echoService.getChainLib().api.getBlock(blockNum);
 
 	if (block.transactions.length) {
 		for (let tr = 0; tr < block.transactions.length; tr += 1) {
@@ -697,7 +642,7 @@ const checkBlockTransactions = async (blockNum, count, tokens) => {
 				let isChanged = false;
 
 				tokens.mapEntries(([, tokensArr]) => {
-					if (tokensArr.findKey((value, key) => key === data.receiver)) {
+					if (tokensArr.findKey((value, key) => key === data.callee)) {
 						isChanged = true;
 					}
 				});
@@ -729,7 +674,8 @@ const checkBlockTransactions = async (blockNum, count, tokens) => {
  * 	@param {Object} tokens
  */
 const isBlockChanged = (tokens) => async (dispatch, getState) => {
-	const blockNum = (await echoService.getChainLib().api.getObject(GLOBAL_ID_1)).head_block_number;
+	const blockNum = (await echoService.getChainLib().api.getObject(GLOBAL_ID_1, true))
+		.head_block_number;
 
 	const stateBlockNum = getState().global.get('headBlockNum');
 
@@ -744,7 +690,11 @@ const isBlockChanged = (tokens) => async (dispatch, getState) => {
 
 	let isUpdated = false;
 
-	isUpdated = await checkBlockTransactions(stateBlockNum, blockNum - stateBlockNum, tokens);
+	isUpdated = await checkBlockTransactions(
+		stateBlockNum + 1,
+		(blockNum - stateBlockNum) - 1,
+		tokens,
+	);
 
 	dispatch(GlobalReducer.actions.set({ field: 'headBlockNum', value: blockNum }));
 
@@ -754,7 +704,7 @@ const isBlockChanged = (tokens) => async (dispatch, getState) => {
 /**
  *  @method updateTokens
  *
- *  Update tokens in state when when contract was used in the last proceed blocks
+ *  Update tokens in state when contract was used in the last proceed blocks
  */
 export const updateTokens = () => async (dispatch, getState) => {
 	const tokens = getState().balance.get('tokens');

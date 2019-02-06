@@ -22,14 +22,16 @@ const DEFAULT_FIELDS = Map({
 		error: null,
 		goTo: null,
 	}),
-	sign: new Map({
+	sign: {
 		current: null,
-		transactions: new List([]),
+		dataToShow: null,
+		transactions: [],
 		goTo: null,
-	}),
+	},
 	headBlockNum: 0,
 	history: new List([]),
 	formattedHistory: new OrderedMap({}),
+	signAccount: new Map({}),
 });
 
 export default createModule({

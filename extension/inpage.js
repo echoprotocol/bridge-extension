@@ -1,9 +1,10 @@
-import echo, { Transaction, constants } from 'echojs-lib';
+import echo, { Transaction, constants, PublicKey } from 'echojs-lib';
 import lodash from 'lodash';
+import BigNumber from 'bignumber.js';
 
 import { APP_ID } from '../src/constants/GlobalConstants';
 
-// import SignTransaction from './SignTransaction';
+import { uniqueNonceUint64 } from '../src/services/crypto';
 
 const requestQueue = [];
 
@@ -31,7 +32,6 @@ const subscribeSwitchNetwork = (subscriberCb) => {
  * @param event
  */
 const onMessage = (event) => {
-
 	if (event.data.subscriber) {
 
 		networkSubscribers.forEach((cb) => cb(event.data.res));
@@ -107,22 +107,58 @@ const getAccounts = () => {
 	return result;
 };
 
-Transaction.prototype.signWithBridge = function () {
-	// const signTransaction = new SignTransaction();
 
-	// const cb = () => signTransaction.sign();
+class Signat {
 
+	/**
+	 *
+	 * @param {String} value hex
+	 */
+	constructor(value) {
+		this.value = value;
+	}
+
+	toBuffer() {
+		return Buffer.from(this.value, 'hex');
+	}
+
+}
+
+Transaction.prototype.signWithBridge = async function signWithBridge() {
 	const id = Date.now();
 
+	if (!this.hasAllFees) {
+		await this.setRequiredFees();
+	}
+
 	const result = new Promise((resolve, reject) => {
-
 		const cb = ({ data }) => {
+			const signData = JSON.parse(data.signData);
 
-			if (data.signatures.error) {
-				reject(data.res.error);
-			} else {
-				resolve(data.signatures);
+			if (signData.memoMessage) {
+				this._operations[0][1].memo.message = Buffer.from(signData.memoMessage, 'hex');
 			}
+
+			if (this._operations[0][1].from) {
+				this._operations[0][1].from = signData.accountId;
+			} else if (this._operations[0][1].registrar) {
+				this._operations[0][1].registrar = signData.accountId;
+			}
+
+			this._refBlockNum = signData.ref_block_num;
+			this._refBlockPrefix = signData.ref_block_prefix;
+			this._expiration = signData.expiration;
+			this._signatures = signData.serializedSignatures.map((hexString) => new Signat(hexString));
+
+			this._finalized = true;
+
+			this.broadcast()
+				.then((res) => {
+					resolve(res);
+				})
+				.catch((err) => {
+					reject(err);
+				});
 		};
 
 		requestQueue.push({ id, cb });
@@ -130,7 +166,11 @@ Transaction.prototype.signWithBridge = function () {
 		const operations = JSON.stringify(this._operations);
 
 		window.postMessage({
-			method: 'transaction', data: operations, id, target: 'content', appId: APP_ID,
+			method: 'confirm',
+			data: operations,
+			id,
+			target: 'content',
+			appId: APP_ID,
 		}, '*');
 
 	});
@@ -138,53 +178,29 @@ Transaction.prototype.signWithBridge = function () {
 	return result;
 };
 
-// const signWithBridge = async () => {
-// 	const tr = window.getChainLib().createTransaction();
-// 	const signTr = new SignTransaction(tr);
-// 	await signTr.sign();
-// 	tr.addOperation(options.type, options);
-//
-// 	const id = Date.now();
-//
-// 	const cb = (signs) => broadcastTr(signs, tr);
-//
-// 	requestQueue.push({ id, cb });
-// 	window.postMessage({
-// 		method: 'confirm', data: options, id, target: 'content', appId: APP_ID,
-// 	}, '*');
-//
-// 	// const result = new Promise((resolve, reject) => {
-// 	// 	const cb = ({ data }) => {
-// 	//
-// 	// 		const { status, text, resultBroadcast } = data;
-// 	//
-// 	// 		if (status === 'approved') {
-// 	// 			resolve({ status, resultBroadcast });
-// 	// 		} else {
-// 	// 			reject(text || status);
-// 	// 		}
-// 	// 	};
-// 	//
-// 	//
-// 	// });
-// };
-
 const extension = {
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
 	subscribeSwitchNetwork: (subscriberCb) => {
 
 		if (!lodash.isFunction(subscriberCb)) {
-			throw new Error('Is not a function')
+			throw new Error('Is not a function');
 		}
 
-		subscribeSwitchNetwork(subscriberCb)
+		subscribeSwitchNetwork(subscriberCb);
 	},
 };
+
 window.echojslib = echo;
 window.echojslib.isEchoBridge = true;
 window.echojslib.extension = extension;
 window.echojslib.constants = constants;
+window.echojslib.helpers = {
+	BigNumber,
+};
+window.echojslib.PublicKey = PublicKey;
+window.echojslib.Buffer = Buffer;
+window.echojslib.generateNonce = () => uniqueNonceUint64();
 
 window.addEventListener('message', onMessage, false);
 
