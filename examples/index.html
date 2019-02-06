@@ -212,16 +212,19 @@
 				tr.addOperation(transaction.type, trSign);
 
 				tr.signWithBridge()
-					.then(result => {
-						jQuery("#transfer-info").html(
-								`<p>RESULT: ${JSON.stringify(result)}</p>`
-						);
-					})
-					.catch(err => {
-						jQuery("#transfer-info").html(
-								`<p>ERROR: ${JSON.stringify(err)}</p>`
-						);
-					});
+						.then(result => {
+							result.broadcast()
+									.then((res) => {
+										jQuery("#transfer-info").html(
+												`<p>RESULT: ${JSON.stringify(res)}</p>`
+										);
+									})
+									.catch((err) => {
+										jQuery("#transfer-info").html(
+												`<p>ERROR: ${JSON.stringify(err)}</p>`
+										);
+									});
+						});
 			});
 
 			$("#contract-click").click(function(e) {

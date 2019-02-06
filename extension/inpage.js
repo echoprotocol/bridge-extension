@@ -152,13 +152,7 @@ Transaction.prototype.signWithBridge = async function signWithBridge() {
 
 			this._finalized = true;
 
-			this.broadcast()
-				.then((res) => {
-					resolve(res);
-				})
-				.catch((err) => {
-					reject(err);
-				});
+			resolve(this);
 		};
 
 		requestQueue.push({ id, cb });
