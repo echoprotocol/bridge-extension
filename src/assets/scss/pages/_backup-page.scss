@@ -8,6 +8,17 @@
 }
 
 .backup-page {
+	&-empty {
+		color: #596066;
+		font-family: FNBook;
+		text-align: center;
+		padding: 20px;
+		font-size: 15px;
+		letter-spacing: 0.6px;
+		line-height: 19px;
+		text-align: center;
+		
+	}
 	.user-scroll {
 		height: 486px;
 	}
