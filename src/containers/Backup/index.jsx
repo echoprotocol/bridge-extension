@@ -39,7 +39,14 @@ class Backup extends React.Component {
 		const { keys } = this.state;
 
 		if (!keys.length) {
-			return null;
+			return (
+				<React.Fragment>
+					<div className="backup-page-empty">
+						The active key is invalid or has been deleted. Please log in again.
+					</div>
+				</React.Fragment>
+			);
+
 		}
 
 		return (
