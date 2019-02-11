@@ -340,8 +340,8 @@ export const changeNetwork = (network) => async (dispatch, getState) => {
 		const currentNetwork = getState().global.get('network');
 		const emitter = echoService.getEmitter();
 		await emitter.emit('switchNetwork', network || {
-			name: currentNetwork.name,
-			url: currentNetwork.url,
+			name: currentNetwork.get('name'),
+			url: currentNetwork.get('url'),
 		});
 
 		if (network) {
@@ -429,8 +429,21 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 		await storage.remove(network.name);
 
 		if (currentNetworkName === network.name) {
+			if (echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
+				await dispatch(disconnect());
+			}
+
 			await storage.remove('current_network');
+
 			await dispatch(connect());
+
+			const currentNetwork = getState().global.getIn(['network']);
+
+			await echoService.getEmitter().emit('switchNetwork', {
+				name: currentNetwork.get('name'),
+				url: currentNetwork.get('url'),
+			});
+
 			await dispatch(loadInfo());
 		}
 
