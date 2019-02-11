@@ -224,6 +224,10 @@
 												`<p>ERROR: ${JSON.stringify(err)}</p>`
 										);
 									});
+						}).catch((err) => {
+							jQuery("#transfer-info").html(
+									`<p>ERROR: ${JSON.stringify(err.message)}</p>`
+							);
 						});
 			});
 

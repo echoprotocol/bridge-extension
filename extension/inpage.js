@@ -132,6 +132,10 @@ Transaction.prototype.signWithBridge = async function signWithBridge() {
 	}
 
 	const result = new Promise((resolve, reject) => {
+		if (!this._operations.length) {
+			return reject(new Error('Operation required'));
+		}
+
 		const cb = ({ data }) => {
 			const signData = JSON.parse(data.signData);
 
@@ -167,6 +171,7 @@ Transaction.prototype.signWithBridge = async function signWithBridge() {
 			appId: APP_ID,
 		}, '*');
 
+		return null;
 	});
 
 	return result;
