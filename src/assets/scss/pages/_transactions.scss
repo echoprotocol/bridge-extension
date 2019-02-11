@@ -4,45 +4,107 @@
     }
 }
 
+@mixin activeState() {
+	z-index: 2;
 
-.transactions-wrapper {
+	.transaction {
+		&-type {
+			color: #434c53;
+			img {
+				opacity: 1;
+			}
+		}
+		&-date {
+			color: #434c53;
+		}
+	}
+	&:after {
+		opacity: 1;
+		visibility: visible;
+	}
+
+	.bottom-block {
+		.ddDown {
+			opacity: 1;
+		}
+	}
+}
+
+.transactions-wrap {
     width: calc(100% - 20px);
     margin: 0 auto;
     height: 488px;
 
-    .ui.accordion {
-        padding-top: 10px;
-        padding-bottom: 10px;
+    .accordion {
+        padding: 10px 0;
 
-        .title {
-            padding: 0;
-            color: #000000;
-            & ~ .content {
-                padding: 5px 0px 25px 0px !important;
+		input[type="checkbox"] {
+			opacity: 0;
+			display: flex;
+			z-index: -1;
+			width: 0;
+			height: 0;
+
+			& ~ .content {
+				padding: 5px 0px 25px 0px;
+				display: none;
             }
 
-            &.active {
-                .transaction-element {
-                    border-color: transparent;
+			&:checked {
+				& + .transaction-element {
+					border-color: transparent;
+					.bottom-block {
+						.ddDown {
+							transform: rotate(180deg);
+							bottom: -1px;
+						}
+					}
+				}
 
-                    .bottom-block {
-                        .icon {
-                            &-dropdown {
-                                &:before {
-                                    transform: rotate(180deg);
-                                }
-                            }
-                        }
-                    }
-                }
-            }
-        }
+				& ~ .content {
+					display: block;
+				}
+			}
+
+			&:active {
+				& + .transaction-element {
+					.top-block {
+						opacity: 0.6;
+					}
+					.bottom-block {
+						opacity: 0.6;
+					}
+					.transaction-element {
+						&:after {
+							background-color: #f7f9fa;
+							box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
+						}
+					}
+				}
+			}
+
+			&:focus {
+				& + .transaction-element {
+					@include activeState();
+				}
+			}
+
+		}
+		
     }
 }
+
+
 
 .transaction-element {
     position: relative;
     z-index: 1;
+    background-color: #f7f9fa;
+    border-bottom: 1px solid #d3d6d8;
+    padding: 10px 11px 9px 11px;
+	color: #000000;
+	display: block;
+	cursor: pointer;
 
     &:after {
         content: '';
@@ -60,48 +122,8 @@
     }
 
     &:hover {
-        z-index: 2;
-
-        .transaction {
-            &-type {
-				color: #434c53;
-				img {
-					opacity: 1;
-				}
-            }
-            &-date {
-                color: #434c53;
-            }
-        }
-        &:after {
-            opacity: 1;
-            visibility: visible;
-        }
-
-        .bottom-block {
-            .ddDown {
-				opacity: 1;
-			}
-		}
+ 		@include activeState();
     }
-
-    &:active {
-        .top-block {
-            opacity: 0.6;
-        }
-        .bottom-block {
-            opacity: 0.6;
-        }
-        &:after {
-            background-color: #f7f9fa;
-            box-shadow: 0 0 5px rgba(0, 0, 0, 0.05);
-        }
-    }
-
-    background-color: #f7f9fa;
-    border-bottom: 1px solid #d3d6d8;
-
-    padding: 10px 11px 9px 11px;
 
     .top-block {
         display: flex;
@@ -176,14 +198,12 @@
     &-content {
         width: calc(100% - 4px);
         margin: 0 auto;
-
         border: 1px solid #d3d6d8;
-        
         padding-right: 10px;
         padding-left: 15px;
         padding-top: 19px;
         padding-bottom: 17px;
-
+		animation: fadeIn $speed;
         .row {
             font-family: FNMedium;
             font-size: 14px;
