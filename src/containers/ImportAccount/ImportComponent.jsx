@@ -99,7 +99,7 @@ class ImportComponent extends React.Component {
 								type="password"
 								errorText={passwordError}
 								theme="input-light"
-								labelText="WIF key / password"
+								labelText="WIF (Active key) / password"
 								value={password}
 								onChange={(e) => this.onChange(e)}
 								onKeyPress={(e) => this.onPressEnter(e)}
