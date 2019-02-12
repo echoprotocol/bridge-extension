@@ -34,6 +34,12 @@
     }
 
     .key {
+		white-space: pre-wrap;
+		word-break: break-all;
+		
+		/* For Chrome and IE */
+		word-wrap: break-word;
+
         font-family: FNMedium;
         font-size: 13px;
         line-height: 19px;
@@ -62,6 +68,12 @@
              color: #7e8489;
          }
          .wif-key {
+			white-space: pre-wrap;
+			word-break: break-all;
+			
+			/* For Chrome and IE */
+			word-wrap: break-word;
+
             margin-top: 6px;
             font-family: FNMedium;
             font-size: 18px;
