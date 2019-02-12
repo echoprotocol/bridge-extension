@@ -8,12 +8,27 @@ import Navbar from '../Navbar';
 import BridgeSidebar from '../BridgeSidebar';
 
 import { SIGN_TRANSACTION_PATH } from '../../constants/RouterConstants';
+import echoService from '../../services/echo';
 
 class Navigator extends React.PureComponent {
 
 	constructor(props) {
 		super(props);
 		this.sidebarRef = React.createRef();
+	}
+
+	componentDidMount() {
+		document.addEventListener('keydown', this.updateTimeout);
+		document.addEventListener('mousedown', this.updateTimeout);
+	}
+
+	componentWillUnmount() {
+		document.removeEventListener('keydown', this.updateTimeout);
+		document.removeEventListener('mousedown', this.updateTimeout);
+	}
+
+	updateTimeout() {
+		echoService.getCrypto().updateLockTimeout();
 	}
 
 	render() {

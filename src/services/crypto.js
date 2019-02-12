@@ -52,6 +52,15 @@ class Crypto extends EventEmitter {
 	}
 
 	/**
+	 *  @method updateLockTimeout
+	 *
+	 *  Update lock timeout
+	 */
+	updateLockTimeout() {
+		privateAES.timeout();
+	}
+
+	/**
 	 *  @method isFirstTime
 	 *
 	 *  Check is key exist
