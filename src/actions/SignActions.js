@@ -350,6 +350,10 @@ export const loadRequests = () => async (dispatch) => {
 	const { pathname } = history.location;
 	const requests = JSON.parse(JSON.stringify(echoService.getRequests()));
 
+	if (!requests.length) {
+		return null;
+	}
+
 	const dataToShow = await getFetchedData(requests[0].options);
 
 	dispatch(batchActions([
