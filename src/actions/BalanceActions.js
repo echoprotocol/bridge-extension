@@ -45,15 +45,20 @@ export const initAssetsBalances = () => async (dispatch, getState) => {
 	}
 
 	accounts.get(activeNetworkName).forEach(async (account) => {
+		const userAccount = (await echoService.getChainLib().api.getFullAccounts([account.name]))[0];
 
-		const userBalances = (await echoService.getChainLib().api.getFullAccounts([account.name]))[0]
-			.balances;
+		if (!userAccount) {
+			return null;
+		}
+
+		const userBalances = userAccount.balances;
 
 		balancesAssetsPromises.push([
 			echoService.getChainLib().api.getObjects(Object.values(userBalances)),
 			echoService.getChainLib().api.getObjects(Object.keys(userBalances)),
 		]);
 
+		return null;
 	});
 
 	await Promise.all(balancesAssetsPromises);
