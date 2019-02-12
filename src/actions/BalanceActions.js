@@ -6,7 +6,7 @@ import { validators } from 'echojs-lib';
 
 import { setFormError, setValue, setFormValue } from './FormActions';
 import { getTransactionFee } from './SignActions';
-import { getCryptoInfo, setCryptoInfo } from './CryptoActions';
+import { getCrypto, getCryptoInfo, setCryptoInfo } from './CryptoActions';
 import { set } from './GlobalActions';
 
 import { FORM_SEND, FORM_WATCH_TOKEN } from '../constants/FormConstants';
@@ -427,6 +427,8 @@ export const send = () => async (dispatch, getState) => {
  * 	@param {String} path
  */
 export const sendHandler = (path) => (dispatch, getState) => {
+	getCrypto().updateLockTimeout();
+
 	if (getState().global.get('loading')) {
 		history.push(path);
 	}

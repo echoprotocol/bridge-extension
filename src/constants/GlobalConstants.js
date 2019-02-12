@@ -99,7 +99,7 @@ export const SIGN_STATUS = 'sign';
 
 export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
 
-export const TIMEOUT = 10 * 60 * 1000;
+export const TIMEOUT = 2 * 60 * 1000;
 export const RANDOM_SIZE = 2048;
 export const RANDOM_ECHORANDKEY_SIZE = 32;
 export const OWNER_KEY = 'owner';

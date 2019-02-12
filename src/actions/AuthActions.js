@@ -130,7 +130,7 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		return null;
 	} finally {
 		dispatch(toggleLoading(FORM_SIGN_UP, false));
-		getCrypto().resumeLockTimeout();
+		getCrypto().updateLockTimeout();
 	}
 
 };
@@ -358,6 +358,6 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		return false;
 	} finally {
 		dispatch(toggleLoading(FORM_SIGN_IN, false));
-		getCrypto().resumeLockTimeout();
+		getCrypto().updateLockTimeout();
 	}
 };

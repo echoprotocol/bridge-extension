@@ -9,7 +9,10 @@ import { initAssetsBalances, updateTokens } from './BalanceActions';
 
 import echoService from '../services/echo';
 
-import { CONNECT_STATUS, NETWORKS } from '../constants/GlobalConstants';
+import {
+	CONNECT_STATUS,
+	NETWORKS,
+} from '../constants/GlobalConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 
 import storage from '../services/storage';
