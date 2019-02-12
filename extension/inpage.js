@@ -185,6 +185,7 @@ const extension = {
 	},
 };
 
+window._.noConflict();
 window.echojslib = echo;
 window.echojslib.isEchoBridge = true;
 window.echojslib.extension = extension;
