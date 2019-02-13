@@ -7,7 +7,7 @@ import { withRouter } from 'react-router';
 import CustomScroll from 'react-custom-scroll';
 
 import { clearForm, setFormValue } from '../../actions/FormActions';
-import { addNetwork } from '../../actions/GlobalActions';
+import { addNetwork, storageGetDraft, storageRemoveDraft, storageSetDraft } from '../../actions/GlobalActions';
 
 import { FORM_ADD_NETWORK } from '../../constants/FormConstants';
 
@@ -21,6 +21,20 @@ class AddNetwork extends React.Component {
 
 		this.nameRef = null;
 		this.addressRef = null;
+	}
+
+	componentDidMount() {
+		storageGetDraft().then((draft) => {
+			if (!draft) {
+				return null;
+			}
+
+			Object
+				.entries(draft[FORM_ADD_NETWORK])
+				.forEach(([key, value]) => this.props.setFormValue(key, value));
+
+			return null;
+		});
 	}
 
 	componentDidUpdate(prevProps) {
@@ -44,6 +58,8 @@ class AddNetwork extends React.Component {
 	}
 
 	componentWillUnmount() {
+		storageRemoveDraft();
+
 		this.props.clearForm();
 	}
 
@@ -66,6 +82,8 @@ class AddNetwork extends React.Component {
 
 		if (field) {
 			this.props.setFormValue(field, value);
+
+			storageSetDraft(FORM_ADD_NETWORK, field, value);
 		}
 	}
 

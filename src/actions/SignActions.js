@@ -347,39 +347,43 @@ export const trResponseHandler = (status, id, path, windowType) => async (dispat
  * 	Load transactions data from query to redux store
  */
 export const loadRequests = () => async (dispatch) => {
-	const { pathname } = history.location;
-	const requests = JSON.parse(JSON.stringify(echoService.getRequests()));
+	try {
+		const { pathname } = history.location;
+		const requests = JSON.parse(JSON.stringify(echoService.getRequests()));
 
-	if (!requests.length) {
-		return null;
-	}
+		if (!requests.length) {
+			return null;
+		}
 
-	const dataToShow = await getFetchedData(requests[0].options);
+		const dataToShow = await getFetchedData(requests[0].options);
 
-	dispatch(batchActions([
-		GlobalReducer.actions.set({
-			field: 'sign',
-			value: new Map({
-				goTo: !NOT_RETURNED_PATHS.includes(pathname) ? pathname : null,
-				transactions: new List(requests),
-			}),
-		}),
-		GlobalReducer.actions.setIn({
-			field: 'sign',
-			params: {
-				current: new Map({
-					id: requests[0].id,
-					options: requests[0].options,
+		dispatch(batchActions([
+			GlobalReducer.actions.set({
+				field: 'sign',
+				value: new Map({
+					goTo: !NOT_RETURNED_PATHS.includes(pathname) ? pathname : null,
+					transactions: new List(requests),
 				}),
-			},
-		}),
-		GlobalReducer.actions.setIn({
-			field: 'sign',
-			params: {
-				dataToShow: new Map(dataToShow),
-			},
-		}),
-	]));
+			}),
+			GlobalReducer.actions.setIn({
+				field: 'sign',
+				params: {
+					current: new Map({
+						id: requests[0].id,
+						options: requests[0].options,
+					}),
+				},
+			}),
+			GlobalReducer.actions.setIn({
+				field: 'sign',
+				params: {
+					dataToShow: new Map(dataToShow),
+				},
+			}),
+		]));
+	} catch (err) {
+		console.log('loadRequests Error', err);
+	}
 
 	return null;
 };

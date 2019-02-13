@@ -15,11 +15,11 @@ import {
 	SIGN_TRANSACTION_PATH,
 	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
-	NETWORK_ERROR_SEND_PATH,
+	NETWORK_ERROR_SEND_PATH, FORM_TYPES,
 } from '../constants/RouterConstants';
 import { NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
 import { setValue } from './FormActions';
-import { loadInfo, set } from './GlobalActions';
+import { loadInfo, set, storageGetDraft } from './GlobalActions';
 import { globals } from './SignActions';
 
 import FormatHelper from '../helpers/FormatHelper';
@@ -43,11 +43,10 @@ const changeCrypto = (params) => (dispatch) => {
  * 	Lock crypto in GlobalReducer and redirect to unlock
  */
 const lockCrypto = () => (dispatch) => {
-
 	dispatch(batchActions([
 		GlobalReducer.actions.set({ field: 'loading', value: false }),
 		GlobalReducer.actions.lock({
-			goTo: `${history.location.pathname}${history.location.search}`,
+			goTo: INDEX_PATH,
 		}),
 	]));
 	try {
@@ -149,13 +148,21 @@ export const initCrypto = () => async (dispatch) => {
 		if (!crypto.isLocked()) {
 			dispatch(changeCrypto({ isLocked: false }));
 			await dispatch(loadInfo());
-			history.push(globals.WINDOW_TYPE === POPUP_WINDOW_TYPE ? SIGN_TRANSACTION_PATH : INDEX_PATH);
+
+			if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
+				const draft = await storageGetDraft();
+
+				history.push(draft ? FORM_TYPES[Object.keys(draft)[0]] : INDEX_PATH);
+			} else {
+				history.push(SIGN_TRANSACTION_PATH);
+			}
 		} else {
 			const isFirstTime = await crypto.isFirstTime();
 
 			history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
 		}
 	} catch (err) {
+		console.log('initCrypto Error', err);
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };
@@ -166,7 +173,7 @@ export const initCrypto = () => async (dispatch) => {
  *  Set value by field in network storage
  *
  * 	@param {String} field
- * 	@param {Any} value
+ * 	@param {*} value
  * 	@param {String?} networkName
  */
 export const setCryptoInfo = (field, value, networkName) => async (dispatch, getState) => {

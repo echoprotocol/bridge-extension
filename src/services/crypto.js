@@ -413,7 +413,7 @@ class Crypto extends EventEmitter {
 	 *
 	 *  @param {String} networkName
 	 *  @param {String} field
-	 *  @param {Any} fieldData
+	 *  @param {*} fieldData
 	 */
 	async setInByNetwork(networkName, field, fieldData) {
 		privateAES.required();

@@ -65,9 +65,17 @@ class CurrencySelect extends React.Component {
 	componentWillReceiveProps(nextProps) {
 		if (_.isEqual(this.props, nextProps)) { return; }
 
+		const { path } = nextProps;
+
+		const searchList = this.getSymbols(nextProps);
+
 		this.setState({
-			searchList: this.getSymbols(),
+			searchList,
 		});
+
+		if (searchList.symbolsList[0]) {
+			this.props.setAssetFormValue(path.form, path.field, searchList.symbolsList[0].value);
+		}
 	}
 
 	componentWillUpdate() {
@@ -218,7 +226,7 @@ class CurrencySelect extends React.Component {
 		this.menuRef = node;
 	}
 
-	getSymbols() {
+	getSymbols(nextProps) {
 		const symbolsList = [];
 		const tokensList = [];
 
@@ -228,7 +236,7 @@ class CurrencySelect extends React.Component {
 
 		const {
 			balances, assets, account, tokens,
-		} = this.props.data;
+		} = nextProps ? nextProps.data : this.props.data;
 
 		if (!account) {
 			return symbolsList;

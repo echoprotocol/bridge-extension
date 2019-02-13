@@ -14,6 +14,20 @@ class BridgeTextArea extends React.Component {
 			filled: false,
 		};
 	}
+
+	static getDerivedStateFromProps(nextProps, prevState) {
+		const { value } = nextProps;
+		const { filled } = prevState;
+
+		if (value && !filled) {
+			return {
+				filled: !filled,
+			};
+		}
+
+		return null;
+	}
+
 	componentWillMount() {
 		this.setState({ filled: !!this.props.value });
 	}

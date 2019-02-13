@@ -21,6 +21,7 @@ import {
 	ACCOUNT_COLORS,
 	BASE_ICON,
 	BASE_ICON_COLOR,
+	DRAFT_STORAGE_KEY,
 	ICON_COLORS_COUNT,
 	ICONS_COUNT,
 	NETWORKS,
@@ -48,7 +49,7 @@ import Listeners from '../services/listeners';
  * 	Set in GlobalReducer
  *
  * 	@param {String} field
- * 	@param {Any} value
+ * 	@param {*} value
  */
 
 export const set = (field, value) => (dispatch) =>
@@ -247,81 +248,84 @@ export const switchAccount = (name) => async (dispatch, getState) => {
  */
 export const loadInfo = () => async (dispatch, getState) => {
 
+	try {
+		const networks = getState().global.get('networks');
+		let accountsNetworks = new Map();
 
-	const networks = getState().global.get('networks');
-	let accountsNetworks = new Map();
-
-	const resultPromises = networks.concat(NETWORKS).map(async (network) => {
-		const accounts = await dispatch(getCryptoInfo('accounts', network.name));
-		const tokens = await dispatch(getCryptoInfo('tokens', network.name));
-		return [network.name, accounts, tokens];
-	});
-
-	const result = await Promise.all(resultPromises);
-
-	let stateTokens = new Map({});
-	result.forEach(([networkName, accounts, tokens]) => {
-		accountsNetworks = accountsNetworks.set(networkName, new List(accounts));
-
-		if (!tokens) {
-			return null;
-		}
-
-		Object.entries(tokens).forEach(([accountId, tokensArray]) => {
-			tokensArray.forEach((id) => {
-				stateTokens = stateTokens.setIn([accountId, `1.16.${id}`], new Map({}));
-			});
+		const resultPromises = networks.concat(NETWORKS).map(async (network) => {
+			const accounts = await dispatch(getCryptoInfo('accounts', network.name));
+			const tokens = await dispatch(getCryptoInfo('tokens', network.name));
+			return [network.name, accounts, tokens];
 		});
 
-		return null;
-	});
+		const result = await Promise.all(resultPromises);
 
-	dispatch(set('accounts', accountsNetworks));
+		let stateTokens = new Map({});
+		result.forEach(([networkName, accounts, tokens]) => {
+			accountsNetworks = accountsNetworks.set(networkName, new List(accounts));
 
-	const tokensDetails = [];
+			if (!tokens) {
+				return null;
+			}
 
-	stateTokens.mapEntries(([accountId, tokensArr]) => {
-		const tokenPromises = [];
-		tokensArr.mapKeys((contractId) => {
-			tokenPromises.push(getTokenDetails(contractId, accountId));
-		});
-		tokensDetails.push(Promise.all(tokenPromises));
-	});
-
-	Promise.all(tokensDetails).then((resTokensDetails) => {
-		if (resTokensDetails) {
-			stateTokens.mapEntries(([accountId, tokensArr], i) => {
-				tokensArr.mapEntries(([contractId], j) => {
-					stateTokens = stateTokens
-						.setIn([accountId, contractId, 'symbol'], resTokensDetails[i][j].symbol)
-						.setIn([accountId, contractId, 'precision'], resTokensDetails[i][j].precision)
-						.setIn([accountId, contractId, 'balance'], resTokensDetails[i][j].balance);
+			Object.entries(tokens).forEach(([accountId, tokensArray]) => {
+				tokensArray.forEach((id) => {
+					stateTokens = stateTokens.setIn([accountId, `1.16.${id}`], new Map({}));
 				});
 			});
+
+			return null;
+		});
+
+		dispatch(set('accounts', accountsNetworks));
+
+		const tokensDetails = [];
+
+		stateTokens.mapEntries(([accountId, tokensArr]) => {
+			const tokenPromises = [];
+			tokensArr.mapKeys((contractId) => {
+				tokenPromises.push(getTokenDetails(contractId, accountId));
+			});
+			tokensDetails.push(Promise.all(tokenPromises));
+		});
+
+		Promise.all(tokensDetails).then((resTokensDetails) => {
+			if (resTokensDetails) {
+				stateTokens.mapEntries(([accountId, tokensArr], i) => {
+					tokensArr.mapEntries(([contractId], j) => {
+						stateTokens = stateTokens
+							.setIn([accountId, contractId, 'symbol'], resTokensDetails[i][j].symbol)
+							.setIn([accountId, contractId, 'precision'], resTokensDetails[i][j].precision)
+							.setIn([accountId, contractId, 'balance'], resTokensDetails[i][j].balance);
+					});
+				});
+			}
+
+			dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }));
+		});
+
+
+		const accounts = await dispatch(getCryptoInfo('accounts'));
+
+		if (accounts && accounts.length) {
+			await dispatch(initAccount(accounts.find((account) => account.active)));
+
+			let path = getState().global.getIn(['crypto', 'goTo']) || INDEX_PATH;
+
+			if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE
+				&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH].includes(path)) {
+				path = EMPTY_PATH;
+			}
+
+			history.push(path);
+		} else {
+			history.push(CREATE_ACCOUNT_PATH);
 		}
 
-		dispatch(BalanceReducer.actions.set({ field: 'tokens', value: stateTokens }));
-	});
-
-
-	const accounts = await dispatch(getCryptoInfo('accounts'));
-
-	if (accounts && accounts.length) {
-		await dispatch(initAccount(accounts.find((account) => account.active)));
-
-		let path = getState().global.getIn(['crypto', 'goTo']) || INDEX_PATH;
-
-		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE
-			&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH].includes(path)) {
-			path = EMPTY_PATH;
-		}
-
-		history.push(path);
-	} else {
-		history.push(CREATE_ACCOUNT_PATH);
+		await dispatch(loadRequests());
+	} catch (err) {
+		console.log('loadInfo Error', err);
 	}
-
-	await dispatch(loadRequests());
 };
 
 /**
@@ -605,3 +609,34 @@ export const addKeyToAccount = (accountId, active) => async (dispatch, getState)
 	dispatch(set('accounts', accounts));
 
 };
+
+export const storageSetDraft = async (form, field, value) => {
+	let data = await storage.get(DRAFT_STORAGE_KEY);
+
+	if (data) {
+		data[form] = {
+			...data[form],
+			[field]: value,
+		};
+	} else {
+		data = {
+			[form]: {
+				[field]: value,
+			},
+		};
+	}
+
+	if (Object.values(data[form]).find((v) => !!v)) {
+		await storage.set(DRAFT_STORAGE_KEY, data);
+
+		return null;
+	}
+
+	await storage.remove(DRAFT_STORAGE_KEY);
+
+	return null;
+};
+
+export const storageGetDraft = () => storage.get(DRAFT_STORAGE_KEY);
+
+export const storageRemoveDraft = () => storage.remove(DRAFT_STORAGE_KEY);

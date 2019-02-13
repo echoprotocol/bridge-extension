@@ -2,7 +2,7 @@ import { aes, PrivateKey } from 'echojs-lib';
 import random from 'crypto-random-string';
 
 import storage from './storage';
-import { RANDOM_SIZE, TIMEOUT } from '../constants/GlobalConstants';
+import { DRAFT_STORAGE_KEY, RANDOM_SIZE, TIMEOUT } from '../constants/GlobalConstants';
 
 class AesStorage {
 
@@ -130,6 +130,7 @@ class AesStorage {
      */
 	clear() {
 		this.aes = null;
+		storage.remove(DRAFT_STORAGE_KEY);
 		this.emitter('locked');
 	}
 

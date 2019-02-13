@@ -1,3 +1,10 @@
+import {
+	FORM_SIGN_UP,
+	FORM_SIGN_IN,
+	FORM_ADD_NETWORK,
+	FORM_SEND,
+	FORM_WATCH_TOKEN,
+} from './FormConstants';
 
 export const IMPORT_ACCOUNT_PATH = '/accounts/import';
 export const CREATE_ACCOUNT_PATH = '/accounts/create';
@@ -50,3 +57,11 @@ export const NOT_RETURNED_PATHS = PIN_PATHS.concat([
 ]);
 
 export const HIDE_NAVBAR_PATHS = [SUCCESS_SEND_PATH, ERROR_SEND_PATH];
+
+export const FORM_TYPES = {
+	[FORM_SIGN_UP]: CREATE_ACCOUNT_PATH,
+	[FORM_SIGN_IN]: IMPORT_ACCOUNT_PATH,
+	[FORM_ADD_NETWORK]: ADD_NETWORK_PATH,
+	[FORM_SEND]: SEND_PATH,
+	[FORM_WATCH_TOKEN]: WATCH_TOKEN_PATH,
+};

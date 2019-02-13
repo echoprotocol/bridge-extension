@@ -16,6 +16,7 @@ import ImportComponent from './ImportComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
 import NewKeyComponent from '../../components/NewKeyComponent';
 import SettingsAccount from '../SettingsAccount';
+import { storageGetDraft, storageRemoveDraft, storageSetDraft } from '../../actions/GlobalActions';
 
 class ImportAccount extends React.Component {
 
@@ -38,6 +39,18 @@ class ImportAccount extends React.Component {
 		if (`${pathname}${search}` === IMPORT_SUCCESS_PATH && !success) {
 			this.props.history.push(IMPORT_ACCOUNT_PATH);
 		}
+
+		storageGetDraft().then((draft) => {
+			if (!draft) {
+				return null;
+			}
+
+			Object
+				.entries(draft[FORM_SIGN_IN])
+				.forEach(([key, value]) => this.setState({ [key]: value }));
+
+			return null;
+		});
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -72,11 +85,15 @@ class ImportAccount extends React.Component {
 	}
 
 	componentWillUnmount() {
+		storageRemoveDraft();
+
 		this.props.clearForm();
 	}
 
 	onChange(key, value) {
 		this.setState({ [key]: value });
+
+		storageSetDraft(FORM_SIGN_IN, key, value);
 
 		if (this.props[`${key}Error`]) {
 			this.props.clearError(`${key}Error`);
