@@ -33,6 +33,8 @@ export const POPUP_PATH = 'index.html?windowType=popup';
 
 export const ABOUT_PATH = '/about';
 
+export const NETWORK_PATH = '/network';
+
 export const EMPTY_PATH = '/';
 
 export const INDEX_PATH = WALLET_PATH;

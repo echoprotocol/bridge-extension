@@ -36,10 +36,18 @@
             color: #FFFFFF;
             font-size: 20px;
 			letter-spacing: 1px;
+			display: flex;
 			-webkit-font-smoothing: antialiased;
+			
             & + .link-nav {
                 margin-left: auto;
-            }
+			}
+			
+			span {
+				max-width: 180px;
+				margin-right: 5px;
+				@include cutTxt();
+			}
         }
         .link-nav {
             font-family: FNBook;

@@ -44,11 +44,14 @@
 .page-wrap {
     padding-top: 70px;
     max-height: 488px;
-    overflow: auto;
+	overflow: auto;
+
     .page {
         padding: 0 28px 35px;
         position: relative;
-        min-height: 348px;
+		min-height: 348px;
+		
+
 
         &.enter-pin {
             min-height: 315px;

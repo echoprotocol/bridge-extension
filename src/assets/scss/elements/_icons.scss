@@ -91,14 +91,6 @@
         }
     }
 
-    &.back {
-        [class*="icon-ava"] {
-            font-size: 50px;
-            opacity: .3;
-            transition: opacity $speed;
-        }
-    }
-
     &.transparent {
         background-color: transparent;
     }
@@ -134,12 +126,8 @@
 
 
     &.change-animation {
-        opacity: 1;
-        [class*="icon-ava"] {
-            font-size: 35px;
-            display: block;
-            margin-top: -3px;
-        }
+
+		opacity: 1;
 
         .content {
             transition: opacity $speed;
@@ -210,11 +198,7 @@
     }
 
     &.back-animation {
-        [class*="icon-ava"] {
-            font-size: 29px;
-            display: block;
-            margin-top: -21px;
-        }
+
         .animation-blobs {
             height: auto;
             width: auto;

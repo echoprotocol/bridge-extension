@@ -1,5 +1,3 @@
-// Будет использоваться (не удалять)
-// import NetworkInfo from './NetworkInfo';
 import React from 'react';
 import { connect } from 'react-redux';
 import { Dropdown, MenuItem } from 'react-bootstrap';
@@ -11,16 +9,17 @@ import classnames from 'classnames';
 
 import {
 	changeNetwork,
-	deleteNetwork,
 	switchAccountNetwork,
+	setNetworkInfo,
 } from '../../actions/GlobalActions';
 
 import { NETWORKS } from '../../constants/GlobalConstants';
-import { ADD_NETWORK_PATH } from '../../constants/RouterConstants';
+import { ADD_NETWORK_PATH, NETWORK_PATH } from '../../constants/RouterConstants';
 
 import GlobalReducer from '../../reducers/GlobalReducer';
+
 import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
-import Cross from '../../assets/images/icons/cross_small.svg';
+import networkInfo from '../../assets/images/icons/network_info.svg';
 
 class NetworkDropdown extends React.PureComponent {
 
@@ -29,28 +28,17 @@ class NetworkDropdown extends React.PureComponent {
 		this.state = {
 			menuHeight: null,
 			opened: false,
+			disableHover: false,
 		};
 	}
 
 	componentDidMount() {
 		this.setDDMenuHeight();
-
 	}
 
 	componentDidUpdate() {
 		this.setDDMenuHeight();
 		this.blur();
-	}
-
-	onDeleteNetwork(e, name) {
-		e.stopPropagation();
-		e.preventDefault();
-
-		const { networks } = this.props;
-
-		const network = networks.concat(NETWORKS).find((i) => i.name === name);
-		this.props.deleteNetwork(network);
-		this.closeDropDown();
 	}
 
 	onChangeNetwork(name) {
@@ -79,6 +67,14 @@ class NetworkDropdown extends React.PureComponent {
 		this.closeDropDown();
 
 		return true;
+	}
+
+	onMouseEnter() {
+		this.setState({ disableHover: true });
+	}
+
+	onMouseLeave() {
+		this.setState({ disableHover: false });
 	}
 
 
@@ -115,8 +111,9 @@ class NetworkDropdown extends React.PureComponent {
 				key={n.name}
 				eventKey={i + eventKey}
 				active={n.name === name}
+				className={classnames({ 'disable-hover': this.state.disableHover })}
 			>
-				{custom &&
+				{/* {custom &&
 					<Button
 						className="btn-round-close"
 						onClick={(e) => this.onDeleteNetwork(e, n.name)}
@@ -124,10 +121,31 @@ class NetworkDropdown extends React.PureComponent {
 							<img src={Cross} alt="" />
 						}
 					/>
-				}
+				} */}
 				<span className="title">{n.name}</span>
+				<Button
+					className="info-network"
+					onMouseEnter={() => this.onMouseEnter()}
+					onMouseLeave={() => this.onMouseLeave()}
+					onClick={(e) => this.showNetworkInfo(e, n, n.name === name, custom)}
+					content={
+						<img src={networkInfo} alt="networkInfo" />}
+				/>
 			</MenuItem>
 		));
+	}
+
+	showNetworkInfo(e, network, isActive, custom) {
+		e.preventDefault();
+		e.stopPropagation();
+		this.props.setNetworkInfo({
+			name: network.name,
+			url: network.url,
+			isActive,
+			custom,
+		});
+		this.props.history.push(NETWORK_PATH);
+		this.closeDropDown();
 	}
 
 	closeDropDown() {
@@ -224,8 +242,9 @@ NetworkDropdown.propTypes = {
 	networks: PropTypes.object.isRequired,
 
 	changeNetwork: PropTypes.func.isRequired,
-	deleteNetwork: PropTypes.func.isRequired,
+
 	setGlobalLoad: PropTypes.func.isRequired,
+	setNetworkInfo: PropTypes.func.isRequired,
 
 	tryToConnect: PropTypes.func.isRequired,
 	history: PropTypes.object.isRequired,
@@ -244,8 +263,8 @@ export default withRouter(connect(
 	}),
 	(dispatch) => ({
 		changeNetwork: (network) => dispatch(changeNetwork(network)),
-		deleteNetwork: (network) => dispatch(deleteNetwork(network)),
 		setGlobalLoad: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
+		setNetworkInfo: (network) => dispatch(setNetworkInfo(network)),
 		switchAccountNetwork: (name, network) => dispatch(switchAccountNetwork(name, network)),
 		tryToConnect: () => dispatch(changeNetwork()),
 	}),

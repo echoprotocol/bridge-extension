@@ -51,7 +51,10 @@ class Navbar extends React.PureComponent {
 					}
 					{
 						this.isNetworkInfoPage(networkInfo.name) ?
-							<li className="page-title">{networkInfo.name} info</li>
+							<li className="page-title">
+								<span>{networkInfo.name}</span>
+								info
+							</li>
 							: title && <li className="page-title">{title}</li>
 					}
 					{

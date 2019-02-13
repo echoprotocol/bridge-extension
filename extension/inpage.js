@@ -1,3 +1,4 @@
+
 import echo, { Transaction, constants, PublicKey } from 'echojs-lib';
 import lodash from 'lodash';
 import BigNumber from 'bignumber.js';
@@ -184,6 +185,7 @@ const extension = {
 	subscribeSwitchNetwork: (subscriberCb) => {
 
 		if (!lodash.isFunction(subscriberCb)) {
+
 			throw new Error('Is not a function');
 		}
 

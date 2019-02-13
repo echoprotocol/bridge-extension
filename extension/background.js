@@ -69,6 +69,15 @@ const connectSubscribe = (status) => {
 };
 
 /**
+ * Get current network
+ * @returns {Promise.<*>}
+ */
+const getNetwork = async () => {
+	const network = await storage.get('current_network') || NETWORKS[0];
+	return network;
+};
+
+/**
  * Create default socket
  * @param {String?} url
  * @return {Promise.<void>}
@@ -77,7 +86,9 @@ const createSocket = async (url) => {
 
 	if (!url) {
 		const network = await getNetwork();
+
 		({ url } = network);
+
 	}
 
 	url = url || NETWORKS[0].url;
@@ -162,15 +173,6 @@ const createNotification = (title = '', message = '') => {
 		message,
 		title,
 	});
-};
-
-/**
- * Get current network
- * @returns {Promise.<*>}
- */
-const getNetwork = async () => {
-	const network = await storage.get('current_network') || NETWORKS[0];
-	return network;
 };
 
 /**
@@ -467,6 +469,12 @@ export const onSend = async (options, networkName) => {
 	return null;
 };
 
+/**
+ *  @method onSwitchNetwork
+ *
+ *
+ * 	@param {Object} network
+ */
 export const onSwitchNetwork = async (network) => {
 
 	try {
@@ -474,9 +482,6 @@ export const onSwitchNetwork = async (network) => {
 	} catch (e) {
 		console.log('onSwitchNetwork Error', e);
 	} finally {
-
-		console.log('onSwitchNetwork (bg): ', networkSubscribers);
-
 		networkSubscribers = networkSubscribers.filter((cb) => {
 			try {
 				cb({ subscriber: true, res: network });
@@ -484,7 +489,6 @@ export const onSwitchNetwork = async (network) => {
 			} catch (error) {
 				return false;
 			}
-
 		});
 
 	}
