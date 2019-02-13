@@ -122,6 +122,7 @@ export const BASE_ICON = 1;
 export const BASE_ICON_COLOR = 'green';
 export const POPUP_WINDOW_TYPE = 'popup';
 export const MAX_NOTE_LENGTH = 200 * 1000;
+export const DRAFT_STORAGE_KEY = 'draft';
 
 export const BROADCAST_LIMIT = 20 * 1000;
 export const SET_TR_FEE_TIMEOUT = 3 * 1000;

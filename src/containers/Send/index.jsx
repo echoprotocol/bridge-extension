@@ -9,6 +9,7 @@ import _ from 'lodash';
 
 import { send, setFeeFormValue } from '../../actions/BalanceActions';
 import { clearForm, setFormError, setFormValue } from '../../actions/FormActions';
+import { storageGetDraft, storageRemoveDraft, storageSetDraft } from '../../actions/GlobalActions';
 
 import { INDEX_PATH } from '../../constants/RouterConstants';
 import { FORM_SEND } from '../../constants/FormConstants';
@@ -19,7 +20,10 @@ import BridgeTextArea from '../../components/BridgeTextArea';
 
 import ValidateSendHelper from '../../helpers/ValidateSendHelper';
 import ValidateTransactionHelper from '../../helpers/ValidateTransactionHelper';
+
 import arrowLeft from '../../assets/images/icons/arrow_dark_left.svg';
+
+import GlobalReducer from '../../reducers/GlobalReducer';
 
 class Send extends React.Component {
 
@@ -36,6 +40,27 @@ class Send extends React.Component {
 
 	}
 
+	componentWillMount() {
+		storageGetDraft().then((draft) => {
+			if (!draft) {
+				return null;
+			}
+
+			Object
+				.entries(draft[FORM_SEND])
+				.forEach(([key, value]) => {
+					if (key === 'loading') {
+						this.props.continueLoading();
+					} else {
+						this.props.setFormValue(key, value);
+					}
+				});
+
+			return null;
+		});
+	}
+
+
 	componentWillReceiveProps(nextProps) {
 		if (_.isEqual(this.props, nextProps)) { return; }
 
@@ -43,9 +68,9 @@ class Send extends React.Component {
 			clearTimeout(this.state.timeout);
 		}
 
-		const { to, amount } = nextProps;
+		const { to, amount, loading } = nextProps;
 
-		if (to.value && amount.value) {
+		if (to.value && amount.value && !loading) {
 			this.setState({
 				timeout: setTimeout(() => {
 					this.props.setFeeFormValue();
@@ -78,6 +103,8 @@ class Send extends React.Component {
 	}
 
 	componentWillUnmount() {
+		storageRemoveDraft();
+
 		this.props.clearForm();
 	}
 
@@ -103,6 +130,8 @@ class Send extends React.Component {
 
 		if (field) {
 			this.props.setFormValue(field, value);
+
+			storageSetDraft(FORM_SEND, field, value);
 		}
 
 		return null;
@@ -148,6 +177,9 @@ class Send extends React.Component {
 
 		this.setState({ warning: false });
 		this.props.setFormValue(field, validatedValue);
+
+		storageSetDraft(FORM_SEND, field, value);
+
 		return true;
 	}
 
@@ -302,7 +334,7 @@ class Send extends React.Component {
 												name="memo"
 												value={memo.value}
 												onChange={(e) => this.onChange(e)}
-												label="Note (optional)"
+												label="Note (Optional)"
 												error={!!memo.error}
 												errorText={memo.error}
 												disabled={loading}
@@ -342,6 +374,7 @@ Send.propTypes = {
 	send: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
 	setFeeFormValue: PropTypes.func.isRequired,
+	continueLoading: PropTypes.func.isRequired,
 };
 
 Send.defaultProps = {
@@ -370,5 +403,6 @@ export default connect(
 		setFeeFormValue: () => dispatch(setFeeFormValue()),
 		send: () => dispatch(send()),
 		clearForm: () => dispatch(clearForm(FORM_SEND)),
+		continueLoading: () => dispatch(GlobalReducer.actions.set({ field: 'loading', value: true })),
 	}),
 )(Send);

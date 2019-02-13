@@ -24,7 +24,7 @@ import {
 	PING_INTERVAL,
 	PING_TIMEOUT,
 	CONNECTION_TIMEOUT,
-	MAX_RETRIES, SIGN_STATUS,
+	MAX_RETRIES, SIGN_STATUS, DRAFT_STORAGE_KEY,
 } from '../src/constants/GlobalConstants';
 import { operationKeys } from '../src/constants/OperationConstants';
 
@@ -379,6 +379,8 @@ export const trSignResponse = (signData) => {
  * 	@param {Object} details
  */
 const onFirstInstall = (details) => {
+	storage.remove(DRAFT_STORAGE_KEY);
+
 	if (details.reason === 'install') {
 		createNotification('Bridge', 'Extension is now installed. Restart your work pages, please.');
 	} else if (details.reason === 'update') {
@@ -460,6 +462,8 @@ export const onSend = async (options, networkName) => {
 		} catch (e) { return null; }
 
 		return null;
+	} finally {
+		await storage.remove(DRAFT_STORAGE_KEY);
 	}
 
 	try {

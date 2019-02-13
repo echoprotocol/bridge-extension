@@ -15,10 +15,27 @@ import { watchToken } from '../../actions/BalanceActions';
 import { clearForm, setFormValue } from '../../actions/FormActions';
 import { KEY_CODE_ENTER } from '../../constants/GlobalConstants';
 import arrowLeft from '../../assets/images/icons/arrow_dark_left.svg';
+import { storageGetDraft, storageRemoveDraft, storageSetDraft } from '../../actions/GlobalActions';
 
 class WatchTokens extends React.Component {
 
+	componentDidMount() {
+		storageGetDraft().then((draft) => {
+			if (!draft) {
+				return null;
+			}
+
+			Object
+				.entries(draft[FORM_WATCH_TOKEN])
+				.forEach(([key, value]) => this.props.setFormValue(key, value));
+
+			return null;
+		});
+	}
+
 	componentWillUnmount() {
+		storageRemoveDraft();
+
 		this.props.clearForm();
 	}
 
@@ -29,6 +46,8 @@ class WatchTokens extends React.Component {
 
 		if (field) {
 			this.props.setFormValue(field, value);
+
+			storageSetDraft(FORM_WATCH_TOKEN, field, value);
 		}
 	}
 

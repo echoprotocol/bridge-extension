@@ -17,6 +17,19 @@ class BridgeInput extends React.Component {
 		};
 	}
 
+	static getDerivedStateFromProps(nextProps, prevState) {
+		const { value } = nextProps;
+		const { filled } = prevState;
+
+		if (value && !filled) {
+			return {
+				filled: !filled,
+			};
+		}
+
+		return null;
+	}
+
 	onFocus() {
 		this.setState({ up: true });
 	}

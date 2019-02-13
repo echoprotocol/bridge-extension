@@ -16,6 +16,7 @@ import { setValue, clearForm } from '../../actions/FormActions';
 import CreateComponent from './CreateComponent';
 import WelcomeComponent from '../../components/WelcomeComponent';
 import SettingsAccount from '../SettingsAccount';
+import { storageGetDraft, storageRemoveDraft, storageSetDraft } from '../../actions/GlobalActions';
 
 
 class CreateAccount extends React.Component {
@@ -36,6 +37,18 @@ class CreateAccount extends React.Component {
 		if (`${pathname}${search}` === CREATE_SUCCESS_PATH && !wif) {
 			this.props.history.push(CREATE_ACCOUNT_PATH);
 		}
+
+		storageGetDraft().then((draft) => {
+			if (!draft) {
+				return null;
+			}
+
+			Object
+				.entries(draft[FORM_SIGN_UP])
+				.forEach(([key, value]) => this.setState({ [key]: value }));
+
+			return null;
+		});
 	}
 
 	componentWillReceiveProps(nextProps) {
@@ -88,12 +101,16 @@ class CreateAccount extends React.Component {
 	}
 
 	componentWillUnmount() {
+		storageRemoveDraft();
+
 		this.props.clearForm();
 	}
 
 
 	onChangeName(name) {
 		this.setState({ name });
+
+		storageSetDraft(FORM_SIGN_UP, 'name', name);
 
 		if (this.props.name.error || this.props.name.example) {
 			this.props.setValue({ error: null, example: '' });

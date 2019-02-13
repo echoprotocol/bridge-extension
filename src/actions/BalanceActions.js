@@ -7,7 +7,7 @@ import { validators } from 'echojs-lib';
 import { setFormError, setValue, setFormValue } from './FormActions';
 import { getTransactionFee } from './SignActions';
 import { getCrypto, getCryptoInfo, setCryptoInfo } from './CryptoActions';
-import { set } from './GlobalActions';
+import { set, storageRemoveDraft, storageSetDraft } from './GlobalActions';
 
 import { FORM_SEND, FORM_WATCH_TOKEN } from '../constants/FormConstants';
 import { CORE_ID, GET_TOKENS_TIMEOUT, GLOBAL_ID_1, NATHAN_ACCOUNT_ID } from '../constants/GlobalConstants';
@@ -185,80 +185,86 @@ const getTransferCode = (id, amount) => {
  * 	Set fee depending on the amount value and memo
  */
 export const setFeeFormValue = () => async (dispatch, getState) => {
-	const form = getState().form.get(FORM_SEND);
+	try {
+		const form = getState().form.get(FORM_SEND);
 
-	const to = form.get('to');
+		const to = form.get('to');
 
-	const result = await echoService.getChainLib().api.lookupAccounts(to.value);
+		const result = await echoService.getChainLib().api.lookupAccounts(to.value);
 
-	if (!result.find((i) => i[0] === to.value)) {
-		return false;
-	}
-
-	const amount = Number(form.get('amount').value).toString();
-	const memo = form.get('memo');
-	const selectedBalance = getState().form.getIn([FORM_SEND, 'selectedBalance']);
-	const selectedFeeBalance = getState().form.getIn([FORM_SEND, 'selectedFeeBalance']);
-	const balances = getState().balance.get('balances');
-	const assets = getState().balance.get('assets');
-	const [fromAccount] = await echoService.getChainLib().api.getFullAccounts([getState().global.getIn(['account', 'name'])]);
-	const [toAccount] = await echoService.getChainLib().api.getFullAccounts([to.value]);
-
-	let isToken = false;
-
-	if (!ValidateTransactionHelper.validateContractId(selectedBalance)) {
-		isToken = true;
-	}
-
-	let options = {};
-
-	if (!isToken) {
-		const amountAsset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
-
-		options = {
-			amount: {
-				amount: amount * (10 ** amountAsset.get('precision')),
-				asset: amountAsset,
-			},
-			fee: {
-				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
-			},
-			from: fromAccount,
-			to: toAccount,
-			memo: memo.value,
-			type: 'transfer',
-		};
-
-		if (!options.amount.asset || !options.fee.asset || !options.from) {
+		if (!result.find((i) => i[0] === to.value)) {
 			return false;
 		}
-	} else {
-		const precision = getState().balance.getIn(['tokens', selectedBalance, 'precision']);
-		const code = getTransferCode(toAccount.id, new BN(amount).times(10 ** precision));
-		const receiver = await echoService.getChainLib().api.getObject(selectedBalance);
-		options = {
-			code,
-			fee: {
-				amount: 0,
-				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
-			},
-			callee: receiver,
-			registrar: fromAccount,
-			type: 48,
-			value: {
-				amount: 0,
-				asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
-			},
-		};
 
-		if (!options.value.asset_id || !options.fee.asset || !options.registrar) {
-			return false;
+		const amount = Number(form.get('amount').value).toString();
+		const memo = form.get('memo');
+		const selectedBalance = getState().form.getIn([FORM_SEND, 'selectedBalance']);
+		console.log('selectedBalance', selectedBalance);
+		const selectedFeeBalance = getState().form.getIn([FORM_SEND, 'selectedFeeBalance']);
+		console.log('selectedFeeBalance', selectedFeeBalance);
+		const balances = getState().balance.get('balances');
+		const assets = getState().balance.get('assets');
+		const [fromAccount] = await echoService.getChainLib().api.getFullAccounts([getState().global.getIn(['account', 'name'])]);
+		const [toAccount] = await echoService.getChainLib().api.getFullAccounts([to.value]);
+
+		let isToken = false;
+
+		if (!ValidateTransactionHelper.validateContractId(selectedBalance)) {
+			isToken = true;
 		}
+
+		let options = {};
+
+		if (!isToken) {
+			const amountAsset = assets.get(balances.getIn([selectedBalance, 'asset_type']));
+
+			options = {
+				amount: {
+					amount: amount * (10 ** amountAsset.get('precision')),
+					asset: amountAsset,
+				},
+				fee: {
+					asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+				},
+				from: fromAccount,
+				to: toAccount,
+				memo: memo.value,
+				type: 'transfer',
+			};
+
+			if (!options.amount.asset || !options.fee.asset || !options.from) {
+				return false;
+			}
+		} else {
+			const precision = getState().balance.getIn(['tokens', selectedBalance, 'precision']);
+			const code = getTransferCode(toAccount.id, new BN(amount).times(10 ** precision));
+			const receiver = await echoService.getChainLib().api.getObject(selectedBalance);
+			options = {
+				code,
+				fee: {
+					amount: 0,
+					asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+				},
+				callee: receiver,
+				registrar: fromAccount,
+				type: 48,
+				value: {
+					amount: 0,
+					asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
+				},
+			};
+
+			if (!options.value.asset_id || !options.fee.asset || !options.registrar) {
+				return false;
+			}
+		}
+
+		const resultFee = await getTransactionFee(options);
+
+		dispatch(setFormValue(FORM_SEND, 'fee', resultFee.amount / (10 ** options.fee.asset.get('precision'))));
+	} catch (err) {
+		console.warn('setFee Realtime Error', err);
 	}
-
-	const resultFee = await getTransactionFee(options);
-
-	dispatch(setFormValue(FORM_SEND, 'fee', resultFee.amount / (10 ** options.fee.asset.get('precision'))));
 
 	return true;
 };
@@ -412,6 +418,9 @@ export const send = () => async (dispatch, getState) => {
 
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
+	await storageRemoveDraft();
+	await storageSetDraft(FORM_SEND, 'loading', true);
+
 	const emitter = echoService.getEmitter();
 
 	emitter.emit('sendRequest', options, activeNetworkName);
@@ -436,6 +445,14 @@ export const sendHandler = (path) => (dispatch, getState) => {
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 };
 
+/**
+ *  @method getTokenDetails
+ *
+ * 	Get token balance, symbol and precision
+ *
+ * 	@param {String} contractId
+ * 	@param {String} accountId
+ */
 export const getTokenDetails = async (contractId, accountId) => {
 	const methods = [
 		{

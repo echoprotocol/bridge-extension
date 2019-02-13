@@ -180,8 +180,6 @@ const formatHistory = (history) => async (dispatch, getState) => {
 			field: 'error',
 			value: FormatHelper.formatError(err),
 		}));
-	} finally {
-		dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 	}
 };
 

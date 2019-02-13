@@ -8,7 +8,7 @@ class Storage {
 	 *  Set value by key in storage
 	 *
 	 *  @param {String} key
-	 *  @param {Any} value
+	 *  @param {*} value
 	 */
 	static set(key, value) {
 		if (extension.storage && extension.storage.local) {
