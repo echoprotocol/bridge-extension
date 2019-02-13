@@ -20,6 +20,7 @@ import {
 	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
 	ABOUT_PATH,
+	NETWORK_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -38,6 +39,7 @@ import Backup from './containers/Backup';
 import WatchToken from './containers/WatchToken';
 import SignTransaction from './containers/SignTransaction';
 import About from './containers/About';
+import Network from './containers/Network';
 
 
 import { required } from './components/Require';
@@ -51,6 +53,7 @@ export default class Routes extends React.Component {
 					<Route exact path={CREATE_PIN_PATH} component={Pin.Create} />
 					<Route exact path={WIPE_PIN_PATH} component={Pin.Wipe} />
 					<Route exact path={UNLOCK_PATH} component={Pin.Unlock} />
+
 					<Route exact path={CREATE_ACCOUNT_PATH} component={CreateAccount} />
 					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
 
@@ -67,7 +70,7 @@ export default class Routes extends React.Component {
 					<Route exact path={BACKUP_PATH} component={required(Backup)} />
 					<Route exact path={WATCH_TOKEN_PATH} component={required(WatchToken)} />
 					<Route exact path={ABOUT_PATH} component={required(About)} />
-
+					<Route exact path={NETWORK_PATH} component={Network} />
 				</div>
 			</App>
 		);

@@ -1,6 +1,7 @@
 import React from 'react';
 
 import ModalLogout from './ModalLogout';
+import ModalRemoveNetwork from './ModalRemoveNetwork';
 
 
 export default class ModalsComponent extends React.Component {
@@ -9,6 +10,7 @@ export default class ModalsComponent extends React.Component {
 		return (
 			<React.Fragment>
 				<ModalLogout />
+				<ModalRemoveNetwork />
 			</React.Fragment>
 		);
 	}

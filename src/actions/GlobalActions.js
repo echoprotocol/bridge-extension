@@ -411,6 +411,21 @@ export const addNetwork = () => async (dispatch, getState) => {
 };
 
 /**
+ *  @method setNetworkInfo
+ *
+ * 	Add new network to storage and connect to it
+ *
+ *  @param {Object} network
+ */
+export const setNetworkInfo = (network) => async (dispatch) => {
+	dispatch(GlobalReducer.actions.set({
+		field: 'networkInfo',
+		value: network,
+	}));
+	return null;
+};
+
+/**
  *  @method deleteNetwork
  *
  * 	Delete custom network from storage

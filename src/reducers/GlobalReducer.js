@@ -15,6 +15,12 @@ const DEFAULT_FIELDS = Map({
 		name: '',
 		url: '',
 	}),
+	networkInfo: {
+		name: '',
+		url: '',
+		isActive: false,
+		custom: false,
+	},
 	networks: new List([]),
 	connected: false,
 	crypto: new Map({
@@ -41,7 +47,6 @@ export default createModule({
 		set: {
 			reducer: (state, { payload }) => {
 				state = state.set(payload.field, payload.value);
-
 				return state;
 			},
 		},

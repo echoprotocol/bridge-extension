@@ -66,4 +66,66 @@
 			min-width: 220px;
 		}
 	}
+
 }
+
+.network-page {
+
+	.page {
+		padding: 0 12px 35px;
+
+	}
+
+	.block {
+		text-align: center;
+		margin-top: 20px;
+		&-title {
+			color: rgba(#3F4A52, .7);
+			font-size: 14px;
+			letter-spacing: 0.2px;
+		}
+		&-number {
+			color: #3F4A52;
+			font-family: FNMedium;
+			font-size: 18px;
+			margin-top: 8px;
+			letter-spacing: 1px;
+		}
+	}
+
+	.network-table {
+		background-color: #DFE3E5;
+		padding: 20px 15px;
+		margin-top: 26px;
+		.line {
+			display: flex;
+			align-items: baseline;
+			justify-content: space-between;
+			
+			&:not(:last-child) {
+				margin-bottom: 16px;
+				span {
+					&:nth-child(2) {
+						@include cutTxt();
+					}
+				}
+			}
+			span {
+
+				font-size: 14px;
+				-webkit-font-smoothing: antialiased;
+				-moz-osx-font-smoothing: grayscale;
+				line-height: 20px;
+				&:nth-child(1) {
+					color: #90999A;
+					
+				}
+				&:nth-child(2) {
+					color: #2C393D;
+					max-width: 180px;
+				}
+			}
+		}
+	}
+}
+

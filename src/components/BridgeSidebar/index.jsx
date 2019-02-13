@@ -44,15 +44,16 @@ class BridgeSidebar extends React.PureComponent {
 							}
 						/>
 						{
-							account &&
-							<div className="sidebar-user">
-								<UserIcon
-									color={account.get('iconColor')}
-									avatar={`ava${account.get('icon')}`}
-									size="medium"
-								/>
-								<div className="name">{account.get('name')}</div>
-							</div>
+							account && account.size ?
+								<div className="sidebar-user">
+									<UserIcon
+										color={account.get('iconColor')}
+										avatar={`ava${account.get('icon')}`}
+										size="medium"
+									/>
+									<div className="name">{account.get('name')}</div>
+								</div> : null
+
 						}
 					</div>
 					<nav className="sidebar-body">
