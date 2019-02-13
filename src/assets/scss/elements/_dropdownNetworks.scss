@@ -17,22 +17,17 @@
             color: #7E9090;
             font-size: 13px;
             cursor: pointer;
-            &:hover {
-                background-color: #2c3a40;
-                .icon {
-                    color: #899c9d;
-                }
+
+			&:not(.disable-hover):hover {
+                background-color: rgba(#222F30, .25);
+  
                 .current-network {
                     &:after {
                         opacity: 1;
                     }
                 }
             }
-            .icon {
-                margin: 3px 5px 0 7px;
-                color: #495b5f;
-                font-size: 11px;
-            }
+
             .current-network {
                 display: flex;
                 align-items: center;
@@ -44,42 +39,6 @@
                     letter-spacing: .7px;
                     @include cutTxt();
                 }
-                &:before {
-                    min-width: 4px;
-                    height: 4px;
-                    border-radius: 50%;
-                    content: "";
-                    display: block;
-                    background-color: #ca304e;
-                    margin: 2px 7px 0 -1px;
-                    transition: background-color $speed;
-                }
-                &:after {
-                    content: "Not Connected";
-                    position: absolute;
-                    pointer-events: none;
-                    color: #ca304e;
-                    width: 104px;
-                    text-align: right;
-                    opacity: 0;
-                    transition: color $speed, opacity $speed;
-                    text-transform: uppercase;
-                    font-size: 10px;
-                    letter-spacing: 2px;
-                    right: 128px;
-                    top: 6px;
-                }
-                &.connected {
-                    &:before {
-                        background-color: #78d2a8;
-
-                    }
-                    &:after {
-                        content: "Connected";
-                        color: #78d2a8;
-                    }
-                }
-
             }
         }
         &-menu {
@@ -311,6 +270,81 @@
 		background-color: #263033;
 		img {
 			opacity: .7;
+		}
+	}
+}
+
+@keyframes connectionBlink {
+	10% {
+		opacity: 1;
+	}
+	80% {
+		opacity: 1;
+	}
+	90% {
+		opacity: 0;
+	}
+}
+
+.connection-dot {
+	min-width: 8px;
+	height: 8px;
+	border: 2px solid transparent;
+	border-radius: 50%;
+	margin: 2px 7px 0 -1px;
+	z-index: 5;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	background-color: transparent;
+	
+	&:hover {
+		background-color: rgba(#2A3639, .7);
+		&:before {
+			opacity: 1;
+		}
+	}
+
+
+	&:after {
+		content: "";
+		display: block;
+		background-color: #78d2a8;
+		min-width: 4px;
+		height: 4px;
+		transition: background-color $speed;
+		border-radius: 50%;
+	}
+	&:before {
+		content: "Connected";
+		width: 80px;
+		right: 110px;
+		color: #78d2a8;
+		position: absolute;
+		pointer-events: none;
+		text-align: center;
+		line-height: 14px;
+		opacity: 0;
+		transition: color $speed, opacity $speed;
+		text-transform: uppercase;
+		font-size: 9px;
+		letter-spacing: 2px;
+		background-color: rgba(#2A3639, .7);
+		top: 2px;
+	}
+	&.disconnected {
+		&:not(:hover) {
+			animation: connectionBlink 2s linear infinite;
+		}
+			
+		&:after {
+			background-color: #ca304e;
+		}
+	
+		&:before {
+			content: "Disconnected";
+			color: #ca304e;
+			width: 110px;
 		}
 	}
 }

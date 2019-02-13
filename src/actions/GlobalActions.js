@@ -421,6 +421,7 @@ export const setNetworkInfo = (network) => async (dispatch) => {
 	dispatch(GlobalReducer.actions.set({
 		field: 'networkInfo',
 		value: network,
+
 	}));
 	return null;
 };

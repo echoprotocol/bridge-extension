@@ -181,6 +181,7 @@ class UserDropdown extends React.PureComponent {
 						color={account.get('iconColor')}
 						avatar={`ava${account.get('icon')}`}
 					/>
+					<div className="user-name">{account.get('name')}</div>
 					<img className="ddDown" src={downArrow} alt="" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu >

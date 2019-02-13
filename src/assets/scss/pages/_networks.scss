@@ -70,6 +70,10 @@
 }
 
 .network-page {
+	&.page-wrap {
+		padding-top: 40px;	
+	}
+
 
 	.page {
 		padding: 0 12px 35px;
