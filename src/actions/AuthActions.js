@@ -191,7 +191,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	const account = await echoService.getChainLib().api.getAccountByName(name);
 	const active = getCrypto().getPublicKey(name, password);
-	const [[accountId]] = await echoService.getChainLib().api.getKeyReferences(active);
+	const [[accountId]] = await echoService.getChainLib().api.getKeyReferences([active]);
 
 	const keys = account.active.key_auths;
 
@@ -199,7 +199,7 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 
 	keys.find((
 		(key) => {
-			key = key.get('0');
+			[key] = key;
 			if (key === active) {
 				hasKey = true;
 				return null;
