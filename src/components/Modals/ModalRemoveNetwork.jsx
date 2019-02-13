@@ -24,6 +24,7 @@ class ModalLogout extends React.Component {
 	render() {
 		const { show } = this.props;
 
+
 		if (!show) {
 			return null;
 		}

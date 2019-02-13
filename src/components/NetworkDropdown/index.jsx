@@ -16,9 +16,11 @@ import {
 import { NETWORKS } from '../../constants/GlobalConstants';
 import { ADD_NETWORK_PATH, NETWORK_PATH } from '../../constants/RouterConstants';
 
+
 import GlobalReducer from '../../reducers/GlobalReducer';
 
 import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
+
 import networkInfo from '../../assets/images/icons/network_info.svg';
 
 class NetworkDropdown extends React.PureComponent {
@@ -28,7 +30,9 @@ class NetworkDropdown extends React.PureComponent {
 		this.state = {
 			menuHeight: null,
 			opened: false,
-			disableHover: false,
+			disableItemHover: false,
+			disableToggleHover: false,
+
 		};
 	}
 
@@ -40,6 +44,7 @@ class NetworkDropdown extends React.PureComponent {
 		this.setDDMenuHeight();
 		this.blur();
 	}
+
 
 	onChangeNetwork(name) {
 
@@ -69,12 +74,13 @@ class NetworkDropdown extends React.PureComponent {
 		return true;
 	}
 
-	onMouseEnter() {
-		this.setState({ disableHover: true });
+	onMouseEnter(value) {
+		this.setState({ [value]: true });
 	}
 
-	onMouseLeave() {
-		this.setState({ disableHover: false });
+	onMouseLeave(value) {
+		this.setState({ [value]: false });
+
 	}
 
 
@@ -111,29 +117,23 @@ class NetworkDropdown extends React.PureComponent {
 				key={n.name}
 				eventKey={i + eventKey}
 				active={n.name === name}
-				className={classnames({ 'disable-hover': this.state.disableHover })}
+				className={classnames({ 'disable-hover': this.state.disableItemHover })}
+
 			>
-				{/* {custom &&
-					<Button
-						className="btn-round-close"
-						onClick={(e) => this.onDeleteNetwork(e, n.name)}
-						content={
-							<img src={Cross} alt="" />
-						}
-					/>
-				} */}
 				<span className="title">{n.name}</span>
 				<Button
 					className="info-network"
-					onMouseEnter={() => this.onMouseEnter()}
-					onMouseLeave={() => this.onMouseLeave()}
+					onMouseEnter={() => this.onMouseEnter('disableItemHover')}
+					onMouseLeave={() => this.onMouseLeave('disableItemHover')}
 					onClick={(e) => this.showNetworkInfo(e, n, n.name === name, custom)}
+
 					content={
 						<img src={networkInfo} alt="networkInfo" />}
 				/>
 			</MenuItem>
 		));
 	}
+
 
 	showNetworkInfo(e, network, isActive, custom) {
 		e.preventDefault();
@@ -192,8 +192,16 @@ class NetworkDropdown extends React.PureComponent {
 				onToggle={() => this.toggleDropdown()}
 				open={this.state.opened}
 			>
-				<Dropdown.Toggle noCaret>
-					<div className={classnames('current-network', { connected })}>
+				<Dropdown.Toggle
+					className={classnames({ 'disable-hover': this.state.disableToggleHover })}
+					noCaret
+				>
+					<div className="current-network">
+						<span
+							onMouseEnter={() => this.onMouseEnter('disableToggleHover')}
+							onMouseLeave={() => this.onMouseLeave('disableToggleHover')}
+							className={classnames('connection-dot', { disconnected: !connected })}
+						/>
 						<span className="cut">{name}</span>
 					</div>
 					<img className="ddDown" src={downArrow} alt="" />

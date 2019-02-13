@@ -3,14 +3,12 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { withRouter } from 'react-router';
 import { Button } from 'semantic-ui-react';
-
 import { setNetworkInfo } from '../../actions/GlobalActions';
-
 import { GLOBAL_ID_1, NETWORKS } from '../../constants/GlobalConstants';
-
 import arrowLeft from '../../assets/images/icons/arrow_dark_left.svg';
 import { openModal } from '../../actions/ModalActions';
 import { MODAL_RM_NETWORK } from '../../constants/ModalConstants';
+
 
 class Network extends React.Component {
 
@@ -27,6 +25,7 @@ class Network extends React.Component {
 		e.preventDefault();
 		this.props.history.goBack();
 	}
+
 
 	onDeleteNetwork(name) {
 		const { networks } = this.props;
@@ -49,6 +48,7 @@ class Network extends React.Component {
 					</a>
 				</div>
 				<div className="networks-scroll">
+
 					<div className="page-wrap network-page">
 						<div className="page">
 							<div className="icon-pageNetwork">
@@ -60,10 +60,12 @@ class Network extends React.Component {
 							</div>
 							{
 								network.isActive && connected &&
+
 								<div className="block">
 									<div className="block-title">Block number</div>
 									<div className="block-number">{objectsById.getIn([GLOBAL_ID_1, 'head_block_number'])}</div>
 								</div>
+
 							}
 
 							<div className="network-table">
@@ -103,6 +105,7 @@ class Network extends React.Component {
 
 Network.propTypes = {
 	network: PropTypes.object,
+
 	networks: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
 	connected: PropTypes.bool,
@@ -120,6 +123,7 @@ Network.defaultProps = {
 export default withRouter(connect(
 	(state) => ({
 		network: state.global.get('networkInfo'),
+
 		networks: state.global.get('networks'),
 		connected: state.global.get('connected'),
 		objectsById: state.blockchain.get('objectsById'),
