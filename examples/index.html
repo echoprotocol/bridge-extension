@@ -130,24 +130,7 @@
 					window.echojslib.disconnect();
 				}
 
-				window.echojslib.connect(data.url,
-					{
-						connectionTimeout: 5000,
-						maxRetries: 10,
-						pingTimeout: 1000,
-						pingInterval: 2000,
-						debug: false,
-						apis: [
-							"database",
-							"network_broadcast",
-							"history",
-							"registration",
-							"asset",
-							"login",
-							"network_node"
-						]
-					}
-				);
+				window.echojslib.connectBridge();
 
 			});
 			window.echojslib.extension.subscribeSwitchNetwork('');

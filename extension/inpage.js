@@ -2,7 +2,14 @@ import echo, { Transaction, constants, PublicKey } from 'echojs-lib';
 import lodash from 'lodash';
 import BigNumber from 'bignumber.js';
 
-import { APP_ID } from '../src/constants/GlobalConstants';
+import {
+	APP_ID,
+	CONNECTION_TIMEOUT,
+	MAX_RETRIES,
+	NETWORKS,
+	PING_INTERVAL,
+	PING_TIMEOUT
+} from '../src/constants/GlobalConstants';
 
 import { uniqueNonceUint64 } from '../src/services/crypto';
 
@@ -177,6 +184,19 @@ Transaction.prototype.signWithBridge = async function signWithBridge() {
 	return result;
 };
 
+const connectBridge = (url, params) => {
+	const options = params || {
+		connectionTimeout: CONNECTION_TIMEOUT,
+		maxRetries: MAX_RETRIES,
+		pingTimeout: PING_TIMEOUT,
+		pingInterval: PING_INTERVAL,
+		debug: false,
+		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
+	};
+
+	echo.connect(url || NETWORKS[0].url, options);
+};
+
 const extension = {
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
@@ -201,6 +221,7 @@ window.echojslib.helpers = {
 window.echojslib.PublicKey = PublicKey;
 window.echojslib.Buffer = Buffer;
 window.echojslib.generateNonce = () => uniqueNonceUint64();
+window.echojslib.connectBridge = (url, params) => connectBridge(url, params);
 
 window.addEventListener('message', onMessage, false);
 
