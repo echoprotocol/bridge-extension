@@ -4,6 +4,7 @@ stages:
   - artifacts
 
 cache:
+  key: $CI_COMMIT_REF_NAME
   paths:
   - node_modules/
 
