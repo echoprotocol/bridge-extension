@@ -1,22 +1,19 @@
 import React from 'react';
 import PropTypes from 'prop-types';
-import query from 'query-string';
 import { connect } from 'react-redux';
 
 import {
 	CREATE_ACCOUNT_PATH,
 	CREATE_SUCCESS_PATH,
-	INDEX_PATH, CREATE_SETTINGS_PATH,
+	INDEX_PATH, WELCOME_PATH,
 } from '../../constants/RouterConstants';
 import { FORM_SIGN_UP } from '../../constants/FormConstants';
 
+import { storageGetDraft, storageRemoveDraft, storageSetDraft } from '../../actions/GlobalActions';
 import { createAccount } from '../../actions/AuthActions';
 import { setValue, clearForm } from '../../actions/FormActions';
 
 import CreateComponent from './CreateComponent';
-import WelcomeComponent from '../../components/WelcomeComponent';
-import SettingsAccount from '../SettingsAccount';
-import { storageGetDraft, storageRemoveDraft, storageSetDraft } from '../../actions/GlobalActions';
 
 
 class CreateAccount extends React.Component {
@@ -26,15 +23,13 @@ class CreateAccount extends React.Component {
 
 		this.state = {
 			name: '',
-			wif: '',
 		};
 	}
 
 	componentDidMount() {
 		const { pathname, search } = this.props.location;
-		const { wif } = this.state;
 
-		if (`${pathname}${search}` === CREATE_SUCCESS_PATH && !wif) {
+		if (`${pathname}${search}` === CREATE_SUCCESS_PATH) {
 			this.props.history.push(CREATE_ACCOUNT_PATH);
 		}
 
@@ -45,7 +40,12 @@ class CreateAccount extends React.Component {
 
 			Object
 				.entries(draft[FORM_SIGN_UP])
-				.forEach(([key, value]) => this.setState({ [key]: value }));
+				.forEach(([key, value]) => {
+					if (key === 'error') {
+						this.props.setValue(value);
+					}
+					this.setState({ [key]: value });
+				});
 
 			return null;
 		});
@@ -53,7 +53,7 @@ class CreateAccount extends React.Component {
 
 	componentWillReceiveProps(nextProps) {
 
-		if (this.state.wif && this.state.name) {
+		if (this.state.name) {
 			const { accounts, networkName } = nextProps;
 
 			const accountsNetwork = accounts.get(networkName);
@@ -62,42 +62,8 @@ class CreateAccount extends React.Component {
 				return false;
 			}
 
-			const account = accountsNetwork.find((i) => i.name === this.state.name);
-
-			if (!account) {
-				this.resetState();
-			}
 		}
-
-		const { pathname: nextPath, search: nextSearch } = nextProps.location;
-		const { pathname, search } = this.props.location;
-
-		if (
-			(`${nextPath}${nextSearch}` !== `${pathname}${search}`)
-            && (`${nextPath}${nextSearch}` === CREATE_ACCOUNT_PATH)
-		) {
-			this.setState({
-				name: '',
-				wif: '',
-			});
-		}
-
 		return true;
-	}
-
-	componentDidUpdate(prevProps, prevState) {
-		const { wif } = this.state;
-		const { wif: prevWif } = prevState;
-
-		const { location } = this.props;
-		const { settings } = query.parse(location.search);
-
-		const { location: prevLocation } = prevProps;
-		const { settings: prevSettings } = query.parse(prevLocation.search);
-
-		if (!wif && !settings && (wif !== prevWif) && (settings !== prevSettings)) {
-			this.props.history.push(CREATE_ACCOUNT_PATH);
-		}
 	}
 
 	componentWillUnmount() {
@@ -117,71 +83,21 @@ class CreateAccount extends React.Component {
 		}
 	}
 
-	async onCreateAccount() {
-		const wif = await this.props.createAccount(this.state.name);
-		if (wif) {
-			this.setState({ wif });
-			this.props.history.push(CREATE_SUCCESS_PATH);
-		}
+	onCreateAccount() {
+		this.props.createAccount(this.state.name, WELCOME_PATH);
 	}
 
 	onProceedClick() {
 		this.props.history.push(INDEX_PATH);
 	}
 
-	onChangeIcon() {
-		this.props.history.push(CREATE_SETTINGS_PATH);
-	}
-
-	onBack() {
-		this.props.history.goBack();
-	}
-
-	resetState() {
-		this.setState({
-			name: '',
-			wif: '',
-		});
-	}
 
 	render() {
-		const { name, wif } = this.state;
+		const { name } = this.state;
 		const {
-			loading, name: { error, example }, location, accounts, networkName,
+			loading, name: { error, example },
 		} = this.props;
 
-		const { success, settings } = query.parse(location.search);
-
-		if (wif && success) {
-			const accountsNetwork = accounts.get(networkName);
-
-			if (!accountsNetwork) {
-				return null;
-			}
-
-			const account = accountsNetwork.find((i) => i.name === name);
-
-			if (!account) {
-				return null;
-			}
-
-			return (
-				<WelcomeComponent
-					wif={wif}
-					name={name}
-					icon={account.icon}
-					iconColor={account.iconColor}
-					proceed={() => this.onProceedClick()}
-					onChangeIcon={() => this.onChangeIcon()}
-				/>
-			);
-		} else if (settings) {
-			return (
-				<SettingsAccount
-					onBack={() => this.onBack()}
-				/>
-			);
-		}
 
 		return (
 			<CreateComponent
@@ -217,7 +133,7 @@ export default connect(
 		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
-		createAccount: (name) => dispatch(createAccount(name)),
+		createAccount: (name, link) => dispatch(createAccount(name, link)),
 		clearForm: () => dispatch(clearForm(FORM_SIGN_UP)),
 		setValue: (value) => dispatch(setValue(FORM_SIGN_UP, 'accountName', value)),
 	}),

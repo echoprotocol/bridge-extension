@@ -115,10 +115,15 @@ export const isAccountAdded = (name) => (dispatch, getState) => {
  *
  * 	@param {String} name
  * 	@param {Array} keys
+ *  @param {String} networkName
+ *  @param {String?} path
  */
-export const addAccount = (name, keys, networkName) => async (dispatch, getState) => {
+export const addAccount = (name, keys, networkName, path) => async (dispatch, getState) => {
+
+	storage.remove('account');
 
 	try {
+
 		const account = await echoService.getChainLib().api.getAccountByName(name);
 		let accounts = getState().global.get('accounts');
 
@@ -140,7 +145,11 @@ export const addAccount = (name, keys, networkName) => async (dispatch, getState
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
 
 		dispatch(set('accounts', accounts));
-		dispatch(initAccount({ name, icon, iconColor }));
+		await dispatch(initAccount({ name, icon, iconColor }));
+		if (path) {
+			history.push(path);
+		}
+
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
@@ -207,6 +216,7 @@ export const onLogout = (name) => async (dispatch, getState) => {
 		dispatch(set('accounts', accounts));
 
 		dispatch(initAccount(accounts.getIn([networkName, 0])));
+		history.push(CREATE_ACCOUNT_PATH);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
@@ -534,7 +544,6 @@ export const changeAccountIcon = (icon, iconColor) => async (dispatch, getState)
 			GlobalReducer.actions.set({ field: 'account', value: account }),
 		]));
 
-		history.push(INDEX_PATH);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}

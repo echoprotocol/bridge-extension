@@ -23,6 +23,7 @@ import '../../assets/images/avatars/ava15.svg';
 class UserIcon extends React.PureComponent {
 
 	onClick() {
+
 		if (this.props.onClickIcon) {
 			this.props.onClickIcon();
 		}

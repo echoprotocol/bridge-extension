@@ -34,7 +34,6 @@ class Navigator extends React.PureComponent {
 	render() {
 		const { visibleSidebar, pathname } = this.props;
 
-
 		return (
 			<React.Fragment>
 				<FocusTrap active={visibleSidebar} className="trap-wrap">
@@ -42,6 +41,7 @@ class Navigator extends React.PureComponent {
 					<BridgeSidebar />
 				</FocusTrap>
 				{ pathname !== SIGN_TRANSACTION_PATH ? <Navbar /> : null }
+
 			</React.Fragment>
 		);
 	}

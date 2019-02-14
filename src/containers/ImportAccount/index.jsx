@@ -3,20 +3,17 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {
-	IMPORT_ACCOUNT_PATH,
-	IMPORT_SUCCESS_PATH,
-	INDEX_PATH, IMPORT_SETTINGS_PATH,
+	INDEX_PATH, SETTINGS_PATH,
+	WELCOME_PATH, NEW_KEY_PATH,
+	IMPORT_ACCOUNT_PATH, IMPORT_SUCCESS_PATH,
 } from '../../constants/RouterConstants';
 import { FORM_SIGN_IN } from '../../constants/FormConstants';
 
 import { importAccount } from '../../actions/AuthActions';
 import { clearForm, setValue } from '../../actions/FormActions';
-
 import ImportComponent from './ImportComponent';
-import WelcomeComponent from '../../components/WelcomeComponent';
-import NewKeyComponent from '../../components/NewKeyComponent';
-import SettingsAccount from '../SettingsAccount';
 import { storageGetDraft, storageRemoveDraft, storageSetDraft } from '../../actions/GlobalActions';
+
 
 class ImportAccount extends React.Component {
 
@@ -26,11 +23,9 @@ class ImportAccount extends React.Component {
 		this.state = {
 			name: '',
 			password: '',
-			success: false,
-			settings: false,
-			isAccAdded: false,
 		};
 	}
+
 
 	componentDidMount() {
 		const { pathname, search } = this.props.location;
@@ -84,6 +79,7 @@ class ImportAccount extends React.Component {
 		}
 	}
 
+
 	componentWillUnmount() {
 		storageRemoveDraft();
 
@@ -105,16 +101,18 @@ class ImportAccount extends React.Component {
 		const { name, password } = this.state;
 		const success = await this.props.importAccount(name, password);
 
-
 		if (success) {
 			this.setState({
-				success: true,
 				name: success.name,
-				isAccAdded: success.isAccAdded,
 			});
 
-			this.props.history.push(IMPORT_SUCCESS_PATH);
+			if (success.isAccAdded) {
+				this.props.history.push(NEW_KEY_PATH);
+				return null;
+			}
+			this.props.history.push(WELCOME_PATH);
 		}
+		return null;
 	}
 
 	onProceedClick() {
@@ -122,75 +120,17 @@ class ImportAccount extends React.Component {
 	}
 
 	onChangeIcon() {
-		this.setState({
-			success: false,
-			settings: true,
-		});
-
-		this.props.history.push(IMPORT_SETTINGS_PATH);
+		this.props.history.push(SETTINGS_PATH);
 	}
 
-	onBack() {
-		this.setState({
-			success: true,
-			settings: false,
-		});
-
-		this.props.history.goBack();
-	}
 
 	render() {
 		const {
-			nameError, passwordError, loading, accounts, networkName,
+			nameError, passwordError, loading,
 		} = this.props;
 		const {
-			name, password, success, settings, isAccAdded,
+			name, password, // success,
 		} = this.state;
-
-		if (success) {
-
-
-			const accountsNetwork = accounts.get(networkName);
-
-			if (!accountsNetwork) {
-				return null;
-			}
-
-			const account = accountsNetwork.find((i) => i.name === name);
-
-			if (!account) {
-				return null;
-			}
-
-
-			if (isAccAdded) {
-				return (
-					<NewKeyComponent
-						name={name}
-						icon={account.icon}
-						iconColor={account.iconColor}
-						proceed={() => this.onProceedClick()}
-						onChangeIcon={() => this.onChangeIcon()}
-					/>
-				);
-			}
-
-			return (
-				<WelcomeComponent
-					name={name}
-					icon={account.icon}
-					iconColor={account.iconColor}
-					proceed={() => this.onProceedClick()}
-					onChangeIcon={() => this.onChangeIcon()}
-				/>
-			);
-		} else if (settings) {
-			return (
-				<SettingsAccount
-					onBack={() => this.onBack()}
-				/>
-			);
-		}
 
 		return (
 			<ImportComponent
@@ -215,11 +155,9 @@ ImportAccount.defaultProps = {
 ImportAccount.propTypes = {
 	nameError: PropTypes.any,
 	passwordError: PropTypes.any,
-	loading: PropTypes.bool.isRequired,
 	location: PropTypes.object.isRequired,
+	loading: PropTypes.bool.isRequired,
 	history: PropTypes.object.isRequired,
-	accounts: PropTypes.object.isRequired,
-	networkName: PropTypes.string.isRequired,
 	importAccount: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
 	clearError: PropTypes.func.isRequired,

@@ -18,11 +18,12 @@ import bridgeLogo from '../assets/images/bridge-logo-hor-bw.svg';
 
 class App extends React.Component {
 
+
 	componentDidMount() {
 		this.props.initListeners();
-
 		this.props.initApp();
 	}
+
 
 	renderHeader(pathname) {
 		if (PIN_PATHS.includes(pathname)) {
@@ -88,6 +89,9 @@ export default connect(
 		const initApp = () => dispatch(globalInit());
 		const initListeners = () => dispatch(init());
 
-		return { initApp, initListeners };
+		return {
+			initApp,
+			initListeners,
+		};
 	},
 )(App);

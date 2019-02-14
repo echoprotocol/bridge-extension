@@ -351,6 +351,7 @@ export const loadRequests = () => async (dispatch) => {
 		const { pathname } = history.location;
 		const requests = JSON.parse(JSON.stringify(echoService.getRequests()));
 
+
 		if (!requests.length) {
 			return null;
 		}

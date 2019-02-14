@@ -3,13 +3,15 @@ import { Button } from 'semantic-ui-react';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
-import { changeAccountIcon } from '../../actions/GlobalActions';
+import { changeAccountIcon, storageRemoveDraft } from '../../actions/GlobalActions';
 
 import UserIcon from '../../components/UserIcon';
 
 import { ACCOUNT_COLORS, BASE_ICON, BASE_ICON_COLOR, ICONS_COUNT } from '../../constants/GlobalConstants';
+import { WELCOME_PATH } from '../../constants/RouterConstants';
 
 class SettingsAccount extends React.Component {
+
 
 	constructor(props) {
 		super(props);
@@ -26,6 +28,14 @@ class SettingsAccount extends React.Component {
 			icon: accountIcon,
 			iconColor: accountColor,
 		};
+	}
+	componentWillUnmount() {
+
+		storageRemoveDraft();
+
+	}
+	onBack() {
+		this.props.history.push(WELCOME_PATH);
 	}
 
 	onChangeIcon(value) {
@@ -52,10 +62,11 @@ class SettingsAccount extends React.Component {
 		return true;
 	}
 
-	onSaveIcon() {
+	async onSaveIcon() {
 		const { icon, iconColor } = this.state;
 
-		this.props.changeAccountIcon(icon, iconColor);
+		await this.props.changeAccountIcon(icon, iconColor);
+		this.onBack();
 	}
 
 	render() {
@@ -70,7 +81,7 @@ class SettingsAccount extends React.Component {
 						size="big"
 						animationBack
 						avatar={`ava${icon}`}
-						onClickIcon={() => this.props.onBack()}
+						onClickIcon={() => this.onBack()}
 					/>
 					<div className="page-wrap" >
 						<div className="page">
@@ -140,7 +151,7 @@ class SettingsAccount extends React.Component {
 SettingsAccount.propTypes = {
 	account: PropTypes.object,
 	changeAccountIcon: PropTypes.func.isRequired,
-	onBack: PropTypes.func.isRequired,
+	history: PropTypes.object.isRequired,
 };
 
 SettingsAccount.defaultProps = {
