@@ -15,15 +15,17 @@ import {
 	SIGN_TRANSACTION_PATH,
 	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
-	NETWORK_ERROR_SEND_PATH, FORM_TYPES,
+	NETWORK_ERROR_SEND_PATH,
+	FORM_TYPES,
 } from '../constants/RouterConstants';
-import { NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
+import { DRAFT_STORAGE_KEY, NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
 import { setValue } from './FormActions';
 import { loadInfo, set, storageGetDraft } from './GlobalActions';
 import { globals } from './SignActions';
 
 import FormatHelper from '../helpers/FormatHelper';
 import ValidatePinHelper from '../helpers/ValidatePinHelper';
+import { FORM_SEND } from '../constants/FormConstants';
 
 
 /**
@@ -152,7 +154,18 @@ export const initCrypto = () => async (dispatch) => {
 			if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
 				const draft = await storageGetDraft();
 
-				history.push(draft ? FORM_TYPES[Object.keys(draft)[0]] : INDEX_PATH);
+				const draftForm = Object.keys(draft)[0];
+				const draftKey = Object.values(draft)[0];
+
+				const path = draftKey.loading === false
+					? SUCCESS_SEND_PATH
+					: FORM_TYPES[draftForm];
+
+				history.push(draft ? path : INDEX_PATH);
+
+				if (draftForm === FORM_SEND && draftKey.loading === false) {
+					await storage.remove(DRAFT_STORAGE_KEY);
+				}
 			} else {
 				history.push(SIGN_TRANSACTION_PATH);
 			}
@@ -162,7 +175,7 @@ export const initCrypto = () => async (dispatch) => {
 			history.push(isFirstTime ? CREATE_PIN_PATH : UNLOCK_PATH);
 		}
 	} catch (err) {
-		console.log('initCrypto Error', err);
+		console.warn('Crypto initialization error', err);
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
 };

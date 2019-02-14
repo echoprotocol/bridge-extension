@@ -324,7 +324,7 @@ export const loadInfo = () => async (dispatch, getState) => {
 
 		await dispatch(loadRequests());
 	} catch (err) {
-		console.log('loadInfo Error', err);
+		console.warn('Global loading information error', err);
 	}
 };
 
@@ -613,7 +613,7 @@ export const storageSetDraft = async (form, field, value) => {
 		};
 	}
 
-	if (Object.values(data[form]).find((v) => !!v)) {
+	if (Object.keys(data[form]).find((v) => !!v)) {
 		await storage.set(DRAFT_STORAGE_KEY, data);
 
 		return null;

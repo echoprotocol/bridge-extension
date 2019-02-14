@@ -34,6 +34,8 @@ import {
 	NETWORK_ERROR_SEND_PATH,
 	SUCCESS_SEND_INDEX_PATH,
 } from '../src/constants/RouterConstants';
+import { storageSetDraft } from '../src/actions/GlobalActions';
+import { FORM_SEND } from '../src/constants/FormConstants';
 
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
@@ -329,11 +331,6 @@ export const onResponse = (err, id, status) => {
 		removeTransaction(id);
 	}
 
-	// if (lastTransaction) {
-	// 	console.log(1, lastTransaction);
-	// 	lastTransaction.cb({ id, status, text: err });
-	// }
-
 	if (COMPLETE_STATUS !== status) {
 		createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
 	}
@@ -443,7 +440,7 @@ export const onSend = async (options, networkName) => {
 		await Promise.race([
 			sendTransaction(options, networkName)
 				.then(() => {}, (err) => {
-					console.log('Broadcast error', err);
+					console.warn('Broadcast transaction error', err);
 					if (err) { path = ERROR_SEND_PATH; }
 				}).finally(() => new Date().getTime() - start),
 			new Promise((resolve, reject) => {
@@ -454,7 +451,7 @@ export const onSend = async (options, networkName) => {
 			}),
 		]);
 	} catch (err) {
-		console.log('Broadcast error', err);
+		console.warn('Broadcast transaction error', err);
 		path = NETWORK_ERROR_SEND_PATH;
 
 		try {
@@ -463,7 +460,7 @@ export const onSend = async (options, networkName) => {
 
 		return null;
 	} finally {
-		await storage.remove(DRAFT_STORAGE_KEY);
+		await storageSetDraft(FORM_SEND, 'loading', false);
 	}
 
 	try {
@@ -484,7 +481,7 @@ export const onSwitchNetwork = async (network) => {
 	try {
 		await createSocket(network.url);
 	} catch (e) {
-		console.log('onSwitchNetwork Error', e);
+		console.warn('Switch network error', e);
 	} finally {
 		networkSubscribers = networkSubscribers.filter((cb) => {
 			try {

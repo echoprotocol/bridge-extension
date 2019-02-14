@@ -164,7 +164,7 @@ const formatHistory = (history) => async (dispatch, getState) => {
 				const result = await formatOperation(row, map, accountName);
 				rows.push(result);
 			} catch (e) {
-				console.log('Error formatHistory:', e);
+				console.warn('Formating history error:', e);
 			}
 		}
 
@@ -215,7 +215,7 @@ export const updateHistory = () => async (dispatch, getState) => {
 		// }
 
 	} catch (err) {
-		console.log('Update history error', err);
+		console.warn('Update history error', err);
 		dispatch(GlobalReducer.actions.set({
 			field: 'error',
 			value: FormatHelper.formatError(err),

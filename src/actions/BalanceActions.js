@@ -199,9 +199,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 		const amount = Number(form.get('amount').value).toString();
 		const memo = form.get('memo');
 		const selectedBalance = getState().form.getIn([FORM_SEND, 'selectedBalance']);
-		console.log('selectedBalance', selectedBalance);
 		const selectedFeeBalance = getState().form.getIn([FORM_SEND, 'selectedFeeBalance']);
-		console.log('selectedFeeBalance', selectedFeeBalance);
 		const balances = getState().balance.get('balances');
 		const assets = getState().balance.get('assets');
 		const [fromAccount] = await echoService.getChainLib().api.getFullAccounts([getState().global.getIn(['account', 'name'])]);
