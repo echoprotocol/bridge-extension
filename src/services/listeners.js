@@ -2,7 +2,7 @@ import echoService from './echo';
 
 import { requestHandler, signTr, trResponseHandler, windowRequestHandler } from '../actions/SignActions';
 import { sendHandler } from '../actions/BalanceActions';
-import { onLogout } from '../actions/GlobalActions';
+import { onLogout, addAccount } from '../actions/GlobalActions';
 import { getCrypto, lockResponse, unlockResponse } from '../actions/CryptoActions';
 
 import { offerName } from '../actions/AuthActions';
@@ -36,6 +36,9 @@ class Listeners {
 		this.onStatusConnected = (status) => dispatch(onStatusConnected(status));
 		this.onGlobalSubscribe = () => dispatch(subscribe());
 		this.sign = (id, options) => dispatch(signTr(id, options));
+		this.addAccount = (name, keys, networkName, link) => {
+			dispatch(addAccount(name, keys, networkName, link));
+		};
 
 		this.emitter.on('windowRequest', this.windowRequestHandler);
 		this.emitter.on('request', this.requestHandler);
@@ -54,6 +57,7 @@ class Listeners {
 		this.crypto.on('unlocked', this.unlockResponse);
 
 		this.emitter.on('transaction', this.sign);
+		this.emitter.on('addAccount', this.addAccount);
 
 		window.onunload = () => {
 			this.removeListeners();
@@ -76,7 +80,8 @@ class Listeners {
 		this.crypto.removeListener('unlocked', this.unlockResponse);
 	}
 
-	initBackgroundListeners(onResponse, onSend, onSwitchNetwork, trSignResponse) {
+	initBackgroundListeners(createAccount, onResponse, onSend, onSwitchNetwork, trSignResponse) {
+		this.emitter.on('createAccount', createAccount);
 		this.emitter.on('response', onResponse);
 		this.emitter.on('sendRequest', onSend);
 		this.emitter.on('switchNetwork', onSwitchNetwork);

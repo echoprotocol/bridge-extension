@@ -15,12 +15,13 @@ import {
 	SIGN_TRANSACTION_PATH,
 	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
+	WELCOME_PATH,
 	NETWORK_ERROR_SEND_PATH,
 	FORM_TYPES,
 } from '../constants/RouterConstants';
 import { DRAFT_STORAGE_KEY, NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
 import { setValue } from './FormActions';
-import { loadInfo, set, storageGetDraft } from './GlobalActions';
+import { loadInfo, set, addAccount, storageGetDraft } from './GlobalActions';
 import { globals } from './SignActions';
 
 import FormatHelper from '../helpers/FormatHelper';
@@ -144,12 +145,22 @@ export const lockResponse = () => (dispatch) => {
  * 	Set subscribe on lock event
  */
 export const initCrypto = () => async (dispatch) => {
+
 	const crypto = echoService.getCrypto();
 
 	try {
+
 		if (!crypto.isLocked()) {
 			dispatch(changeCrypto({ isLocked: false }));
 			await dispatch(loadInfo());
+
+			const account = await storage.get('account');
+			if (account && account.name) {
+
+				dispatch(addAccount(account.name, account.keys, account.networkName, WELCOME_PATH));
+
+				return null;
+			}
 
 			if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
 				const draft = await storageGetDraft();
@@ -178,6 +189,7 @@ export const initCrypto = () => async (dispatch) => {
 		console.warn('Crypto initialization error', err);
 		dispatch(changeCrypto({ error: FormatHelper.formatError(err) }));
 	}
+	return null;
 };
 
 /**

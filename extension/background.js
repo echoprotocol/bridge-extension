@@ -9,6 +9,7 @@ import storage from '../src/services/storage';
 import Listeners from '../src/services/listeners';
 import extensionizer from './extensionizer';
 import NotificationManager from './NotificationManager';
+import echoService from '../src/services/echo';
 
 import {
 	NETWORKS,
@@ -26,16 +27,22 @@ import {
 	CONNECTION_TIMEOUT,
 	MAX_RETRIES, SIGN_STATUS, DRAFT_STORAGE_KEY,
 } from '../src/constants/GlobalConstants';
+
 import { operationKeys } from '../src/constants/OperationConstants';
 
 import { formatToSend } from '../src/services/operation';
+import { validateAccountExist } from '../src/actions/AuthActions';
+import { storageSetDraft } from '../src/actions/GlobalActions';
+
+
 import {
 	ERROR_SEND_PATH,
 	NETWORK_ERROR_SEND_PATH,
 	SUCCESS_SEND_INDEX_PATH,
 } from '../src/constants/RouterConstants';
-import { storageSetDraft } from '../src/actions/GlobalActions';
-import { FORM_SEND } from '../src/constants/FormConstants';
+
+import { FORM_SIGN_UP, FORM_SEND } from '../src/constants/FormConstants';
+import FormatHelper from '../src/helpers/FormatHelper';
 
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
@@ -178,6 +185,40 @@ const createNotification = (title = '', message = '') => {
 };
 
 /**
+ * createAccount
+ * @param {String} name
+ * @param {String?} path
+ */
+const createAccount = async (name, path) => {
+	try {
+		const network = await getNetwork();
+		const { error, example } = await validateAccountExist(name);
+
+		if (error) {
+			storageSetDraft(FORM_SIGN_UP, 'error', { error, example });
+			emitter.emit('offerName', error, example);
+			return null;
+		}
+
+		const wif = crypto.generateWIF();
+		const echoRandKey = crypto.generateEchoRandKey();
+		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
+
+		await echoService.getChainLib().api.registerAccount(name, key, key, key, echoRandKey);
+
+		await storage.set('account', { name, keys: [key, key], networkName: network.name });
+		await crypto.importByWIF(network.name, wif);
+		await emitter.emit('addAccount', name, [key, key], network.name, path);
+		storage.remove(DRAFT_STORAGE_KEY);
+	} catch (err) {
+		storageSetDraft(FORM_SIGN_UP, 'error', { error: FormatHelper.formatError(err), example: '' });
+	}
+	return null;
+
+};
+
+/**
+
  * Get user account if unlocked
  * @returns {Promise.<*>}
  */
@@ -498,6 +539,7 @@ export const onSwitchNetwork = async (network) => {
 
 const listeners = new Listeners(emitter, crypto);
 listeners.initBackgroundListeners(
+	createAccount,
 	onResponse,
 	onSend,
 	onSwitchNetwork,

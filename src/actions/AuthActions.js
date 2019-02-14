@@ -72,15 +72,14 @@ export const validateAccountExist = async (
 /**
  *  @method createAccount
  *
- * 	Create account through account name
+ * 	Validate account name and emmit action to background
  *
  * 	@param {String} name
- *
- * 	@return {String} wif
+ * 	@param {String?} path
  */
-export const createAccount = (name) => async (dispatch, getState) => {
+export const createAccount = (name, path) => async (dispatch, getState) => {
 	let error = null;
-	let example = '';
+	const example = '';
 
 	dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
 
@@ -101,28 +100,10 @@ export const createAccount = (name) => async (dispatch, getState) => {
 	try {
 		getCrypto().pauseLockTimeout();
 
-		const networkName = getState().global.getIn(['network', 'name']);
-
 		dispatch(toggleLoading(FORM_SIGN_UP, true));
-
-		({ error, example } = await validateAccountExist(name));
-		if (error) {
-			dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
-			return null;
-		}
-
-		const wif = getCrypto().generateWIF();
-
-		const echoRandKey = getCrypto().generateEchoRandKey();
-
-		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
-
-		await echoService.getChainLib().api.registerAccount(name, key, key, key, echoRandKey);
-
-		await getCrypto().importByWIF(networkName, wif);
-
-		await dispatch(addAccount(name, [key, key], networkName));
-		return wif;
+		const emitter = echoService.getEmitter();
+		await emitter.emit('createAccount', name, path);
+		return null;
 
 	} catch (err) {
 		dispatch(setValue(FORM_SIGN_UP, 'error', FormatHelper.formatError(err)));
@@ -132,17 +113,13 @@ export const createAccount = (name) => async (dispatch, getState) => {
 		dispatch(toggleLoading(FORM_SIGN_UP, false));
 		getCrypto().updateLockTimeout();
 	}
-
 };
 
 /**
  *  @method offerName
  *
- * 	Create account through account name
- *
- * 	@param {String} name
- *
- * 	@return {String} wif
+ * 	@param {String} error
+ * 	@param {String} example
  */
 export const offerName = (error, example) => async (dispatch) => {
 	dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example }));
@@ -346,7 +323,6 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		}
 
 		if (success) {
-
 			await dispatch(addAccount(name, keys, networkName));
 		}
 

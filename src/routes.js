@@ -20,7 +20,10 @@ import {
 	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
 	ABOUT_PATH,
+	WELCOME_PATH,
+	SETTINGS_PATH,
 	NETWORK_PATH,
+
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -29,6 +32,8 @@ import ImportAccount from './containers/ImportAccount';
 import AddNetwork from './containers/AddNetwork';
 import Pin from './containers/PinCode';
 import SuccessAddNetwork from './containers/SuccessAddNetwork';
+import Welcome from './containers/Welcome';
+import SettingsAccount from './containers/SettingsAccount';
 import Wallet from './containers/Wallet';
 import Receive from './containers/Receive';
 import Transactions from './containers/Transactions';
@@ -61,6 +66,9 @@ export default class Routes extends React.Component {
 
 					<Route exact path={ADD_NETWORK_PATH} component={AddNetwork} />
 					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={SuccessAddNetwork} />
+					<Route exact path={WELCOME_PATH} component={Welcome} />
+					<Route exact path={SETTINGS_PATH} component={required(SettingsAccount)} />
+					<Route exact path={WALLET_PATH} component={required(Wallet)} />
 					<Route exact path={WALLET_PATH} component={required(Wallet)} />
 					<Route exact path={RECEIVE_PATH} component={required(Receive)} />
 					<Route exact path={TRANSACTIONS_PATH} component={required(Transactions)} />

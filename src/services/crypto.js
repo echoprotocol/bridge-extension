@@ -7,7 +7,11 @@ import AesStorage from './aesStorage';
 
 import storage from './storage';
 
-import { RANDOM_SIZE, ACTIVE_KEY, MEMO_KEY } from '../constants/GlobalConstants';
+import {
+	RANDOM_SIZE,
+	ACTIVE_KEY, MEMO_KEY,
+	ECHORANDKEY_SIZE,
+} from '../constants/GlobalConstants';
 
 const { Long } = require('bytebuffer');
 
@@ -185,15 +189,13 @@ class Crypto extends EventEmitter {
 	 */
 	generateEchoRandKey() {
 		privateAES.required();
-		try {
-			const EchoRandKeyBuffer = ED25519.createKeyPair();
-			const echoRandPublicKey = EchoRandKeyBuffer.publicKey;
-			return `DET${bs58.encode(echoRandPublicKey)}`;
-		} catch (error) {
-			return null;
+		const EchoRandKeyBuffer = ED25519.createKeyPair();
+		const echoRandPublicKey = EchoRandKeyBuffer.publicKey;
+		const echoRandKey = `DET${bs58.encode(echoRandPublicKey)}`;
+		if (echoRandKey.length !== ECHORANDKEY_SIZE) {
+			return this.generateEchoRandKey();
 		}
-
-
+		return echoRandKey;
 	}
 
 	/**
@@ -207,7 +209,6 @@ class Crypto extends EventEmitter {
 	 *  @param {String} wif
 	 */
 	async importByWIF(networkName, wif) {
-
 
 		privateAES.required();
 
