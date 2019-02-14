@@ -21,10 +21,6 @@ if (EXTENSION) {
 
 class Echo {
 
-	// static getWsLib() {
-	// 	return EXTENSION ? extension.extension.getBackgroundPage().getWsLib() : echojs;
-	// }
-
 	static getChainLib() {
 		return EXTENSION ? extension.extension.getBackgroundPage().getChainLib() : chainlib;
 	}

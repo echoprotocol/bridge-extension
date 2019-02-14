@@ -382,7 +382,7 @@ export const loadRequests = () => async (dispatch) => {
 			}),
 		]));
 	} catch (err) {
-		console.log('loadRequests Error', err);
+		console.warn('Loading requests error', err);
 	}
 
 	return null;
