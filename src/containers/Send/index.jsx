@@ -138,12 +138,15 @@ class Send extends React.Component {
 	}
 
 	onAmountChange(e) {
+
 		const {
 			selectedBalance, balances, assets, tokens, account,
 		} = this.props;
 
 		const field = e.target.name;
-		const { value } = e.target;
+
+		const value = e.target.value.replace(/\s+/g, '');
+
 
 		let precision = null;
 		let symbol = null;
