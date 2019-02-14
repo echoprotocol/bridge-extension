@@ -44,7 +44,9 @@ class Wallet extends React.Component {
 							{
 								asset ?
 									<React.Fragment>
-										<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
+										<span>
+											{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}
+										</span>
 										<span>{asset.get('symbol')}</span>
 									</React.Fragment>
 									:
