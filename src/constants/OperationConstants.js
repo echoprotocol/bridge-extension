@@ -76,16 +76,6 @@ export const operationFieldsSend = {
 			type: 'asset_object',
 			hasProperties: 'asset_id',
 		},
-		gasPrice: {
-			type: 'number',
-			required: false,
-			default: 0,
-		},
-		gas: {
-			type: 'number',
-			required: false,
-			default: 4700000,
-		},
 		code: {
 			type: 'string',
 			required: true,

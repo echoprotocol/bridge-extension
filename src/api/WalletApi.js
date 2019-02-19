@@ -3,12 +3,13 @@ import { aes, PrivateKey } from 'echojs-lib';
 import { MEMO_FEE_KEYS } from '../constants/GlobalConstants';
 
 import echoService from '../services/echo';
+import { uniqueNonceUint64 } from '../services/crypto';
 
 const getOperationFee = async (type, transaction) => {
 	const options = JSON.parse(JSON.stringify(transaction));
 
 	if (options.memo) {
-		const nonce = null;
+		const nonce = uniqueNonceUint64();
 		const pKey = PrivateKey.fromWif(MEMO_FEE_KEYS.WIF);
 
 		const message = aes.encryptWithChecksum(
