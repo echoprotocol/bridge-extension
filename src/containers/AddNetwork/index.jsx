@@ -135,7 +135,7 @@ class AddNetwork extends React.Component {
 							disabled={loading}
 							name="address"
 							theme="input-light"
-							labelText="Address (URL or IP)"
+							labelText="WS address (ws:// or wss://)"
 							errorText={address.error}
 							value={address.value}
 							onChange={(e) => this.onChange(e)}
