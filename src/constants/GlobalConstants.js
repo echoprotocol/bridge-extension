@@ -78,7 +78,7 @@ export const HEADER_TITLE = [
 export const NETWORKS = [
 	{
 		name: 'Dev Network',
-		url: 'wss://testnet.echo-dev.io/ws',
+		url: 'wss://devnet.echo-dev.io/ws',
 	},
 ];
 

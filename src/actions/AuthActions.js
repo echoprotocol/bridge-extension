@@ -254,12 +254,32 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 		getCrypto().pauseLockTimeout();
 		dispatch(toggleLoading(FORM_SIGN_IN, true));
 
-		let success = true;
+		let success = false;
 		let keys = [];
 
 		let isAccAdded = false;
 
-		if (getCrypto().isWIF(password)) {
+		if (name) {
+			const {
+				successStatus,
+				isAccAddedByPas,
+			} = await dispatch(importByPassword(networkName, name, password));
+
+			isAccAdded = isAccAddedByPas;
+			success = successStatus;
+
+			if (success && isAccAddedByPas) {
+
+				return { name, isAccAdded };
+			}
+
+			keys = [
+				getCrypto().getPublicKey(name, password, ACTIVE_KEY),
+				getCrypto().getPublicKey(name, password, MEMO_KEY),
+			];
+		}
+
+		if (getCrypto().isWIF(password) && !success) {
 
 			const active = PrivateKey.fromWif(password).toPublicKey().toString();
 
@@ -300,26 +320,7 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 			}
 			keys = [active];
 
-		} else {
-
-			const {
-				successStatus,
-				isAccAddedByPas,
-			} = await dispatch(importByPassword(networkName, name, password));
-
-			isAccAdded = isAccAddedByPas;
-			success = successStatus;
-
-			if (success && isAccAddedByPas) {
-
-				return { name, isAccAdded };
-			}
-
-			keys = [
-				getCrypto().getPublicKey(name, password, ACTIVE_KEY),
-				getCrypto().getPublicKey(name, password, MEMO_KEY),
-			];
-
+			success = true;
 		}
 
 		if (success) {
