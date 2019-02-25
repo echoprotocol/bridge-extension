@@ -38,7 +38,7 @@ class Backup extends React.Component {
 	render() {
 		const { keys } = this.state;
 
-		if (!keys.length) {
+		if (!keys.every((key) => key.wif)) {
 			return (
 				<React.Fragment>
 					<div className="backup-page-empty">
@@ -60,7 +60,7 @@ class Backup extends React.Component {
 							<div className="page">
 								{
 									keys.map((key) => (
-										key.wif ?
+										key.wif &&
 											<div className="backup-container" key={key.wif}>
 												<p className="title">Public key</p>
 												<span className="key">{key.publicKey}</span>
@@ -70,7 +70,7 @@ class Backup extends React.Component {
 													<div className="wif-key">{key.wif}</div>
 													<BridgeBtnCopy compact btnTextWif text={key.wif} />
 												</div>
-											</div> : null
+											</div>
 									))
 								}
 							</div>
