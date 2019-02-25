@@ -347,7 +347,14 @@ class Send extends React.Component {
 							</div>
 							<Button
 								className={classnames('btn-in-light', { loading })}
-								disabled={(!to.value || !amount.value || !!memo.error || loading)}
+								disabled={(
+									!to.value
+									|| !amount.value
+									|| !!memo.error
+									|| !!fee.error
+									|| !!amount.error
+									|| loading
+								)}
 								content={<span className="btn-text">Send</span>}
 								onClick={() => this.onSend()}
 								type="submit"

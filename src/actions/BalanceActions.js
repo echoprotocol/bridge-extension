@@ -266,7 +266,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 
 		dispatch(setFormValue(FORM_SEND, 'fee', resultFee.amount / (10 ** options.fee.asset.get('precision'))));
 	} catch (err) {
-		console.warn('setFee Realtime Error', err);
+		dispatch(setFormError(FORM_SEND, 'fee', 'Can\'t be calculated'));
 	}
 
 	return true;
