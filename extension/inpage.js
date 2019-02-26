@@ -1,4 +1,3 @@
-
 import echo, { Transaction, constants, PublicKey } from 'echojs-lib';
 import lodash from 'lodash';
 import BigNumber from 'bignumber.js';
@@ -17,6 +16,8 @@ import { uniqueNonceUint64 } from '../src/services/crypto';
 const requestQueue = [];
 
 const networkSubscribers = [];
+
+let currentNetworkURL = NETWORKS[0].url;
 
 /**
  * subscribeSwitchNetwork to switch network
@@ -42,6 +43,7 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 const onMessage = (event) => {
 	if (event.data.subscriber) {
 
+		currentNetworkURL = event.data.res.url;
 		networkSubscribers.forEach((cb) => cb(event.data.res));
 		subscribeSwitchNetwork();
 		return;
@@ -185,7 +187,9 @@ Transaction.prototype.signWithBridge = async function signWithBridge() {
 	return result;
 };
 
-const connectBridge = (url, params) => {
+const oldConnect = echo.connect;
+
+echo.connect = (url, params) => {
 	const options = params || {
 		connectionTimeout: CONNECTION_TIMEOUT,
 		maxRetries: MAX_RETRIES,
@@ -195,7 +199,7 @@ const connectBridge = (url, params) => {
 		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
 	};
 
-	echo.connect(url || NETWORKS[0].url, options);
+	return oldConnect.apply(echo, [url || currentNetworkURL, options]);
 };
 
 const extension = {
@@ -223,7 +227,5 @@ window.echojslib.helpers = {
 window.echojslib.PublicKey = PublicKey;
 window.echojslib.Buffer = Buffer;
 window.echojslib.generateNonce = () => uniqueNonceUint64();
-window.echojslib.connectBridge = (url, params) => connectBridge(url, params);
 
 window.addEventListener('message', onMessage, false);
-
