@@ -23,7 +23,7 @@ class Header extends React.Component {
 	}
 
 	render() {
-		const { accounts, pathname } = this.props;
+		const { accounts, pathname, connected } = this.props;
 
 		if (
 			[SIGN_TRANSACTION_PATH, SUCCESS_SEND_PATH, ERROR_SEND_PATH, EMPTY_PATH].includes(pathname)
@@ -44,7 +44,7 @@ class Header extends React.Component {
 				tabIndex="-1"
 			>
 				{
-					(accounts && accounts.size) ?
+					(accounts && accounts.size) && connected ?
 						<UserDropdown
 							ref={(r) => { this.refUserDropdown = r ? r.getWrappedInstance() : null; }}
 						/> : null
@@ -60,17 +60,19 @@ Header.propTypes = {
 	accounts: PropTypes.object,
 	pathname: PropTypes.string.isRequired,
 	sidebarToggle: PropTypes.func.isRequired,
+	connected: PropTypes.bool,
 };
 
 Header.defaultProps = {
 	accounts: null,
+	connected: false,
 };
 
 export default connect(
 	(state) => {
 		const networkName = state.global.getIn(['network', 'name']);
 		const accounts = state.global.getIn(['accounts', networkName]);
-		return { accounts };
+		return { accounts, connected: state.global.get('connected') };
 	},
 	(dispatch) => ({
 		sidebarToggle: (value) => dispatch(sidebarToggle(value)),

@@ -23,7 +23,7 @@ import {
 	WELCOME_PATH,
 	SETTINGS_PATH,
 	NETWORK_PATH,
-
+	CONNECTION_ERROR_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -45,9 +45,11 @@ import WatchToken from './containers/WatchToken';
 import SignTransaction from './containers/SignTransaction';
 import About from './containers/About';
 import Network from './containers/Network';
+import ConnectionError from './containers/ConnectionError';
 
 
 import { required } from './components/Require';
+import { isConnected } from './components/Connected';
 
 export default class Routes extends React.Component {
 
@@ -59,16 +61,15 @@ export default class Routes extends React.Component {
 					<Route exact path={WIPE_PIN_PATH} component={Pin.Wipe} />
 					<Route exact path={UNLOCK_PATH} component={Pin.Unlock} />
 
-					<Route exact path={CREATE_ACCOUNT_PATH} component={CreateAccount} />
-					<Route exact path={IMPORT_ACCOUNT_PATH} component={ImportAccount} />
+					<Route exact path={CREATE_ACCOUNT_PATH} component={isConnected(CreateAccount)} />
+					<Route exact path={IMPORT_ACCOUNT_PATH} component={isConnected(ImportAccount)} />
 
 					<Route exact path={SIGN_TRANSACTION_PATH} component={required(SignTransaction)} />
-
+					<Route exact path={CONNECTION_ERROR_PATH} component={ConnectionError} />
 					<Route exact path={ADD_NETWORK_PATH} component={AddNetwork} />
 					<Route exact path={SUCCESS_ADD_NETWORK_PATH} component={SuccessAddNetwork} />
-					<Route exact path={WELCOME_PATH} component={Welcome} />
+					<Route exact path={WELCOME_PATH} component={required(Welcome)} />
 					<Route exact path={SETTINGS_PATH} component={required(SettingsAccount)} />
-					<Route exact path={WALLET_PATH} component={required(Wallet)} />
 					<Route exact path={WALLET_PATH} component={required(Wallet)} />
 					<Route exact path={RECEIVE_PATH} component={required(Receive)} />
 					<Route exact path={TRANSACTIONS_PATH} component={required(Transactions)} />

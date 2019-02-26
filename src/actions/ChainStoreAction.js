@@ -14,8 +14,10 @@ import {
 	NETWORKS,
 } from '../constants/GlobalConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
+import { CONNECTION_ERROR_PATH } from '../constants/RouterConstants';
 
 import storage from '../services/storage';
+import history from '../history';
 
 import FormatHelper from '../helpers/FormatHelper';
 import { updateHistory } from './HistoryActions';
@@ -99,6 +101,13 @@ export const disconnect = () => async (dispatch) => {
 	}
 };
 
-export const onStatusConnected = (status) => (dispatch) => {
-	dispatch(GlobalReducer.actions.set({ field: 'connected', value: status === CONNECT_STATUS }));
+export const onStatusConnected = (status) => (dispatch, getState) => {
+	const currentPath = getState().router.location.pathname;
+	const isConnected = status === CONNECT_STATUS;
+
+	dispatch(GlobalReducer.actions.set({ field: 'connected', value: isConnected }));
+
+	if (currentPath === CONNECTION_ERROR_PATH && isConnected) {
+		history.goBack();
+	}
 };

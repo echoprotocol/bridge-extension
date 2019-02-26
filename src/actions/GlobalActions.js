@@ -346,6 +346,7 @@ export const loadInfo = () => async (dispatch, getState) => {
  * 	@param {Object} network
  */
 export const changeNetwork = (network) => async (dispatch, getState) => {
+
 	try {
 		if (echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
 			await dispatch(disconnect());

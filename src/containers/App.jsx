@@ -11,7 +11,7 @@ import { globalInit, initListeners as init } from '../actions/GlobalActions';
 import Navigator from '../components/Navigator';
 import Modals from '../components/Modals';
 
-import { PIN_PATHS, SIGN_TRANSACTION_PATH } from '../constants/RouterConstants';
+import { PIN_PATHS, SIGN_TRANSACTION_PATH, CONNECTION_ERROR_PATH } from '../constants/RouterConstants';
 
 import bridgeLogo from '../assets/images/bridge-logo-hor-bw.svg';
 
@@ -43,7 +43,7 @@ class App extends React.Component {
 		const { children, loading, pathname } = this.props;
 
 		return (
-			<div className={classnames('app-wrap', { dark: PIN_PATHS.includes(pathname) })}>
+			<div className={classnames('app-wrap', { dark: PIN_PATHS.includes(pathname) || CONNECTION_ERROR_PATH === pathname })}>
 				<Sidebar.Pushable>
 					{ this.renderHeader(pathname) }
 					{children}

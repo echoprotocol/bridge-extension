@@ -11,6 +11,7 @@ import {
 	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
 	NETWORK_ERROR_SEND_PATH,
+	CONNECTION_ERROR_PATH,
 } from '../../constants/RouterConstants';
 
 export function required(Component) {
@@ -26,8 +27,15 @@ export function required(Component) {
 		}
 
 		check() {
-			const { isLogin, isLocked, isSign } = this.props;
+			const {
+				isLogin, isLocked, isSign, connected,
+			} = this.props;
 			const { pathname } = this.props.history.location;
+
+			if (!connected) {
+				this.props.history.push(CONNECTION_ERROR_PATH);
+				return;
+			}
 
 			if (isLocked) {
 				this.props.history.push(UNLOCK_PATH);
@@ -72,12 +80,14 @@ export function required(Component) {
 	RequiredComponent.propTypes = {
 		isLogin: PropTypes.object.isRequired,
 		history: PropTypes.object.isRequired,
+		connected: PropTypes.bool,
 		isLocked: PropTypes.bool,
 		isSign: PropTypes.bool,
 		dispatch: PropTypes.func.isRequired,
 	};
 
 	RequiredComponent.defaultProps = {
+		connected: false,
 		isLocked: true,
 		isSign: true,
 	};
@@ -86,6 +96,7 @@ export function required(Component) {
 		isLocked: state.global.getIn(['crypto', 'isLocked']),
 		isLogin: state.global.get('account'),
 		isSign: !!state.global.getIn(['sign', 'current']),
+		connected: state.global.get('connected'),
 	}))(RequiredComponent);
 
 }

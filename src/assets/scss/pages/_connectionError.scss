@@ -1,0 +1,37 @@
+.connection-error-page {
+	position: relative;
+	height: 550px;
+	display: flex;
+	align-items: center;
+	justify-content: center;
+	flex-direction: column;
+
+	&:before {
+		right: 0;
+		left: 0;
+		top: 0;
+		bottom: 0;
+		position: absolute;
+		content: "";
+		display: block;
+		background-repeat: no-repeat;
+		background-image: url(../images/connectionErrorBG.jpg);
+		opacity: .08;
+	}
+	.one-btn-wrap {
+		margin-bottom: 40px;
+		.btn-transparent,
+		.btn-inverted,
+		.btn-in-light {
+			min-width: 170px;
+		}
+	}
+}
+
+.connection-error-text {
+	font-size: 20px;
+	font-family: FNBook;
+	color: #fff;
+	margin-bottom: 50px;
+	letter-spacing: .3px;
+}

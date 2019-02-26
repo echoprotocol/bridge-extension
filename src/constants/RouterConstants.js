@@ -7,6 +7,8 @@ import {
 	FORM_WELCOME,
 } from './FormConstants';
 
+export const CONNECTION_ERROR_PATH = '/connection-error';
+
 export const CREATE_ACCOUNT_PATH = '/accounts/create';
 export const CREATE_SUCCESS_PATH = '/accounts/create?success=1';
 
