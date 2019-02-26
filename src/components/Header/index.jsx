@@ -15,7 +15,12 @@ import {
 
 import { sidebarToggle } from '../../actions/GlobalActions';
 
-class Header extends React.PureComponent {
+class Header extends React.Component {
+
+	constructor(props) {
+		super(props);
+		this.refUserDropdown = React.createRef();
+	}
 
 	render() {
 		const { accounts, pathname } = this.props;
@@ -38,7 +43,12 @@ class Header extends React.PureComponent {
 				onKeyPress={() => this.props.sidebarToggle(true)}
 				tabIndex="-1"
 			>
-				{(accounts && accounts.size) ? <UserDropdown /> : null}
+				{
+					(accounts && accounts.size) ?
+						<UserDropdown
+							ref={(r) => { this.refUserDropdown = r ? r.getWrappedInstance() : null; }}
+						/> : null
+				}
 				<NetworkDropdown />
 			</header>
 		);
@@ -65,4 +75,6 @@ export default connect(
 	(dispatch) => ({
 		sidebarToggle: (value) => dispatch(sidebarToggle(value)),
 	}),
+	null,
+	{ withRef: true },
 )(Header);

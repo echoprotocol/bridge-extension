@@ -10,11 +10,11 @@ import BridgeSidebar from '../BridgeSidebar';
 import { SIGN_TRANSACTION_PATH } from '../../constants/RouterConstants';
 import echoService from '../../services/echo';
 
-class Navigator extends React.PureComponent {
+class Navigator extends React.Component {
 
 	constructor(props) {
 		super(props);
-		this.sidebarRef = React.createRef();
+		this.refHeader = React.createRef();
 	}
 
 	componentDidMount() {
@@ -27,6 +27,12 @@ class Navigator extends React.PureComponent {
 		document.removeEventListener('mousedown', this.updateTimeout);
 	}
 
+	toggleFocusClass(value) {
+		if (this.refHeader && this.refHeader.refUserDropdown) {
+			this.refHeader.refUserDropdown.toggleFocusClass(value);
+		}
+	}
+
 	updateTimeout() {
 		echoService.getCrypto().updateLockTimeout();
 	}
@@ -36,8 +42,18 @@ class Navigator extends React.PureComponent {
 
 		return (
 			<React.Fragment>
-				<FocusTrap active={visibleSidebar} className="trap-wrap">
-					<Header pathname={pathname} />
+				<FocusTrap
+					active={visibleSidebar}
+					className="trap-wrap"
+					focusTrapOptions={{
+						onActivate: () => this.toggleFocusClass(true),
+						onDeactivate: () => this.toggleFocusClass(false),
+					}}
+				>
+					<Header
+						pathname={pathname}
+						ref={(r) => { this.refHeader = r ? r.getWrappedInstance() : null; }}
+					/>
 					<BridgeSidebar />
 				</FocusTrap>
 				{ pathname !== SIGN_TRANSACTION_PATH ? <Navbar /> : null }

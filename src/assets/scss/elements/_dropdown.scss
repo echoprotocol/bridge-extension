@@ -85,14 +85,6 @@
 			width: 20px;
 			margin: 0 2px;
 		}
-		
-		// &:hover {
-		// 	background-color: #2c3a40;
-		// 	.ddDown {
-		// 		opacity: 1;
-		// 	}
-
-		// }
 	}
 }
 
@@ -100,11 +92,13 @@
 .dropdown-user {
 	@extend %dropdown;
 	@include noSelection();
-	&:not(.open) {
-        .dropdown-toggle {
-            @include onToggleFocus(#4c5c60);
-        }
-    }
+	&:not(.open){
+		&:not(.hide-focus) {
+			.dropdown-toggle {
+				@include onToggleFocus(#4c5c60);
+			}
+		}
+	}
 }
 
 

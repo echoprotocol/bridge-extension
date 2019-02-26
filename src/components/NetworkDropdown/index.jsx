@@ -32,7 +32,6 @@ class NetworkDropdown extends React.PureComponent {
 			opened: false,
 			disableItemHover: false,
 			disableToggleHover: false,
-
 		};
 	}
 
@@ -133,7 +132,6 @@ class NetworkDropdown extends React.PureComponent {
 			</MenuItem>
 		));
 	}
-
 
 	showNetworkInfo(e, network, isActive, custom) {
 		e.preventDefault();
@@ -277,4 +275,3 @@ export default withRouter(connect(
 		tryToConnect: () => dispatch(changeNetwork()),
 	}),
 )(NetworkDropdown));
-

@@ -6,7 +6,6 @@ import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import { connect } from 'react-redux';
 import classnames from 'classnames';
-import { withRouter } from 'react-router';
 
 import { switchAccount } from '../../actions/GlobalActions';
 import { openModal } from '../../actions/ModalActions';
@@ -21,7 +20,7 @@ import UserIcon from '../UserIcon';
 import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
 import exit from '../../assets/images/icons/exit.svg';
 
-class UserDropdown extends React.PureComponent {
+class UserDropdown extends React.Component {
 
 	constructor(props) {
 		super(props);
@@ -29,6 +28,7 @@ class UserDropdown extends React.PureComponent {
 		this.state = {
 			menuHeight: null,
 			opened: false,
+			hideFocus: false,
 		};
 	}
 
@@ -36,9 +36,7 @@ class UserDropdown extends React.PureComponent {
 		this.setDDMenuHeight();
 	}
 
-
 	componentWillReceiveProps(nextProps) {
-
 		if (!nextProps.account) {
 			this.setState({
 				opened: false,
@@ -106,6 +104,10 @@ class UserDropdown extends React.PureComponent {
 		}
 	}
 
+	toggleFocusClass(value) {
+		this.setState({ hideFocus: value });
+	}
+
 	renderList() {
 
 		const {
@@ -158,7 +160,7 @@ class UserDropdown extends React.PureComponent {
 
 	render() {
 		const { account, accounts } = this.props;
-
+		const { hideFocus } = this.state;
 
 		if (!account) {
 			return null;
@@ -170,11 +172,12 @@ class UserDropdown extends React.PureComponent {
 
 		return (
 			<Dropdown
-				className="dropdown-user"
+				className={classnames('dropdown-user', { 'hide-focus': hideFocus })}
 				id="dropdown-user"
 				onToggle={() => this.toggleDropdown()}
 				open={this.state.opened}
 			>
+
 				<Dropdown.Toggle noCaret>
 
 					<UserIcon
@@ -241,7 +244,7 @@ UserDropdown.defaultProps = {
 	account: null,
 };
 
-export default withRouter(connect(
+export default connect(
 	(state) => ({
 		balances: state.balance.get('balances'),
 		assets: state.balance.get('assets'),
@@ -253,4 +256,6 @@ export default withRouter(connect(
 		openModal: (value) => dispatch(openModal(MODAL_LOGOUT, 'accountName', value)),
 		switchAccount: (name) => dispatch(switchAccount(name)),
 	}),
-)(UserDropdown));
+	null,
+	{ withRef: true },
+)(UserDropdown);
