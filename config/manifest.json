@@ -40,7 +40,8 @@
   "permissions": [
     "storage",
     "clipboardWrite",
-    "notifications"
+    "notifications",
+    "activeTab"
   ],
   "web_accessible_resources": [
     "inpage.js",

@@ -9,12 +9,16 @@ cache:
   - node_modules/
 
 lint.test:
+  image: node:10.15
   stage: lint
   script:
+    - node -v
+    - if [ -d node_modules/echojs-lib ]; then rm -rf node_modules/echojs-lib; fi
+    - npm config set unsafe-perm true
     - npm i
     - npm run lint
   tags:
-    - pp-projects
+    - docker
 
 build.develop:
   stage: build
@@ -57,3 +61,28 @@ build.master:
     name: stage
   tags:
     - pp-projects
+
+build.publish:
+  image: node:10.15
+  stage: build
+  cache:
+    key: $CI_COMMIT_REF_NAME
+    paths:
+      - node_modules
+  script:
+    - apt-get update -y && apt-get -y install curl jq
+    - if [ -d node_modules/echojs-lib ]; then rm -rf node_modules/echojs-lib; fi
+    - npm config set unsafe-perm true
+    - npm i
+    - npm run build-ext
+    - cd build/zip
+    - ls
+    - ACCESS_TOKEN=$(curl "https://accounts.google.com/o/oauth2/token" -d "client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&refresh_token=${REFRESH_TOKEN}&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob" | jq -r .access_token)
+    - 'curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -X PUT -T echo_bridge.zip -v "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${APP_ID}"'
+    - 'curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -H "Content-Length: 0" -X POST -v "https://www.googleapis.com/chromewebstore/v1.1/items/${APP_ID}/publish?publishTarget=default"'
+  only:
+    - tags
+  tags:
+    - docker
+  environment:
+    name: development
