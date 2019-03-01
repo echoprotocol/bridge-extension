@@ -1,6 +1,6 @@
 {
   "name": "echo-bridge",
-  "description": "Echo Bridge",
+  "description": "The bridge between your web site and the Echo",
   "version": "1.5.2",
   "scripts": {
     "start": "cross-env NODE_ENV=local webpack-dev-server --mode development --progress --colors --history-api-fallback --hot --inline --port 8081",

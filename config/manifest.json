@@ -1,6 +1,7 @@
 {
   "short_name": "BRG",
   "name": "Echo Bridge",
+  "description": "The bridge between your web site and the Echo",
   "manifest_version": 2,
   "browser_action": {
     "default_popup": "./index.html",
