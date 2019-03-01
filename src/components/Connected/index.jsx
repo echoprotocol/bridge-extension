@@ -19,9 +19,9 @@ export function isConnected(Component) {
 		}
 
 		check() {
-			const { connected } = this.props;
+			const { connected, loading } = this.props;
 
-			if (!connected) {
+			if (!loading && !connected) {
 				this.props.history.push(CONNECTION_ERROR_PATH);
 			}
 		}
@@ -35,6 +35,7 @@ export function isConnected(Component) {
 
 	ConnectedComponent.propTypes = {
 		history: PropTypes.object.isRequired,
+		loading: PropTypes.bool.isRequired,
 		connected: PropTypes.bool,
 	};
 
@@ -43,6 +44,7 @@ export function isConnected(Component) {
 	};
 
 	return connect((state) => ({
+		loading: state.global.get('loading'),
 		connected: state.global.get('connected'),
 	}))(ConnectedComponent);
 

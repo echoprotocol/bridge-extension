@@ -28,11 +28,12 @@ export function required(Component) {
 
 		check() {
 			const {
-				isLogin, isLocked, isSign, connected,
+				isLogin, isLocked, isSign, connected, loading,
 			} = this.props;
+
 			const { pathname } = this.props.history.location;
 
-			if (!connected) {
+			if (!connected && !loading) {
 				this.props.history.push(CONNECTION_ERROR_PATH);
 				return;
 			}
@@ -81,6 +82,7 @@ export function required(Component) {
 		isLogin: PropTypes.object.isRequired,
 		history: PropTypes.object.isRequired,
 		connected: PropTypes.bool,
+		loading: PropTypes.bool.isRequired,
 		isLocked: PropTypes.bool,
 		isSign: PropTypes.bool,
 		dispatch: PropTypes.func.isRequired,
@@ -97,6 +99,7 @@ export function required(Component) {
 		isLogin: state.global.get('account'),
 		isSign: !!state.global.getIn(['sign', 'current']),
 		connected: state.global.get('connected'),
+		loading: state.global.get('loading'),
 	}))(RequiredComponent);
 
 }
