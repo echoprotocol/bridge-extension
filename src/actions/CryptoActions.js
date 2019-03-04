@@ -1,6 +1,5 @@
 /* eslint-disable no-empty */
 import { batchActions } from 'redux-batched-actions';
-
 import history from '../history';
 
 import storage from '../services/storage';
@@ -255,20 +254,32 @@ export const transitPublicKey = () => async (dispatch, getState) => {
 		if (!account) {
 			return null;
 		}
-		const accountID = getState().global.getIn(['account', 'id']);
 
-		const [accountChain] = (await echoService.getChainLib().api.getAccounts([accountID]))[0]
-			.active.key_auths;
+		const accountId = getState().global.getIn(['account', 'id']);
 
-		for (let i = 0; i < accountChain.length - 1; i += 1) {
+		const accountChain = [];
+		try {
+			const accountInfo = (await echoService.getChainLib().api.getAccounts([accountId]))[0];
+			if (accountInfo) {
+				accountInfo.active.key_auths.forEach((key) => {
+					accountChain.push(key[0]);
+				});
+			}
+		} catch (err) {
+			console.warn('Crypto transitPublicKey: ', err);
+		}
+
+		for (let i = 0; i < accountChain.length; i += 1) {
 			const wif = getCrypto().getWIFByPublicKey(networkName, accountChain[i]);
 			wifs.push(wif);
 		}
 
 		wifs = await Promise.all(wifs);
 
-		for (let i = 0; i < accountChain.length - 1; i += 1) {
-			keys.push({ publicKey: accountChain[i], wif: wifs[i] });
+		for (let i = 0; i < accountChain.length; i += 1) {
+			if (wifs[i]) {
+				keys.push({ publicKey: accountChain[i], wif: wifs[i] });
+			}
 		}
 
 		return keys;

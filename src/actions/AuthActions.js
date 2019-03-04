@@ -295,7 +295,6 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 				return false;
 			}
 
-
 			const [account] = await echoService.getChainLib().api.getAccounts([accountId]);
 
 			const publicKeys = account.active.key_auths;
