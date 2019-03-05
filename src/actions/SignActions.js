@@ -31,6 +31,8 @@ import GlobalReducer from '../reducers/GlobalReducer';
 
 import SignTransaction from '../../extension/SignTransaction';
 import { operationFields, operationTypes } from '../constants/OperationConstants';
+import { setFormError } from './FormActions';
+import { FORM_SEND } from '../constants/FormConstants';
 
 export const globals = {
 	WINDOW_TYPE: null,
@@ -44,25 +46,32 @@ export const globals = {
  *
  * 	@param {Object} options
  */
-export const getTransactionFee = async (options) => {
-	const { fee } = options;
-	const core = await echoService.getChainLib().api.getObject(CORE_ID);
+export const getTransactionFee = (options) => async (dispatch) => {
 
-	let amount = await getOperationFee(options.type, formatToSend(options.type, options), core);
+	try {
+		const { fee } = options;
+		const core = await echoService.getChainLib().api.getObject(CORE_ID);
 
-	if (fee.asset.get('id') !== CORE_ID) {
-		const price = new BN(fee.asset.getIn(['options', 'core_exchange_rate', 'quote', 'amount']))
-			.div(fee.asset.getIn(['options', 'core_exchange_rate', 'base', 'amount']))
-			.times(10 ** (core.precision - fee.asset.get('precision')));
+		let amount = await getOperationFee(options.type, formatToSend(options.type, options), core);
 
-		amount = new BN(amount).div(10 ** core.precision);
-		amount = price.times(amount).times(10 ** fee.asset.get('precision'));
+		if (fee.asset.get('id') !== CORE_ID) {
+			const price = new BN(fee.asset.getIn(['options', 'core_exchange_rate', 'quote', 'amount']))
+				.div(fee.asset.getIn(['options', 'core_exchange_rate', 'base', 'amount']))
+				.times(10 ** (core.precision - fee.asset.get('precision')));
+
+			amount = new BN(amount).div(10 ** core.precision);
+			amount = price.times(amount).times(10 ** fee.asset.get('precision'));
+		}
+
+		return {
+			amount: new BN(amount).integerValue(BN.ROUND_UP).toString(),
+			asset: fee.asset,
+		};
+	} catch (err) {
+		dispatch(setFormError(FORM_SEND, 'fee', 'Can\'t be calculated'));
 	}
 
-	return {
-		amount: new BN(amount).integerValue(BN.ROUND_UP).toString(),
-		asset: fee.asset,
-	};
+	return null;
 };
 
 /**
@@ -496,7 +505,7 @@ export const approve = (operations, id) => async (dispatch, getState) => {
 			throw new Error('Invalid operations data');
 		}
 
-		if (!echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
+		if (!echoService.getChainLib().isConnected) {
 			throw new Error('Network error');
 		}
 

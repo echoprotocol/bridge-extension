@@ -267,11 +267,15 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 			}
 		}
 
-		const resultFee = await getTransactionFee(options);
+		const resultFee = await dispatch(getTransactionFee(options));
+
+		if (!resultFee) {
+			return false;
+		}
 
 		dispatch(setFormValue(FORM_SEND, 'fee', resultFee.amount / (10 ** options.fee.asset.get('precision'))));
 	} catch (err) {
-		dispatch(setFormError(FORM_SEND, 'fee', 'Can\'t be calculated'));
+		console.warn(err);
 	}
 
 	return true;
@@ -387,7 +391,11 @@ export const send = () => async (dispatch, getState) => {
 	}
 
 	if (!options.fee.amount) {
-		options.fee = await getTransactionFee(options);
+		options.fee = await dispatch(getTransactionFee(options));
+
+		if (!options.fee) {
+			return false;
+		}
 	}
 
 	if (!checkFeePool(assets.get(CORE_ID), options.fee.asset, options.fee.amount)) {

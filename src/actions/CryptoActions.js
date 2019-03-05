@@ -164,17 +164,21 @@ export const initCrypto = () => async (dispatch) => {
 			if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
 				const draft = await storageGetDraft();
 
-				const draftForm = Object.keys(draft)[0];
-				const draftKey = Object.values(draft)[0];
+				if (draft) {
+					const draftForm = Object.keys(draft)[0];
+					const draftKey = Object.values(draft)[0];
 
-				const path = draftKey.loading === false
-					? SUCCESS_SEND_PATH
-					: FORM_TYPES[draftForm];
+					const path = draftKey.loading === false
+						? SUCCESS_SEND_PATH
+						: FORM_TYPES[draftForm];
 
-				history.push(draft ? path : INDEX_PATH);
+					history.push(path);
 
-				if (draftForm === FORM_SEND && draftKey.loading === false) {
-					await storage.remove(DRAFT_STORAGE_KEY);
+					if (draftForm === FORM_SEND && draftKey.loading === false) {
+						await storage.remove(DRAFT_STORAGE_KEY);
+					}
+				} else {
+					history.push(INDEX_PATH);
 				}
 			} else {
 				history.push(SIGN_TRANSACTION_PATH);

@@ -64,7 +64,7 @@ export const connect = () => async (dispatch) => {
 			dispatch(GlobalReducer.actions.set({ field: 'networks', value: new List(networks) }));
 		}
 
-		if (echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
+		if (echoService.getChainLib().isConnected) {
 			dispatch(GlobalReducer.actions.set({ field: 'connected', value: true }));
 		}
 	} catch (err) {

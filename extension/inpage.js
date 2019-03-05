@@ -1,6 +1,5 @@
-import echo, { Transaction, constants, PublicKey } from 'echojs-lib';
+import * as echojslib from 'echojs-lib';
 import lodash from 'lodash';
-import BigNumber from 'bignumber.js';
 
 import {
 	APP_ID,
@@ -8,7 +7,7 @@ import {
 	MAX_RETRIES,
 	NETWORKS,
 	PING_INTERVAL,
-	PING_TIMEOUT
+	PING_TIMEOUT,
 } from '../src/constants/GlobalConstants';
 
 import { uniqueNonceUint64 } from '../src/services/crypto';
@@ -134,7 +133,7 @@ class Signat {
 
 }
 
-Transaction.prototype.signWithBridge = async function signWithBridge() {
+echojslib.Transaction.prototype.signWithBridge = async function signWithBridge() {
 	const id = Date.now();
 
 	if (!this.hasAllFees) {
@@ -187,9 +186,11 @@ Transaction.prototype.signWithBridge = async function signWithBridge() {
 	return result;
 };
 
-const oldConnect = echo.connect;
+echojslib.echo = echojslib.default;
 
-echo.connect = (url, params) => {
+const oldConnect = echojslib.echo.connect;
+
+echojslib.echo.connect = (url, params) => {
 	const options = params || {
 		connectionTimeout: CONNECTION_TIMEOUT,
 		maxRetries: MAX_RETRIES,
@@ -199,7 +200,7 @@ echo.connect = (url, params) => {
 		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
 	};
 
-	return oldConnect.apply(echo, [url || currentNetworkURL, options]);
+	return oldConnect.apply(echojslib.echo, [url || currentNetworkURL, options]);
 };
 
 const extension = {
@@ -217,14 +218,9 @@ const extension = {
 };
 
 window._.noConflict();
-window.echojslib = echo;
+window.echojslib = echojslib;
 window.echojslib.isEchoBridge = true;
 window.echojslib.extension = extension;
-window.echojslib.constants = constants;
-window.echojslib.helpers = {
-	BigNumber,
-};
-window.echojslib.PublicKey = PublicKey;
 window.echojslib.Buffer = Buffer;
 window.echojslib.generateNonce = () => uniqueNonceUint64();
 

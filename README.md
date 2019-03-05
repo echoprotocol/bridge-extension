@@ -6,14 +6,27 @@
 There is an example of connecting to the node and subscribe to switch network (recommended to use inside `window.onload`)  
   
 ```javascript  
-window.onload = function() {   
-    window.echojslib.extension.subscribeSwitchNetwork(data => {    
-        console.log("subscriber: ", data);   
-        if (window.echojslib._ws._connected) {    
-            window.echojslib.disconnect();    
-        }   
-        window.echojslib.connect();  
-    }); 
+window.onload = () => {
+
+    if (echojslib && echojslib.isEchoBridge) {
+    
+        /**
+        * Subscribe to current Echo network selected in Bridge
+        */
+        echojslib.extension.subscribeSwitchNetwork(async () => {
+        
+            if (echojslib.echo.isConnected) {
+                await window.echojslib.echo.disconnect();
+            }
+            
+            /**
+            * Connect to current Echo network selected in Bridge
+            */
+            await echojslib.echo.connect();
+            
+        });
+    
+    }
 };  
 ```  
 Callback will be called, when network will be changed in extension.  
@@ -24,16 +37,29 @@ Callback will be called, when network will be changed in extension.
 Simple example of creating and broadcasting transaction  
   
 ```javascript  
-const tr = window.echojslib.createTransaction();  
+/**
+* Create a transaction
+* @type {Transaction}
+*/
+const tr = window.echojslib.echo.createTransaction();  
 
+/**
+* Add transfer operation
+*/
 tr.addOperation(echojslib.constants.OPERATIONS_IDS.TRANSFER,  {   
     from:  "1.2.1",  
     to:  "1.2.2",   
     amount:  { asset_id:  "1.3.0", amount:  10  }
 });  
 
+/**
+* Sign the transaction with Bridge
+*/
 await tr.signWithBridge();  
 
+/**
+* Broadcast the transaction to blockchain
+*/
 await tr.broadcast();  
 ```  
 Method `addOperation(operationNumber, operationOptions)` in this example used transfer operation.  

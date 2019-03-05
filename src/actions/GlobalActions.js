@@ -348,7 +348,7 @@ export const loadInfo = () => async (dispatch, getState) => {
 export const changeNetwork = (network) => async (dispatch, getState) => {
 
 	try {
-		if (echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
+		if (echoService.getChainLib().isConnected) {
 			await dispatch(disconnect());
 		}
 
@@ -460,7 +460,7 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 		await storage.remove(network.name);
 
 		if (currentNetworkName === network.name) {
-			if (echoService.getChainLib()._ws._connected) { // eslint-disable-line no-underscore-dangle
+			if (echoService.getChainLib().isConnected) {
 				await dispatch(disconnect());
 			}
 
@@ -636,7 +636,7 @@ export const storageSetDraft = async (form, field, value) => {
 		};
 	}
 
-	if (Object.keys(data[form]).find((v) => !!v)) {
+	if (Object.values(data[form]).find((v) => !!v)) {
 		await storage.set(DRAFT_STORAGE_KEY, data);
 
 		return null;

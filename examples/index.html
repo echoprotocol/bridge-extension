@@ -121,15 +121,15 @@
 		<!---->
 	</body>
 	<script>
-		window.onload = function() {
-			window.echojslib.extension.subscribeSwitchNetwork(data => {
+		window.onload = () => {
+			window.echojslib.extension.subscribeSwitchNetwork(async (data) => {
 				console.log("subscriber: ", data);
 
-				if (window.echojslib._ws._connected) {
-					window.echojslib.disconnect();
+				if (window.echojslib.echo.isConnected) {
+					await window.echojslib.echo.disconnect();
 				}
 
-				window.echojslib.connect();
+				await window.echojslib.echo.connect();
 
 			});
 		};
@@ -170,7 +170,7 @@
 					};
 				}
 
-				const tr = window.echojslib.createTransaction();
+				const tr = window.echojslib.echo.createTransaction();
 
 				const trSign = {
 					from: transaction.from,
@@ -238,7 +238,7 @@
 					};
 				}
 
-				const tr = window.echojslib.createTransaction();
+				const tr = window.echojslib.echo.createTransaction();
 
 				tr.addOperation(48, {
 					registrar: transaction.registrar,
