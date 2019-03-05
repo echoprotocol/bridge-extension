@@ -1,6 +1,6 @@
 import { serializer, Signature } from 'echojs-lib';
 
-import { EXPIRATION_MAX_LAG_SECONDS, GLOBAL_ID_1 } from '../src/constants/GlobalConstants';
+import { EXPIRATION_INFELICITY, GLOBAL_ID_1 } from '../src/constants/GlobalConstants';
 
 import echoService from '../src/services/echo';
 
@@ -17,12 +17,9 @@ class SignTransaction {
 
 		const dynamicGlobalChainData = await echoService.getChainLib().api.getObject(GLOBAL_ID_1, true);
 
-		if (tr.expiration === undefined) {
-			const headBlockTimeSeconds = Math.ceil(new Date(`${dynamicGlobalChainData.time}Z`).getTime() / 1000);
-			const nowSeconds = Math.ceil(new Date().getTime() / 1000);
-			tr.expiration = nowSeconds - headBlockTimeSeconds > EXPIRATION_MAX_LAG_SECONDS ?
-				headBlockTimeSeconds : Math.max(nowSeconds, headBlockTimeSeconds);
-		}
+		const headBlockTimeSeconds = Math.ceil(new Date(`${dynamicGlobalChainData.time}Z`).getTime() / 1000);
+
+		tr.expiration = headBlockTimeSeconds + EXPIRATION_INFELICITY;
 
 		const chainId = await echoService.getChainLib().api.getChainId();
 

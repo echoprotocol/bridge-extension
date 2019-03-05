@@ -10,7 +10,12 @@ import { getCrypto, getCryptoInfo, setCryptoInfo } from './CryptoActions';
 import { set, storageRemoveDraft, storageSetDraft } from './GlobalActions';
 
 import { FORM_SEND, FORM_WATCH_TOKEN } from '../constants/FormConstants';
-import { CORE_ID, GET_TOKENS_TIMEOUT, GLOBAL_ID_1, NATHAN_ACCOUNT_ID } from '../constants/GlobalConstants';
+import {
+	CORE_ID,
+	GET_TOKENS_TIMEOUT,
+	GLOBAL_ID_1,
+	NATHAN_ACCOUNT_ID,
+} from '../constants/GlobalConstants';
 import { ERROR_SEND_PATH, WALLET_PATH, SEND_PATH } from '../constants/RouterConstants';
 
 import echoService from '../services/echo';
@@ -368,7 +373,6 @@ export const send = () => async (dispatch, getState) => {
 				asset: assets.get(balances.getIn([selectedBalance, 'asset_type'])),
 			},
 			fee: {
-				amount: fee.value || 0,
 				asset: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
 			},
 			from: fromAccount,
@@ -376,6 +380,10 @@ export const send = () => async (dispatch, getState) => {
 			memo: memo.value,
 			type: 'transfer',
 		};
+
+		if (fee.value) {
+			options.fee.amount = fee.value;
+		}
 	}
 
 	if (!options.fee.amount) {

@@ -25,7 +25,7 @@ import {
 	PING_INTERVAL,
 	PING_TIMEOUT,
 	CONNECTION_TIMEOUT,
-	MAX_RETRIES, SIGN_STATUS, DRAFT_STORAGE_KEY,
+	MAX_RETRIES, SIGN_STATUS, DRAFT_STORAGE_KEY, GLOBAL_ID_1, EXPIRATION_INFELICITY,
 } from '../src/constants/GlobalConstants';
 
 import { operationKeys } from '../src/constants/OperationConstants';
@@ -465,6 +465,12 @@ const sendTransaction = async (transaction, networkName) => {
 	let tr = echo.createTransaction();
 
 	tr = tr.addOperation(type, options);
+
+	const dynamicGlobalChainData = await echoService.getChainLib().api.getObject(GLOBAL_ID_1, true);
+
+	const headBlockTimeSeconds = Math.ceil(new Date(`${dynamicGlobalChainData.time}Z`).getTime() / 1000);
+
+	tr.expiration = headBlockTimeSeconds + EXPIRATION_INFELICITY;
 
 	await tr.sign(pKey);
 
