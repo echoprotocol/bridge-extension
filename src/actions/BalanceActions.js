@@ -49,16 +49,26 @@ export const initAssetsBalances = () => async (dispatch, getState) => {
 		return false;
 	}
 
-	accounts.get(activeNetworkName).forEach(async (account) => {
-		const userAccount = (await echoService.getChainLib().api.getFullAccounts([account.name]))[0];
+	const accountsPromise = [];
 
-		if (!userAccount) {
+	accounts.get(activeNetworkName).forEach((account) => {
+		const userAccount = echoService.getChainLib().api.getFullAccounts([account.name]);
+
+		accountsPromise.push(userAccount);
+
+		return null;
+	});
+
+	const fullAccounts = await Promise.all(accountsPromise);
+
+	fullAccounts.forEach((userAccount) => {
+		if (!userAccount || !userAccount[0]) {
 			return null;
 		}
 
-		const userBalances = userAccount.balances;
+		const userBalances = userAccount[0].balances;
 
-		balancesAssetsPromises.push([
+		Array.prototype.push.apply(balancesAssetsPromises, [
 			echoService.getChainLib().api.getObjects(Object.values(userBalances)),
 			echoService.getChainLib().api.getObjects(Object.keys(userBalances)),
 		]);
@@ -71,7 +81,7 @@ export const initAssetsBalances = () => async (dispatch, getState) => {
 	let balances = stateBalances;
 	let assets = stateAssets;
 
-	const objectsById = getState().blockchain.get('objectsById');
+	const { objectsById } = echoService.getChainLib().cache;
 
 	objectsById.forEach((object) => {
 		if (validators.isAccountBalanceId(object.get('id'))) {

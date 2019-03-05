@@ -185,7 +185,6 @@ const importByPassword = (networkName, name, password) => async (dispatch) => {
 		}));
 
 	if (!hasKey) {
-		dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid password'));
 		return { successStatus: false, isAccAddedByPas };
 	}
 
@@ -324,11 +323,14 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 		if (success) {
 			await dispatch(addAccount(name, keys, networkName));
+		} else {
+			dispatch(setValue(FORM_SIGN_IN,	'passwordError', 'Invalid WIF/Password'));
 		}
 
 		return success ? { name, isAccAdded } : null;
 
 	} catch (err) {
+		console.warn(err);
 		dispatch(setValue(FORM_SIGN_IN,	'error', FormatHelper.formatError(err)));
 
 		return false;
