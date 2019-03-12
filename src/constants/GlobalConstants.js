@@ -78,11 +78,11 @@ export const HEADER_TITLE = [
 
 export const NETWORKS = [
 	{
-		name: 'Test Network',
+		name: 'Testnet',
 		url: 'wss://testnet.echo-dev.io/ws',
 	},
 	{
-		name: 'Dev Network',
+		name: 'Devnet',
 		url: 'wss://devnet.echo-dev.io/ws',
 	},
 ];
