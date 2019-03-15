@@ -70,7 +70,7 @@ build.publish:
     paths:
       - node_modules
   script:
-    - apt-get update -y && apt-get -y install curl jq
+    - apt-get update -y && apt-get -y --allow-unauthenticated install curl jq
     - if [ -d node_modules/echojs-lib ]; then rm -rf node_modules/echojs-lib; fi
     - npm config set unsafe-perm true
     - npm i
