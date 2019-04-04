@@ -90,7 +90,7 @@ class NetworkDropdown extends React.PureComponent {
 
 		if (el) {
 			const height = el.clientHeight;
-			if (this.state.menuHeight !== height) {
+			if (this.state.menuHeight !== height && this.state.menuHeight !== MAX_MENU_HEIGHT) {
 				return height > MAX_MENU_HEIGHT ?
 					this.setState({ menuHeight: MAX_MENU_HEIGHT }) :
 					this.setState({ menuHeight: height });
