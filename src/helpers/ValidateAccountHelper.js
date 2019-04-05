@@ -12,10 +12,6 @@ class ValidateAccountHelper {
 			return validators.checkAccountName(accountName);
 		}
 
-		if (!validators.checkCheapName(accountName)) {
-			return 'Enter a name containing least one dash, a number or no vowels';
-		}
-
 		return null;
 	}
 

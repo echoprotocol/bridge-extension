@@ -5,7 +5,7 @@ import { initCrypto, setCryptoInfo, getCryptoInfo, removeCryptoInfo } from './Cr
 
 import history from '../history';
 
-import { setFormError, toggleLoading } from './FormActions';
+import { setFormError, setValue, toggleLoading } from './FormActions';
 import { disconnect, connect } from './ChainStoreAction';
 import { getTokenDetails, initAssetsBalances, removeBalances } from './BalanceActions';
 import { globals, loadRequests } from './SignActions';
@@ -37,7 +37,7 @@ import {
 	ERROR_SEND_PATH,
 	NETWORK_ERROR_SEND_PATH,
 } from '../constants/RouterConstants';
-import { FORM_ADD_NETWORK } from '../constants/FormConstants';
+import { FORM_ADD_NETWORK, FORM_SIGN_UP } from '../constants/FormConstants';
 
 import storage from '../services/storage';
 import BalanceReducer from '../reducers/BalanceReducer';
@@ -153,6 +153,17 @@ export const addAccount = (name, keys, networkName, path) => async (dispatch, ge
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
+};
+
+/**
+ *  @method addAccountError
+ *
+ * 	Add account
+ *
+ * 	@param {String} error
+ */
+export const addAccountError = (error) => (dispatch) => {
+	dispatch(setValue(FORM_SIGN_UP, 'accountName', { error, example: '' }));
 };
 
 
@@ -636,7 +647,7 @@ export const storageSetDraft = async (form, field, value) => {
 		};
 	}
 
-	if (Object.values(data[form]).find((v) => !!v)) {
+	if (Object.values(data[form]).find((v) => !!v && typeof v === 'string')) {
 		await storage.set(DRAFT_STORAGE_KEY, data);
 
 		return null;

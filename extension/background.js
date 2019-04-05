@@ -211,6 +211,8 @@ const createAccount = async (name, path) => {
 		await emitter.emit('addAccount', name, [key, key], network.name, path);
 		storage.remove(DRAFT_STORAGE_KEY);
 	} catch (err) {
+		await emitter.emit('addAccountError', FormatHelper.formatError(err));
+
 		storageSetDraft(FORM_SIGN_UP, 'error', { error: FormatHelper.formatError(err), example: '' });
 	}
 	return null;

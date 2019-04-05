@@ -2,7 +2,7 @@ import echoService from './echo';
 
 import { requestHandler, signTr, trResponseHandler, windowRequestHandler } from '../actions/SignActions';
 import { sendHandler } from '../actions/BalanceActions';
-import { onLogout, addAccount } from '../actions/GlobalActions';
+import { onLogout, addAccount, addAccountError } from '../actions/GlobalActions';
 import { getCrypto, lockResponse, unlockResponse } from '../actions/CryptoActions';
 
 import { offerName } from '../actions/AuthActions';
@@ -39,6 +39,7 @@ class Listeners {
 		this.addAccount = (name, keys, networkName, link) => {
 			dispatch(addAccount(name, keys, networkName, link));
 		};
+		this.addAccountError = (error) => dispatch(addAccountError(error));
 
 		this.emitter.on('windowRequest', this.windowRequestHandler);
 		this.emitter.on('request', this.requestHandler);
@@ -58,6 +59,7 @@ class Listeners {
 
 		this.emitter.on('transaction', this.sign);
 		this.emitter.on('addAccount', this.addAccount);
+		this.emitter.on('addAccountError', this.addAccountError);
 
 		window.onunload = () => {
 			this.removeListeners();
