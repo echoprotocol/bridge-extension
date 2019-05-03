@@ -10,7 +10,7 @@ import storage from './storage';
 import {
 	RANDOM_SIZE,
 	ACTIVE_KEY, MEMO_KEY,
-	ECHORANDKEY_SIZE,
+	ECHORANDKEY_SIZE, STORE,
 } from '../constants/GlobalConstants';
 
 const { Long } = require('bytebuffer');
@@ -72,7 +72,7 @@ class Crypto extends EventEmitter {
 	 *  @return {Boolean} isFirstTime
 	 */
 	async isFirstTime() {
-		const key = await storage.get('randomKey');
+		const key = await storage.get(STORE);
 
 		return Boolean(!key);
 	}
