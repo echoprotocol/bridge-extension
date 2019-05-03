@@ -8,11 +8,12 @@ import classnames from 'classnames';
 import BridgeInput from '../../components/BridgeInput';
 
 import { FORM_UNLOCK } from '../../constants/FormConstants';
-import { WIPE_PIN_PATH } from '../../constants/RouterConstants';
+import { WIPE_PIN_PATH, INDEX_PATH } from '../../constants/RouterConstants';
 import { KEY_CODE_ENTER } from '../../constants/GlobalConstants';
 
 import { unlockCrypto } from '../../actions/CryptoActions';
 import { setValue, clearForm } from '../../actions/FormActions';
+import arrowLeft from '../../assets/images/icons/arrow_emerald_left.svg';
 
 class Unlock extends React.Component {
 
@@ -72,6 +73,12 @@ class Unlock extends React.Component {
 
 		return (
 			<div className="page-wrap">
+				<div className="return-block transparent absolute">
+					<Link to={INDEX_PATH} className="link-return green">
+						<img src={arrowLeft} alt="" />
+						<span className="link-text">Return</span>
+					</Link>
+				</div>
 				<div className="page pin-screen enter-pin">
 					<div className="icon-pagePin">
 						<span className="path1" />
