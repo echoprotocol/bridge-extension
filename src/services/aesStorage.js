@@ -180,7 +180,7 @@ class AesStorage {
 			header,
 		});
 
-		return decrypted;
+		return decrypted.toString('hex');
 	}
 
 	/**
