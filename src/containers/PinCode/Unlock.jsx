@@ -4,16 +4,18 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Link } from 'react-router-dom';
 import classnames from 'classnames';
+import { withRouter } from 'react-router';
 
 import BridgeInput from '../../components/BridgeInput';
 
 import { FORM_UNLOCK } from '../../constants/FormConstants';
-import { WIPE_PIN_PATH, INDEX_PATH } from '../../constants/RouterConstants';
+import { BACKUP_PATH, WIPE_PIN_PATH } from '../../constants/RouterConstants';
 import { KEY_CODE_ENTER } from '../../constants/GlobalConstants';
 
-import { unlockCrypto } from '../../actions/CryptoActions';
+import { unlockAccount, unlockCrypto } from '../../actions/CryptoActions';
 import { setValue, clearForm } from '../../actions/FormActions';
 import arrowLeft from '../../assets/images/icons/arrow_emerald_left.svg';
+
 
 class Unlock extends React.Component {
 
@@ -67,18 +69,24 @@ class Unlock extends React.Component {
 		}
 	}
 
+	goBack() {
+		this.props.unlockAccount();
+		this.props.history.go(-2);
+	}
+
 	render() {
-		const { loading, error } = this.props;
+		const { loading, error, goTo } = this.props;
 		const { pin } = this.state;
 
 		return (
 			<div className="page-wrap">
-				<div className="return-block transparent absolute">
-					<Link to={INDEX_PATH} className="link-return green">
-						<img src={arrowLeft} alt="" />
-						<span className="link-text">Return</span>
-					</Link>
-				</div>
+				{goTo === BACKUP_PATH &&
+					<div className="return-block transparent absolute">
+						<Link to="" className="link-return green" onClick={() => this.goBack()}>
+							<img src={arrowLeft} alt="" />
+							<span className="link-text">Return</span>
+						</Link>
+					</div>}
 				<div className="page pin-screen enter-pin">
 					<div className="icon-pagePin">
 						<span className="path1" />
@@ -115,7 +123,8 @@ class Unlock extends React.Component {
 							type="submit"
 							onClick={(e) => this.onSubmit(e)}
 						/>
-						<Link className="link gray forgot-password" to={WIPE_PIN_PATH}>Forgot PIN?</Link>
+						{goTo !== BACKUP_PATH &&
+						<Link className="link gray forgot-password" to={WIPE_PIN_PATH}>Forgot PIN?</Link>}
 					</div>
 				</div>
 			</div>
@@ -127,24 +136,32 @@ class Unlock extends React.Component {
 Unlock.defaultProps = {
 	loading: false,
 	error: null,
+	history: null,
+	goTo: '',
 };
 
 Unlock.propTypes = {
 	loading: PropTypes.bool,
+	history: PropTypes.object,
 	error: PropTypes.any,
+	goTo: PropTypes.string,
 	unlock: PropTypes.func.isRequired,
 	clearError: PropTypes.func.isRequired,
 	clearForm: PropTypes.func.isRequired,
+	unlockAccount: PropTypes.func.isRequired,
 };
 
-export default connect(
+export default withRouter(connect(
 	(state) => ({
+		isLocked: state.global.getIn(['crypto']),
 		loading: state.form.getIn([FORM_UNLOCK, 'loading']),
 		error: state.form.getIn([FORM_UNLOCK, 'error']),
+		goTo: state.global.getIn(['crypto', 'goTo']),
 	}),
 	(dispatch) => ({
 		unlock: (value) => dispatch(unlockCrypto(FORM_UNLOCK, value)),
+		unlockAccount: () => dispatch(unlockAccount()),
 		clearError: () => dispatch(setValue(FORM_UNLOCK, 'error', null)),
 		clearForm: () => dispatch(clearForm(FORM_UNLOCK)),
 	}),
-)(Unlock);
+)(Unlock));

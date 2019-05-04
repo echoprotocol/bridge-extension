@@ -35,7 +35,7 @@ import { FORM_SEND } from '../constants/FormConstants';
  *
  * 	@param {Object} params
  */
-const changeCrypto = (params) => (dispatch) => {
+export const changeCrypto = (params) => (dispatch) => {
 	dispatch(GlobalReducer.actions.setIn({ field: 'crypto', params }));
 };
 
@@ -63,6 +63,13 @@ const lockCrypto = () => (dispatch) => {
  */
 export const getCrypto = () => echoService.getCrypto();
 
+/**
+ *
+ * @returns {Function}
+ */
+export const unlockAccount = () => (dispatch) => {
+	dispatch(changeCrypto({ isLocked: false }));
+};
 /**
  *  @method unlockCrypto
  *
