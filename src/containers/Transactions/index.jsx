@@ -12,6 +12,7 @@ import '../../assets/images/icons/picRecieved.svg';
 import '../../assets/images/icons/picSent.svg';
 import '../../assets/images/icons/picTransaction.svg';
 import '../../assets/images/icons/picContract.svg';
+import { TRANSFER_OPERATION } from '../../constants/GlobalConstants';
 
 class Transactions extends React.Component {
 
@@ -133,12 +134,13 @@ class Transactions extends React.Component {
 															<div className="right-block">{elem.getIn(['content', 'fee'])}<span className="currency">{elem.getIn(['content', 'feeCurrency'])}</span></div>
 														</div>
 														<div className="row">
-															<div className="left-block">Note</div>
-															{
-																note &&
-																<div className="right-block">
-																	{note}
-																</div>
+															{elem.getIn(['transaction', 'typeName']).includes(TRANSFER_OPERATION) && note &&
+																<React.Fragment>
+																	<div className="left-block">Note</div>
+																	<div className="right-block">
+																		{note}
+																	</div>
+																</React.Fragment>
 															}
 														</div>
 													</div>
