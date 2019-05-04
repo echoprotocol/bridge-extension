@@ -80,10 +80,12 @@ export const NETWORKS = [
 	{
 		name: 'Testnet',
 		url: 'wss://testnet.echo-dev.io/ws',
+		explorer: 'https://explorer.echo-dev.io',
 	},
 	{
 		name: 'Devnet',
 		url: 'wss://devnet.echo-dev.io/ws',
+		explorer: 'http://656-echo-explorer.pixelplex-test.by',
 	},
 ];
 

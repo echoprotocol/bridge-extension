@@ -1,71 +1,71 @@
 .icon-checkbox {
     &:before {
-        content: $icon-checkbox; 
+        content: $icon-checkbox;
     }
 }
 
 .icon-eyeDisabled {
     &:before {
-        content: $icon-eyeDisabled; 
+        content: $icon-eyeDisabled;
     }
 }
 
 .icon-eyeEnable {
     &:before {
-        content: $icon-eyeEnable; 
+        content: $icon-eyeEnable;
     }
 }
 
 .icon-pageAccount .path1 {
     &:before {
-        content: $icon-pageAccount-path1;  
+        content: $icon-pageAccount-path1;
         color: transparent;
     }
 }
 
 .icon-pageAccount .path2 {
     &:before {
-        content: $icon-pageAccount-path2;  
-        margin-left: -0.9140625em;  
+        content: $icon-pageAccount-path2;
+        margin-left: -0.9140625em;
         color: #bbbfc2;
     }
 }
 
 .icon-pageNetwork .path1 {
     &:before {
-        content: $icon-pageNetwork-path1;  
+        content: $icon-pageNetwork-path1;
         color: #e3e6e8;
     }
 }
 
 .icon-pageNetwork .path2 {
     &:before {
-        content: $icon-pageNetwork-path2;  
-        margin-left: -0.8857421875em;  
+        content: $icon-pageNetwork-path2;
+        margin-left: -0.8857421875em;
         color: #a9aeb1;
     }
 }
 
 .icon-pageNetwork .path3 {
     &:before {
-        content: $icon-pageNetwork-path3;  
-        margin-left: -0.8857421875em;  
+        content: $icon-pageNetwork-path3;
+        margin-left: -0.8857421875em;
         color: #a9aeb1;
     }
 }
 
 .icon-pageNetwork .path4 {
     &:before {
-        content: $icon-pageNetwork-path4;  
-        margin-left: -0.8857421875em;  
+        content: $icon-pageNetwork-path4;
+        margin-left: -0.8857421875em;
         color: #a9aeb1;
     }
 }
 
 .icon-pageNetwork .path5 {
     &:before {
-        content: $icon-pageNetwork-path5;  
-        margin-left: -0.8857421875em;  
+        content: $icon-pageNetwork-path5;
+        margin-left: -0.8857421875em;
         color: #a9aeb1;
     }
 }
@@ -77,47 +77,53 @@
 
 .icon-pagePin .path1 {
     &:before {
-        content: $icon-pagePin-path1;  
-        color: #434b50;  
+        content: $icon-pagePin-path1;
+        color: #434b50;
     }
 }
 
 .icon-pagePin .path2 {
     &:before {
-        content: $icon-pagePin-path2;  
-        margin-left: -1.0400390625em;  
+        content: $icon-pagePin-path2;
+        margin-left: -1.0400390625em;
         color: #595f66;
     }
 }
 
 .icon-pagePin .path3 {
     &:before {
-        content: $icon-pagePin-path3;  
-        margin-left: -1.0400390625em;  
+        content: $icon-pagePin-path3;
+        margin-left: -1.0400390625em;
         color: #595f66;
     }
 }
 
 .icon-pagePin .path4 {
     &:before {
-        content: $icon-pagePin-path4;  
-        margin-left: -1.0400390625em;  
+        content: $icon-pagePin-path4;
+        margin-left: -1.0400390625em;
         color: #595f66;
     }
 }
 
 .icon-pagePin .path5 {
     &:before {
-        content: $icon-pagePin-path5;  
-        margin-left: -1.0400390625em;  
+        content: $icon-pagePin-path5;
+        margin-left: -1.0400390625em;
         color: #595f66;
     }
 }
 
 .icon-pagePin .path6 {
     &:before {
-        content: $icon-pagePin-path6;  
-        margin-left: -1.0400390625em;  
+        content: $icon-pagePin-path6;
+        margin-left: -1.0400390625em;
         color: #595f66;
+    }
+}
+
+.icon-link {
+    &:before {
+        content: $icon-link;
     }
 }
