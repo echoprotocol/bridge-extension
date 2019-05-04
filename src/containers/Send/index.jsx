@@ -222,7 +222,7 @@ class Send extends React.Component {
 
 		if (amount) {
 			amount = amount.split('.');
-			return amount.splice(0, 2).join('.') !== '1.16';
+			return amount.splice(0, 2).join('.') !== '1.14';
 		}
 		return true;
 

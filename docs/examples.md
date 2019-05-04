@@ -27,7 +27,7 @@ const tr = window.echojslib.echo.createTransaction();
 tr.addOperation(echojslib.constants.OPERATIONS_IDS.CALL_CONTRACT,  {  
     registrar: '1.2.1',  
     code: '86be3f80' + '0000000000000000000000000000000000000000000000000000000000000001', // setVariable(uint256)  
-    callee: '1.16.1', // contract id  
+    callee: '1.14.1', // contract id  
     value: { asset_id: '1.3.0', amount: 0 },  
 });  
 

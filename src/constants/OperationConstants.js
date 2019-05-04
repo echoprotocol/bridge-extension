@@ -1,3 +1,5 @@
+import { OPERATIONS_IDS } from 'echojs-lib';
+
 export const operationFields = {
 	transfer: {
 		fee: {
@@ -58,7 +60,7 @@ export const operationFieldsSend = {
 			required: false,
 		},
 	},
-	48: {
+	[OPERATIONS_IDS.CALL_CONTRACT]: {
 		fee: {
 			type: 'asset_object',
 			required: false,
@@ -87,7 +89,7 @@ export const operationFieldsSend = {
 export const operationKeys = {
 	transfer: 'from',
 	contract: 'registrar',
-	48: 'registrar',
+	[OPERATIONS_IDS.CALL_CONTRACT]: 'registrar',
 };
 
 export const operationTypes = {
@@ -97,7 +99,7 @@ export const operationTypes = {
 	},
 	contract: {
 		name: 'Contract',
-		code: 48,
+		code: OPERATIONS_IDS.CALL_CONTRACT,
 	},
 };
 

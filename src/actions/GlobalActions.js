@@ -280,7 +280,7 @@ export const loadInfo = () => async (dispatch, getState) => {
 
 			Object.entries(tokens).forEach(([accountId, tokensArray]) => {
 				tokensArray.forEach((id) => {
-					stateTokens = stateTokens.setIn([accountId, `1.16.${id}`], new Map({}));
+					stateTokens = stateTokens.setIn([accountId, `1.14.${id}`], new Map({}));
 				});
 			});
 

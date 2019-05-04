@@ -1,4 +1,4 @@
-import { aes, PrivateKey } from 'echojs-lib';
+import { aes, PrivateKey, OPERATIONS_IDS } from 'echojs-lib';
 
 import { MEMO_FEE_KEYS } from '../constants/GlobalConstants';
 
@@ -29,7 +29,7 @@ const getOperationFee = async (type, transaction) => {
 
 	let tr = echoService.getChainLib().createTransaction();
 
-	if (type === 48) {
+	if (type === OPERATIONS_IDS.CALL_CONTRACT) {
 		options.fee = undefined;
 	}
 
