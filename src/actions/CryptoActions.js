@@ -18,7 +18,7 @@ import {
 	NETWORK_ERROR_SEND_PATH,
 	FORM_TYPES,
 } from '../constants/RouterConstants';
-import { DRAFT_STORAGE_KEY, NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
+import { DRAFT_STORAGE_KEY, NETWORKS, POPUP_WINDOW_TYPE, STORE } from '../constants/GlobalConstants';
 import { setValue } from './FormActions';
 import { loadInfo, set, addAccount, storageGetDraft } from './GlobalActions';
 import { globals } from './SignActions';
@@ -331,7 +331,7 @@ export const wipeCrypto = () => async (dispatch, getState) => {
 	const networks = getState().global.get('networks');
 
 	const promises = networks.concat(NETWORKS).map(({ name }) => storage.remove(name));
-	promises.push(storage.remove('randomKey'));
+	promises.push(storage.remove(STORE));
 
 	await Promise.all(promises);
 

@@ -1,6 +1,8 @@
+import { OPERATIONS_IDS } from 'echojs-lib';
+
 export default {
 	transfer: {
-		value: 0,
+		value: OPERATIONS_IDS.TRANSFER,
 		name: 'Sent',
 		options: {
 			from: 'from',
@@ -10,7 +12,7 @@ export default {
 		},
 	},
 	limit_order_create: {
-		value: 1,
+		value: OPERATIONS_IDS.LIMIT_ORDER_CREATE,
 		name: 'Place order',
 		options: {
 			from: 'seller',
@@ -20,7 +22,7 @@ export default {
 		},
 	},
 	limit_order_cancel: {
-		value: 2,
+		value: OPERATIONS_IDS.LIMIT_ORDER_CANCEL,
 		name: 'Cancel order',
 		options: {
 			from: 'fee_paying_account',
@@ -30,7 +32,7 @@ export default {
 		},
 	},
 	call_order_update: {
-		value: 3,
+		value: OPERATIONS_IDS.CALL_ORDER_UPDATE,
 		name: 'Update margin',
 		options: {
 			from: 'funding_account',
@@ -40,7 +42,7 @@ export default {
 		},
 	},
 	fill_order: {
-		value: 4,
+		value: OPERATIONS_IDS.FILL_ORDER,
 		name: 'Fill order',
 		options: {
 			from: 'account_id',
@@ -50,7 +52,7 @@ export default {
 		},
 	},
 	account_create: {
-		value: 5,
+		value: OPERATIONS_IDS.ACCOUNT_CREATE,
 		name: 'Account created',
 		options: {
 			from: 'registrar',
@@ -60,7 +62,7 @@ export default {
 		},
 	},
 	account_update: {
-		value: 6,
+		value: OPERATIONS_IDS.ACCOUNT_UPDATE,
 		name: 'Update account',
 		options: {
 			from: 'account',
@@ -70,7 +72,7 @@ export default {
 		},
 	},
 	account_whitelist: {
-		value: 7,
+		value: OPERATIONS_IDS.ACCOUNT_WHITELIST,
 		name: 'Account whitelist',
 		options: {
 			from: 'authorizing_account',
@@ -80,7 +82,7 @@ export default {
 		},
 	},
 	account_upgrade: {
-		value: 8,
+		value: OPERATIONS_IDS.ACCOUNT_UPGRADE,
 		name: 'Upgrade Account',
 		options: {
 			from: 'account_to_upgrade',
@@ -90,7 +92,7 @@ export default {
 		},
 	},
 	account_transfer: {
-		value: 9,
+		value: OPERATIONS_IDS.ACCOUNT_TRANSFER,
 		name: 'Transfer Account',
 		options: {
 			from: 'account_id',
@@ -100,7 +102,7 @@ export default {
 		},
 	},
 	asset_create: {
-		value: 10,
+		value: OPERATIONS_IDS.ASSET_CREATE,
 		name: 'Create asset',
 		options: {
 			from: 'issuer',
@@ -110,7 +112,7 @@ export default {
 		},
 	},
 	asset_update: {
-		value: 11,
+		value: OPERATIONS_IDS.ASSET_UPDATE,
 		name: 'Update asset',
 		options: {
 			from: 'issuer',
@@ -120,7 +122,7 @@ export default {
 		},
 	},
 	asset_update_bitasset: {
-		value: 12,
+		value: OPERATIONS_IDS.ASSET_UPDATE_BITASSET,
 		name: 'Update SmartCoin',
 		options: {
 			from: 'issuer',
@@ -130,7 +132,7 @@ export default {
 		},
 	},
 	asset_update_feed_producers: {
-		value: 13,
+		value: OPERATIONS_IDS.ASSET_UPDATE_FEED_PRODUCERS,
 		name: 'Update asset feed producers',
 		options: {
 			from: 'issuer',
@@ -140,7 +142,7 @@ export default {
 		},
 	},
 	asset_issue: {
-		value: 14,
+		value: OPERATIONS_IDS.ASSET_ISSUE,
 		name: 'Issue asset',
 		options: {
 			from: 'issuer',
@@ -150,7 +152,7 @@ export default {
 		},
 	},
 	asset_reserve: {
-		value: 15,
+		value: OPERATIONS_IDS.ASSET_RESERVE,
 		name: 'Burn asset',
 		options: {
 			from: 'payer',
@@ -160,7 +162,7 @@ export default {
 		},
 	},
 	asset_fund_fee_pool: {
-		value: 16,
+		value: OPERATIONS_IDS.ASSET_FUND_FEE_POOL,
 		name: 'Fund asset fee pool',
 		options: {
 			from: 'from_account',
@@ -170,7 +172,7 @@ export default {
 		},
 	},
 	asset_settle: {
-		value: 17,
+		value: OPERATIONS_IDS.ASSET_SETTLE,
 		name: 'Asset settlement',
 		options: {
 			from: 'account',
@@ -180,7 +182,7 @@ export default {
 		},
 	},
 	asset_global_settle: {
-		value: 18,
+		value: OPERATIONS_IDS.ASSET_GLOBAL_SETTLE,
 		name: 'Global asset settlement',
 		options: {
 			from: 'issuer',
@@ -190,7 +192,7 @@ export default {
 		},
 	},
 	asset_publish_feed: {
-		value: 19,
+		value: OPERATIONS_IDS.ASSET_PUBLISH_FEED,
 		name: 'Publish feed',
 		options: {
 			from: 'publisher',
@@ -199,28 +201,8 @@ export default {
 			asset: 'asset_id',
 		},
 	},
-	witness_create: {
-		value: 20,
-		name: 'Create witness',
-		options: {
-			from: 'witness_account',
-			subject: null,
-			value: null,
-			asset: null,
-		},
-	},
-	witness_update: {
-		value: 21,
-		name: 'Update witness',
-		options: {
-			from: 'witness_account',
-			subject: ['witness', 'name'],
-			value: null,
-			asset: null,
-		},
-	},
 	proposal_create: {
-		value: 22,
+		value: OPERATIONS_IDS.PROPOSAL_CREATE,
 		name: 'Create proposal',
 		options: {
 			from: 'fee_paying_account',
@@ -230,7 +212,7 @@ export default {
 		},
 	},
 	proposal_update: {
-		value: 23,
+		value: OPERATIONS_IDS.PROPOSAL_UPDATE,
 		name: 'Update proposal',
 		options: {
 			from: 'fee_paying_account',
@@ -240,7 +222,7 @@ export default {
 		},
 	},
 	proposal_delete: {
-		value: 24,
+		value: OPERATIONS_IDS.PROPOSAL_DELETE,
 		name: 'Delete proposal',
 		options: {
 			from: 'fee_paying_account',
@@ -250,7 +232,7 @@ export default {
 		},
 	},
 	withdraw_permission_create: {
-		value: 25,
+		value: OPERATIONS_IDS.WITHDRAW_PERMISSION_CREATE,
 		name: 'Create withdrawal permission',
 		options: {
 			from: 'withdraw_from_account',
@@ -260,7 +242,7 @@ export default {
 		},
 	},
 	withdraw_permission_update: {
-		value: 26,
+		value: OPERATIONS_IDS.WITHDRAW_PERMISSION_UPDATE,
 		name: 'Update withdrawal permission',
 		options: {
 			from: 'withdraw_from_account',
@@ -270,7 +252,7 @@ export default {
 		},
 	},
 	withdraw_permission_claim: {
-		value: 27,
+		value: OPERATIONS_IDS.WITHDRAW_PERMISSION_CLAIM,
 		name: 'Claim withdrawal permission',
 		options: {
 			from: 'withdraw_from_account',
@@ -280,7 +262,7 @@ export default {
 		},
 	},
 	withdraw_permission_delete: {
-		value: 28,
+		value: OPERATIONS_IDS.WITHDRAW_PERMISSION_DELETE,
 		name: 'Delete withdrawal permission',
 		options: {
 			from: 'withdraw_from_account',
@@ -290,7 +272,7 @@ export default {
 		},
 	},
 	committee_member_create: {
-		value: 29,
+		value: OPERATIONS_IDS.COMMITTEE_MEMBER_CREATE,
 		name: 'Create committee member',
 		options: {
 			from: 'committee_member_account',
@@ -300,7 +282,7 @@ export default {
 		},
 	},
 	committee_member_update: {
-		value: 30,
+		value: OPERATIONS_IDS.COMMITTEE_MEMBER_UPDATE,
 		name: 'Update committee member',
 		options: {
 			from: 'committee_member_account',
@@ -310,7 +292,7 @@ export default {
 		},
 	},
 	committee_member_update_global_parameters: {
-		value: 31,
+		value: OPERATIONS_IDS.COMMITTEE_MEMBER_UPDATE_GLOBAL_PARAMETERS,
 		name: 'Global parameters update',
 		options: {
 			from: null,
@@ -320,7 +302,7 @@ export default {
 		},
 	},
 	vesting_balance_create: {
-		value: 32,
+		value: OPERATIONS_IDS.VESTING_BALANCE_CREATE,
 		name: 'Create vesting balance',
 		options: {
 			from: 'creator',
@@ -330,7 +312,7 @@ export default {
 		},
 	},
 	vesting_balance_withdraw: {
-		value: 33,
+		value: OPERATIONS_IDS.VESTING_BALANCE_WITHDRAW,
 		name: 'Withdraw vesting balance',
 		options: {
 			from: 'owner',
@@ -339,18 +321,8 @@ export default {
 			asset: 'amount.asset_id',
 		},
 	},
-	worker_create: {
-		value: 34,
-		name: 'Create worker',
-		options: {
-			from: 'owner',
-			subject: ['name', null],
-			value: null,
-			asset: null,
-		},
-	},
 	custom: {
-		value: 35,
+		value: OPERATIONS_IDS.CUSTOM,
 		name: 'Custom',
 		options: {
 			from: 'payer',
@@ -360,7 +332,7 @@ export default {
 		},
 	},
 	assert: {
-		value: 36,
+		value: OPERATIONS_IDS.ASSERT,
 		name: 'Assert operation',
 		options: {
 			from: 'fee_paying_account',
@@ -370,7 +342,7 @@ export default {
 		},
 	},
 	balance_claim: {
-		value: 37,
+		value: OPERATIONS_IDS.BALANCE_CLAIM,
 		name: 'Claim balance',
 		options: {
 			from: null,
@@ -380,7 +352,7 @@ export default {
 		},
 	},
 	override_transfer: {
-		value: 38,
+		value: OPERATIONS_IDS.OVERRIDE_TRANSFER,
 		name: 'Override transfer',
 		options: {
 			from: 'from',
@@ -389,38 +361,8 @@ export default {
 			asset: 'amount.asset_id',
 		},
 	},
-	transfer_to_blind: {
-		value: 39,
-		name: 'Transfer to blinded account',
-		options: {
-			from: 'from',
-			subject: null,
-			value: 'amount.amount',
-			asset: 'amount.asset_id',
-		},
-	},
-	blind_transfer: {
-		value: 40,
-		name: 'Blinded transfer',
-		options: {
-			from: null,
-			subject: null,
-			value: null,
-			asset: null,
-		},
-	},
-	transfer_from_blind: {
-		value: 41,
-		name: 'Transfer from blinded account',
-		options: {
-			from: null,
-			subject: ['to', 'name'],
-			value: 'amount.amount',
-			asset: 'amount.asset_id',
-		},
-	},
 	asset_settle_cancel: {
-		value: 42,
+		value: OPERATIONS_IDS.ASSET_SETTLE_CANCEL,
 		name: 'Cancel asset settlement',
 		options: {
 			from: 'account',
@@ -430,7 +372,7 @@ export default {
 		},
 	},
 	asset_claim_fees: {
-		value: 43,
+		value: OPERATIONS_IDS.ASSET_CLAIM_FEES,
 		name: 'Claim asset fees',
 		options: {
 			from: 'issuer',
@@ -440,7 +382,7 @@ export default {
 		},
 	},
 	contract: {
-		value: 47,
+		value: OPERATIONS_IDS.CREATE_CONTRACT,
 		name: 'Contract created',
 		options: {
 			from: 'registrar',
@@ -450,7 +392,7 @@ export default {
 		},
 	},
 	call_contract: {
-		value: 48,
+		value: OPERATIONS_IDS.CALL_CONTRACT,
 		name: 'Call contract',
 		options: {
 			from: 'registrar',
@@ -460,7 +402,7 @@ export default {
 		},
 	},
 	contract_transfer: {
-		value: 49,
+		value: OPERATIONS_IDS.CONTRACT_TRANSFER,
 		name: 'Contract transfer',
 		options: {
 			from: 'from',

@@ -80,10 +80,12 @@ export const NETWORKS = [
 	{
 		name: 'Testnet',
 		url: 'wss://testnet.echo-dev.io/ws',
+		explorer: 'https://explorer.echo-dev.io',
 	},
 	{
 		name: 'Devnet',
 		url: 'wss://devnet.echo-dev.io/ws',
+		explorer: 'http://656-echo-explorer.pixelplex-test.by',
 	},
 ];
 
@@ -146,3 +148,14 @@ export const MEMO_FEE_KEYS = {
 	PUBLIC_MEMO_FROM: 'ECHO7WBUN97NJfSXbDVDqLDQDKu8FasTb7YBdpbWoJF3RYo6qYY6aX',
 	PUBLIC_MEMO_TO: 'ECHO7WBUN97NJfSXbDVDqLDQDKu8FasTb7YBdpbWoJF3RYo6qYY6aX',
 };
+
+export const ALGORITHM = 'aes-256-cbc';
+export const SCRYPT_ALGORITHM_PARAMS = {
+	N: 2 ** 14,
+	r: 8,
+	p: 1,
+	l: 32,
+	SALT_BYTES_LENGTH: 256,
+};
+export const ALGORITHM_IV_BYTES_LENGTH = 16;
+export const STORE = 'keyval';
