@@ -1,4 +1,4 @@
-import { aes as aesLib, PrivateKey, ED25519 } from 'echojs-lib';
+import { aes as aesLib, PrivateKey, ED25519, PrivateKeyECDSA } from 'echojs-lib';
 import random from 'crypto-random-string';
 import bs58 from 'bs58';
 import secureRandom from 'secure-random';
@@ -181,6 +181,19 @@ class Crypto extends EventEmitter {
 	}
 
 	/**
+	 *  @method generateECDSAPublicKey
+	 *
+	 *  @return {String} ecdsaPublicKey
+	 */
+	generateECDSAPublicKey() {
+		privateAES.required();
+		const privateKeyECDSA = PrivateKeyECDSA.fromSeed(random(RANDOM_SIZE));
+		const ecdsaPublicKey = PrivateKeyECDSA
+			.fromWif(privateKeyECDSA.toWif()).toPublicKey().toString();
+		return ecdsaPublicKey;
+	}
+
+	/**
 	 *  @method generateEchoRandKey
 	 *
 	 * 	Generate random string and private key from this seed.
@@ -209,6 +222,7 @@ class Crypto extends EventEmitter {
 	 *  @param {String} wif
 	 */
 	async importByWIF(networkName, wif) {
+
 
 		privateAES.required();
 
@@ -417,6 +431,7 @@ class Crypto extends EventEmitter {
 	 *  @param {*} fieldData
 	 */
 	async setInByNetwork(networkName, field, fieldData) {
+
 		privateAES.required();
 
 		let networkData = await storage.get(networkName);
@@ -486,6 +501,7 @@ class Crypto extends EventEmitter {
 		networkData = privateAES.get().encryptToHex(Buffer.from(networkData));
 		await storage.set(networkName, networkData);
 	}
+
 
 }
 
