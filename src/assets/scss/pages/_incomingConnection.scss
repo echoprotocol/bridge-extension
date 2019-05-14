@@ -1,0 +1,60 @@
+.incoming-connection-bg {
+    position: relative;
+    width: 100%;
+    height: 125px;
+    background-color: rgba(52, 64, 69, 1);
+    background-image: url(../images/connection/connectionBg.jpg);
+    background-position: center;
+    background-size: cover;
+}
+
+.incoming-connection-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 356px;
+    padding: 0 8px;
+
+    .connection-block {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        height: 76px;
+        width: 100%;
+        color: #303B40;
+        background-color: #DFE4E7;
+        margin-top: 8px;
+
+        .connect {
+            width: 32px;
+            margin: 0 25px;
+        }
+
+        .account {
+            display: flex;
+            align-items: center;
+
+            .user-name {
+                @include cutTxt();
+                margin-left: 8px;
+                max-width: 90px;
+            }
+        }
+    }
+
+    .connection-info {
+        text-align: center;
+        font-size: 16px;
+        font-family: FNBook;
+        margin: auto;
+        max-width: 250px;
+        color: #3E4851;
+        line-height: 20px;
+
+        .line {
+            &:not(:last-child) {
+                margin-bottom: 14px;
+            }
+        }
+    }
+}
