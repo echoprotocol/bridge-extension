@@ -23,7 +23,7 @@
     padding: 0;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
-	
+
     &.disabled {
         pointer-events: none;
         border: 2px solid $colorDisabled;
@@ -198,7 +198,7 @@
         color: #535e65;
         border-radius: $angularMax;
 		border: 1px solid #c3c7cc;
-		
+
         &.link {
             &:not(.disabled):not(:active) {
                 display: flex;
@@ -236,7 +236,7 @@
                 );
             }
 		}
-		
+
         &.compact {
             .btn-text {
                 display: block;
@@ -390,7 +390,7 @@
         margin: 0 7px 0 -7px;
         transition: background-color $speed;
 		cursor: pointer;
-		
+
 		img {
 			width: 20px;
 			opacity: .3;
@@ -451,14 +451,14 @@
         top: 0;
         right: 0;
 		transition: color $speed, background-color $speed;
-		
+
         &.compact {
             .btn-text {
                 font-size: 11px;
                 margin: 1px 0 0 0;
             }
 		}
-		
+
 		img {
 			margin-top: -1px;
 			width: 20px;
@@ -536,7 +536,7 @@
         background-color: #efeff0;
         border: 1px solid #efeff0;
 	}
-	
+
 }
 
 .one-btn-wrap {
@@ -552,7 +552,7 @@
         }
 	}
 	.btn-noborder {
-		min-width: 150px;	
+		min-width: 150px;
 	}
 
  }
@@ -628,42 +628,51 @@
                 background-color:#64d3ad;
             }
         }
-    
+
         &-sky {
             &:before {
                 background-color: #76c5d3;
             }
         }
-    
+
         &-blue {
             &:before {
                 background-color: #7683d3;
             }
         }
-    
+
         &-pink {
             &:before {
                 background-color: #b989cf;
             }
         }
-    
+
         &-red {
             &:before {
                 background-color: #d36496;
             }
         }
-        
+
         &-yellow {
             &:before {
                 background-color: #d3c564;
             }
         }
-    
+
         &-lemon {
             &:before {
                 background-color: #cbd376;
             }
         }
+    }
+    .btn-close {
+        padding: 0;
+        height: 40px;
+        width: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        margin: 0 0 0 -6px;
     }
 }
 

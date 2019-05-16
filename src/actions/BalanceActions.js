@@ -2,7 +2,7 @@ import BN from 'bignumber.js';
 import { Map } from 'immutable';
 import { batchActions } from 'redux-batched-actions';
 import { keccak256 } from 'js-sha3';
-import { validators } from 'echojs-lib';
+import { OPERATIONS_IDS, validators } from 'echojs-lib';
 
 import { setFormError, setValue, setFormValue } from './FormActions';
 import { getTransactionFee } from './SignActions';
@@ -265,7 +265,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 				},
 				callee: receiver,
 				registrar: fromAccount,
-				type: 48,
+				type: OPERATIONS_IDS.CALL_CONTRACT,
 				value: {
 					amount: 0,
 					asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
@@ -373,7 +373,7 @@ export const send = () => async (dispatch, getState) => {
 			},
 			callee: receiver,
 			registrar: fromAccount,
-			type: 48,
+			type: OPERATIONS_IDS.CALL_CONTRACT,
 			value: {
 				asset_id: coreAsset,
 				amount: 0,

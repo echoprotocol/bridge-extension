@@ -44,7 +44,7 @@ export const WATCH_TOKEN_PATH = '/tokens/watch';
 
 export const SIGN_TRANSACTION_PATH = '/transaction/sign';
 
-export const POPUP_PATH = 'index.html?windowType=popup';
+export const POPUP_PATH = 'index.html?windowType=popup&windowPath=:path';
 
 export const ABOUT_PATH = '/about';
 
@@ -54,7 +54,13 @@ export const EMPTY_PATH = '/';
 
 export const INDEX_PATH = WALLET_PATH;
 
-export const PIN_PATHS = [CREATE_PIN_PATH, UNLOCK_PATH, WIPE_PIN_PATH];
+export const INCOMING_CONNECTION_PATH = '/incoming-connection';
+
+export const PIN_PATHS = [
+	CREATE_PIN_PATH,
+	UNLOCK_PATH,
+	WIPE_PIN_PATH,
+];
 
 export const NOT_RETURNED_PATHS = PIN_PATHS.concat([
 	IMPORT_ACCOUNT_PATH,
@@ -64,7 +70,11 @@ export const NOT_RETURNED_PATHS = PIN_PATHS.concat([
 	SIGN_TRANSACTION_PATH,
 ]);
 
-export const HIDE_NAVBAR_PATHS = [SUCCESS_SEND_PATH, ERROR_SEND_PATH];
+export const HIDE_NAVBAR_PATHS = [
+	SUCCESS_SEND_PATH,
+	ERROR_SEND_PATH,
+	INCOMING_CONNECTION_PATH,
+];
 
 export const FORM_TYPES = {
 	[FORM_SIGN_UP]: CREATE_ACCOUNT_PATH,

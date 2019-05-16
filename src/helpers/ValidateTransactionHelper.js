@@ -6,7 +6,7 @@ class ValidateTransactionHelper {
 
 		id = id.split('.');
 
-		if (id.length !== 3 || parseInt(id[2], 10).toString() !== id[2] || id.splice(0, 2).join('.') !== '1.16') {
+		if (id.length !== 3 || parseInt(id[2], 10).toString() !== id[2] || id.splice(0, 2).join('.') !== '1.14') {
 			return 'Invalid contract ID';
 		}
 

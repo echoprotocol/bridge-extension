@@ -27,7 +27,7 @@ const tr = window.echojslib.echo.createTransaction();
 tr.addOperation(echojslib.constants.OPERATIONS_IDS.CALL_CONTRACT,  {  
     registrar: '1.2.1',  
     code: '86be3f80' + '0000000000000000000000000000000000000000000000000000000000000001', // setVariable(uint256)  
-    callee: '1.16.1', // contract id  
+    callee: '1.14.1', // contract id  
     value: { asset_id: '1.3.0', amount: 0 },  
 });  
 
@@ -41,16 +41,70 @@ await tr.broadcast();
 ```javascript  
 const tr = window.echojslib.echo.createTransaction();  
 
-tr.addOperation(echojslib.constants.OPERATIONS_IDS.ACCOUNT_UPDATE,  {  
-    fee: { asset_id: '1.3.0' },  
-    account: '1.2.1',  
-    active: {  
-        weight_threshold: 1,  
-        account_auths: [],  
-        key_auths: [['ECHO4tmRW8HFwLSJR1wxPp5at3qeJ2XcfSwpKpAM6AQE8dZugqBtU7', 1 ]],
-        address_auths: []  
+tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_UPDATE,  {
+    fee: { asset_id: '1.3.0' },
+    account: '1.2.1',
+    ed_key: 'DET9enh5vJko3eTTbjmoLaCaY4FP9nxDk2KdqrSkJwq97rG',
+    active: {
+        weight_threshold: 1,
+        account_auths: [],
+        key_auths: [
+            ['DET6vDKmRF6PLP6Y5J1MVg1YwBYfNF1RJs1eDcJoPwwvW92', 1 ],
+            ['DETBwrdNr45VgXgzH7LicfnSNedeqcsgbMrjfejwrgsfGG6', 1 ],
+        ]
     }
 });  
+
+await tr.signWithBridge();  
+
+await tr.broadcast();  
+```  
+
+### Upgrade account
+
+```javascript  
+const tr = window.echojslib.echo.createTransaction();  
+
+tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_UPGRADE, {
+        account_to_upgrade: '1.2.1',
+        upgrade_to_lifetime_member: true
+    }
+});  
+
+await tr.signWithBridge();  
+
+await tr.broadcast();  
+```  
+
+### Create account
+
+```javascript  
+const tr = window.echojslib.echo.createTransaction();  
+
+tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_CREATE, {
+        ed_key: 'DETCgtBQvQvT4aKvKRmdRYEiWdtEeG4bDEfhcpYmdFbiHCo',
+        registrar: '1.2.1',
+        referrer: '1.2.1',
+        referrer_percent: 0,
+        name: 'randomAccount1',
+        active: {
+            weight_threshold: 1,
+            account_auths: [],
+            key_auths: [[
+                'DETCgtBQvQvT4aKvKRmdRYEiWdtEeG4bDEfhcpYmdFbiHCo',
+                1,
+            ]]
+        },
+        options: {
+            memo_key: 'ECHO1111111111111111111111111111111114T1Anm',
+            voting_account: "1.2.3",
+            delegating_account: "1.2.3",
+            num_committee: 0,
+            votes: [],
+            extensions: [],
+        },
+    }
+);
 
 await tr.signWithBridge();  
 

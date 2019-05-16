@@ -80,10 +80,12 @@ export const NETWORKS = [
 	{
 		name: 'Testnet',
 		url: 'wss://testnet.echo-dev.io/ws',
+		explorer: 'https://explorer.echo-dev.io',
 	},
 	{
 		name: 'Devnet',
 		url: 'wss://devnet.echo-dev.io/ws',
+		explorer: 'http://656-echo-explorer.pixelplex-test.by',
 	},
 ];
 
@@ -127,6 +129,7 @@ export const ICON_COLORS_COUNT = 7;
 export const BASE_ICON = 1;
 export const BASE_ICON_COLOR = 'green';
 export const POPUP_WINDOW_TYPE = 'popup';
+
 export const MAX_NOTE_LENGTH = 200 * 1000;
 export const DRAFT_STORAGE_KEY = 'draft';
 
@@ -139,8 +142,21 @@ export const MAX_RETRIES = 999999999;
 export const PING_TIMEOUT = 7000;
 export const PING_INTERVAL = 7000;
 
+export const TRANSFER_OPERATION = 'Transfer';
+
 export const MEMO_FEE_KEYS = {
 	WIF: '5KGG3tFb5F4h3aiUSKNnKeDcNbL5y1ZVXQXVqpWVMYhW82zBrNb',
 	PUBLIC_MEMO_FROM: 'ECHO7WBUN97NJfSXbDVDqLDQDKu8FasTb7YBdpbWoJF3RYo6qYY6aX',
 	PUBLIC_MEMO_TO: 'ECHO7WBUN97NJfSXbDVDqLDQDKu8FasTb7YBdpbWoJF3RYo6qYY6aX',
 };
+
+export const ALGORITHM = 'aes-256-cbc';
+export const SCRYPT_ALGORITHM_PARAMS = {
+	N: 2 ** 14,
+	r: 8,
+	p: 1,
+	l: 32,
+	SALT_BYTES_LENGTH: 256,
+};
+export const ALGORITHM_IV_BYTES_LENGTH = 16;
+export const STORE = 'keyval';

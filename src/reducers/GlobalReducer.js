@@ -38,6 +38,7 @@ const DEFAULT_FIELDS = Map({
 	history: new List([]),
 	formattedHistory: new OrderedMap({}),
 	signAccount: new Map({}),
+	providerRequests: new Map({}),
 });
 
 export default createModule({
@@ -81,5 +82,16 @@ export default createModule({
 		sidebarToggle: {
 			reducer: (state, { payload }) => state.set('visibleSidebar', !payload.value),
 		},
+
+		deleteIn: {
+			reducer: (state, { payload }) => {
+				payload.params.forEach((field) => {
+					state = state.deleteIn([payload.field, field]);
+				});
+
+				return state;
+			},
+		},
+
 	},
 });

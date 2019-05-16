@@ -35,6 +35,7 @@ import { setFormError } from './FormActions';
 import { FORM_SEND } from '../constants/FormConstants';
 
 export const globals = {
+	WINDOW_PATH: null,
 	WINDOW_TYPE: null,
 	IS_LOADING: false,
 };
@@ -583,6 +584,7 @@ export const approve = (operations, id) => async (dispatch, getState) => {
 	}
 };
 
-export const setWindowType = (type) => {
+export const setWindowProps = (type, path) => {
 	globals.WINDOW_TYPE = type;
+	globals.WINDOW_PATH = path;
 };

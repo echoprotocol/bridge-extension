@@ -11,14 +11,13 @@ import {
 	CREATE_PIN_PATH,
 	UNLOCK_PATH,
 	INDEX_PATH,
-	SIGN_TRANSACTION_PATH,
 	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
 	WELCOME_PATH,
 	NETWORK_ERROR_SEND_PATH,
 	FORM_TYPES,
 } from '../constants/RouterConstants';
-import { DRAFT_STORAGE_KEY, NETWORKS, POPUP_WINDOW_TYPE } from '../constants/GlobalConstants';
+import { DRAFT_STORAGE_KEY, NETWORKS, POPUP_WINDOW_TYPE, STORE } from '../constants/GlobalConstants';
 import { setValue } from './FormActions';
 import { loadInfo, set, addAccount, storageGetDraft } from './GlobalActions';
 import { globals } from './SignActions';
@@ -35,7 +34,7 @@ import { FORM_SEND } from '../constants/FormConstants';
  *
  * 	@param {Object} params
  */
-const changeCrypto = (params) => (dispatch) => {
+export const changeCrypto = (params) => (dispatch) => {
 	dispatch(GlobalReducer.actions.setIn({ field: 'crypto', params }));
 };
 
@@ -63,6 +62,13 @@ const lockCrypto = () => (dispatch) => {
  */
 export const getCrypto = () => echoService.getCrypto();
 
+/**
+ *
+ * @returns {Function}
+ */
+export const unlockAccount = () => (dispatch) => {
+	dispatch(changeCrypto({ isLocked: false }));
+};
 /**
  *  @method unlockCrypto
  *
@@ -96,7 +102,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 			&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH]
 				.includes(history.location.pathname)
 		) {
-			history.push(SIGN_TRANSACTION_PATH);
+			history.push(globals.WINDOW_PATH);
 		}
 		return true;
 	} catch (err) {
@@ -122,7 +128,7 @@ export const unlockResponse = () => async (dispatch) => {
 		&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH]
 			.includes(history.location.pathname)
 	) {
-		history.push(SIGN_TRANSACTION_PATH);
+		history.push(globals.WINDOW_PATH);
 	}
 	return true;
 };
@@ -181,7 +187,7 @@ export const initCrypto = () => async (dispatch) => {
 					history.push(INDEX_PATH);
 				}
 			} else {
-				history.push(SIGN_TRANSACTION_PATH);
+				history.push(globals.WINDOW_PATH);
 			}
 		} else {
 			const isFirstTime = await crypto.isFirstTime();
@@ -324,7 +330,7 @@ export const wipeCrypto = () => async (dispatch, getState) => {
 	const networks = getState().global.get('networks');
 
 	const promises = networks.concat(NETWORKS).map(({ name }) => storage.remove(name));
-	promises.push(storage.remove('randomKey'));
+	promises.push(storage.remove(STORE));
 
 	await Promise.all(promises);
 

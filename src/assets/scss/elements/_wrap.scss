@@ -18,13 +18,13 @@
     }
     &.dark {
         // background-color: $colorBgDark;
-        
+
         // background-color: #394247;
-        
+
         background-color: #324045; // Цвет брал так: загружал картинку через pixelperfect и брал с неё цвет
 
         input:-webkit-autofill,
-        input:-webkit-autofill:hover, 
+        input:-webkit-autofill:hover,
         input:-webkit-autofill:focus
         textarea:-webkit-autofill,
         textarea:-webkit-autofill:hover
@@ -33,7 +33,7 @@
         select:-webkit-autofill:hover,
         select:-webkit-autofill:focus {
             -webkit-text-fill-color: #3d4b52;
-            -webkit-box-shadow: 0 0 0px 1000px #394247 inset, 0 1px 0px 0 #ebeef0; // 
+            -webkit-box-shadow: 0 0 0px 1000px #394247 inset, 0 1px 0px 0 #ebeef0; //
             transition: background-color 5000s ease-in-out 0s;
         }
     }
@@ -45,12 +45,13 @@
     padding-top: 70px;
     max-height: 488px;
 	overflow: auto;
-
+    position: relative;
+    
     .page {
         padding: 0 28px 35px;
         position: relative;
 		min-height: 348px;
-		
+
 
 
         &.enter-pin {
@@ -83,7 +84,7 @@
             .one-btn-wrap {
                 flex-direction: column;
                 align-items: center;
-                
+
                 .forgot-password {
                     margin-top: 15px;
                 }

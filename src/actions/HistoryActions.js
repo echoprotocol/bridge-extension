@@ -67,6 +67,7 @@ const formatOperation = async (data, result, accountName) => {
 	result = result.set('id', data.get('id'))
 		.setIn(['transaction', 'type'], typeOperation ? typeOperation.type : 'Transaction')
 		.setIn(['transaction', 'typeName'], name)
+		.setIn(['transaction', 'blockNumber'], block.round)
 		.setIn(['transaction', 'date'], moment.utc(block.timestamp).local().format('DD MMM, HH:mm'))
 		.setIn(['transaction', 'value'], 0)
 		.setIn(['transaction', 'currency'], CORE_SYMBOL)

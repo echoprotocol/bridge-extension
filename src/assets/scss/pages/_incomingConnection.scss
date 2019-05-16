@@ -1,0 +1,75 @@
+.incoming-connection-bg {
+    position: relative;
+    width: 100%;
+    height: 125px;
+    background-color: rgba(52, 64, 69, 1);
+    background-image: url(../images/connection/connectionBg.jpg);
+    background-position: center;
+    background-size: cover;
+    display: flex;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .page-header {
+        color: #fff;
+        font-size: 20px;
+        margin: auto 0 20px 20px;
+        font-family: FNBook;
+        letter-spacing: 1px;
+    }
+}
+
+.incoming-connection-wrap {
+    display: flex;
+    flex-direction: column;
+    justify-content: center;
+    height: 356px;
+    padding: 0 8px;
+
+    .connection-block {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        width: 100%;
+        margin: 70px 0 0;
+
+        .connect {
+            width: 32px;
+            height: 32px;
+            opacity: 0.3;
+        }
+
+        .account {
+            display: flex;
+            align-items: center;
+
+            .user-name {
+                @include cutTxt();
+                margin-left: 8px;
+                max-width: 90px;
+            }
+        }
+    }
+
+    .connection-info {
+        text-align: center;
+        font-size: 16px;
+        font-family: FNBook;
+        margin: 70px auto auto;
+        max-width: 250px;
+        color: #3E4851;
+        line-height: 20px;
+
+        .line {
+            &:not(:last-child) {
+                margin-bottom: 14px;
+            }
+        }
+
+        .provider {
+            color: #00C0A1;
+        }
+    }
+}

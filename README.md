@@ -1,41 +1,56 @@
 
 # BRIDGE    
- Echo browser extension  
-  ## Connect to node  
-  
+ Echo browser extension
+
+
+## Get access to use Bridge data
+
+ Before connecting to Bridge you need to get access for using Brige.
+
+ ```javascript
+    /**
+     * Get access
+     * @returns {Promise.<Boolean>} status
+     */
+    await echojslib.extension.getAccess();
+ ```
+
+
+## Connect to node  
+
 There is an example of connecting to the node and subscribe to switch network (recommended to use inside `window.onload`)  
-  
+
 ```javascript  
 window.onload = () => {
 
     if (echojslib && echojslib.isEchoBridge) {
-    
+
         /**
         * Subscribe to current Echo network selected in Bridge
         */
-        echojslib.extension.subscribeSwitchNetwork(async () => {
-        
+        await echojslib.extension.subscribeSwitchNetwork(async () => {
+
             if (echojslib.echo.isConnected) {
                 await window.echojslib.echo.disconnect();
             }
-            
+
             /**
             * Connect to current Echo network selected in Bridge
             */
             await echojslib.echo.connect();
-            
+
         });
-    
+
     }
 };  
 ```  
 Callback will be called, when network will be changed in extension.  
 ## Sign transaction with Bridge  
-  
+
 ### Transfer  
-  
+
 Simple example of creating and broadcasting transaction  
-  
+
 ```javascript  
 /**
 * Create a transaction
@@ -63,7 +78,7 @@ await tr.signWithBridge();
 await tr.broadcast();  
 ```  
 Method `addOperation(operationNumber, operationOptions)` in this example used transfer operation.  
-  
+
 ### Transaction examples
-  
+
 See the [examples](./docs/examples.md) for more different transactions.

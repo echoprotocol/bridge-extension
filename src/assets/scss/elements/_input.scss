@@ -180,7 +180,7 @@
             &:not(.disabled):not(.error) {
 
                 input {
-					color: #3F4A52;	
+					color: #3F4A52;
 					&::placeholder {
 						color: rgba(#3F4A52, .4);
 						-webkit-font-smoothing: antialiased;
@@ -208,7 +208,7 @@
             }
 
 		}
-		
+
 
 
     }
@@ -341,9 +341,6 @@
     input {
         cursor: pointer;
 		@extend %input;
-		&[type="password"] {
-			letter-spacing: -.15em;
-		}
         height: 42px;
 
         &::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
@@ -405,7 +402,7 @@
         position: relative;
         z-index: 3;
         overflow: hidden;
-        
+
         &::-webkit-input-placeholder {
             font-family: FNMedium;
         }
@@ -497,5 +494,3 @@
         padding-left: 3px;
     }
 }
-
-

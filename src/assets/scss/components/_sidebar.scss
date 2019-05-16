@@ -23,15 +23,6 @@
 			background-repeat: no-repeat;
             z-index: -1;
         }
-        .btn-icon {
-			padding: 0;
-			height: 40px;
-			width: 40px;
-			display: flex;
-			align-items: center;
-			justify-content: center;
-			margin: 0 0 0 -6px;
-        }
 
     }
     &-body {
@@ -98,7 +89,7 @@
 					background-image: url('../images/icons/navigation_history_emerald.svg');
 				}
 			}
-			
+
 		}
 		&:nth-child(3) a {
 			&:before {
@@ -120,7 +111,7 @@
 				}
 			}
 		}
-		
+
         a {
             color: #6d7f80;
             font-size: 18px;
@@ -128,7 +119,7 @@
             height: 30px;
             display: flex;
 			align-items: center;
-			
+
             transition: color $speed;
             -webkit-font-smoothing: antialiased;
 			-moz-osx-font-smoothing: grayscale;
@@ -157,7 +148,7 @@
 
 			}
 
-			
+
             &:hover,
             &:focus {
 				color: #d4dede;

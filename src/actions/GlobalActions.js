@@ -68,6 +68,90 @@ export const sidebarToggle = (value) => (dispatch) => {
 };
 
 /**
+ *  @method setIn
+ *
+ * 	Set params in field from GlobalReducer
+ *
+ * 	@param {String} field
+ * 	@param {Object} params
+ */
+export const setIn = (field, params) => (dispatch) => {
+	dispatch(GlobalReducer.actions.setIn({ field, params }));
+};
+
+/**
+ *  @method deleteIn
+ *
+ * 	Delete params in field from GlobalReducer
+ *
+ * 	@param {String} field
+ * 	@param {Array} params
+ */
+export const deleteIn = (field, params) => (dispatch) => {
+	dispatch(GlobalReducer.actions.deleteIn({ field, params }));
+};
+
+/**
+ *  @method loadProviderRequests
+ *
+ * 	Load provider requests
+ *
+ */
+export const loadProviderRequests = () => (dispatch) => {
+	const requests = new Map(echoService.getProviderRequests());
+
+	if (!requests.size) {
+		return;
+	}
+
+	dispatch(set('providerRequests', requests));
+};
+
+/**
+ *  @method addProviderRequest
+ *
+ * 	Add new provider request
+ *
+ */
+export const addProviderRequest = (id, origin) => (dispatch) => {
+	dispatch(setIn('providerRequests', { [id]: origin }));
+};
+
+/**
+ *  @method removeProviderRequest
+ *
+ * 	Remove provider request
+ *
+ */
+export const removeProviderRequest = (id) => (dispatch) => {
+	dispatch(deleteIn('providerRequests', [id]));
+
+	const requests = new Map(echoService.getProviderRequests());
+
+	if (!requests.size) {
+		history.push(INDEX_PATH);
+	}
+};
+
+/**
+ *  @method chooseProviderAccess
+ *
+ * 	Choose provider access
+ *
+ * 	@param {String} id
+ * 	@param {Boolean} status
+ */
+export const chooseProviderAccess = (id, status) => (dispatch) => {
+	const emitter = echoService.getEmitter();
+
+	try {
+		emitter.emit('providerResponse', null, id, status);
+	} catch (err) {
+		dispatch(set('error', FormatHelper.formatError(err)));
+	}
+};
+
+/**
  *  @method initAccount
  *
  * 	Initialize account
@@ -291,7 +375,7 @@ export const loadInfo = () => async (dispatch, getState) => {
 
 			Object.entries(tokens).forEach(([accountId, tokensArray]) => {
 				tokensArray.forEach((id) => {
-					stateTokens = stateTokens.setIn([accountId, `1.16.${id}`], new Map({}));
+					stateTokens = stateTokens.setIn([accountId, `1.14.${id}`], new Map({}));
 				});
 			});
 
@@ -344,6 +428,7 @@ export const loadInfo = () => async (dispatch, getState) => {
 		}
 
 		await dispatch(loadRequests());
+		dispatch(loadProviderRequests());
 	} catch (err) {
 		console.warn('Global loading information error', err);
 	}

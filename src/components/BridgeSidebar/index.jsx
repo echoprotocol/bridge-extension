@@ -2,16 +2,17 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Sidebar, Button } from 'semantic-ui-react';
 import { NavLink } from 'react-router-dom';
+import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 
 import { sidebarToggle } from '../../actions/GlobalActions';
-import { userLockCrypto } from '../../actions/CryptoActions';
+import { changeCrypto, userLockCrypto } from '../../actions/CryptoActions';
 
 import {
 	BACKUP_PATH,
 	TRANSACTIONS_PATH,
 	ABOUT_PATH,
-	WALLET_PATH,
+	WALLET_PATH, UNLOCK_PATH,
 } from '../../constants/RouterConstants';
 
 import UserIcon from '../UserIcon';
@@ -26,6 +27,15 @@ class BridgeSidebar extends React.PureComponent {
 		this.props.lock();
 	}
 
+	goToBackup(e) {
+		e.preventDefault();
+		this.props.sidebarToggle(this.props.visibleSidebar);
+		if (this.props.location.pathname === BACKUP_PATH) return;
+		this.props.history.push(BACKUP_PATH);
+		this.props.setGoTo(BACKUP_PATH);
+		this.props.history.push(UNLOCK_PATH);
+	}
+
 	render() {
 		const { visibleSidebar, account } = this.props;
 
@@ -37,7 +47,7 @@ class BridgeSidebar extends React.PureComponent {
 				>
 					<div className="sidebar-header">
 						<Button
-							className="btn-icon"
+							className="btn-close btn-icon"
 							onClick={() => this.props.sidebarToggle(visibleSidebar)}
 							content={
 								<img src={IconClose} alt="" />
@@ -79,7 +89,7 @@ class BridgeSidebar extends React.PureComponent {
 							<li>
 								<NavLink
 									exact
-									onClick={() => this.props.sidebarToggle(visibleSidebar)}
+									onClick={(e) => this.goToBackup(e)}
 									to={BACKUP_PATH}
 								>
 									<div className="nav-title">Backup account</div>
@@ -118,22 +128,28 @@ class BridgeSidebar extends React.PureComponent {
 
 BridgeSidebar.propTypes = {
 	account: PropTypes.object,
+	history: PropTypes.object,
+	location: PropTypes.object,
 	visibleSidebar: PropTypes.bool.isRequired,
+	setGoTo: PropTypes.func.isRequired,
 	sidebarToggle: PropTypes.func.isRequired,
 	lock: PropTypes.func.isRequired,
 };
 
 BridgeSidebar.defaultProps = {
 	account: null,
+	history: null,
+	location: null,
 };
 
-export default connect(
+export default withRouter(connect(
 	(state) => ({
 		visibleSidebar: state.global.get('visibleSidebar'),
 		account: state.global.get('account'),
 	}),
 	(dispatch) => ({
 		lock: () => dispatch(userLockCrypto()),
+		setGoTo: (value) => dispatch(changeCrypto({ goTo: value })),
 		sidebarToggle: (value) => dispatch(sidebarToggle(value)),
 	}),
-)(BridgeSidebar);
+)(BridgeSidebar));

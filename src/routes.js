@@ -24,6 +24,7 @@ import {
 	SETTINGS_PATH,
 	NETWORK_PATH,
 	CONNECTION_ERROR_PATH,
+	INCOMING_CONNECTION_PATH,
 } from './constants/RouterConstants';
 
 import App from './containers/App';
@@ -46,6 +47,7 @@ import SignTransaction from './containers/SignTransaction';
 import About from './containers/About';
 import Network from './containers/Network';
 import ConnectionError from './containers/ConnectionError';
+import IncomingConnection from './containers/IncomingConnection';
 
 
 import { required } from './components/Require';
@@ -79,6 +81,7 @@ export default class Routes extends React.Component {
 					<Route exact path={BACKUP_PATH} component={required(Backup)} />
 					<Route exact path={WATCH_TOKEN_PATH} component={required(WatchToken)} />
 					<Route exact path={ABOUT_PATH} component={required(About)} />
+					<Route exact path={INCOMING_CONNECTION_PATH} component={required(IncomingConnection)} />
 					<Route exact path={NETWORK_PATH} component={Network} />
 				</div>
 			</App>

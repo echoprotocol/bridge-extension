@@ -13,16 +13,16 @@ import store from './store';
 
 import { POPUP_HEIGHT, POPUP_WIDTH, POPUP_WINDOW_TYPE } from './constants/GlobalConstants';
 
-import { setWindowType } from './actions/SignActions';
+import { setWindowProps } from './actions/SignActions';
 
 if (window.innerWidth !== window.outerWidth || window.innerHeight !== window.outerHeight) {
 	window.resizeBy(POPUP_WIDTH - window.innerWidth, POPUP_HEIGHT - window.innerHeight);
 }
 
-const { windowType } = query.parse(window.location.search);
+const { windowType, windowPath } = query.parse(window.location.search);
 
 if (windowType === POPUP_WINDOW_TYPE) {
-	setWindowType(POPUP_WINDOW_TYPE);
+	setWindowProps(windowType, windowPath);
 }
 
 
