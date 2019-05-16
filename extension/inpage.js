@@ -69,6 +69,7 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 			}
 
 			networkSubscribers.push(subscriberCb);
+			subscriberCb(data.res);
 		};
 
 		requestQueue.push({ id, cb: callback });
