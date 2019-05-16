@@ -55,6 +55,7 @@
     "secure-random": "^1.1.1",
     "semantic-ui-react": "^0.78.3",
     "uglifyjs-webpack-plugin": "^1.2.2",
+    "url-parse": "^1.4.7",
     "utf8": "^3.0.0"
   },
   "devDependencies": {

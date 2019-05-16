@@ -37,6 +37,10 @@ class Echo {
 		return EXTENSION ? extension.extension.getBackgroundPage().getList() : [];
 	}
 
+	static getProviderRequests() {
+		return EXTENSION ? extension.extension.getBackgroundPage().getProviderMap() : {};
+	}
+
 }
 
 export default Echo;

@@ -129,6 +129,7 @@ export const ICON_COLORS_COUNT = 7;
 export const BASE_ICON = 1;
 export const BASE_ICON_COLOR = 'green';
 export const POPUP_WINDOW_TYPE = 'popup';
+
 export const MAX_NOTE_LENGTH = 200 * 1000;
 export const DRAFT_STORAGE_KEY = 'draft';
 

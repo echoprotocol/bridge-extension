@@ -1,34 +1,33 @@
 import React from 'react';
-import { Link } from 'react-router-dom';
-import UserIcon from '../../components/UserIcon';
-import connect from '../../assets/images/connection/connect.svg';
+import { Button } from 'semantic-ui-react';
+import { connect } from 'react-redux';
+import PropTypes from 'prop-types';
 
+import connectImage from '../../assets/images/connection/connect.svg';
 
-class About extends React.Component {
+import { chooseProviderAccess } from '../../actions/GlobalActions';
+
+class Access extends React.Component {
 
 	render() {
+		const { requests } = this.props;
+		const provider = requests.first();
 
 		return (
 			<React.Fragment>
 
-				<div className="incoming-connection-bg" />
+				<div className="incoming-connection-bg">
+					<div className="page-header">New incoming connection</div>
+				</div>
 				<div className="incoming-connection-wrap">
 
 					<div className="connection-block">
-						<div className="site">Mywebsite.com</div>
-						<img className="connect" src={connect} alt="" />
-						<div className="account">
-							<UserIcon
-								color="green"
-								avatar="ava1"
-							/>
-							<div className="user-name">Username</div>
-						</div>
+						<img className="connect" src={connectImage} alt="" />
 					</div>
 
 					<div className="connection-info">
 						<div className="line">
-							mywebsite.com is trying to connect to your Echo account using Bridge.
+							<span className="provider">{provider}</span> is trying to connect to your Echo account using Bridge.
 						</div>
 						<div className="line">
 							Would you like to approve access?
@@ -37,12 +36,12 @@ class About extends React.Component {
 				</div>
 				<div className="page-action-wrap">
 					<div className="two-btn-wrap" >
-						<Link className="btn-transparent link" to="/">
+						<Button className="btn-transparent link" onClick={() => this.props.reject(requests.keyOf(provider))}>
 							<span className="btn-text">Reject</span>
-						</Link>
-						<Link className="btn-in-light link" to="/">
+						</Button>
+						<Button className="btn-in-light link" onClick={() => this.props.approve(requests.keyOf(provider))}>
 							<span className="btn-text">Approve</span>
-						</Link>
+						</Button>
 
 					</div>
 				</div>
@@ -53,4 +52,18 @@ class About extends React.Component {
 
 }
 
-export default About;
+Access.propTypes = {
+	requests: PropTypes.object.isRequired,
+	approve: PropTypes.func.isRequired,
+	reject: PropTypes.func.isRequired,
+};
+
+export default connect(
+	(state) => ({
+		requests: state.global.get('providerRequests'),
+	}),
+	(dispatch) => ({
+		approve: (id) => dispatch(chooseProviderAccess(id, true)),
+		reject: (id) => dispatch(chooseProviderAccess(id, false)),
+	}),
+)(Access);

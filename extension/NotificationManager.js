@@ -1,14 +1,14 @@
 import extensionizer from './extensionizer';
 
 import { POPUP_HEIGHT, POPUP_WIDTH } from '../src/constants/GlobalConstants';
-import { POPUP_PATH } from '../src/constants/RouterConstants';
+import { POPUP_PATH, SIGN_TRANSACTION_PATH } from '../src/constants/RouterConstants';
 
 class NotificationManager {
 
 	/**
 	 * Create popup
      */
-	showPopup() {
+	showPopup(path = SIGN_TRANSACTION_PATH) {
 		const cb = (popup) => {
 			this.popupId = popup.id;
 		};
@@ -18,7 +18,7 @@ class NotificationManager {
 
 		// create new notification popup
 		const creation = extensionizer.windows.create({
-			url: POPUP_PATH,
+			url: POPUP_PATH.replace(/:path/g, path),
 			type: 'popup',
 			state: 'normal',
 			height: POPUP_HEIGHT,

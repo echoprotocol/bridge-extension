@@ -47,7 +47,7 @@ class BridgeSidebar extends React.PureComponent {
 				>
 					<div className="sidebar-header">
 						<Button
-							className="btn-icon"
+							className="btn-close btn-icon"
 							onClick={() => this.props.sidebarToggle(visibleSidebar)}
 							content={
 								<img src={IconClose} alt="" />

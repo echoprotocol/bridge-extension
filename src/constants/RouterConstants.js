@@ -44,7 +44,7 @@ export const WATCH_TOKEN_PATH = '/tokens/watch';
 
 export const SIGN_TRANSACTION_PATH = '/transaction/sign';
 
-export const POPUP_PATH = 'index.html?windowType=popup';
+export const POPUP_PATH = 'index.html?windowType=popup&windowPath=:path';
 
 export const ABOUT_PATH = '/about';
 

@@ -18,21 +18,67 @@ const networkSubscribers = [];
 
 let currentNetworkURL = NETWORKS[0].url;
 
+
+/**
+ * network subscription
+ *
+ */
+const networkSubscription = () => {
+	const id = Date.now();
+
+	const callback = ({ data }) => {
+		/**
+		 *  call all subscribers and repost subscription
+		 */
+		currentNetworkURL = data.res.url;
+		networkSubscribers.forEach((cb) => cb(data.res));
+		networkSubscription();
+	};
+
+	requestQueue.push({ id, cb: callback });
+
+	window.postMessage({
+		method: 'networkSubscribe', target: 'content', appId: APP_ID, id,
+	}, '*');
+};
+
 /**
  * subscribeSwitchNetwork to switch network
  * @param subscriberCb
+ * @returns {Promise}
  */
 const subscribeSwitchNetwork = (subscriberCb) => {
+	const id = Date.now();
+	const result = new Promise((resolve, reject) => {
+		if (!lodash.isFunction(subscriberCb)) {
+			reject(new Error('Is not a function'));
+			return;
+		}
 
-	if (subscriberCb) {
-		networkSubscribers.push(subscriberCb);
-		return window.postMessage({
-			method: 'getNetwork', target: 'content', appId: APP_ID,
+		const callback = ({ data }) => {
+			if (data.error) {
+				reject(data.error);
+				return;
+			}
+
+			currentNetworkURL = data.res.url;
+			resolve();
+
+			if (!networkSubscribers.length) {
+				networkSubscription();
+			}
+
+			networkSubscribers.push(subscriberCb);
+		};
+
+		requestQueue.push({ id, cb: callback });
+
+		window.postMessage({
+			method: 'getNetwork', target: 'content', appId: APP_ID, id,
 		}, '*');
-	}
-	return window.postMessage({
-		method: 'networkSubscribe', target: 'content', appId: APP_ID,
-	}, '*');
+	});
+
+	return result;
 };
 
 /**
@@ -40,14 +86,6 @@ const subscribeSwitchNetwork = (subscriberCb) => {
  * @param event
  */
 const onMessage = (event) => {
-	if (event.data.subscriber) {
-
-		currentNetworkURL = event.data.res.url;
-		networkSubscribers.forEach((cb) => cb(event.data.res));
-		subscribeSwitchNetwork();
-		return;
-	}
-
 	const { id, target, appId } = event.data;
 
 	if (!id || target !== 'inpage' || !appId || appId !== APP_ID) return;
@@ -75,7 +113,7 @@ const sendTransaction = (options) => {
 			if (status === 'approved') {
 				resolve({ status, resultBroadcast });
 			} else {
-				reject(text || status);
+				reject(data.error || text || status);
 			}
 		};
 		requestQueue.push({ id, cb });
@@ -98,9 +136,8 @@ const getAccounts = () => {
 	const result = new Promise((resolve, reject) => {
 
 		const cb = ({ data }) => {
-
-			if (data.res.error) {
-				reject(data.res.error);
+			if (data.error || data.res.error) {
+				reject(data.error || data.res.error);
 			} else {
 				resolve(data.res);
 			}
@@ -109,6 +146,32 @@ const getAccounts = () => {
 		requestQueue.push({ id, cb });
 		window.postMessage({
 			method: 'accounts', id, target: 'content', appId: APP_ID,
+		}, '*');
+
+	});
+
+	return result;
+};
+
+/**
+ * Get provider approval
+ * @returns {Promise}
+ */
+const getAccess = () => {
+	const id = Date.now();
+	const result = new Promise((resolve, reject) => {
+
+		const cb = ({ data }) => {
+			if (data.error) {
+				reject(data.error);
+			} else {
+				resolve(data.status);
+			}
+		};
+
+		requestQueue.push({ id, cb });
+		window.postMessage({
+			method: 'getAccess', id, target: 'content', appId: APP_ID,
 		}, '*');
 
 	});
@@ -206,15 +269,8 @@ echojslib.echo.connect = (url, params) => {
 const extension = {
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
-	subscribeSwitchNetwork: (subscriberCb) => {
-
-		if (!lodash.isFunction(subscriberCb)) {
-
-			throw new Error('Is not a function');
-		}
-
-		subscribeSwitchNetwork(subscriberCb);
-	},
+	subscribeSwitchNetwork: (subscriberCb) => subscribeSwitchNetwork(subscriberCb),
+	getAccess: () => getAccess(),
 };
 
 window._.noConflict();

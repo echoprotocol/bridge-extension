@@ -2,7 +2,7 @@ import echoService from './echo';
 
 import { requestHandler, signTr, trResponseHandler, windowRequestHandler } from '../actions/SignActions';
 import { sendHandler } from '../actions/BalanceActions';
-import { onLogout, addAccount } from '../actions/GlobalActions';
+import { onLogout, addAccount, addProviderRequest, removeProviderRequest } from '../actions/GlobalActions';
 import { getCrypto, lockResponse, unlockResponse } from '../actions/CryptoActions';
 
 import { offerName } from '../actions/AuthActions';
@@ -40,9 +40,15 @@ class Listeners {
 			dispatch(addAccount(name, keys, networkName, link));
 		};
 
+		this.addProviderRequestHandler = (id, origin) => dispatch(addProviderRequest(id, origin));
+		this.removeProviderRequestHandler = (id) => dispatch(removeProviderRequest(id));
+
 		this.emitter.on('windowRequest', this.windowRequestHandler);
 		this.emitter.on('request', this.requestHandler);
 		this.emitter.on('trResponse', this.trResponseHandler);
+
+		this.emitter.on('addProviderRequest', this.addProviderRequestHandler);
+		this.emitter.on('removeProviderRequest', this.removeProviderRequestHandler);
 
 		this.emitter.on('sendResponse', this.sendHandler);
 		this.emitter.on('logout', this.onLogout);
@@ -76,16 +82,23 @@ class Listeners {
 		this.emitter.removeListener('globalSubscribe', this.onGlobalSubscribe);
 		this.emitter.removeListener('transaction', this.sign);
 
+		this.emitter.removeListener('addProviderRequest', this.addProviderRequestHandler);
+		this.emitter.removeListener('removeProviderRequest', this.removeProviderRequestHandler);
+
 		this.crypto.removeListener('locked', this.lockResponse);
 		this.crypto.removeListener('unlocked', this.unlockResponse);
 	}
 
-	initBackgroundListeners(createAccount, onResponse, onSend, onSwitchNetwork, trSignResponse) {
+	initBackgroundListeners(
+		createAccount, onResponse, onSend, onSwitchNetwork,
+		trSignResponse, onProviderApproval,
+	) {
 		this.emitter.on('createAccount', createAccount);
 		this.emitter.on('response', onResponse);
 		this.emitter.on('sendRequest', onSend);
 		this.emitter.on('switchNetwork', onSwitchNetwork);
 		this.emitter.on('trSignResponse', trSignResponse);
+		this.emitter.on('providerResponse', onProviderApproval);
 	}
 
 }

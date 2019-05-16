@@ -1,6 +1,7 @@
 /* eslint-disable no-nested-ternary */
 import echo, { Transaction, PrivateKey, aes } from 'echojs-lib';
 import { throttle } from 'lodash';
+import urlParse from 'url-parse';
 
 import EventEmitter from '../libs/CustomAwaitEmitter';
 
@@ -39,6 +40,7 @@ import {
 	ERROR_SEND_PATH,
 	NETWORK_ERROR_SEND_PATH,
 	SUCCESS_SEND_INDEX_PATH,
+	INCOMING_CONNECTION_PATH,
 } from '../src/constants/RouterConstants';
 
 import { FORM_SIGN_UP, FORM_SEND } from '../src/constants/FormConstants';
@@ -57,6 +59,10 @@ let lastTransaction = null;
 let networkSubscribers = [];
 
 let popupId = null;
+
+const processedOrigins = [];
+let providerRequests = [];
+const providerNotification = new NotificationManager();
 
 const connectSubscribe = (status) => {
 	try {
@@ -137,35 +143,35 @@ const createSocket = async (url) => {
 /**
  * show popup
  */
-const showPopup = () => {
-	notificationManager.showPopup();
+const showPopup = (path, manager = notificationManager) => {
+	manager.showPopup(path);
 };
 
 /**
  * check before show popup
  */
-const triggerPopup = () => {
-	notificationManager.getPopup()
+const triggerPopup = (path, manager = notificationManager) => {
+	manager.getPopup()
 		.then((popup) => {
 			if (!popup) {
-				showPopup();
+				showPopup(path, manager);
 			}
 		})
-		.catch(showPopup);
+		.catch(() => showPopup(path, manager));
 };
 
 /**
  * close popup
  */
-const closePopup = () => {
-	notificationManager.closePopup();
+const closePopup = (manager = notificationManager) => {
+	manager.closePopup();
 };
 
 /**
  * Set count of requests
  */
 const setBadge = () => {
-	const { length } = requestQueue;
+	const length = requestQueue.length + providerRequests.length;
 	const text = length === 0 ? 'BETA' : (length > 9 ? '9+' : length.toString());
 	extensionizer.browserAction.setBadgeText({ text });
 };
@@ -252,21 +258,48 @@ const resolveAccounts = async () => {
  * @returns {boolean}
  */
 const onMessage = (request, sender, sendResponse) => {
+	const { hostname } = urlParse(sender.tab.url);
 
 	request = JSON.parse(JSON.stringify(request));
 
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
+	if (typeof processedOrigins[hostname] !== 'boolean') {
+		if (request.method !== 'getAccess') {
+			sendResponse({ id: request.id, error: 'No access' });
+			return true;
+		}
+
+		if (providerRequests.find((p) => p.origin === hostname)) {
+			sendResponse({ id: request.id, error: 'Access has already requested' });
+			return true;
+		}
+
+		providerRequests.push({ origin: hostname, id: request.id, cb: sendResponse });
+
+		setBadge();
+
+		try {
+			emitter.emit('addProviderRequest', request.id, hostname);
+		} catch (e) { return null; }
+
+		triggerPopup(INCOMING_CONNECTION_PATH, providerNotification);
+		return true;
+	} else if (request.method === 'getAccess') {
+		sendResponse({ id: request.id, status: processedOrigins[hostname] });
+		return true;
+	}
+
 	if (request.method === 'getNetwork') {
 
 		getNetwork().then((result) => {
-			sendResponse(({ subscriber: true, res: JSON.parse(JSON.stringify(result)) }));
+			sendResponse(({ id: request.id, res: JSON.parse(JSON.stringify(result)) }));
 		});
 		return true;
 	}
 
 	if (request.method === 'networkSubscribe') {
-		networkSubscribers.push(sendResponse);
+		networkSubscribers.push({ id: request.id, cb: sendResponse });
 		return true;
 	}
 
@@ -523,23 +556,53 @@ export const onSend = async (options, networkName) => {
  * 	@param {Object} network
  */
 export const onSwitchNetwork = async (network) => {
-
 	try {
 		await createSocket(network.url);
 	} catch (e) {
 		console.warn('Switch network error', e);
 	} finally {
-		networkSubscribers = networkSubscribers.filter((cb) => {
+		networkSubscribers.forEach(({ id, cb }) => {
 			try {
-				cb({ subscriber: true, res: network });
-				return false;
+				cb({ id, res: network });
 			} catch (error) {
-				return false;
+				console.warn('Switch network callback error', error);
 			}
 		});
 
 	}
 
+};
+
+/**
+ *  @method onProviderApproval
+ *
+ * 	@param {Object} err
+ * 	@param {String} id
+ * 	@param {Boolean} status
+ */
+export const onProviderApproval = (err, id, status) => {
+	const request = providerRequests.find((r) => String(r.id) === id);
+
+	if (!request) {
+		return;
+	}
+
+	request.cb({ error: err, id: request.id, status });
+
+	providerRequests = providerRequests.filter((p) => p.id !== request.id);
+	processedOrigins[request.origin] = status;
+
+	if (!providerRequests.length) {
+		closePopup(providerNotification);
+	}
+
+	try {
+		emitter.emit('removeProviderRequest', id);
+	} catch (e) {
+		//
+	}
+
+	setBadge();
 };
 
 const listeners = new Listeners(emitter, crypto);
@@ -549,6 +612,7 @@ listeners.initBackgroundListeners(
 	onSend,
 	onSwitchNetwork,
 	trSignResponse,
+	onProviderApproval,
 );
 
 createSocket();
@@ -560,6 +624,10 @@ window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }
 window.getPrivateKey = () => PrivateKey;
 window.getAes = () => aes;
 window.Transaction = () => Transaction;
+window.getProviderMap = () => providerRequests.reduce((map, { id, origin }) => {
+	map[id] = origin;
+	return map;
+}, {});
 
 extensionizer.runtime.onMessage.addListener(onMessage);
 

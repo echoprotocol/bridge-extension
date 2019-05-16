@@ -6,6 +6,19 @@
     background-image: url(../images/connection/connectionBg.jpg);
     background-position: center;
     background-size: cover;
+    display: flex;
+    padding: 10px;
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+
+    .page-header {
+        color: #fff;
+        font-size: 20px;
+        margin: auto 0 20px 20px;
+        font-family: FNBook;
+        letter-spacing: 1px;
+    }
 }
 
 .incoming-connection-wrap {
@@ -19,15 +32,13 @@
         display: flex;
         align-items: center;
         justify-content: center;
-        height: 76px;
         width: 100%;
-        color: #303B40;
-        background-color: #DFE4E7;
-        margin-top: 8px;
+        margin: 70px 0 0;
 
         .connect {
             width: 32px;
-            margin: 0 25px;
+            height: 32px;
+            opacity: 0.3;
         }
 
         .account {
@@ -46,7 +57,7 @@
         text-align: center;
         font-size: 16px;
         font-family: FNBook;
-        margin: auto;
+        margin: 70px auto auto;
         max-width: 250px;
         color: #3E4851;
         line-height: 20px;
@@ -55,6 +66,10 @@
             &:not(:last-child) {
                 margin-bottom: 14px;
             }
+        }
+
+        .provider {
+            color: #00C0A1;
         }
     }
 }

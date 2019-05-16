@@ -11,7 +11,6 @@ import {
 	CREATE_PIN_PATH,
 	UNLOCK_PATH,
 	INDEX_PATH,
-	SIGN_TRANSACTION_PATH,
 	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
 	WELCOME_PATH,
@@ -103,7 +102,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 			&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH]
 				.includes(history.location.pathname)
 		) {
-			history.push(SIGN_TRANSACTION_PATH);
+			history.push(globals.WINDOW_PATH);
 		}
 		return true;
 	} catch (err) {
@@ -129,7 +128,7 @@ export const unlockResponse = () => async (dispatch) => {
 		&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH]
 			.includes(history.location.pathname)
 	) {
-		history.push(SIGN_TRANSACTION_PATH);
+		history.push(globals.WINDOW_PATH);
 	}
 	return true;
 };
@@ -188,7 +187,7 @@ export const initCrypto = () => async (dispatch) => {
 					history.push(INDEX_PATH);
 				}
 			} else {
-				history.push(SIGN_TRANSACTION_PATH);
+				history.push(globals.WINDOW_PATH);
 			}
 		} else {
 			const isFirstTime = await crypto.isFirstTime();
