@@ -5,7 +5,6 @@ import {
 	APP_ID,
 	CONNECTION_TIMEOUT,
 	MAX_RETRIES,
-	NETWORKS,
 	PING_INTERVAL,
 	PING_TIMEOUT,
 } from '../src/constants/GlobalConstants';
@@ -15,8 +14,6 @@ import { uniqueNonceUint64 } from '../src/services/crypto';
 const requestQueue = [];
 
 const networkSubscribers = [];
-
-let currentNetworkURL = NETWORKS[0].url;
 
 
 /**
@@ -30,7 +27,6 @@ const networkSubscription = () => {
 		/**
 		 *  call all subscribers and repost subscription
 		 */
-		currentNetworkURL = data.res.url;
 		networkSubscribers.forEach((cb) => cb(data.res));
 		networkSubscription();
 	};
@@ -61,7 +57,6 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 				return;
 			}
 
-			currentNetworkURL = data.res.url;
 			resolve();
 
 			if (!networkSubscribers.length) {
@@ -77,6 +72,49 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 		window.postMessage({
 			method: 'getNetwork', target: 'content', appId: APP_ID, id,
 		}, '*');
+	});
+
+	return result;
+};
+
+echojslib.echo = echojslib.default;
+
+const oldConnect = echojslib.echo.connect;
+
+/**
+ *
+ * @param {String} url
+ * @param {Object} params
+ * @returns {Promise<any>}
+ */
+echojslib.echo.connect = (url, params) => {
+	const connectionParams = params || {
+		connectionTimeout: CONNECTION_TIMEOUT,
+		maxRetries: MAX_RETRIES,
+		pingTimeout: PING_TIMEOUT,
+		pingInterval: PING_INTERVAL,
+		debug: false,
+		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
+	};
+
+	const id = Date.now();
+	const result = new Promise((resolve, reject) => {
+
+		const cb = async ({ data }) => {
+			await oldConnect.apply(echojslib.echo, [url || data.res.url, connectionParams]);
+
+			if (data.res.error) {
+				reject(data.res.error);
+			} else {
+				resolve(`Connected to ${data.res.url}`);
+			}
+		};
+
+		requestQueue.push({ id, cb });
+		window.postMessage({
+			method: 'getNetwork', id, target: 'content', appId: APP_ID,
+		}, '*');
+
 	});
 
 	return result;
@@ -248,23 +286,6 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 	});
 
 	return result;
-};
-
-echojslib.echo = echojslib.default;
-
-const oldConnect = echojslib.echo.connect;
-
-echojslib.echo.connect = (url, params) => {
-	const options = params || {
-		connectionTimeout: CONNECTION_TIMEOUT,
-		maxRetries: MAX_RETRIES,
-		pingTimeout: PING_TIMEOUT,
-		pingInterval: PING_INTERVAL,
-		debug: false,
-		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
-	};
-
-	return oldConnect.apply(echojslib.echo, [url || currentNetworkURL, options]);
 };
 
 const extension = {
