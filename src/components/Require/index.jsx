@@ -11,6 +11,7 @@ import {
 	SUCCESS_SEND_PATH,
 	ERROR_SEND_PATH,
 	NETWORK_ERROR_SEND_PATH,
+	ACCOUNT_ERROR_SEND_PATH,
 	CONNECTION_ERROR_PATH,
 	INCOMING_CONNECTION_PATH,
 } from '../../constants/RouterConstants';
@@ -56,18 +57,29 @@ export function required(Component) {
 				return;
 			}
 
-			if (!isLogin.size) {
-				this.props.history.push(CREATE_ACCOUNT_PATH);
+			if (isSign) {
+				if (pathname === SIGN_TRANSACTION_PATH && !isLogin) {
+					this.props.history.push(ACCOUNT_ERROR_SEND_PATH);
+					return;
+				}
+
+				if (
+					pathname !== SIGN_TRANSACTION_PATH
+					&& globals.WINDOW_PATH !== INCOMING_CONNECTION_PATH
+					&& ![
+						SUCCESS_SEND_PATH,
+						ERROR_SEND_PATH,
+						NETWORK_ERROR_SEND_PATH,
+						ACCOUNT_ERROR_SEND_PATH,
+					].includes(pathname)
+				) {
+					this.props.history.push(isLogin ? SIGN_TRANSACTION_PATH : ACCOUNT_ERROR_SEND_PATH);
+				}
 				return;
 			}
 
-			if (
-				isSign
-				&& pathname !== SIGN_TRANSACTION_PATH
-				&& globals.WINDOW_PATH !== INCOMING_CONNECTION_PATH
-				&& ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH].includes(pathname)
-			) {
-				this.props.history.push(SIGN_TRANSACTION_PATH);
+			if (!isLogin) {
+				this.props.history.push(CREATE_ACCOUNT_PATH);
 			}
 		}
 
@@ -77,7 +89,7 @@ export function required(Component) {
 			} = this.props;
 			const { pathname } = this.props.history.location;
 
-			if (isLocked || (!isLogin.size && !isProviderApproval)) {
+			if (isLocked) {
 				return null;
 			}
 
@@ -89,13 +101,17 @@ export function required(Component) {
 				return null;
 			}
 
+			if (!isLogin && !(isProviderApproval || isSign)) {
+				return null;
+			}
+
 			return (<Component {...this.props} />);
 		}
 
 	}
 
 	RequiredComponent.propTypes = {
-		isLogin: PropTypes.object.isRequired,
+		isLogin: PropTypes.object,
 		history: PropTypes.object.isRequired,
 		connected: PropTypes.bool,
 		loading: PropTypes.bool.isRequired,
@@ -108,13 +124,14 @@ export function required(Component) {
 	RequiredComponent.defaultProps = {
 		connected: false,
 		isLocked: true,
+		isLogin: false,
 		isSign: true,
 		isProviderApproval: true,
 	};
 
 	return connect((state) => ({
 		isLocked: state.global.getIn(['crypto', 'isLocked']),
-		isLogin: state.global.get('account'),
+		isLogin: state.global.get('account').size,
 		isSign: !!state.global.getIn(['sign', 'current']),
 		isProviderApproval: !!state.global.get('providerRequests').size,
 		connected: state.global.get('connected'),

@@ -21,6 +21,7 @@ import {
 	ERROR_STATUS,
 	COMPLETE_STATUS,
 	DISCONNECT_STATUS,
+	NOT_LOGGED_STATUS,
 	BROADCAST_LIMIT,
 	CONNECT_STATUS,
 	PING_INTERVAL,
@@ -53,12 +54,8 @@ const crypto = new Crypto();
 let lastRequestType = '';
 const accountsRequests = [];
 
-const requestQueue = [];
-let lastTransaction = null;
-
-let networkSubscribers = [];
-
-let popupId = null;
+let requestQueue = [];
+const networkSubscribers = [];
 
 const processedOrigins = [];
 let providerRequests = [];
@@ -371,11 +368,14 @@ const onPinUnlock = () => {
  * @param id
  * @returns null
  */
-const removeTransaction = (id) => {
-	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
-	if (requestIndex === -1) return null;
+const removeTransaction = (id, err = null) => {
+	requestQueue = requestQueue.filter((r) => {
+		if (r.id === id) {
+			r.cb({ error: err, id: r.id });
+		}
 
-	[lastTransaction] = requestQueue.splice(requestIndex, 1);
+		return r.id !== id;
+	});
 
 	setBadge();
 
@@ -403,11 +403,15 @@ export const onResponse = (err, id, status) => {
 	}
 
 	if ([CANCELED_STATUS, ERROR_STATUS].includes(status)) {
-		removeTransaction(id);
+		removeTransaction(id, status);
 	}
 
 	if (COMPLETE_STATUS !== status) {
 		createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
+	}
+
+	if (NOT_LOGGED_STATUS === status) {
+		requestQueue.forEach((r) => removeTransaction(r.id, status));
 	}
 
 	if (requestQueue.length === 1 && SIGN_STATUS === status) {
@@ -416,7 +420,7 @@ export const onResponse = (err, id, status) => {
 
 	if (
 		(requestQueue.length === 0 && COMPLETE_STATUS === status)
-        || DISCONNECT_STATUS === status
+        || [DISCONNECT_STATUS, NOT_LOGGED_STATUS].includes(status)
 	) closePopup();
 
 	return null;
@@ -435,7 +439,6 @@ export const trSignResponse = (signData) => {
 		return null;
 	}
 
-	({ popupId } = notificationManager);
 	const dataToSend = JSON.stringify(signData);
 	requestQueue[0].cb({ id: requestQueue[0].id, signData: dataToSend });
 	removeTransaction(requestQueue[0].id);

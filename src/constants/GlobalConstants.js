@@ -103,6 +103,7 @@ export const ERROR_STATUS = 'error';
 export const DISCONNECT_STATUS = 'disconnect';
 export const CONNECT_STATUS = 'connect';
 export const SIGN_STATUS = 'sign';
+export const NOT_LOGGED_STATUS = 'not logged';
 
 export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
 

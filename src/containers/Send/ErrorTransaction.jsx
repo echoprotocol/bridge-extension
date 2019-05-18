@@ -5,17 +5,24 @@ import query from 'query-string';
 
 import { closePopup, globals } from '../../actions/SignActions';
 
-import { DISCONNECT_STATUS, POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
+import { NOT_LOGGED_STATUS, DISCONNECT_STATUS, POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 import { INDEX_PATH } from '../../constants/RouterConstants';
 
 class ErrorTransaction extends React.PureComponent {
 
-	onClick(e, network) {
+	onClick(e, network, account) {
 		if (!this.props.isReturn) {
 			closePopup(DISCONNECT_STATUS);
 		}
 
-		closePopup(network && DISCONNECT_STATUS);
+		if (account) {
+			closePopup(NOT_LOGGED_STATUS);
+		} else if (network) {
+			closePopup(DISCONNECT_STATUS);
+		} else {
+			closePopup();
+		}
+
 
 		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
 			this.props.history.goBack();
@@ -29,31 +36,37 @@ class ErrorTransaction extends React.PureComponent {
 	}
 
 	render() {
-		const { network } = query.parse(this.props.location.search);
+		const { network, account } = query.parse(this.props.location.search);
+
 		const { isReturn } = this.props;
+
+		let error = (<div className="description">A problem has occurred while sending <br /> your transaction</div>);
+
+		if (network || !isReturn) {
+			error = (
+				<div className="description">
+					Connection was interrupted.
+					<br /> Please, check transaction history to verify if transaction was sent.
+				</div>
+			);
+		}
+
+		if (account) {
+			error = (<div className="description">You have to add account first</div>);
+		}
 
 		return (
 			<div className="transaction-status-wrap error">
 				<div className="transaction-status-body">
 					<div className="title">Error</div>
-					{
-						network || !isReturn ?
-							<div className="description">
-                                Connection was interrupted.
-								<br /> Please, check transaction history to verify if transaction was sent.
-							</div>
-							:
-							<div className="description">
-                                A problem has occurred while sending <br /> your transaction
-							</div>
-					}
+					{error}
 				</div>
 				<div className="page-action-wrap">
 					<div className="one-btn-wrap">
 						<Button
 							className="btn-inverted error"
 							content={<span className="btn-text">Return</span>}
-							onClick={(e) => this.onClick(e, network)}
+							onClick={(e) => this.onClick(e, network, account)}
 						/>
 					</div>
 				</div>

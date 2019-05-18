@@ -139,13 +139,19 @@ class SignDropdown extends React.PureComponent {
 				open={this.state.opened}
 			>
 				<Dropdown.Toggle noCaret>
+					{
+						account.size ? (
+							<React.Fragmet>
+								<UserIcon
+									color={account.get('iconColor')}
+									avatar={`ava${account.get('icon')}`}
+								/>
 
-					<UserIcon
-						color={account.get('iconColor')}
-						avatar={`ava${account.get('icon')}`}
-					/>
+								<i aria-hidden="true" className="dropdown icon" />
+							</React.Fragmet>
+						) : null
+					}
 
-					<i aria-hidden="true" className="dropdown icon" />
 				</Dropdown.Toggle>
 				<Dropdown.Menu >
 					<div

@@ -248,6 +248,11 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 		}
 
 		const cb = ({ data }) => {
+			if (data.error) {
+				reject(data.error);
+				return;
+			}
+
 			const signData = JSON.parse(data.signData);
 
 			if (signData.memoMessage) {
