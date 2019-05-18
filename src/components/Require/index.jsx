@@ -111,7 +111,7 @@ export function required(Component) {
 	}
 
 	RequiredComponent.propTypes = {
-		isLogin: PropTypes.object,
+		isLogin: PropTypes.bool,
 		history: PropTypes.object.isRequired,
 		connected: PropTypes.bool,
 		loading: PropTypes.bool.isRequired,
@@ -131,7 +131,7 @@ export function required(Component) {
 
 	return connect((state) => ({
 		isLocked: state.global.getIn(['crypto', 'isLocked']),
-		isLogin: state.global.get('account').size,
+		isLogin: !!state.global.get('account').size,
 		isSign: !!state.global.getIn(['sign', 'current']),
 		isProviderApproval: !!state.global.get('providerRequests').size,
 		connected: state.global.get('connected'),

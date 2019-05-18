@@ -141,14 +141,14 @@ class SignDropdown extends React.PureComponent {
 				<Dropdown.Toggle noCaret>
 					{
 						account.size ? (
-							<React.Fragmet>
+							<React.Fragment>
 								<UserIcon
 									color={account.get('iconColor')}
 									avatar={`ava${account.get('icon')}`}
 								/>
 
 								<i aria-hidden="true" className="dropdown icon" />
-							</React.Fragmet>
+							</React.Fragment>
 						) : null
 					}
 
