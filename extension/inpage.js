@@ -39,6 +39,32 @@ const networkSubscription = () => {
 };
 
 /**
+ * Get current network
+ * @returns {Promise}
+ */
+const getCurrentNetwork = () => {
+	const id = Date.now();
+	const result = new Promise((resolve, reject) => {
+		const callback = ({ data }) => {
+			if (data.error) {
+				reject(data.error);
+				return;
+			}
+
+			resolve(data.res);
+		};
+
+		requestQueue.push({ id, cb: callback });
+
+		window.postMessage({
+			method: 'getNetwork', target: 'content', appId: APP_ID, id,
+		}, '*');
+	});
+
+	return result;
+};
+
+/**
  * subscribeSwitchNetwork to switch network
  * @param subscriberCb
  * @returns {Promise}
@@ -296,6 +322,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 const extension = {
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
+	getCurrentNetwork: () => getCurrentNetwork(),
 	subscribeSwitchNetwork: (subscriberCb) => subscribeSwitchNetwork(subscriberCb),
 	getAccess: () => getAccess(),
 };
