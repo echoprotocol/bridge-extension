@@ -86,7 +86,7 @@ class Network extends React.Component {
 							<div className="page-action-wrap">
 								<div className="one-btn-wrap" >
 									<Button
-										content={<span className="btn-text">Delete network</span>}
+										content={<span className="btn-text">Remove network</span>}
 										className="btn-in-light"
 										onClick={() => this.onDeleteNetwork(network.name)}
 									/>
