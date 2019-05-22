@@ -151,7 +151,7 @@ class Transactions extends React.Component {
 																	href={`${network.get('explorer')}/blocks/${elem.getIn(['transaction', 'blockNumber'])}`}
 																	className="link-to-block"
 																>
-																	<span className="text">View block information</span>
+																	<span className="text">open in explorer</span>
 																	<i className="icon-link" />
 																</a>
 															</div>
