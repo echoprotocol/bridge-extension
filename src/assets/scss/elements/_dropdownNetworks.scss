@@ -20,7 +20,7 @@
 
 			&:not(.disable-hover):hover {
                 background-color: rgba(#222F30, .25);
-  
+
                 .current-network {
                     &:after {
                         opacity: 1;
@@ -68,21 +68,21 @@
 								text-decoration: none;
 								outline: none;
 								box-shadow: 0px 0px 6px rgba(0, 0, 0, 0.05);
-									
+
 								.title {
 									color: #adb3b9;
 								}
 							}
 						}
 					}
-					
+
 
 					&.active {
 						a, a:focus, a:hover {
 							.title {
 								color:#E4E6E8;
 							}
-							
+
 						}
 					}
 
@@ -151,7 +151,7 @@
                         &:hover {
 							color: #828E99;
 							background-color: #475054;
-							
+
                             &:after {
                                 background-color: #475054;
                             }
@@ -196,7 +196,7 @@
                     max-width: 100%;
                 }
 			}
-			
+
 
         }
         &-footer {
@@ -206,7 +206,7 @@
             padding: 0 20px;
             background-color: rgba(#0e1416,.2);
 			letter-spacing: 2.2px;
-			
+
             a {
                 color: #61D3AD;
 				font-size: 10px;
@@ -264,7 +264,8 @@
 	cursor: pointer;
 	img {
 		transition: opacity .2s;
-		max-width: 20px;
+        max-width: 25px;
+        margin-top: -1px;
 	}
 	&:hover {
 		background-color: #263033;
@@ -297,7 +298,7 @@
 	align-items: center;
 	justify-content: center;
 	background-color: transparent;
-	
+
 	&:hover {
 		background-color: rgba(#2A3639, .7);
 		&:before {
@@ -336,11 +337,11 @@
 		&:not(:hover) {
 			animation: connectionBlink 2s linear infinite;
 		}
-			
+
 		&:after {
 			background-color: #ca304e;
 		}
-	
+
 		&:before {
 			content: "Disconnected";
 			color: #ca304e;
