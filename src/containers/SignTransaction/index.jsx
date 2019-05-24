@@ -17,7 +17,7 @@ import {
 import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 import GlobalReducer from '../../reducers/GlobalReducer';
-import { operationFields, operationKeys } from '../../constants/OperationConstants';
+import { operationFields, operationKeys, operationTypes } from '../../constants/OperationConstants';
 import FormatHelper from '../../helpers/FormatHelper';
 
 class SignTransaction extends React.Component {
@@ -104,6 +104,17 @@ class SignTransaction extends React.Component {
 						</div>);
 						break;
 				}
+
+				return null;
+			}
+
+			if (key === 'type') {
+				mapShow.unshift(<div className="line">
+					<div className="key">{FormatHelper.capitalize(key)}</div>
+					<div className="value">
+						{operationTypes[value] ? operationTypes[value].name : value}
+					</div>
+				</div>);
 
 				return null;
 			}

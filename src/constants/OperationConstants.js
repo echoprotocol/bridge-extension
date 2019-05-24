@@ -33,7 +33,7 @@ export const operationFields = {
 			hasProperties: 'asset_id',
 		},
 	},
-	createContact: {
+	createContract: {
 		registrar: {
 			type: 'account_id',
 		},
@@ -147,7 +147,7 @@ export const operationFieldsSend = {
 export const operationKeys = {
 	transfer: 'from',
 	contract: 'registrar',
-	createContact: 'registrar',
+	createContract: 'registrar',
 	createAccount: 'registrar',
 	updateAccount: 'account',
 	upgradeAccount: 'account_to_upgrade',
@@ -159,15 +159,15 @@ export const operationTypes = {
 		code: 0,
 	},
 	contract: {
-		name: 'Contract',
+		name: 'Contract call',
 		code: OPERATIONS_IDS.CALL_CONTRACT,
 	},
-	createContact: {
-		name: 'Contract Create',
+	createContract: {
+		name: 'Contract create',
 		code: OPERATIONS_IDS.CREATE_CONTRACT,
 	},
 	createAccount: {
-		name: 'Account Create',
+		name: 'Account create',
 		code: OPERATIONS_IDS.ACCOUNT_CREATE,
 	},
 	updateAccount: {
