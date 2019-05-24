@@ -7,7 +7,7 @@ import classnames from 'classnames';
 import { withRouter } from 'react-router';
 import { Map } from 'immutable';
 
-import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
+import { BASE_ICON, BASE_ICON_COLOR, CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
 import UserIcon from '../UserIcon';
@@ -149,7 +149,16 @@ class SignDropdown extends React.PureComponent {
 
 								<i aria-hidden="true" className="dropdown icon" />
 							</React.Fragment>
-						) : null
+						) : (
+							<React.Fragment>
+								<UserIcon
+									color={BASE_ICON_COLOR}
+									avatar={`ava${BASE_ICON}`}
+								/>
+
+								<i aria-hidden="true" className="dropdown icon" />
+							</React.Fragment>
+						)
 					}
 
 				</Dropdown.Toggle>

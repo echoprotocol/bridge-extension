@@ -93,6 +93,7 @@ export const closePopup = (status) => {
 
 const getFetchedData = async (options) => {
 	const type = Object.entries(operationTypes).find(([, v]) => v.code === options[0][0]);
+
 	let opts = JSON.parse(JSON.stringify(options));
 
 	if (!type) {
@@ -121,6 +122,9 @@ const getFetchedData = async (options) => {
 				requests.push(opts[key][value.field]);
 			}
 
+			return null;
+		} else if (value.type === 'string') {
+			requests.push(opts[key]);
 			return null;
 		}
 

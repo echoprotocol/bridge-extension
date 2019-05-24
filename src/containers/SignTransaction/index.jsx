@@ -17,7 +17,7 @@ import {
 import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 import GlobalReducer from '../../reducers/GlobalReducer';
-import { operationFields } from '../../constants/OperationConstants';
+import { operationFields, operationKeys } from '../../constants/OperationConstants';
 import FormatHelper from '../../helpers/FormatHelper';
 
 class SignTransaction extends React.Component {
@@ -33,9 +33,13 @@ class SignTransaction extends React.Component {
 			return null;
 		}
 
+		const { transactionShow } = this.props;
 		const options = this.props.transaction.get('options');
+		const type = transactionShow.get('type');
+
 		const account = this.props.accounts
-			.find((value) => [options[0][1].from, options[0][1].registrar].includes(value.id));
+			.find((value) => options[0][1][operationKeys[type]] === value.id);
+
 		this.props.set('signAccount', new Map(account));
 
 		return null;
@@ -155,25 +159,6 @@ class SignTransaction extends React.Component {
 					<div className="transaction-info">
 						{
 							this.getOptions()
-						}
-						{
-							/*
-							<div className="line">
-								<div className="key">Type</div>
-								<div className="value">Transfer</div>
-							</div>
-							<div className="line">
-								<div className="key">Max transaction fee</div>
-								<div className="value">
-									<div className="balance">0.000000030000011111111111111111111111111</div>
-									<div className="currency">ECHO</div>
-								</div>
-							</div>
-							<div className="line">
-								<div className="key">Max total</div>
-								<div className="value"> {'<'} 0.0000001 ECHO</div>
-							</div>
-							*/
 						}
 					</div>
 				</div>
