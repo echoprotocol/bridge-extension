@@ -2,34 +2,15 @@ import BN from 'bignumber.js';
 
 import echoService from '../src/services/echo';
 
-import { CORE_ID, MEMO_FEE_KEYS, SET_TR_FEE_TIMEOUT } from '../src/constants/GlobalConstants';
+import { CORE_ID, SET_TR_FEE_TIMEOUT } from '../src/constants/GlobalConstants';
 
 import { formatToSend, getFetchMap } from '../src/services/operation';
 
 
-export const getTrOperationFee = async (type, transaction, core) => {
-	const { Transaction, aes, PrivateKey } = await echoService.getChainLib();
+const getTrOperationFee = async (type, transaction, core) => {
+	const { Transaction } = await echoService.getChainLib();
 
 	const options = JSON.parse(JSON.stringify(transaction));
-
-	if (options.memo) {
-		const nonce = null;
-		const pKey = PrivateKey.fromWif(MEMO_FEE_KEYS.WIF);
-
-		const message = aes.encryptWithChecksum(
-			pKey,
-			MEMO_FEE_KEYS.PUBLIC_MEMO_TO,
-			nonce,
-			Buffer.from(options.memo, 'utf-8'),
-		);
-
-		options.memo = {
-			from: MEMO_FEE_KEYS.PUBLIC_MEMO_FROM,
-			to: MEMO_FEE_KEYS.PUBLIC_MEMO_TO,
-			nonce,
-			message,
-		};
-	}
 
 	const tr = new Transaction();
 	tr.addOperation(type, options);

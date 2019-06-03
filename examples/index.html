@@ -53,12 +53,6 @@
 					placeholder="fee asset id"
 					value="1.3.0"
 				/>
-				<input
-					type="text"
-					id="transfer-memo"
-					name="transfer-memo"
-					placeholder="memo"
-				/>
 				<button id="transfer-click">submit</button>
 			</div>
 			<div id="transfer-info"></div>
@@ -318,10 +312,6 @@
 					to: jQuery("#transfer-toAddress")[0].value
 				};
 
-				if (jQuery("#transfer-memo")[0].value) {
-					transaction.memo = jQuery("#transfer-memo")[0].value;
-				}
-
 				if (jQuery("#transfer-fee-asset")[0].value) {
 					transaction.fee = {
 						amount: 0,
@@ -340,18 +330,6 @@
 					},
 					fee: { asset_id: transaction.fee.asset_id }
 				};
-
-				if (transaction.memo) {
-					trSign.memo = {
-						from: "ECHO859gxfnXyUriMgUeThh1fWv3oqcpLFyHa3TfFYC4PK2HqhToVM",
-						to: "ECHO59St8wBpta2ZREBnA3dQQTVFBrEcx5UK12Tm5geG7kv7Hwyzyc",
-						nonce: window.echojslib.generateNonce(),
-						message: window.echojslib.Buffer.from(
-							transaction.memo,
-							"utf8"
-						).toString("hex")
-					};
-				}
 
 				tr.addOperation(transaction.type, trSign);
 

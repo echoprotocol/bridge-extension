@@ -1,43 +1,4 @@
-import FormatHelper from '../helpers/FormatHelper';
-
 import { operationFields, operationFieldsSend } from '../constants/OperationConstants';
-
-/**
- *  @method validateOperation
- *
- *  Validate operation type and field full
- *
- *  @param {Object} options
- */
-export const validateOperation = (options) => {
-	if (!options.type) {
-		return 'Operation type is required';
-	}
-
-	const operation = operationFields[options.type];
-
-	if (!operation) {
-		return 'Operation not found';
-	}
-
-	const notDefined = Object.entries(operation)
-		.find(([key, value]) => {
-			if (!options[key] && value.required) {
-				return true;
-			}
-
-			if (options[key] && value.hasProperties) {
-				return value.hasProperties.find((propKey) => (!options[key][propKey] && value.required));
-			}
-			return false;
-		});
-
-	if (notDefined) {
-		return `Field "${notDefined[0]}" is required`;
-	}
-
-	return null;
-};
 
 /**
  *  @method getFetchMap
@@ -63,66 +24,6 @@ export const getFetchMap = (type, options) => {
 
 		return obj;
 	}, {});
-};
-
-/**
- *  @method formatToShow
- *
- *  Formatting data to display in the extension
- *
- *  @param {String} type
- *  @param {Object} options
- */
-export const formatToShow = (type, options) => {
-	const operation = operationFields[type];
-
-	return Object.entries(operation).reduce((obj, [key, value]) => {
-		if (!options[key]) {
-			return obj;
-		}
-
-		switch (value.type) {
-			case 'account_id':
-				if (typeof options[key].get === 'function') {
-					obj[key] = options[key].get('name') || options[key].get('id');
-
-					break;
-				}
-
-				obj[key] = options[key].name || options[key].id;
-				break;
-			case 'asset_id':
-				if (typeof options[key].get === 'function') {
-					obj[key] = options[key].get('symbol');
-
-					break;
-				}
-
-				obj[key] = options[key].symbol;
-				break;
-			case 'asset_object':
-				if (typeof options[key].asset.get === 'function') {
-					obj[key] = FormatHelper.formatAmount(
-						options[key].amount,
-						options[key].asset.get('precision'),
-						options[key].asset.get('symbol'),
-					);
-
-					break;
-				}
-
-				obj[key] = FormatHelper.formatAmount(
-					options[key].amount,
-					options[key].asset.precision,
-					options[key].asset.symbol,
-				);
-				break;
-			default: obj[key] = options[key];
-		}
-
-		return obj;
-
-	}, { ...options });
 };
 
 /**

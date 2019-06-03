@@ -64,6 +64,10 @@ class FormatHelper {
 		return result;
 	}
 
+	static formatOperationKey(value) {
+		return FormatHelper.capitalize(value).replace(/_/g, ' ');
+	}
+
 }
 
 export default FormatHelper;

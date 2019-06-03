@@ -9,8 +9,6 @@ import {
 	PING_TIMEOUT,
 } from '../src/constants/GlobalConstants';
 
-import { uniqueNonceUint64 } from '../src/services/crypto';
-
 const requestQueue = [];
 
 const networkSubscribers = [];
@@ -281,10 +279,6 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 
 			const signData = JSON.parse(data.signData);
 
-			if (signData.memoMessage) {
-				this._operations[0][1].memo.message = Buffer.from(signData.memoMessage, 'hex');
-			}
-
 			if (this._operations[0][1].from) {
 				this._operations[0][1].from = signData.accountId;
 			} else if (this._operations[0][1].registrar) {
@@ -332,6 +326,5 @@ window.echojslib = echojslib;
 window.echojslib.isEchoBridge = true;
 window.echojslib.extension = extension;
 window.echojslib.Buffer = Buffer;
-window.echojslib.generateNonce = () => uniqueNonceUint64();
 
 window.addEventListener('message', onMessage, false);

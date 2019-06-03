@@ -16,7 +16,6 @@ import { FORM_SEND } from '../../constants/FormConstants';
 import { KEY_CODE_ENTER, CORE_ID } from '../../constants/GlobalConstants';
 
 import BridgeInput from '../../components/BridgeInput';
-import BridgeTextArea from '../../components/BridgeTextArea';
 
 import ValidateSendHelper from '../../helpers/ValidateSendHelper';
 import ValidateTransactionHelper from '../../helpers/ValidateTransactionHelper';
@@ -117,17 +116,6 @@ class Send extends React.Component {
 			value = value.toLowerCase();
 		}
 
-		let error = null;
-
-		if (field && field === 'memo') {
-			error = ValidateSendHelper.validateMemo(value);
-		}
-
-		if (error) {
-			this.props.setFormError(field, error);
-			return null;
-		}
-
 		if (field) {
 			this.props.setFormValue(field, value);
 
@@ -218,19 +206,9 @@ class Send extends React.Component {
 		}
 	}
 
-	isSelectedToken(amount) {
-
-		if (amount) {
-			amount = amount.split('.');
-			return amount.splice(0, 2).join('.') !== '1.14';
-		}
-		return true;
-
-	}
-
 	render() {
 		const {
-			to, amount, selectedBalance, fee, memo, account, loading, balances, assets, tokens,
+			to, amount, fee, account, loading, balances, assets, tokens,
 		} = this.props;
 
 		if (!account) {
@@ -328,29 +306,12 @@ class Send extends React.Component {
 									error={!!fee.error}
 									errorText={fee.error}
 								/>
-
-								{
-									this.isSelectedToken(selectedBalance) ?
-										<div className="message-error">
-
-											<BridgeTextArea
-												name="memo"
-												value={memo.value}
-												onChange={(e) => this.onChange(e)}
-												label="Note (Optional)"
-												error={!!memo.error}
-												errorText={memo.error}
-												disabled={loading}
-											/>
-										</div> : null
-								}
 							</div>
 							<Button
 								className={classnames('btn-in-light', { loading })}
 								disabled={(
 									!to.value
 									|| !amount.value
-									|| !!memo.error
 									|| !!fee.error
 									|| !!amount.error
 									|| loading
@@ -374,7 +335,6 @@ Send.propTypes = {
 	to: PropTypes.object.isRequired,
 	amount: PropTypes.object.isRequired,
 	fee: PropTypes.object.isRequired,
-	memo: PropTypes.object.isRequired,
 	balances: PropTypes.object.isRequired,
 	assets: PropTypes.object.isRequired,
 	tokens: PropTypes.object.isRequired,
@@ -399,7 +359,6 @@ export default connect(
 		to: state.form.getIn([FORM_SEND, 'to']),
 		amount: state.form.getIn([FORM_SEND, 'amount']),
 		fee: state.form.getIn([FORM_SEND, 'fee']),
-		memo: state.form.getIn([FORM_SEND, 'memo']),
 		selectedBalance: state.form.getIn([FORM_SEND, 'selectedBalance']),
 		selectedFeeBalance: state.form.getIn([FORM_SEND, 'selectedFeeBalance']),
 		balances: state.balance.get('balances'),

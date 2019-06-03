@@ -3,7 +3,6 @@ import CustomScroll from 'react-custom-scroll';
 import { withRouter } from 'react-router';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { decryptNote } from '../../actions/HistoryActions';
 
 import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
 
@@ -12,7 +11,7 @@ import '../../assets/images/icons/picRecieved.svg';
 import '../../assets/images/icons/picSent.svg';
 import '../../assets/images/icons/picTransaction.svg';
 import '../../assets/images/icons/picContract.svg';
-import { NETWORKS, TRANSFER_OPERATION } from '../../constants/GlobalConstants';
+import { NETWORKS } from '../../constants/GlobalConstants';
 
 class Transactions extends React.Component {
 
@@ -20,32 +19,17 @@ class Transactions extends React.Component {
 		super(props);
 		this.state = {
 			activeId: null,
-			note: '',
-			noteId: '',
 		};
 	}
 
 	async getTransactionInfo(e, index) {
 
-		const { activeId, noteId } = this.state;
+		const { activeId } = this.state;
 		const newId = activeId === index ? -1 : index;
 
 		this.setState({
-			noteId: index,
 			activeId: newId,
 		});
-
-		const id = index;
-
-		if (noteId !== index) {
-			this.setState({ note: null });
-
-			const note = await this.props.decryptNote(id);
-
-			if (this.state.noteId === id) {
-				this.setState({ note });
-			}
-		}
 	}
 
 	render() {
@@ -68,7 +52,7 @@ class Transactions extends React.Component {
 			return 0;
 		});
 
-		const { note, activeId } = this.state;
+		const { activeId } = this.state;
 		const { accountName, network } = this.props;
 
 		return (
@@ -133,16 +117,6 @@ class Transactions extends React.Component {
 															<div className="left-block">Fee</div>
 															<div className="right-block">{elem.getIn(['content', 'fee'])}<span className="currency">{elem.getIn(['content', 'feeCurrency'])}</span></div>
 														</div>
-														<div className="row">
-															{elem.getIn(['transaction', 'typeName']).includes(TRANSFER_OPERATION) && note &&
-																<React.Fragment>
-																	<div className="left-block">Note</div>
-																	<div className="right-block">
-																		{note}
-																	</div>
-																</React.Fragment>
-															}
-														</div>
 														{NETWORKS.find((item) => item.name === network.get('name')) &&
 															<div className="row">
 																<a
@@ -174,7 +148,6 @@ class Transactions extends React.Component {
 Transactions.propTypes = {
 	network: PropTypes.object,
 	history: PropTypes.object,
-	decryptNote: PropTypes.func.isRequired,
 	accountName: PropTypes.string.isRequired,
 };
 
@@ -189,7 +162,5 @@ export default withRouter(connect(
 		accountName: state.global.getIn(['account', 'name']),
 		network: state.global.get('network'),
 	}),
-	(dispatch) => ({
-		decryptNote: (memo) => dispatch(decryptNote(memo)),
-	}),
+	() => ({}),
 )(Transactions));

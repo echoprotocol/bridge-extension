@@ -202,7 +202,7 @@ const getTransferCode = (id, amount) => {
 /**
  *  @method setFeeFormValue
  *
- * 	Set fee depending on the amount value and memo
+ * 	Set fee
  */
 export const setFeeFormValue = () => async (dispatch, getState) => {
 	try {
@@ -217,7 +217,6 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 		}
 
 		const amount = Number(form.get('amount').value).toString();
-		const memo = form.get('memo');
 		const selectedBalance = getState().form.getIn([FORM_SEND, 'selectedBalance']);
 		const selectedFeeBalance = getState().form.getIn([FORM_SEND, 'selectedFeeBalance']);
 		const balances = getState().balance.get('balances');
@@ -246,7 +245,6 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 				},
 				from: fromAccount,
 				to: toAccount,
-				memo: memo.value,
 				type: 'transfer',
 			};
 
@@ -304,9 +302,8 @@ export const send = () => async (dispatch, getState) => {
 
 	const to = form.get('to');
 	const fee = form.get('fee');
-	const memo = form.get('memo');
 
-	if (to.error || form.get('amount').error || fee.error || memo.error) {
+	if (to.error || form.get('amount').error || fee.error) {
 		return false;
 	}
 
@@ -391,7 +388,6 @@ export const send = () => async (dispatch, getState) => {
 			},
 			from: fromAccount,
 			to: toAccount,
-			memo: memo.value,
 			type: 'transfer',
 		};
 

@@ -69,7 +69,7 @@ tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_UPGRADE, {
         account_to_upgrade: '1.2.1',
         upgrade_to_lifetime_member: true
     }
-});  
+);  
 
 await tr.signWithBridge();  
 

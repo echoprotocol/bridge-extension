@@ -1,7 +1,6 @@
-import { aes as aesLib, PrivateKey, ED25519, PrivateKeyECDSA } from 'echojs-lib';
+import { PrivateKey, ED25519, PrivateKeyECDSA } from 'echojs-lib';
 import random from 'crypto-random-string';
 import bs58 from 'bs58';
-import secureRandom from 'secure-random';
 import EventEmitter from '../../libs/CustomAwaitEmitter';
 import AesStorage from './aesStorage';
 
@@ -13,27 +12,7 @@ import {
 	ECHORANDKEY_SIZE, STORE,
 } from '../constants/GlobalConstants';
 
-const { Long } = require('bytebuffer');
-
 const privateAES = new AesStorage();
-
-let uniqueNonceEntropy = null;
-
-export const uniqueNonceUint64 = () => {
-	const entropy = ((() => {
-		if (uniqueNonceEntropy === null) {
-			return parseInt(secureRandom.randomUint8Array(1)[0], 10);
-		}
-
-		return (uniqueNonceEntropy + 1) % 256;
-	})());
-
-	uniqueNonceEntropy = entropy;
-
-	let long = Long.fromNumber(Date.now());
-	long = long.shiftLeft(8).or(Long.fromNumber(entropy));
-	return long.toString();
-};
 
 class Crypto extends EventEmitter {
 
@@ -332,81 +311,6 @@ class Crypto extends EventEmitter {
 		const aes = privateAES.get();
 		const privateKeyBuffer = aes.decryptHexToBuffer(encryptedPrivateKey);
 		return PrivateKey.fromBuffer(privateKeyBuffer);
-	}
-
-	/**
-	 *  @method encryptMemo
-	 *
-	 *  Encrypt memo.
-	 *
-	 *  @param {String} networkName
-	 *  @param {String} fromMemoKey
-	 *  @param {String} toMemoKey
-	 *  @param {String} memo
-	 *  @param {String} nonceSign
-	 *
-	 *  @return {Object} encryptedMemo
-	 */
-	async encryptMemo(networkName, fromMemoKey, toMemoKey, memo, nonceSign) {
-		privateAES.required();
-
-		const encryptedPrivateKey = await this.getInByNetwork(networkName, fromMemoKey);
-
-		if (!encryptedPrivateKey) {
-			throw new Error('Key not found.');
-		}
-
-		const aes = privateAES.get();
-		const privateKeyBuffer = aes.decryptHexToBuffer(encryptedPrivateKey);
-		const privateKey = PrivateKey.fromBuffer(privateKeyBuffer);
-
-		memo = Buffer.from(memo, 'utf-8');
-
-		const nonce = nonceSign || uniqueNonceUint64();
-
-		return {
-			from: fromMemoKey,
-			to: toMemoKey,
-			nonce,
-			message: aesLib.encryptWithChecksum(privateKey, toMemoKey, nonce, memo),
-		};
-	}
-
-	/**
-     *  @method decryptMemo
-     *
-     *  Decrypt memo
-     *
-     *  @param {String} networkName
-     *  @param {Object} memo
-     *
-     *  @return {Object} decryptedMemo
-     */
-	async decryptMemo(networkName, memo) {
-		privateAES.required();
-
-		const encryptedPrivateKey = await this.getInByNetwork(networkName, memo.get('from'), memo.get('to'));
-
-		if (!encryptedPrivateKey) {
-			throw new Error('Key not found.');
-		}
-
-		const aes = privateAES.get();
-		const privateKeyBuffer = aes.decryptHexToBuffer(encryptedPrivateKey);
-		const privateKey = PrivateKey.fromBuffer(privateKeyBuffer);
-
-		const publicKey = privateKey.toPublicKey().toString();
-
-		if (publicKey !== memo.get('from') && publicKey !== memo.get('to')) {
-			return null;
-		}
-
-		return aesLib.decryptWithChecksum(
-			privateKey,
-			publicKey === memo.get('from') ? memo.get('to') : memo.get('from'),
-			memo.get('nonce'),
-			memo.get('message'),
-		).toString('utf-8');
 	}
 
 	/**

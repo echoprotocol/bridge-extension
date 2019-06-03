@@ -475,7 +475,7 @@ const onFirstInstall = (details) => {
  * 	@param {String} networkName
  */
 const sendTransaction = async (transaction, networkName) => {
-	const { type, memo } = transaction;
+	const { type } = transaction;
 	const account = transaction[operationKeys[type]];
 	const options = formatToSend(type, transaction);
 
@@ -487,17 +487,6 @@ const sendTransaction = async (transaction, networkName) => {
 	const indexPublicKey = keyPromises.findIndex((key) => !!key);
 
 	const pKey = await crypto.getSignPrivateKey(networkName, publicKeys[indexPublicKey][0]);
-
-	if (memo) {
-		const { to } = transaction;
-
-		options.memo = await crypto.encryptMemo(
-			networkName,
-			account.options.memo_key,
-			to.options.memo_key,
-			memo,
-		);
-	}
 
 	let tr = echo.createTransaction();
 

@@ -2,10 +2,9 @@
 import { Map, List } from 'immutable';
 import BN from 'bignumber.js';
 import { batchActions } from 'redux-batched-actions';
+import { OPERATIONS_IDS } from 'echojs-lib';
 
 import history from '../history';
-
-import getOperationFee from '../api/WalletApi';
 
 import echoService from '../services/echo';
 import { formatToSend } from '../services/operation';
@@ -21,8 +20,6 @@ import {
 	CANCELED_STATUS,
 	ERROR_STATUS,
 	CORE_ID,
-	CLOSE_STATUS,
-	OPEN_STATUS,
 	POPUP_WINDOW_TYPE,
 	COMPLETE_STATUS, SIGN_STATUS,
 } from '../constants/GlobalConstants';
@@ -38,6 +35,28 @@ export const globals = {
 	WINDOW_PATH: null,
 	WINDOW_TYPE: null,
 	IS_LOADING: false,
+};
+
+/**
+ *
+ * @param type
+ * @param transaction
+ * @returns {Promise<*>}
+ */
+const getOperationFee = async (type, transaction) => {
+	const options = JSON.parse(JSON.stringify(transaction));
+
+	let tr = echoService.getChainLib().createTransaction();
+
+	if (type === OPERATIONS_IDS.CALL_CONTRACT) {
+		options.fee = undefined;
+	}
+
+	tr = tr.addOperation(type, options);
+
+	tr = await tr.setRequiredFees();
+
+	return tr._operations[0][1].fee.amount; // eslint-disable-line no-underscore-dangle
 };
 
 /**
@@ -116,11 +135,7 @@ const getFetchedData = async (options) => {
 
 			return null;
 		} else if (value.field) {
-			if (key === 'memo') {
-				requests.push(Buffer.from(opts[key][value.field], 'hex').toString());
-			} else {
-				requests.push(opts[key][value.field]);
-			}
+			requests.push(opts[key][value.field]);
 
 			return null;
 		} else if (value.type === 'string') {
@@ -210,13 +225,6 @@ export const removeTransaction = (id, isClose) => async (dispatch, getState) => 
 			},
 		}),
 	]));
-
-	// if (!transactions.size && isClose) {
-	// 	closePopup();
-	// 	history.push(INDEX_PATH);
-	// } else if (transactions.size) {
-	// 	dispatch(setTransaction(transactions.get(0)));
-	// }
 };
 
 /**
@@ -404,45 +412,6 @@ export const loadRequests = () => async (dispatch) => {
 };
 
 /**
- *  @method approveTransaction
- *
- * 	Approve transaction
- *
- * 	@param {Object} transaction
- */
-export const approveTransaction = (transaction) => async (dispatch, getState) => {
-	const emitter = echoService.getEmitter();
-
-	try {
-		emitter.emit('response', null, transaction.get('id'), globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE ? CLOSE_STATUS : OPEN_STATUS);
-
-		emitter.emit('windowRequest', transaction.get('id'), globals.WINDOW_TYPE);
-	} catch (e) {
-		return null;
-	}
-
-	const networkName = getState().global.getIn(['network', 'name']);
-
-	globals.IS_LOADING = true;
-	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
-
-	const balances = getState().balance.get('balances');
-	const accountId = getState().global.getIn(['account', 'id']);
-
-	if (!accountId) {
-		return 'Account not available';
-	}
-
-	const balance = balances
-		.find((val) => val.get('owner') === accountId && val.get('asset_type') === transaction.get('options').fee.asset.get('id'))
-		.get('balance');
-
-	emitter.emit('trRequest', transaction.get('id'), networkName, balance, globals.WINDOW_TYPE);
-
-	return null;
-};
-
-/**
  *  @method cancelTransaction
  *
  * 	Cancel transaction
@@ -545,17 +514,6 @@ export const approve = (operations, id) => async (dispatch, getState) => {
 			networkName,
 			accountKeys[indexPublicKey][0],
 		);
-
-		// if its transfer and has memo
-		if (operations[0][1].memo) {
-			operations[0][1].memo = await echoService.getCrypto().encryptMemo(
-				networkName,
-				operations[0][1].memo.from,
-				operations[0][1].memo.to,
-				Buffer.from(operations[0][1].memo.message, 'hex').toString(),
-				operations[0][1].memo.nonce,
-			);
-		}
 
 		if (operations[0][1].from) {
 			operations[0][1].from = currentAccount.get('id');

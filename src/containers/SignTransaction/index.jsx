@@ -73,7 +73,7 @@ class SignTransaction extends React.Component {
 				switch (typeParams[key].type) {
 					case 'asset_object':
 						mapShow.push(<div className="line">
-							<div className="key">{FormatHelper.capitalize(key)}</div>
+							<div className="key">{FormatHelper.formatOperationKey(key)}</div>
 							<div className="value">
 								{
 									FormatHelper.formatAmount(
@@ -88,7 +88,7 @@ class SignTransaction extends React.Component {
 						break;
 					case 'account_id':
 						mapShow.push(<div className="line">
-							<div className="key">{FormatHelper.capitalize(key)}</div>
+							<div className="key">{FormatHelper.formatOperationKey(key)}</div>
 							<div className="value">
 								{value.name}
 							</div>
@@ -97,7 +97,7 @@ class SignTransaction extends React.Component {
 						break;
 					default:
 						mapShow.push(<div className="line">
-							<div className="key">{FormatHelper.capitalize(key === 'memo' ? 'note' : key)}</div>
+							<div className="key">{FormatHelper.formatOperationKey(key)}</div>
 							<div className="value">
 								{value}
 							</div>
@@ -110,7 +110,7 @@ class SignTransaction extends React.Component {
 
 			if (key === 'type') {
 				mapShow.unshift(<div className="line">
-					<div className="key">{FormatHelper.capitalize(key)}</div>
+					<div className="key">{FormatHelper.formatOperationKey(key)}</div>
 					<div className="value">
 						{operationTypes[value] ? operationTypes[value].name : value}
 					</div>
@@ -120,7 +120,7 @@ class SignTransaction extends React.Component {
 			}
 
 			mapShow.push(<div className="line">
-				<div className="key">{FormatHelper.capitalize(key)}</div>
+				<div className="key">{FormatHelper.formatOperationKey(key)}</div>
 				<div className="value">
 					{value}
 				</div>

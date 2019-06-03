@@ -52,7 +52,6 @@ class SignTransaction {
 			ref_block_prefix: tr._refBlockPrefix,
 			expiration: tr.expiration,
 			serializedSignatures,
-			memoMessage: operations[0][1].memo && operations[0][1].memo.message.toString('hex'),
 			accountId: operations[0][1].from || operations[0][1].registrar,
 		};
 	}

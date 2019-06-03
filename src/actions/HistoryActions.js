@@ -14,34 +14,6 @@ import echoService from '../services/echo';
 
 // import { isAssetsChanged } from './BalanceActions';
 
-/**
- *  @method decryptNote
- *
- * 	Decodes note for transaction details
- *
- * 	@param {String} index
- */
-export const decryptNote = (index) => async (dispatch, getState) => new Promise((resolve) => {
-
-	const networkName = getState().global.getIn(['network', 'name']);
-	const memo = getState().global.getIn(['formattedHistory', index, 'content', 'memo']);
-
-	if (!memo) {
-		return resolve(null);
-	}
-
-	return setTimeout(async () => {
-		let note = null;
-		try {
-			note = await echoService.getCrypto().decryptMemo(networkName, memo);
-		} catch (err) {
-			return resolve(null);
-		}
-
-		return resolve(note);
-	}, 0);
-
-});
 
 /**
  *  @method formatOperation
@@ -127,10 +99,6 @@ const formatOperation = async (data, result, accountName) => {
 
 	if (type === operations.contract.value) {
 		result = result.setIn(['content', 'receiver'], data.getIn(['result', '1']));
-	}
-
-	if (type === operations.transfer.value && operation.get('memo') && operation.getIn(['memo', 'message'])) {
-		result = result.setIn(['content', 'memo'], operation.get('memo'));
 	}
 
 	return result;

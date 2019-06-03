@@ -16,9 +16,6 @@ export const operationFields = {
 			type: 'asset_object',
 			hasProperties: 'asset_id',
 		},
-		memo: {
-			field: 'message',
-		},
 	},
 	contract: {
 		fee: {
@@ -112,10 +109,6 @@ export const operationFieldsSend = {
 			type: 'asset_object',
 			required: true,
 			hasProperties: ['amount', 'asset_id'],
-		},
-		memo: {
-			type: 'string',
-			required: false,
 		},
 	},
 	[OPERATIONS_IDS.CALL_CONTRACT]: {
