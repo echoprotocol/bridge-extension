@@ -411,4 +411,124 @@ export default {
 			asset: 'amount.asset_id',
 		},
 	},
+	change_sidechain_config: {
+		value: OPERATIONS_IDS.CHANGE_SIDECHAIN_CONFIG,
+		name: 'Change sidechain config',
+		options: {
+			from: null,
+			subject: null,
+			amount: null,
+			asset: null,
+		},
+	},
+	account_address_create: {
+		value: OPERATIONS_IDS.ACCOUNT_ADDRESS_CREATE,
+		name: 'Account address create',
+		options: {
+			from: 'owner',
+			subject: null,
+			amount: null,
+			asset: null,
+		},
+	},
+	transfer_to_address: {
+		value: OPERATIONS_IDS.TRANSFER_TO_ADDRESS,
+		name: 'Transfer to address',
+		options: {
+			from: 'from',
+			subject: ['to'],
+			amount: 'amount.amount',
+			asset: 'amount.asset_id',
+		},
+	},
+	generate_eth_address: {
+		value: OPERATIONS_IDS.GENERATE_ETH_ADDRESS,
+		name: 'Generate eth address',
+		options: {
+			from: 'account',
+			subject: null,
+			amount: null,
+			asset: null,
+		},
+	},
+	create_eth_address: {
+		value: OPERATIONS_IDS.CREATE_ETH_ADDRESS,
+		name: 'Create eth address',
+		options: {
+			from: 'account',
+			subject: null,
+			amount: null,
+			asset: null,
+		},
+	},
+	deposit_eth: {
+		value: OPERATIONS_IDS.DEPOSIT_ETH,
+		name: 'Deposit eth',
+		options: {
+			from: 'committee_member_id',
+			subject: ['account', 'name'],
+			amount: 'value',
+			asset: null,
+		},
+	},
+	withdraw_eth: {
+		value: OPERATIONS_IDS.WITHDRAW_ETH,
+		name: 'Withdraw eth',
+		options: {
+			from: 'account',
+			subject: ['eth_addr'],
+			amount: 'value',
+			asset: null,
+		},
+	},
+	approve_withdraw_eth: {
+		value: OPERATIONS_IDS.APPROVE_WITHDRAW_ETH,
+		name: 'Approve withdraw eth',
+		options: {
+			from: 'committee_member_id',
+			subject: ['withdraw_id'],
+			amount: null,
+			asset: null,
+		},
+	},
+	contract_fund_pool: {
+		value: OPERATIONS_IDS.CONTRACT_FUND_POOL,
+		name: 'Contract fund pool',
+		options: {
+			from: 'registrar',
+			subject: ['contract_to_modify'],
+			amount: null,
+			asset: 'fee',
+		},
+	},
+	contract_whitelist: {
+		value: OPERATIONS_IDS.CONTRACT_WHITELIST,
+		name: 'Contract whitelist',
+		options: {
+			from: 'sender',
+			subject: ['callee'],
+			amount: 'value',
+			asset: 'fee',
+		},
+	},
+	sidechain_issue: {
+		value: OPERATIONS_IDS.SIDECHAIN_ISSUE,
+		name: 'Sidechain issue',
+		options: {
+			from: 'account',
+			subject: ['deposit_id'],
+			amount: 'value',
+			asset: 'fee',
+		},
+	},
+	sidechain_burn: {
+		value: OPERATIONS_IDS.SIDECHAIN_BURN,
+		name: 'Sidechain burn',
+		options: {
+			from: 'account',
+			subject: ['withdraw_id'],
+			amount: 'value',
+			asset: 'fee',
+		},
+	},
 };

@@ -144,6 +144,7 @@ export const operationKeys = {
 	createAccount: 'registrar',
 	updateAccount: 'account',
 	upgradeAccount: 'account_to_upgrade',
+	[OPERATIONS_IDS.CALL_CONTRACT]: 'registrar',
 };
 
 export const operationTypes = {

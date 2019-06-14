@@ -252,7 +252,8 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 				return false;
 			}
 		} else {
-			const precision = getState().balance.getIn(['tokens', selectedBalance, 'precision']);
+			const activeUser = getState().global.getIn(['account']);
+			const precision = getState().balance.getIn(['tokens', activeUser.get('id'), selectedBalance, 'precision']);
 			const code = getTransferCode(toAccount.id, new BN(amount).times(10 ** precision));
 			const receiver = await echoService.getChainLib().api.getObject(selectedBalance);
 			options = {
