@@ -109,8 +109,6 @@ export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 
 
 export const TIMEOUT = 2 * 60 * 1000;
 export const RANDOM_SIZE = 2048;
-export const RANDOM_ECHORANDKEY_SIZE = 32;
-export const ECHORANDKEY_SIZE = 47;
 export const OWNER_KEY = 'owner';
 export const ACTIVE_KEY = 'active';
 export const MEMO_KEY = 'memo';
@@ -153,4 +151,3 @@ export const SCRYPT_ALGORITHM_PARAMS = {
 };
 export const ALGORITHM_IV_BYTES_LENGTH = 16;
 export const STORE = 'keyval';
-

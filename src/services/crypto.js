@@ -9,7 +9,7 @@ import storage from './storage';
 import {
 	RANDOM_SIZE,
 	ACTIVE_KEY, MEMO_KEY,
-	ECHORANDKEY_SIZE, STORE,
+	STORE,
 } from '../constants/GlobalConstants';
 
 const privateAES = new AesStorage();
@@ -181,13 +181,9 @@ class Crypto extends EventEmitter {
 	 */
 	generateEchoRandKey() {
 		privateAES.required();
+
 		const EchoRandKeyBuffer = ED25519.createKeyPair();
-		const echoRandPublicKey = EchoRandKeyBuffer.publicKey;
-		const echoRandKey = `DET${bs58.encode(echoRandPublicKey)}`;
-		if (echoRandKey.length !== ECHORANDKEY_SIZE) {
-			return this.generateEchoRandKey();
-		}
-		return echoRandKey;
+		return `ECHO${bs58.encode(EchoRandKeyBuffer.publicKey)}`;
 	}
 
 	/**
