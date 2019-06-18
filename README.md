@@ -44,7 +44,12 @@ window.onload = () => {
     }
 };  
 ```  
-Callback will be called, when network will be changed in extension.  
+Callback will be called, when network will be changed in extension.
+
+Subscribe to change active account. Callback will be triggered when active account is changed
+```javascript
+echojslib.extension.subscribeSwitchAccount((account) => console.log(account))
+```
 ## Sign transaction with Bridge  
 
 ### Transfer  
