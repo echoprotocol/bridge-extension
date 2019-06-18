@@ -12,6 +12,7 @@ import {
 const requestQueue = [];
 
 const networkSubscribers = [];
+const accountSubscribers = [];
 
 
 /**
@@ -33,6 +34,24 @@ const networkSubscription = () => {
 
 	window.postMessage({
 		method: 'networkSubscribe', target: 'content', appId: APP_ID, id,
+	}, '*');
+};
+
+const accountSubscription = () => {
+	const id = Date.now();
+
+	const callback = ({ data }) => {
+		/**
+		 *  call all subscribers and repost subscription
+		 */
+		accountSubscribers.forEach((cb) => cb(data.res));
+		accountSubscription();
+	};
+
+	requestQueue.push({ id, cb: callback });
+
+	window.postMessage({
+		method: 'accountSubscribe', target: 'content', appId: APP_ID, id,
 	}, '*');
 };
 
@@ -101,6 +120,39 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 	return result;
 };
 
+const subscribeSwitchAccount = (subscriberCb) => {
+	const id = Date.now();
+	const result = new Promise((resolve, reject) => {
+		if (!lodash.isFunction(subscriberCb)) {
+			reject(new Error('Is not a function'));
+			return;
+		}
+
+		const callback = ({ data }) => {
+			if (data.error) {
+				reject(data.error);
+				return;
+			}
+
+			resolve();
+
+			if (!accountSubscribers.length) {
+				accountSubscription();
+			}
+
+			accountSubscribers.push(subscriberCb);
+			subscriberCb(data.res.find((account) => account.active));
+		};
+
+		requestQueue.push({ id, cb: callback });
+
+		window.postMessage({
+			method: 'accounts', target: 'content', appId: APP_ID, id,
+		}, '*');
+	});
+
+	return result;
+};
 
 echojslib.echo = echojslib.default;
 
@@ -345,6 +397,7 @@ const extension = {
 	sendTransaction: (data) => sendTransaction(data),
 	getCurrentNetwork: () => getCurrentNetwork(),
 	subscribeSwitchNetwork: (subscriberCb) => subscribeSwitchNetwork(subscriberCb),
+	subscribeSwitchAccount: (subscriberCb) => subscribeSwitchAccount(subscriberCb),
 	getAccess: () => getAccess(),
 	proofOfAuthority: (message, accountId) => proofOfAuthority(message, accountId),
 };

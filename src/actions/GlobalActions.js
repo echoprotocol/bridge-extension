@@ -264,7 +264,7 @@ export const isAccountAdded = (name) => (dispatch, getState) => {
  *  @param {String?} path
  */
 export const addAccount = (name, keys, networkName, path) => async (dispatch, getState) => {
-
+	const emitter = echoService.getEmitter();
 	storage.remove('account');
 
 	try {
@@ -291,6 +291,11 @@ export const addAccount = (name, keys, networkName, path) => async (dispatch, ge
 
 		dispatch(set('accounts', accounts));
 		await dispatch(initAccount({ name, icon, iconColor }));
+
+		emitter.emit('activeAccountResponse', {
+			id: account.id, active: true, icon, iconColor, name, keys,
+		});
+
 		if (path) {
 			history.push(path);
 		}
@@ -334,6 +339,7 @@ export const removeAccount = (name) => {
  */
 export const onLogout = (name) => async (dispatch, getState) => {
 
+	const emitter = echoService.getEmitter();
 	const accountName = getState().global.getIn(['account', 'name']);
 	const networkName = getState().global.getIn(['network', 'name']);
 	let accounts = getState().global.get('accounts');
@@ -371,7 +377,9 @@ export const onLogout = (name) => async (dispatch, getState) => {
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
 		dispatch(set('accounts', accounts));
 
-		dispatch(initAccount(accounts.getIn([networkName, 0])));
+		await dispatch(initAccount(accounts.getIn([networkName, 0])));
+
+		emitter.emit('activeAccountResponse', accounts.getIn([networkName, 0]));
 		history.push(CREATE_ACCOUNT_PATH);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
@@ -388,6 +396,7 @@ export const onLogout = (name) => async (dispatch, getState) => {
  * 	@param {String} name
  */
 export const switchAccount = (name) => async (dispatch, getState) => {
+	const emitter = echoService.getEmitter();
 	const networkName = getState().global.getIn(['network', 'name']);
 	let accounts = getState().global.get('accounts');
 	accounts = accounts.set(
@@ -399,7 +408,10 @@ export const switchAccount = (name) => async (dispatch, getState) => {
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
 		dispatch(set('accounts', accounts));
 
-		dispatch(initAccount(accounts.get(networkName).find((i) => i.active)));
+		const account = accounts.get(networkName).find((i) => i.active);
+		await dispatch(initAccount(account));
+
+		emitter.emit('activeAccountResponse', account);
 
 		history.push(WALLET_PATH);
 	} catch (err) {

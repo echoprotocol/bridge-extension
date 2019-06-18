@@ -116,6 +116,7 @@ class Listeners {
 	initBackgroundListeners(
 		createAccount, onResponse, onSend, onSwitchNetwork,
 		trSignResponse, onProviderApproval, onSignMessageApproval,
+		onSwitchActiveAccount,
 	) {
 		this.emitter.on('createAccount', createAccount);
 		this.emitter.on('response', onResponse);
@@ -124,6 +125,7 @@ class Listeners {
 		this.emitter.on('trSignResponse', trSignResponse);
 		this.emitter.on('providerResponse', onProviderApproval);
 		this.emitter.on('signMessageResponse', onSignMessageApproval);
+		this.emitter.on('activeAccountResponse', onSwitchActiveAccount);
 	}
 
 }

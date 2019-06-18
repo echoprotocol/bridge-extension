@@ -57,6 +57,7 @@ const accountsRequests = [];
 
 let requestQueue = [];
 const networkSubscribers = [];
+const activeAccountSubscribers = [];
 
 const processedOrigins = [];
 let providerRequests = [];
@@ -325,6 +326,11 @@ const onMessage = (request, sender, sendResponse) => {
 		return true;
 	}
 
+	if (request.method === 'accountSubscribe') {
+		activeAccountSubscribers.push({ id: request.id, cb: sendResponse });
+		return true;
+	}
+
 	if (!request.id) return false;
 
 	const { id } = request;
@@ -371,7 +377,6 @@ const onMessage = (request, sender, sendResponse) => {
 
 	return true;
 };
-
 
 const onPinUnlock = () => {
 	if (lastRequestType === 'accounts') {
@@ -590,6 +595,17 @@ export const onSwitchNetwork = async (network) => {
 
 };
 
+
+const onSwitchActiveAccount = (res) => {
+	activeAccountSubscribers.forEach(({ id, cb }) => {
+		try {
+			cb({ id, res });
+		} catch (error) {
+			console.warn('Switch account callback error', error);
+		}
+	});
+};
+
 /**
  *  @method onProviderApproval
  *
@@ -680,6 +696,7 @@ listeners.initBackgroundListeners(
 	trSignResponse,
 	onProviderApproval,
 	onSignMessageApproval,
+	onSwitchActiveAccount,
 );
 
 createSocket();
