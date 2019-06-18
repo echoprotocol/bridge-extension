@@ -38,6 +38,7 @@ import {
 	NETWORK_ERROR_SEND_PATH,
 } from '../constants/RouterConstants';
 import { FORM_ADD_NETWORK, FORM_SIGN_UP } from '../constants/FormConstants';
+import { SIGN_MEASSAGE_CANCELED } from '../constants/ErrorsConstants';
 
 import storage from '../services/storage';
 import BalanceReducer from '../reducers/BalanceReducer';
@@ -91,6 +92,48 @@ export const deleteIn = (field, params) => (dispatch) => {
 	dispatch(GlobalReducer.actions.deleteIn({ field, params }));
 };
 
+
+/**
+ *  @method loadSignMessageRequests
+ *
+ * 	Load sign message requests
+ *
+ */
+export const loadSignMessageRequests = () => (dispatch) => {
+	const requests = new Map(echoService.getSignMessageRequests());
+
+	if (!requests.size) {
+		return;
+	}
+
+	dispatch(set('signMessageRequests', requests));
+};
+/**
+ *  @method signMessageRequest
+ *
+ * 	Add new sign message request
+ *
+ */
+export const addSignMessageRequest = (id, origin, signer, message) => (dispatch) => {
+	dispatch(setIn('signMessageRequests', { [id]: { origin, signer, message } }));
+};
+
+/**
+ *  @method removeSignMessageRequest
+ *
+ * 	Remove sign message request
+ *
+ */
+export const removeSignMessageRequest = (id) => (dispatch) => {
+	const requests = new Map(echoService.getSignMessageRequests());
+	if (!requests.size) {
+		history.push(INDEX_PATH);
+	}
+	dispatch(deleteIn('signMessageRequests', [id]));
+
+};
+
+
 /**
  *  @method loadProviderRequests
  *
@@ -99,7 +142,6 @@ export const deleteIn = (field, params) => (dispatch) => {
  */
 export const loadProviderRequests = () => (dispatch) => {
 	const requests = new Map(echoService.getProviderRequests());
-
 	if (!requests.size) {
 		return;
 	}
@@ -117,6 +159,7 @@ export const addProviderRequest = (id, origin) => (dispatch) => {
 	dispatch(setIn('providerRequests', { [id]: origin }));
 };
 
+
 /**
  *  @method removeProviderRequest
  *
@@ -125,7 +168,6 @@ export const addProviderRequest = (id, origin) => (dispatch) => {
  */
 export const removeProviderRequest = (id) => (dispatch) => {
 	dispatch(deleteIn('providerRequests', [id]));
-
 	const requests = new Map(echoService.getProviderRequests());
 
 	if (!requests.size) {
@@ -146,6 +188,25 @@ export const chooseProviderAccess = (id, status) => (dispatch) => {
 
 	try {
 		emitter.emit('providerResponse', null, id, status);
+	} catch (err) {
+		dispatch(set('error', FormatHelper.formatError(err)));
+	}
+};
+
+/**
+ *  @method chooseSignMessageResponse
+ *
+ * 	Choose provider access
+ *
+ * 	@param {String} id
+ * 	@param {Boolean} status
+ */
+export const chooseSignMessageResponse = (id, status, message, signer) => (dispatch) => {
+	const emitter = echoService.getEmitter();
+
+	try {
+		const error = status ? null : SIGN_MEASSAGE_CANCELED;
+		emitter.emit('signMessageResponse', error, id, status, message, signer);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
@@ -428,7 +489,10 @@ export const loadInfo = () => async (dispatch, getState) => {
 		}
 
 		await dispatch(loadRequests());
+
 		dispatch(loadProviderRequests());
+		dispatch(loadSignMessageRequests());
+
 	} catch (err) {
 		console.warn('Global loading information error', err);
 	}
@@ -570,7 +634,6 @@ export const deleteNetwork = (network) => async (dispatch, getState) => {
 				name: currentNetwork.get('name'),
 				url: currentNetwork.get('url'),
 			});
-
 			await dispatch(loadInfo());
 		}
 

@@ -57,6 +57,8 @@ export const INDEX_PATH = WALLET_PATH;
 
 export const INCOMING_CONNECTION_PATH = '/incoming-connection';
 
+export const SIGN_MESSAGE_PATH = '/sign-message';
+
 export const PIN_PATHS = [
 	CREATE_PIN_PATH,
 	UNLOCK_PATH,

@@ -272,6 +272,20 @@
 			<div id="upgradeAccount-info"></div>
 		</div>
 		<!---->
+		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
+			<h4>Sign message</h4>
+			<div style="padding: 5px 0;">
+				<input
+						type="text"
+						id="signMessage-account"
+						name="signMessage-account"
+						placeholder="account"
+						value="1.2.37"
+				/>
+				<button id="signMessage-click">sign message</button>
+				<div id="signMessage-info"></div>
+			</div>
+		</div>
 	</body>
 	<script>
 		window.onload = () => {
@@ -320,7 +334,6 @@
 				}
 
 				const tr = window.echojslib.echo.createTransaction();
-
 				const trSign = {
 					from: transaction.from,
 					to: transaction.to,
@@ -574,7 +587,29 @@
 							);
 						});
 			});
+
+			$("#signMessage-click").click(function (e) {
+				echojslib.extension.getAccess()
+				.then(function(access){
+					if(access) {
+						echojslib.extension.proofOfAuthority('This is example message!', jQuery("#signMessage-account")[0].value)
+							.then(res => {
+								jQuery("#signMessage-info").html(
+										`<p>Signature: ${JSON.stringify(res)}</p>`
+								);
+							})
+							.catch(err => {
+								jQuery("#signMessage-info").html(
+										`<p>${err}</p>`
+								);
+								console.log('result: ', err);
+							});
+					}
+				})
+				.catch(function(err){
+					console.log('error:' , err);
+				});
+			});
 		});
 	</script>
 </html>
-

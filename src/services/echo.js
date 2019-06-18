@@ -41,6 +41,10 @@ class Echo {
 		return EXTENSION ? extension.extension.getBackgroundPage().getProviderMap() : {};
 	}
 
+	static getSignMessageRequests() {
+		return EXTENSION ? extension.extension.getBackgroundPage().getSignMessageMap() : {};
+	}
+
 }
 
 export default Echo;

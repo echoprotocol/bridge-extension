@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import echo, { Transaction, PrivateKey, aes } from 'echojs-lib';
+import echo, { Transaction, PrivateKey, aes, ED25519 } from 'echojs-lib';
 import { throttle } from 'lodash';
 import urlParse from 'url-parse';
 
@@ -42,6 +42,7 @@ import {
 	NETWORK_ERROR_SEND_PATH,
 	SUCCESS_SEND_INDEX_PATH,
 	INCOMING_CONNECTION_PATH,
+	SIGN_MESSAGE_PATH,
 } from '../src/constants/RouterConstants';
 
 import { FORM_SIGN_UP, FORM_SEND } from '../src/constants/FormConstants';
@@ -59,7 +60,9 @@ const networkSubscribers = [];
 
 const processedOrigins = [];
 let providerRequests = [];
+let signMessageRequests = [];
 const providerNotification = new NotificationManager();
+const signNotification = new NotificationManager();
 
 const connectSubscribe = (status) => {
 	try {
@@ -168,7 +171,7 @@ const closePopup = (manager = notificationManager) => {
  * Set count of requests
  */
 const setBadge = () => {
-	const length = requestQueue.length + providerRequests.length;
+	const length = requestQueue.length + providerRequests.length + signMessageRequests.length;
 	const text = length === 0 ? 'BETA' : (length > 9 ? '9+' : length.toString());
 	extensionizer.browserAction.setBadgeText({ text });
 };
@@ -263,6 +266,7 @@ const onMessage = (request, sender, sendResponse) => {
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
 	if (typeof processedOrigins[hostname] !== 'boolean') {
+
 		if (request.method !== 'getAccess') {
 			sendResponse({ id: request.id, error: 'No access' });
 			return true;
@@ -293,6 +297,26 @@ const onMessage = (request, sender, sendResponse) => {
 		getNetwork().then((result) => {
 			sendResponse(({ id: request.id, res: JSON.parse(JSON.stringify(result)) }));
 		});
+		return true;
+	}
+
+	if (request.method === 'proofOfAuthority') {
+
+		signMessageRequests.push({
+			origin: hostname,
+			id: request.id,
+			message: request.data.message,
+			signer: request.data.accountId,
+			cb: sendResponse,
+		});
+
+		setBadge();
+
+		try {
+			emitter.emit('addSignMessageRequest', request.id, hostname, request.data.accountId, request.data.message);
+		} catch (e) { return null; }
+
+		triggerPopup(SIGN_MESSAGE_PATH, signNotification);
 		return true;
 	}
 
@@ -598,6 +622,55 @@ export const onProviderApproval = (err, id, status) => {
 	setBadge();
 };
 
+const removeSignMessageRequest = (err, id, signature) => {
+	const request = signMessageRequests.find((r) => String(r.id) === id);
+	request.cb({ error: err, id: request.id, signature });
+
+	signMessageRequests = signMessageRequests.filter((p) => p.id !== request.id);
+	if (!signMessageRequests.length) {
+		closePopup(signNotification);
+	}
+
+	setBadge();
+
+	try {
+		emitter.emit('removeSignMessageRequest', id);
+	} catch (e) {
+		//
+	}
+};
+
+export const onSignMessageApproval = async (err, id, status, message, signer) => {
+
+	if (!status) {
+		removeSignMessageRequest(err, id);
+		return;
+	}
+
+	const network = await getNetwork();
+
+	try {
+		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		const accountIndex = accounts.findIndex((i) => i.id === signer);
+
+		if (accountIndex >= 0) {
+			const account = accounts[accountIndex];
+			const publicKey = account.keys[0];
+			const wif = await crypto.getWIFByPublicKey(network.name, publicKey);
+			const privateKeyBuffer = PrivateKey.fromWif(wif).toBuffer();
+			const publicKeyBuffer = PrivateKey.fromWif(wif).toPublicKey().toBuffer();
+
+			const signature = ED25519.signMessage(Buffer.from(message, 'utf8'), publicKeyBuffer, privateKeyBuffer);
+			const signatureHex = signature.toString('hex');
+			removeSignMessageRequest(err, id, signatureHex);
+		}
+
+	} catch (error) {
+		console.warn(error);
+	}
+};
+
+
 const listeners = new Listeners(emitter, crypto);
 listeners.initBackgroundListeners(
 	createAccount,
@@ -606,6 +679,7 @@ listeners.initBackgroundListeners(
 	onSwitchNetwork,
 	trSignResponse,
 	onProviderApproval,
+	onSignMessageApproval,
 );
 
 createSocket();
@@ -619,6 +693,17 @@ window.getAes = () => aes;
 window.Transaction = () => Transaction;
 window.getProviderMap = () => providerRequests.reduce((map, { id, origin }) => {
 	map[id] = origin;
+	return map;
+}, {});
+
+window.getSignMessageMap = () => signMessageRequests.reduce((map, {
+	id, origin, message, signer,
+}) => {
+	map[id] = {
+		origin,
+		signer,
+		message,
+	};
 	return map;
 }, {});
 

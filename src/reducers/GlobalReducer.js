@@ -39,6 +39,7 @@ const DEFAULT_FIELDS = Map({
 	formattedHistory: new OrderedMap({}),
 	signAccount: new Map({}),
 	providerRequests: new Map({}),
+	signMessageRequests: new Map({}),
 });
 
 export default createModule({

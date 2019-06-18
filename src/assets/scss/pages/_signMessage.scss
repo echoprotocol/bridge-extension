@@ -1,0 +1,34 @@
+.sign-message-wrap {
+    height: 207px;
+    background-color: rgba(255, 255, 255, 1);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+
+    .scroll-wrap-message {
+        height: 165px;
+        position: relative;
+        color: #3E4851;
+        padding: 0 8px 0 0;
+        width: 100%;
+        font-size: 14px;
+        line-height: 20px;
+    }
+    .sign-message {
+        padding: 0 40px 0 24px;
+        min-height: 165px;
+        display: flex;
+        align-items: center;
+        width: 100%;
+    }
+}
+
+.sign-message-title {
+    color: #3E4851;
+    font-size: 20px;
+    font-family: FNBook;
+    margin: 0px 0 30px 20px;
+    letter-spacing: 0.6px;
+    line-height: 28px;
+}

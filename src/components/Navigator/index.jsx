@@ -7,7 +7,12 @@ import Header from '../Header';
 import Navbar from '../Navbar';
 import BridgeSidebar from '../BridgeSidebar';
 
-import { SIGN_TRANSACTION_PATH, CONNECTION_ERROR_PATH } from '../../constants/RouterConstants';
+import {
+	SIGN_TRANSACTION_PATH,
+	CONNECTION_ERROR_PATH,
+	SIGN_MESSAGE_PATH,
+	INCOMING_CONNECTION_PATH,
+} from '../../constants/RouterConstants';
 import echoService from '../../services/echo';
 
 class Navigator extends React.Component {
@@ -56,7 +61,13 @@ class Navigator extends React.Component {
 					/>
 					<BridgeSidebar />
 				</FocusTrap>
-				{ pathname !== SIGN_TRANSACTION_PATH && pathname !== CONNECTION_ERROR_PATH && <Navbar />}
+				{
+					pathname !== SIGN_MESSAGE_PATH
+					&& pathname !== SIGN_TRANSACTION_PATH
+					&& pathname !== CONNECTION_ERROR_PATH
+					&& pathname !== INCOMING_CONNECTION_PATH
+					&& <Navbar />
+				}
 
 			</React.Fragment>
 		);

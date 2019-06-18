@@ -101,6 +101,7 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 	return result;
 };
 
+
 echojslib.echo = echojslib.default;
 
 const oldConnect = echojslib.echo.connect;
@@ -166,7 +167,6 @@ const onMessage = (event) => {
  * @returns {Promise}
  */
 const sendTransaction = (options) => {
-
 	const id = Date.now();
 	const result = new Promise((resolve, reject) => {
 		const cb = ({ data }) => {
@@ -190,6 +190,7 @@ const sendTransaction = (options) => {
 
 };
 
+
 /**
  * Get user account if unlocked
  * @returns {Promise}
@@ -209,6 +210,32 @@ const getAccounts = () => {
 		requestQueue.push({ id, cb });
 		window.postMessage({
 			method: 'accounts', id, target: 'content', appId: APP_ID,
+		}, '*');
+
+	});
+
+	return result;
+};
+
+const proofOfAuthority = (message, accountId) => {
+	const id = Date.now();
+	const result = new Promise((resolve, reject) => {
+
+		const cb = ({ data }) => {
+			if (data.error) {
+				reject(data.error);
+			} else {
+				resolve(data.signature);
+			}
+		};
+
+		requestQueue.push({ id, cb });
+		window.postMessage({
+			method: 'proofOfAuthority',
+			id,
+			data: { message, accountId },
+			target: 'content',
+			appId: APP_ID,
 		}, '*');
 
 	});
@@ -319,6 +346,7 @@ const extension = {
 	getCurrentNetwork: () => getCurrentNetwork(),
 	subscribeSwitchNetwork: (subscriberCb) => subscribeSwitchNetwork(subscriberCb),
 	getAccess: () => getAccess(),
+	proofOfAuthority: (message, accountId) => proofOfAuthority(message, accountId),
 };
 
 window._.noConflict();

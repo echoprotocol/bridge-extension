@@ -82,3 +82,27 @@ Method `addOperation(operationNumber, operationOptions)` in this example used tr
 ### Transaction examples
 
 See the [examples](./docs/examples.md) for more different transactions.
+
+## Payload signing
+In order for the user to confirm ownership of the account's private key, the extension suggests using the proofOfAuthority method. The method provides an opportunity to sign payload by account private key. Because the raw signing can potentially sign transactions or even leak its private key we have to add an extra layer of encryption. So the extension will sign payload instead of raw data.
+
+```javascript  
+/**
+* Get signature
+* @returns {Promise.<String>} signature
+*/
+await echojslib.extension.proofOfAuthority('This is example message!', '1.2.134');
+```
+
+To verifying the signature use echojs-lib.
+
+```javascript  
+import { ED25519 } from 'echojs-lib';
+import bs58 from 'bs58';
+
+const signature = Buffer.from('757a8b60f4c348e8de49f8dc56563db5d9903be41c7aad145cc8be5c6f66804c168693232c0f150ef017bc01697fc0aca5000a04ac6756d36430aeaefe518b08', 'hex');
+const message = Buffer.from('This is example message!', 'utf8');
+const publicKey = bs58.decode('ECHOJDpsaMaR9qWM2922ZYvQ3xpavsN8oeNN8zBx1VNKdQBf'.slice(4));
+
+ED25519.verifyMessage(signature, message, publicKey);
+```

@@ -14,6 +14,7 @@ import {
 	ACCOUNT_ERROR_SEND_PATH,
 	CONNECTION_ERROR_PATH,
 	INCOMING_CONNECTION_PATH,
+	SIGN_MESSAGE_PATH,
 } from '../../constants/RouterConstants';
 import { globals } from '../../actions/SignActions';
 
@@ -31,7 +32,10 @@ export function required(Component) {
 
 		check() {
 			const {
-				isLogin, isLocked, isSign, connected, loading, isProviderApproval,
+				isLogin, isLocked, isSign,
+				connected, loading,
+				isProviderApproval,
+				isSignMessage,
 			} = this.props;
 
 			const { pathname } = this.props.history.location;
@@ -43,6 +47,17 @@ export function required(Component) {
 
 			if (isLocked) {
 				this.props.history.push(UNLOCK_PATH);
+				return;
+			}
+
+			if (isSignMessage) {
+				if (
+					pathname !== SIGN_MESSAGE_PATH
+					&& globals.WINDOW_PATH !== SIGN_TRANSACTION_PATH
+				) {
+					this.props.history.push(SIGN_MESSAGE_PATH);
+				}
+
 				return;
 			}
 
@@ -85,7 +100,8 @@ export function required(Component) {
 
 		render() {
 			const {
-				isLogin, isLocked, isSign, isProviderApproval,
+				isLogin, isLocked, isSignMessage,
+				isSign, isProviderApproval,
 			} = this.props;
 			const { pathname } = this.props.history.location;
 
@@ -94,14 +110,14 @@ export function required(Component) {
 			}
 
 			if (
-				(isProviderApproval || isSign)
-				&& ![SIGN_TRANSACTION_PATH, INCOMING_CONNECTION_PATH].includes(pathname)
+				(isProviderApproval || isSign || isSignMessage)
+				&& ![SIGN_TRANSACTION_PATH, INCOMING_CONNECTION_PATH, SIGN_MESSAGE_PATH].includes(pathname)
                 && ![SUCCESS_SEND_PATH, ERROR_SEND_PATH].includes(pathname)
 			) {
 				return null;
 			}
 
-			if (!isLogin && !(isProviderApproval || isSign)) {
+			if (!isLogin && !(isProviderApproval || isSign || isSignMessage)) {
 				return null;
 			}
 
@@ -118,6 +134,7 @@ export function required(Component) {
 		isLocked: PropTypes.bool,
 		isSign: PropTypes.bool,
 		isProviderApproval: PropTypes.bool,
+		isSignMessage: PropTypes.bool,
 		dispatch: PropTypes.func.isRequired,
 	};
 
@@ -127,6 +144,7 @@ export function required(Component) {
 		isLogin: false,
 		isSign: true,
 		isProviderApproval: true,
+		isSignMessage: false,
 	};
 
 	return connect((state) => ({
@@ -134,6 +152,7 @@ export function required(Component) {
 		isLogin: !!state.global.get('account').size,
 		isSign: !!state.global.getIn(['sign', 'current']),
 		isProviderApproval: !!state.global.get('providerRequests').size,
+		isSignMessage: !!state.global.get('signMessageRequests').size,
 		connected: state.global.get('connected'),
 		loading: state.global.get('loading'),
 	}))(RequiredComponent);

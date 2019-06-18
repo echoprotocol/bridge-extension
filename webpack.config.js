@@ -45,7 +45,7 @@ module.exports = {
 		sourceMapFilename: '[name].js.map',
 		chunkFilename: '[name].bundle.js',
 	},
-	devtool: 'inline-source-map',//process.env.NODE_ENV !== 'local' ? 'cheap-module-source-map' : 'eval',
+	devtool: 'inline-source-map', // process.env.NODE_ENV !== 'local' ? 'cheap-module-source-map' : 'eval',
 	module: {
 		rules: [
 			{

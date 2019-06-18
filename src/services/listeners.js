@@ -2,7 +2,15 @@ import echoService from './echo';
 
 import { requestHandler, signTr, trResponseHandler, windowRequestHandler } from '../actions/SignActions';
 import { sendHandler } from '../actions/BalanceActions';
-import { onLogout, addAccount, addProviderRequest, addAccountError, removeProviderRequest } from '../actions/GlobalActions';
+import {
+	onLogout,
+	addAccount,
+	addAccountError,
+	addProviderRequest,
+	removeProviderRequest,
+	addSignMessageRequest,
+	removeSignMessageRequest,
+} from '../actions/GlobalActions';
 import { getCrypto, lockResponse, unlockResponse } from '../actions/CryptoActions';
 
 import { offerName } from '../actions/AuthActions';
@@ -42,6 +50,12 @@ class Listeners {
 		this.addAccountError = (error) => dispatch(addAccountError(error));
 
 		this.addProviderRequestHandler = (id, origin) => dispatch(addProviderRequest(id, origin));
+
+		this.addSignMessageRequestHandler =
+			(id, origin, signer, message) => dispatch(addSignMessageRequest(id, origin, signer, message));
+
+		this.removeSignMessageRequestHandler = (id) => dispatch(removeSignMessageRequest(id));
+
 		this.removeProviderRequestHandler = (id) => dispatch(removeProviderRequest(id));
 
 		this.emitter.on('windowRequest', this.windowRequestHandler);
@@ -50,6 +64,10 @@ class Listeners {
 
 		this.emitter.on('addProviderRequest', this.addProviderRequestHandler);
 		this.emitter.on('removeProviderRequest', this.removeProviderRequestHandler);
+
+		this.emitter.on('addSignMessageRequest', this.addSignMessageRequestHandler);
+		this.emitter.on('removeSignMessageRequest', this.removeSignMessageRequestHandler);
+
 
 		this.emitter.on('sendResponse', this.sendHandler);
 		this.emitter.on('logout', this.onLogout);
@@ -88,6 +106,8 @@ class Listeners {
 
 		this.emitter.removeListener('addProviderRequest', this.addProviderRequestHandler);
 		this.emitter.removeListener('removeProviderRequest', this.removeProviderRequestHandler);
+		this.emitter.removeListener('addSignMessageRequest', this.addSignMessageRequestHandler);
+		this.emitter.removeListener('removeSignMessageRequest', this.removeSignMessageRequestHandler);
 
 		this.crypto.removeListener('locked', this.lockResponse);
 		this.crypto.removeListener('unlocked', this.unlockResponse);
@@ -95,7 +115,7 @@ class Listeners {
 
 	initBackgroundListeners(
 		createAccount, onResponse, onSend, onSwitchNetwork,
-		trSignResponse, onProviderApproval,
+		trSignResponse, onProviderApproval, onSignMessageApproval,
 	) {
 		this.emitter.on('createAccount', createAccount);
 		this.emitter.on('response', onResponse);
@@ -103,6 +123,7 @@ class Listeners {
 		this.emitter.on('switchNetwork', onSwitchNetwork);
 		this.emitter.on('trSignResponse', trSignResponse);
 		this.emitter.on('providerResponse', onProviderApproval);
+		this.emitter.on('signMessageResponse', onSignMessageApproval);
 	}
 
 }

@@ -94,7 +94,6 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 		await crypto.unlock(pin);
 
 		dispatch(changeCrypto({ isLocked: false }));
-
 		await dispatch(loadInfo());
 
 		if (
@@ -120,7 +119,6 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
  */
 export const unlockResponse = () => async (dispatch) => {
 	dispatch(changeCrypto({ isLocked: false }));
-
 	await dispatch(loadInfo());
 
 	if (
