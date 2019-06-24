@@ -18,7 +18,7 @@
     "96": "images/96.png",
     "128": "images/128.png"
   },
-  "version": "1.9.0",
+  "version": "1.9.1",
   "background": {
     "scripts": [
       "background.js"
