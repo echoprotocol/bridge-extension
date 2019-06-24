@@ -282,7 +282,8 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 			return false;
 		}
 
-		dispatch(setFormValue(FORM_SEND, 'fee', resultFee.amount / (10 ** options.fee.asset.get('precision'))));
+		const precision = new BN(10).pow(options.fee.asset.get('precision'));
+		dispatch(setFormValue(FORM_SEND, 'fee', new BN(resultFee.amount).div(precision).toString(10)));
 	} catch (err) {
 		console.warn(err);
 	}

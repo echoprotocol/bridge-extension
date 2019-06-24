@@ -495,9 +495,9 @@ export default {
 		value: OPERATIONS_IDS.CONTRACT_FUND_POOL,
 		name: 'Contract fund pool',
 		options: {
-			from: 'registrar',
-			subject: ['contract_to_modify'],
-			amount: null,
+			from: 'sender',
+			subject: ['contract'],
+			amount: 'value',
 			asset: 'fee',
 		},
 	},
@@ -506,7 +506,7 @@ export default {
 		name: 'Contract whitelist',
 		options: {
 			from: 'sender',
-			subject: ['callee'],
+			subject: ['contract'],
 			amount: 'value',
 			asset: 'fee',
 		},
@@ -528,6 +528,56 @@ export default {
 			from: 'account',
 			subject: ['withdraw_id'],
 			amount: 'value',
+			asset: 'fee',
+		},
+	},
+	register_erc20_token: {
+		value: OPERATIONS_IDS.REGISTER_ERC20_TOKEN,
+		name: 'Register ERC20 token',
+		options: {
+			from: 'account',
+			subject: ['eth_addr'],
+			amount: null,
+			asset: 'fee',
+		},
+	},
+	deposit_erc20_token: {
+		value: OPERATIONS_IDS.DEPOSIT_ERC20_TOKEN,
+		name: 'Deposit ERC20 token',
+		options: {
+			from: 'account',
+			subject: ['erc20_token_addr'],
+			amount: 'value',
+			asset: 'fee',
+		},
+	},
+	withdraw_erc20_token: {
+		value: OPERATIONS_IDS.WITHDRAW_ERC20_TOKEN,
+		name: 'Withdraw ERC20 token',
+		options: {
+			from: 'account',
+			subject: ['to'],
+			amount: 'value',
+			asset: 'fee',
+		},
+	},
+	approve_erc20_token_withdraw: {
+		value: OPERATIONS_IDS.APPROVE_ERC20_TOKEN_WITHDRAW,
+		name: 'Approve ERC20 token withdraw',
+		options: {
+			from: 'account',
+			subject: ['to'],
+			amount: 'value',
+			asset: 'fee',
+		},
+	},
+	contract_update: {
+		value: OPERATIONS_IDS.CONTRACT_UPDATE,
+		name: 'Contract update',
+		options: {
+			from: 'sender',
+			subject: ['contract'],
+			amount: null,
 			asset: 'fee',
 		},
 	},
