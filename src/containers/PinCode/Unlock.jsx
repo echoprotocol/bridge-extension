@@ -69,7 +69,8 @@ class Unlock extends React.Component {
 		}
 	}
 
-	goBack() {
+	goBack(e) {
+		e.preventDefault();
 		this.props.unlockAccount();
 		this.props.history.go(-2);
 	}
@@ -82,7 +83,7 @@ class Unlock extends React.Component {
 			<div className="page-wrap">
 				{goTo === BACKUP_PATH &&
 					<div className="return-block transparent absolute">
-						<Link to="" className="link-return green" onClick={() => this.goBack()}>
+						<Link to="" className="link-return green" onClick={(e) => this.goBack(e)}>
 							<img src={arrowLeft} alt="" />
 							<span className="link-text">Return</span>
 						</Link>
