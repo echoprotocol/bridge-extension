@@ -625,7 +625,7 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
 		if (tokens) {
 			const isExists = Object.entries(tokens).find(([accId, tokensArr]) => {
 				if (accId === accountId) {
-					return !!tokensArr.find((id) => id.includes(contractId.split('.')[2]));
+					return !!tokensArr.find((id) => id === contractId.split('.')[2]);
 				}
 
 				return false;
