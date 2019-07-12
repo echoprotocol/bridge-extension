@@ -237,7 +237,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 
 			options = {
 				amount: {
-					amount: amount * (10 ** amountAsset.get('precision')),
+					amount: new BN(amount).times(new BN(10).pow(amountAsset.get('precision'))),
 					asset: amountAsset,
 				},
 				fee: {
@@ -418,30 +418,32 @@ export const send = () => async (dispatch, getState) => {
 		return false;
 	}
 
-	if (!isToken) {
-		if (options.amount.asset.get('id') === options.fee.asset.get('id')) {
-			const total = new BN(amount).times(10 ** options.amount.asset.get('precision')).plus(options.fee.amount);
+	const feePrecision = new BN(10).pow(options.fee.asset.get('precision'));
+	const feeAmount = new BN(options.fee.amount).times(feePrecision);
 
-			if (total.gt(balances.getIn([selectedBalance, 'balance']))) {
-				dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
-				return false;
-			}
-		} else {
-			const feeBalance = balances.find((val) => val.get('asset_type') === options.fee.asset.get('id')).get('balance');
+	if (!isToken && options.amount.asset.get('id') === options.fee.asset.get('id')) {
+		const totalAmount = new BN(amount).times(feePrecision).plus(feeAmount);
 
-			if (new BN(fee.value).gt(feeBalance)) {
-				dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
-				return false;
-			}
+		if (totalAmount.gt(balances.getIn([selectedBalance, 'balance']))) {
+			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
+			return false;
+		}
+	} else {
+		const feeBalance = balances.find((val) => val.get('asset_type') === options.fee.asset.get('id')).get('balance');
+
+		if (feeAmount.gt(feeBalance)) {
+			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
+			return false;
 		}
 	}
 
+	options.fee.amount = feeAmount.toString();
+
 	if (isToken) {
 		options.value.amount = 0;
-		options.fee.amount *= 10 ** options.fee.asset.get('precision');
 	} else {
-		options.amount.amount = parseInt(options.amount.amount * (10 ** options.amount.asset.get('precision')), 10);
-		options.fee.amount *= 10 ** options.fee.asset.get('precision');
+		const precision = new BN(10).pow(options.amount.asset.get('precision'));
+		options.amount.amount = new BN(amount).times(precision).integerValue(BN.ROUND_UP).toString();
 	}
 
 	const activeNetworkName = getState().global.getIn(['network', 'name']);
