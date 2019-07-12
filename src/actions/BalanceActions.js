@@ -297,6 +297,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
  * 	Transfer transaction
  */
 export const send = () => async (dispatch, getState) => {
+	dispatch(setValue(FORM_SEND, 'validating', true));
 
 	const form = getState().form.get(FORM_SEND);
 
@@ -429,7 +430,9 @@ export const send = () => async (dispatch, getState) => {
 			return false;
 		}
 	} else {
-		const feeBalance = balances.find((val) => val.get('asset_type') === options.fee.asset.get('id')).get('balance');
+		const feeBalance = balances
+			.find((val) => val.get('asset_type') === options.fee.asset.get('id') && val.get('owner') === fromAccount.id)
+			.get('balance');
 
 		if (feeAmount.gt(feeBalance)) {
 			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
@@ -448,6 +451,8 @@ export const send = () => async (dispatch, getState) => {
 
 	const activeNetworkName = getState().global.getIn(['network', 'name']);
 
+
+	dispatch(setValue(FORM_SEND, 'validating', false));
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: true }));
 
 	await storageRemoveDraft();
@@ -474,6 +479,7 @@ export const sendHandler = (path) => (dispatch, getState) => {
 		history.push(path);
 	}
 
+	dispatch(setValue(FORM_SEND, 'validating', false));
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
 };
 

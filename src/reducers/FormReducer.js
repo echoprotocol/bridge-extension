@@ -60,6 +60,7 @@ const DEFAULT_FORM_FIELDS = {
 			value: '',
 			error: null,
 		},
+		validating: false,
 	}),
 	[FORM_WATCH_TOKEN]: Map({
 		contractId: {

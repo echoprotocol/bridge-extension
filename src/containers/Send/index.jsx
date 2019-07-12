@@ -179,11 +179,11 @@ class Send extends React.Component {
 	}
 
 	onKeyPress(e) {
-		const { to, amount } = this.props;
+		const { to, amount, validating } = this.props;
 
 		const code = e.keyCode || e.which;
 
-		if (KEY_CODE_ENTER === code && to.value && amount.value) {
+		if (KEY_CODE_ENTER === code && to.value && amount.value && !validating) {
 			this.props.send();
 		}
 	}
@@ -208,7 +208,7 @@ class Send extends React.Component {
 
 	render() {
 		const {
-			to, amount, fee, account, loading, balances, assets, tokens,
+			to, amount, fee, account, loading, balances, assets, tokens, validating,
 		} = this.props;
 
 		if (!account) {
@@ -308,13 +308,14 @@ class Send extends React.Component {
 								/>
 							</div>
 							<Button
-								className={classnames('btn-in-light', { loading })}
+								className={classnames('btn-in-light', { loading: loading || validating })}
 								disabled={(
 									!to.value
 									|| !amount.value
 									|| !!fee.error
 									|| !!amount.error
 									|| loading
+									|| validating
 								)}
 								content={<span className="btn-text">Send</span>}
 								onClick={() => this.onSend()}
@@ -331,6 +332,7 @@ class Send extends React.Component {
 
 Send.propTypes = {
 	loading: PropTypes.bool,
+	validating: PropTypes.bool,
 	account: PropTypes.object,
 	to: PropTypes.object.isRequired,
 	amount: PropTypes.object.isRequired,
@@ -350,6 +352,7 @@ Send.propTypes = {
 Send.defaultProps = {
 	account: null,
 	loading: false,
+	validating: false,
 	selectedBalance: '1.3.0',
 };
 
@@ -359,6 +362,7 @@ export default connect(
 		to: state.form.getIn([FORM_SEND, 'to']),
 		amount: state.form.getIn([FORM_SEND, 'amount']),
 		fee: state.form.getIn([FORM_SEND, 'fee']),
+		validating: state.form.getIn([FORM_SEND, 'validating']),
 		selectedBalance: state.form.getIn([FORM_SEND, 'selectedBalance']),
 		selectedFeeBalance: state.form.getIn([FORM_SEND, 'selectedFeeBalance']),
 		balances: state.balance.get('balances'),
