@@ -399,11 +399,14 @@ export const send = () => async (dispatch, getState) => {
 	}
 
 	if (!options.fee.amount) {
-		options.fee = await dispatch(getTransactionFee(options));
+		const resultFee = await dispatch(getTransactionFee(options));
 
-		if (!options.fee) {
+		if (!resultFee) {
 			return false;
 		}
+
+		const precision = new BN(10).pow(options.fee.asset.get('precision'));
+		options.fee.amount = new BN(resultFee.amount).div(precision).toString(10);
 	}
 
 	if (!checkFeePool(assets.get(CORE_ID), options.fee.asset, options.fee.amount)) {
