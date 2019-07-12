@@ -254,7 +254,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 		} else {
 			const activeUser = getState().global.getIn(['account']);
 			const precision = getState().balance.getIn(['tokens', activeUser.get('id'), selectedBalance, 'precision']);
-			const code = getTransferCode(toAccount.id, new BN(amount).times(10 ** precision));
+			const code = getTransferCode(toAccount.id, new BN(amount).times(new BN(10).pow(precision)));
 			const receiver = await echoService.getChainLib().api.getObject(selectedBalance);
 			options = {
 				code,
@@ -356,7 +356,7 @@ export const send = () => async (dispatch, getState) => {
 	let options = {};
 
 	if (isToken) {
-		const code = getTransferCode(toAccount.id, new BN(amount).times(10 ** token.get('precision')));
+		const code = getTransferCode(toAccount.id, new BN(amount).times(new BN(10).pow(token.get('precision'))));
 		const receiver = await echoService.getChainLib().api.getObject(selectedBalance);
 		let coreAsset = assets.get(balances.getIn([selectedFeeBalance, 'asset_type']));
 
