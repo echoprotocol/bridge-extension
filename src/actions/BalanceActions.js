@@ -307,6 +307,7 @@ export const send = () => async (dispatch, getState) => {
 	const fee = form.get('fee');
 
 	if (to.error || form.get('amount').error || fee.error) {
+		dispatch(setValue(FORM_SEND, 'validating', false));
 		return false;
 	}
 
@@ -341,12 +342,14 @@ export const send = () => async (dispatch, getState) => {
 
 	if (amountError) {
 		dispatch(setFormError(FORM_SEND, 'amount', amountError));
+		dispatch(setValue(FORM_SEND, 'validating', false));
 		return false;
 	}
 
 	const isAccount = await dispatch(checkAccount(activeUser.get('name'), to.value));
 
 	if (!isAccount) {
+		dispatch(setValue(FORM_SEND, 'validating', false));
 		return false;
 	}
 
@@ -403,6 +406,7 @@ export const send = () => async (dispatch, getState) => {
 		const resultFee = await dispatch(getTransactionFee(options));
 
 		if (!resultFee) {
+			dispatch(setValue(FORM_SEND, 'validating', false));
 			return false;
 		}
 
@@ -416,6 +420,7 @@ export const send = () => async (dispatch, getState) => {
 			'fee',
 			`${options.fee.asset.get('symbol')} fee pool balance is less than fee amount`,
 		));
+		dispatch(setValue(FORM_SEND, 'validating', false));
 		return false;
 	}
 
@@ -427,15 +432,16 @@ export const send = () => async (dispatch, getState) => {
 
 		if (totalAmount.gt(balances.getIn([selectedBalance, 'balance']))) {
 			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
+			dispatch(setValue(FORM_SEND, 'validating', false));
 			return false;
 		}
 	} else {
 		const feeBalance = balances
-			.find((val) => val.get('asset_type') === options.fee.asset.get('id') && val.get('owner') === fromAccount.id)
-			.get('balance');
+			.find((val) => val.get('asset_type') === options.fee.asset.get('id') && val.get('owner') === fromAccount.id);
 
-		if (feeAmount.gt(feeBalance)) {
+		if (feeAmount.gt(feeBalance ? feeBalance.get('balance') : 0)) {
 			dispatch(setFormError(FORM_SEND, 'amount', 'Insufficient funds for fee'));
+			dispatch(setValue(FORM_SEND, 'validating', false));
 			return false;
 		}
 	}

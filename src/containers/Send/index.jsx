@@ -308,7 +308,7 @@ class Send extends React.Component {
 								/>
 							</div>
 							<Button
-								className={classnames('btn-in-light', { loading: loading || validating })}
+								className={classnames('btn-in-light', { loading })}
 								disabled={(
 									!to.value
 									|| !amount.value
