@@ -24,6 +24,11 @@ There is an example of connecting to the node and subscribe to switch network (r
 window.onload = async () => {
 
     if (echojslib && echojslib.isEchoBridge) {
+	
+        /**
+        * Get access
+        */
+        await echojslib.extension.getAccess();
 
         /**
         * Subscribe to current Echo network selected in Bridge
