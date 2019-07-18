@@ -21,7 +21,7 @@
 There is an example of connecting to the node and subscribe to switch network (recommended to use inside `window.onload`)  
 
 ```javascript  
-window.onload = () => {
+window.onload = async () => {
 
     if (echojslib && echojslib.isEchoBridge) {
 
