@@ -1,6 +1,5 @@
-import { PrivateKey, ED25519, PrivateKeyECDSA } from 'echojs-lib';
+import { PrivateKey } from 'echojs-lib';
 import random from 'crypto-random-string';
-import bs58 from 'bs58';
 import EventEmitter from '../../libs/CustomAwaitEmitter';
 import AesStorage from './aesStorage';
 
@@ -157,33 +156,6 @@ class Crypto extends EventEmitter {
 		const privateKey = PrivateKey.fromSeed(random(RANDOM_SIZE));
 
 		return privateKey.toWif();
-	}
-
-	/**
-	 *  @method generateECDSAPublicKey
-	 *
-	 *  @return {String} ecdsaPublicKey
-	 */
-	generateECDSAPublicKey() {
-		privateAES.required();
-		const privateKeyECDSA = PrivateKeyECDSA.fromSeed(random(RANDOM_SIZE));
-		const ecdsaPublicKey = PrivateKeyECDSA
-			.fromWif(privateKeyECDSA.toWif()).toPublicKey().toString();
-		return ecdsaPublicKey;
-	}
-
-	/**
-	 *  @method generateEchoRandKey
-	 *
-	 * 	Generate random string and private key from this seed.
-	 *
-	 *  @return {String} echoRandKey
-	 */
-	generateEchoRandKey() {
-		privateAES.required();
-
-		const EchoRandKeyBuffer = ED25519.createKeyPair();
-		return `ECHO${bs58.encode(EchoRandKeyBuffer.publicKey)}`;
 	}
 
 	/**

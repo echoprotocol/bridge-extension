@@ -207,10 +207,9 @@ const createAccount = async (name, path) => {
 			return null;
 		}
 		const wif = crypto.generateWIF();
-		const echoRandKey = crypto.generateEchoRandKey();
 		const key = PrivateKey.fromWif(wif).toPublicKey().toString();
 
-		await echoService.getChainLib().api.registerAccount(name, key, echoRandKey);
+		await echoService.getChainLib().api.registerAccount(name, key, key);
 		await storage.set('account', { name, keys: [key, key], networkName: network.name });
 		await crypto.importByWIF(network.name, wif);
 		await emitter.emit('addAccount', name, [key, key], network.name, path);
