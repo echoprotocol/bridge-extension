@@ -116,3 +116,7 @@ const publicKey = bs58.decode('ECHOJDpsaMaR9qWM2922ZYvQ3xpavsN8oeNN8zBx1VNKdQBf'
 
 ED25519.verifyMessage(signature, message, publicKey);
 ```
+
+## License
+
+[MIT](LICENSE). Copyright (c) [ECHO DEVELOPMENT LTD](https://echo.org).
