@@ -10,33 +10,33 @@ stages:
 jobs:
   include:
 
-    - stage: lint
-      name: "Lint"
-      if: type = push
-      script:
-        - npm run lint
+#    - stage: lint
+#      name: "Lint"
+#      if: type = push
+#      script:
+#        - npm run lint
 
-    - stage: test
-      name: "Tests"
-      if: branch IN (develop, master) AND type = pull_request
-      script: npm run test
+#    - stage: test
+#      name: "Tests"
+#      if: branch IN (develop, master) AND type = pull_request
+#      script: npm run test
 
-    - stage: build
-      name: "Build Artifacts"
-      if: (branch = master OR tag IS present) AND type = push
-      addons:
-        artifacts:
-          working_dir: build/zip/
-          paths:
-            - echo_bridge.zip
-      script:
-        - npm run build-ext
-        - "echo \"Download URL: https://${ARTIFACTS_BUCKET}.s3.amazonaws.com/echoprotocol/bridge-extension/${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}/echo_bridge.zip\""
+#    - stage: build
+#      name: "Build Artifacts"
+#      if: (branch = master OR tag IS present) AND type = push
+#      addons:
+#        artifacts:
+#          working_dir: build/zip/
+#          paths:
+#            - echo_bridge.zip
+#      script:
+#        - npm run build-ext
+#        - "echo \"Download URL: https://${ARTIFACTS_BUCKET}.s3.amazonaws.com/echoprotocol/bridge-extension/${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}/echo_bridge.zip\""
 
     - stage: deploy
       name: "Deploy Chrome Extension"
       if: type = push AND branch = ECHO-1113
       before_install:
-        - apt-get -y --allow-unauthenticated install curl jq
+        - apt-get -y install curl jq
       script:
         - ./scripts/deploy_chrome.sh
