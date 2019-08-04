@@ -26,7 +26,7 @@ jobs:
       if: (branch = master OR tag IS present OR branch = ECHO-1113) AND type = push
       addons:
         artifacts:
-          s3_region: "eu-central-1"
+          s3_region: "eu-west-1"
           debug: true
           paths:
             - package.json
@@ -36,8 +36,8 @@ jobs:
 #        - npm run build-ext
         - npm run test
 
-#    - stage: deploy
-#      name: "Deploy Develop"
-#      if: type = push AND branch = ECHO-1113
-#      script:
-#        - ssh ubuntu@${DEV_SERVER} BRANCH=$CI_COMMIT_REF_NAME PROJECT=$CI_PROJECT_NAME 'bash -s' < ./deploy/update.sh
+    - stage: deploy
+      name: "Deploy Develop"
+      if: type = push AND branch = ECHO-1113
+      script:
+        - ssh devuser@${DEV_SERVER} BRANCH=$CI_COMMIT_REF_NAME PROJECT=$CI_PROJECT_NAME 'bash -s' < ./deploy/update.sh
