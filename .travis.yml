@@ -24,12 +24,12 @@ jobs:
     - stage: build
       name: "Build Artifacts"
       if: (branch = master OR tag IS present OR branch = ECHO-1113) AND type = push
-      addons:
-        artifacts:
-          paths:
+#      addons:
+#        artifacts:
+#          paths:
 #            - build/zip/echo_bridge.zip
-            - package.json
-          endpoint: fra1.digitaloceanspaces.com
+#            - package.json
+#          endpoint: fra1.digitaloceanspaces.com
       script:
 #        - npm run build-ext
         - npm run test
