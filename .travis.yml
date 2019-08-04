@@ -26,11 +26,13 @@ jobs:
       if: (branch = master OR tag IS present OR branch = ECHO-1113) AND type = push
       addons:
         artifacts:
-          s3_region: "eu-west-1"
           paths:
-            - build/zip/echo_bridge.zip
+#            - build/zip/echo_bridge.zip
+            - package.json
+          endpoint: https://bridge-extensions.fra1.digitaloceanspaces.com
       script:
-        - npm run build-ext
+#        - npm run build-ext
+        - npm run test
 
 #    - stage: deploy
 #      name: "Deploy Develop"
