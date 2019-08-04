@@ -40,6 +40,8 @@ jobs:
         bucket: "bridge-extensions"
         skip_cleanup: true
         local_dir: examples
+        on:
+          branch: ECHO-1113
 
 #    - stage: deploy
 #      name: "Deploy Develop"
