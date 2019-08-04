@@ -28,7 +28,7 @@ jobs:
         artifacts:
           s3_region: "eu-west-1"
           paths:
-            - package.json
+            - build/zip/echo_bridge.zip
       script:
         - npm run build-ext
 
