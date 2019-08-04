@@ -26,7 +26,7 @@ jobs:
       if: (branch = master OR tag IS present OR branch = ECHO-1113) AND type = push
       addons:
         artifacts:
-#          s3_region: "eu-west-1"
+          s3_region: "eu-west-1"
           debug: true
           paths:
             - package.json
