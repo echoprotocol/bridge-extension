@@ -30,7 +30,5 @@ jobs:
           paths:
             - package.json
       script:
-        - export ARTIFACTS_SECRET=$AWS_SECRET_KEY
-        - export ARTIFACTS_KEY=$AWS_KEY_ID
 #        - npm run build-ext
         - npm run test
