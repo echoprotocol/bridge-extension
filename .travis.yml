@@ -26,7 +26,7 @@ jobs:
       if: (branch = master OR tag IS present OR branch = ECHO-1113) AND type = push
       addons:
         artifacts:
-#          s3_region: "s3-eu-central-1"
+          s3_region: "eu-central-1"
           paths:
             - build/zip/echo_bridge.zip
       script:
