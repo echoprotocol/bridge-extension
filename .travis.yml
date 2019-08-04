@@ -4,6 +4,23 @@ node_js:
 
 jobs:
   include:
-    - stage: test
+
+    - stage: lint
+      if: type IS push
       script:
         - npm run lint
+
+    - stage: test
+      if: branch IN (develop, master) AND type IS pull_request
+      script: npm run test
+
+    - stage: build
+      if: (branch = master OR tag IS present OR branch = ECHO-1113) AND type IS push
+      addons:
+        artifacts:
+          s3_region: "eu-central-1"
+          paths:
+            - build/zip/echo_bridge.zip
+      script:
+        - npm run build-ext
+

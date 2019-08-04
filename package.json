@@ -11,7 +11,8 @@
     "build-stage": "cross-env NODE_ENV=stage webpack --progress --display-error-details --colors --mode production",
     "lint": "$(npm bin)/eslint 'src/**/*.jsx' 'src/**/*.js'",
     "lint-win": "cross-env eslint 'src/**/*.jsx' 'src/**/*.js' --fix",
-    "copy-manifest": "copyfiles -f config/manifest.json build/src"
+    "copy-manifest": "copyfiles -f config/manifest.json build/src",
+    "test": "echo \"should run tests\""
   },
   "dependencies": {
     "EventEmitter": "^1.0.0",

@@ -1,5 +1,7 @@
 # Echo Bridge Browser Extension
 
+[![Build Status](https://travis-ci.com/echoprotocol/bridge-extension.svg?token=FbPpGfasAys9FvssGPyt&branch=master)](https://travis-ci.com/echoprotocol/bridge-extension)
+
 Bridge is a tool designed to make running Echo dApps for people as easy as possible.
 
 As an extension for browser, Bridge can act as a dedicated Echo wallet,
