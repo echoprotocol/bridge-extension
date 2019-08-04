@@ -11,7 +11,7 @@ jobs:
   include:
 
     - stage: lint
-#      if: type IS push
+      if: type IS push
       script:
         - npm run lint
 
