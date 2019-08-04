@@ -27,12 +27,12 @@ jobs:
       addons:
         artifacts:
           debug: true
+          working_dir: build/zip/
           paths:
-            - package.json
+            - echo_bridge.zip
       script:
-#        - npm run build-ext
-        - npm run test
-        - printenv
+        - npm run build-ext
+        - "echo \"Download URL: https://${ARTIFACTS_BUCKET}.s3.amazonaws.com/echoprotocol/bridge-extension/${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}/echo_bridge.zip\""
 
 #    - stage: deploy
 #      name: "Deploy Develop"
