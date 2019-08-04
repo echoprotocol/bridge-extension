@@ -28,6 +28,9 @@ jobs:
         artifacts:
           s3_region: "eu-central-1"
           paths:
-            - build/zip/echo_bridge.zip
+            - package.json
       script:
-        - npm run build-ext
+        - export ARTIFACTS_SECRET=$AWS_SECRET_KEY
+        - export ARTIFACTS_KEY=$AWS_KEY_ID
+#        - npm run build-ext
+        - npm run test
