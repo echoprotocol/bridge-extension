@@ -10,20 +10,23 @@ stages:
 jobs:
   include:
 
-    - stage: lint
-      if: type = push
-      script:
-        - npm run lint
+#    - stage: lint
+#      name: "Lint"
+#      if: type = push
+#      script:
+#        - npm run lint
 
     - stage: test
+      name: "Tests"
       if: branch IN (develop, master) AND type = pull_request
       script: npm run test
 
     - stage: build
+      name: "Build Artifacts"
       if: (branch = master OR tag IS present OR branch = ECHO-1113) AND type = push
       addons:
         artifacts:
-          s3_region: "eu-central-1"
+#          s3_region: "s3-eu-central-1"
           paths:
             - build/zip/echo_bridge.zip
       script:
