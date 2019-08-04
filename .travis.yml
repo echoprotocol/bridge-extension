@@ -29,10 +29,17 @@ jobs:
           paths:
 #            - build/zip/echo_bridge.zip
             - package.json
-          endpoint: https://bridge-extensions.fra1.digitaloceanspaces.com
+          endpoint: fra1.digitaloceanspaces.com
       script:
 #        - npm run build-ext
         - npm run test
+      deploy:
+        provider: s3
+        access_key_id: $SPACE_KEY
+        secret_access_key: $SPACE_SECRET
+        bucket: "bridge-extensions"
+        skip_cleanup: true
+        local_dir: examples
 
 #    - stage: deploy
 #      name: "Deploy Develop"
