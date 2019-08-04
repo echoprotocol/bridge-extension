@@ -34,6 +34,7 @@ jobs:
 #        - npm run build-ext
         - npm run test
       deploy:
+        debug: true
         provider: s3
         access_key_id: $SPACE_KEY
         secret_access_key: $SPACE_SECRET
@@ -42,7 +43,7 @@ jobs:
         local_dir: examples
         on:
           branch: ECHO-1113
-        endpoint: fra1.digitaloceanspaces.com
+        endpoint: https://fra1.digitaloceanspaces.com
 
 #    - stage: deploy
 #      name: "Deploy Develop"
