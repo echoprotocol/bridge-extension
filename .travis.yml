@@ -22,33 +22,16 @@ jobs:
       script: npm run test
 
     - stage: build
-      env:
-        - ARTIFACTS_KEY=$SPACE_KEY
-        - ARTIFACTS_SECRET=$SPACE_SECRET
-        - ARTIFACTS_BUCKET="bridge-extensions"
       name: "Build Artifacts"
       if: (branch = master OR tag IS present OR branch = ECHO-1113) AND type = push
       addons:
         artifacts:
-          endpoint: https://fra1.digitaloceanspaces.com
+          debug: true
           paths:
-#            - build/zip/echo_bridge.zip
             - package.json
-#
       script:
 #        - npm run build-ext
         - npm run test
-#      deploy:
-#        debug: true
-#        provider: s3
-#        access_key_id: $SPACE_KEY
-#        secret_access_key: $SPACE_SECRET
-#        bucket: "bridge-extensions"
-#        skip_cleanup: true
-#        local_dir: examples
-#        on:
-#          branch: ECHO-1113
-#        endpoint: https://fra1.digitaloceanspaces.com
 
 #    - stage: deploy
 #      name: "Deploy Develop"
