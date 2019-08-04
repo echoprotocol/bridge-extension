@@ -3,10 +3,12 @@ stages:
   - build
   - artifacts
 
+
 cache:
   key: $CI_COMMIT_REF_NAME
   paths:
   - node_modules/
+
 
 lint.test:
   image: node:10.15
@@ -19,6 +21,7 @@ lint.test:
     - npm run lint
   tags:
     - docker
+
 
 build.develop:
   stage: build
@@ -34,6 +37,7 @@ build.develop:
   tags:
     - pp-projects
 
+
 artifacts.build:
   stage: artifacts
   script:
@@ -47,6 +51,7 @@ artifacts.build:
     - master
   tags:
     - pp-projects
+
 
 build.master:
   stage: build
@@ -62,6 +67,7 @@ build.master:
   tags:
     - pp-projects
 
+
 build.publish:
   image: node:10.15
   stage: build
@@ -76,7 +82,6 @@ build.publish:
     - npm i
     - npm run build-ext
     - cd build/zip
-    - ls
     - ACCESS_TOKEN=$(curl "https://accounts.google.com/o/oauth2/token" -d "client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&refresh_token=${REFRESH_TOKEN}&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob" | jq -r .access_token)
     - 'curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -X PUT -T echo_bridge.zip -v "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${APP_ID}"'
     - 'curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -H "Content-Length: 0" -X POST -v "https://www.googleapis.com/chromewebstore/v1.1/items/${APP_ID}/publish?publishTarget=default"'
