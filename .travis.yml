@@ -27,14 +27,10 @@ jobs:
       addons:
         artifacts:
           s3_region: "eu-west-1"
-          debug: true
           paths:
             - package.json
-#      addons:
-#        artifacts:
       script:
-#        - npm run build-ext
-        - npm run test
+        - npm run build-ext
 
 #    - stage: deploy
 #      name: "Deploy Develop"
