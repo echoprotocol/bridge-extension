@@ -14,7 +14,6 @@ lint.test:
   image: node:10.15
   stage: lint
   script:
-    - node -v
     - if [ -d node_modules/echojs-lib ]; then rm -rf node_modules/echojs-lib; fi
     - npm config set unsafe-perm true
     - npm i
