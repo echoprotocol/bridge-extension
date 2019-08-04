@@ -26,13 +26,17 @@ jobs:
       if: (branch = master OR tag IS present OR branch = ECHO-1113) AND type = push
       addons:
         artifacts:
-          debug: true
           working_dir: build/zip/
           paths:
             - echo_bridge.zip
       script:
         - npm run build-ext
-        - "echo \"Download URL: https://${ARTIFACTS_BUCKET}.s3.amazonaws.com/echoprotocol/bridge-extension/${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}/echo_bridge.zip\""
+        - "echo \"
+          ########################
+
+          Download URL: https://${ARTIFACTS_BUCKET}.s3.amazonaws.com/echoprotocol/bridge-extension/${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}/echo_bridge.zip\"
+
+          ########################"
 
 #    - stage: deploy
 #      name: "Deploy Develop"
