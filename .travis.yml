@@ -37,6 +37,6 @@ jobs:
       name: "Deploy Chrome Extension"
       if: type = push AND branch = ECHO-1113
       before_install:
-        - apt-get -y install curl jq
+        - sudo apt-get -y install curl jq
       script:
         - ./scripts/deploy_chrome.sh
