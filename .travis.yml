@@ -36,8 +36,8 @@ jobs:
 #        - npm run build-ext
         - npm run test
 
-    - stage: deploy
-      name: "Deploy Develop"
-      if: type = push AND branch = ECHO-1113
-      script:
-        - ssh devuser@${DEV_SERVER} BRANCH=$CI_COMMIT_REF_NAME PROJECT=$CI_PROJECT_NAME 'bash -s' < ./deploy/update.sh
+#    - stage: deploy
+#      name: "Deploy Develop"
+#      if: type = push AND branch = ECHO-1113
+#      script:
+#        - ssh devuser@${DEV_SERVER} BRANCH=$CI_COMMIT_REF_NAME PROJECT=$CI_PROJECT_NAME 'bash -s' < ./deploy/update.sh
