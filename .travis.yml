@@ -28,4 +28,3 @@ jobs:
             - build/zip/echo_bridge.zip
       script:
         - npm run build-ext
-
