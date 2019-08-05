@@ -347,8 +347,6 @@ const onMessage = (request, sender, sendResponse) => {
 
 		const operations = JSON.parse(request.data);
 
-		console.log('operations', operations);
-
 		requestQueue.push({
 			data: operations, sender, id, cb: sendResponse,
 		});
@@ -404,8 +402,6 @@ const onPinUnlock = () => {
  * @returns null
  */
 const removeTransaction = (id, err = null) => {
-	console.log('hehehe', err);
-
 	requestQueue = requestQueue.filter((r) => {
 		if (r.id === id) {
 			r.cb({ error: err, id: r.id });

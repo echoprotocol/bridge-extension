@@ -6,13 +6,22 @@
 	</head>
 	<body>
 		<h1>Examples</h1>
+		<!-- Get access -->
+			<div style="padding-bottom: 15px;">
+				<h4>Get access</h4>
+				<div id="getAccess"></div>
+				<button id="getAccess-click">submit</button>
+				<div id="getAccess-info"></div>
+			</div>
+		<!---->
 
 		<!-- Accounts (current network) -->
 		<div style="padding-bottom: 15px;">
 			<h4>Accounts</h4>
-			<div id="accounts"></div>
 			<button id="accounts-click">submit</button>
+			<div id="accounts-info"></div>
 		</div>
+		<!---->
 
 		<!-- Transfer -->
 		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
@@ -114,7 +123,7 @@
 		</div>
 		<!---->
 
-		<!-- Create Contract-->
+		<!-- Create Contract -->
 		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
 			<h4>Create Contract</h4>
 			<div style="padding: 5px 0;">
@@ -160,7 +169,7 @@
 		</div>
 		<!---->
 
-        <!-- Create account-->
+        <!-- Create account -->
         <div style="padding-bottom: 10px; border-top: 1px solid #000;">
             <h4>Create account</h4>
             <div style="padding: 5px 0;">
@@ -204,7 +213,8 @@
             <div id="createAccount-info"></div>
         </div>
         <!---->
-		<!-- Update account-->
+
+		<!-- Update account -->
 		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
 			<h4>Update account</h4>
 			<div style="padding: 5px 0;">
@@ -241,7 +251,8 @@
 			<div id="updateAccount-info"></div>
 		</div>
 		<!---->
-		<!-- Upgrade account-->
+
+		<!-- Upgrade account -->
 		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
 			<h4>Upgrade account</h4>
 			<div style="padding: 5px 0;">
@@ -256,6 +267,7 @@
 			</div>
 			<div id="upgradeAccount-info"></div>
 		</div>
+
 		<!-- Sign message -->
 		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
 			<h4>Sign message</h4>
@@ -271,92 +283,112 @@
 				<div id="signMessage-info"></div>
 			</div>
 		</div>
+		<!---->
+
 	</body>
 	<script>
+		[...$('button')].forEach(btn => $(btn).prop('disabled', true));
+		$("#getAccess-click").prop('disabled', false);
+
+		let isAccess = false;
+
+		async function reconnectEcho() {
+			if (window.echojslib.echo.isConnected) {
+				await window.echojslib.echo.disconnect();
+			}
+
+			await window.echojslib.echo.connect();
+		}
+
 		window.onload = () => {
 			window.echojslib.extension.subscribeSwitchNetwork(async (data) => {
 				console.log("subscriber: ", data);
-
-				if (window.echojslib.echo.isConnected) {
-					await window.echojslib.echo.disconnect();
-				}
-
-				await window.echojslib.echo.connect();
-
+				await reconnectEcho();
 			});
 		};
 
 		$(document).ready(function() {
-			$("#accounts-click").click(function(e) {
+			$("#getAccess-click").click(function(e) {
+				if (isAccess) return;
+
 				window.echojslib.extension.getAccess()
-					.then(() => {
-						window.echojslib.extension
-								.getAccounts()
-								.then(result => {
-									jQuery("#accounts").html(
-											`<p>RESULT: ${JSON.stringify(result)}</p>`
-									);
-								})
-								.catch(err => {
-									jQuery("#accounts").html(`<p>ERROR: ${JSON.stringify(err)}</p>`);
-								});
+					.then(async result => {
+						await reconnectEcho();
+						isAccess = true;
+						[...$('button')].forEach(btn => $(btn).prop('disabled', false));
+
+						jQuery("#getAccess-info").html(
+							`<p>RESULT: ${JSON.stringify(result)}</p>`
+						);
 					})
-					.catch((err) => console.log('error:' , err));
+					.catch(err => {
+						jQuery("#getAccess-info").html(`<p>ERROR: ${JSON.stringify(err)}</p>`);
+					});
+			});
+
+			$("#accounts-click").click(function(e) {
+				window.echojslib.extension
+					.getAccounts()
+					.then(result => {
+						jQuery("#accounts-info").html(
+							`<p>RESULT: ${JSON.stringify(result)}</p>`
+						);
+					})
+					.catch(err => {
+						jQuery("#accounts-info").html(`<p>ERROR: ${JSON.stringify(err)}</p>`);
+					});
 			});
 
 			$("#transfer-click").click(function(e) {
-				window.echojslib.extension.getAccess()
-						.then(() => {
-							const transaction = {
-								type: 0,
-								from: jQuery("#transfer-fromAddress")[0].value,
-								amount: {
-									amount: jQuery("#transfer-amount-value")[0].value,
-									asset_id: jQuery("#transfer-amount-asset")[0].value
-								},
-								to: jQuery("#transfer-toAddress")[0].value
-							};
+				const transaction = {
+					type: 0,
+					from: jQuery("#transfer-fromAddress")[0].value,
+					amount: {
+						amount: jQuery("#transfer-amount-value")[0].value,
+						asset_id: jQuery("#transfer-amount-asset")[0].value
+					},
+					to: jQuery("#transfer-toAddress")[0].value
+				};
 
-							if (jQuery("#transfer-fee-asset")[0].value) {
-								transaction.fee = {
-									amount: 0,
-									asset_id: jQuery("#transfer-fee-asset")[0].value
-								};
-							}
+				if (jQuery("#transfer-fee-asset")[0].value) {
+					transaction.fee = {
+						amount: 0,
+						asset_id: jQuery("#transfer-fee-asset")[0].value
+					};
+				}
 
-							const tr = window.echojslib.echo.createTransaction();
-							const trSign = {
-								from: transaction.from,
-								to: transaction.to,
-								amount: {
-									asset_id: transaction.amount.asset_id,
-									amount: transaction.amount.amount
-								},
-								fee: { asset_id: transaction.fee.asset_id }
-							};
+				const tr = window.echojslib.echo.createTransaction();
 
-							tr.addOperation(transaction.type, trSign);
+				const trSign = {
+					from: transaction.from,
+					to: transaction.to,
+					amount: {
+						asset_id: transaction.amount.asset_id,
+						amount: transaction.amount.amount
+					},
+					fee: { asset_id: transaction.fee.asset_id }
+				};
 
-							tr.signWithBridge()
-									.then(result => {
-										result.broadcast()
-												.then((res) => {
-													jQuery("#transfer-info").html(
-															`<p>RESULT: ${JSON.stringify(res)}</p>`
-													);
-												})
-												.catch((err) => {
-													jQuery("#transfer-info").html(
-															`<p>ERROR: ${JSON.stringify(err)}</p>`
-													);
-												});
-									}).catch((err) => {
-								jQuery("#transfer-info").html(
-										`<p>ERROR: ${JSON.stringify(err.message)}</p>`
-								);
-							});
-						})
-						.catch((err) => console.log('error:' , err));
+				tr.addOperation(transaction.type, trSign);
+
+				tr.signWithBridge()
+						.then(result => {
+							result.broadcast()
+									.then((res) => {
+										jQuery("#transfer-info").html(
+												`<p>RESULT: ${JSON.stringify(res)}</p>`
+										);
+									})
+									.catch((err) => {
+										jQuery("#transfer-info").html(
+												`<p>ERROR: ${JSON.stringify(err)}</p>`
+										);
+									});
+						}).catch((err) => {
+					jQuery("#transfer-info").html(
+							`<p>ERROR: ${JSON.stringify(err)}</p>`
+					);
+				});
 			});
 
 			$("#contract-click").click(function(e) {
@@ -418,207 +450,183 @@
 			});
 
 			$("#contactCreate-click").click(function (e) {
-				window.echojslib.extension.getAccess()
-						.then(() => {
-							const transaction = {
-								type: window.echojslib.constants.OPERATIONS_IDS.CREATE_CONTRACT,
-								registrar: jQuery("#contactCreate-fromAddress")[0].value,
-								code: jQuery("#contactCreate-code")[0].value,
-								value: {
-									amount: jQuery("#contactCreate-amount-value")[0].value,
-									asset_id: jQuery("#contactCreate-amount-asset")[0].value
-								}
-							};
+				const transaction = {
+					type: window.echojslib.constants.OPERATIONS_IDS.CREATE_CONTRACT,
+					registrar: jQuery("#contactCreate-fromAddress")[0].value,
+					code: jQuery("#contactCreate-code")[0].value,
+					value: {
+						amount: jQuery("#contactCreate-amount-value")[0].value,
+						asset_id: jQuery("#contactCreate-amount-asset")[0].value
+					}
+				};
 
-							if (jQuery("#contactCreate-fee-asset")[0].value) {
-								transaction.fee = {
-									amount: 0,
-									asset_id: jQuery("#contactCreate-fee-asset")[0].value
-								};
-							}
+				if (jQuery("#contactCreate-fee-asset")[0].value) {
+					transaction.fee = {
+						amount: 0,
+						asset_id: jQuery("#contactCreate-fee-asset")[0].value
+					};
+				}
 
-							const tr = window.echojslib.echo.createTransaction();
+				const tr = window.echojslib.echo.createTransaction();
 
-							tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.CREATE_CONTRACT, {
-								registrar: transaction.registrar,
-								value: {
-									amount: transaction.value.amount,
-									asset_id: transaction.value.asset_id
-								},
-								eth_accuracy: false,
-								code: transaction.code,
-							});
+				tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.CREATE_CONTRACT, {
+					registrar: transaction.registrar,
+					value: {
+						amount: transaction.value.amount,
+						asset_id: transaction.value.asset_id
+					},
+					eth_accuracy: false,
+					code: transaction.code,
+				});
 
-							tr.signWithBridge()
-									.then(result => {
-										result.broadcast()
-												.then((res) => {
-													jQuery("#contactCreate-info").html(
-															`<p>RESULT: ${JSON.stringify(res)}</p>`
-													);
-												}).catch(err => {
-											jQuery("#contactCreate-info").html(
-													`<p>ERROR: ${JSON.stringify(err)}</p>`
-											);
-										});
-									})
-									.catch(err => {
-										jQuery("#contactCreate-info").html(
-												`<p>ERROR: ${JSON.stringify(err)}</p>`
-										);
-									});
-						})
-						.catch((err) => console.log('error:' , err));
-
+				tr.signWithBridge()
+					.then(result => {
+						result.broadcast()
+								.then((res) => {
+									jQuery("#contactCreate-info").html(
+											`<p>RESULT: ${JSON.stringify(res)}</p>`
+									);
+								}).catch(err => {
+							jQuery("#contactCreate-info").html(
+									`<p>ERROR: ${JSON.stringify(err)}</p>`
+							);
+						});
+					})
+					.catch(err => {
+						jQuery("#contactCreate-info").html(
+								`<p>ERROR: ${JSON.stringify(err)}</p>`
+						);
+					});
 			});
 
             $("#createAccount-click").click(function (e) {
-				window.echojslib.extension.getAccess()
-					.then(() => {
-						const transaction = {
-							registrar: jQuery("#createAccount-registrar")[0].value,
-							referrer: jQuery("#createAccount-registrar")[0].value,
-							referrer_percent: 0,
-							echorand_key: jQuery("#createAccount-echorandKey")[0].value,
-							name: jQuery("#createAccount-name")[0].value,
-							active: {
-								weight_threshold: 1,
-								account_auths: [],
-								key_auths: [[
-									jQuery("#createAccount-keyAuth")[0].value,
-									1,
-								]]
-							},
-							options: {
-								voting_account: jQuery("#createAccount-voitingAccount")[0].value,
-								delegating_account:  jQuery("#createAccount-registrar")[0].value,
-								num_committee: 0,
-								votes: [],
-								extensions: [],
-							}
-						};
+				const transaction = {
+					registrar: jQuery("#createAccount-registrar")[0].value,
+					referrer: jQuery("#createAccount-registrar")[0].value,
+					referrer_percent: 0,
+					echorand_key: jQuery("#createAccount-echorandKey")[0].value,
+					name: jQuery("#createAccount-name")[0].value,
+					active: {
+						weight_threshold: 1,
+						account_auths: [],
+						key_auths: [[
+							jQuery("#createAccount-keyAuth")[0].value,
+							1,
+						]]
+					},
+					options: {
+						voting_account: jQuery("#createAccount-voitingAccount")[0].value,
+						delegating_account:  jQuery("#createAccount-registrar")[0].value,
+						num_committee: 0,
+						votes: [],
+						extensions: [],
+					}
+				};
 
-						const tr = window.echojslib.echo.createTransaction();
+				const tr = window.echojslib.echo.createTransaction();
 
-						tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_CREATE, transaction);
-						tr.signWithBridge()
-								.then(result => {
-									result.broadcast()
-											.then((res) => {
-												jQuery("#createAccount-info").html(
-														`<p>RESULT: ${JSON.stringify(res)}</p>`
-												);
-											}).catch(err => {
-										jQuery("#createAccount-info").html(
-												`<p>ERROR: ${JSON.stringify(err)}</p>`
-										);
-									});
-								})
-								.catch(err => {
+				tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_CREATE, transaction);
+				tr.signWithBridge()
+					.then(result => {
+						result.broadcast()
+								.then((res) => {
 									jQuery("#createAccount-info").html(
-											`<p>ERROR: ${JSON.stringify(err)}</p>`
+											`<p>RESULT: ${JSON.stringify(res)}</p>`
 									);
-								});
+								}).catch(err => {
+							jQuery("#createAccount-info").html(
+									`<p>ERROR: ${JSON.stringify(err)}</p>`
+							);
+						});
 					})
-					.catch((err) => console.log('error:' , err));
-
+					.catch(err => {
+						jQuery("#createAccount-info").html(
+								`<p>ERROR: ${JSON.stringify(err)}</p>`
+						);
+					});
             });
 
 			$("#updateAccount-click").click(function (e) {
-				window.echojslib.extension.getAccess()
-					.then(() => {
-						const transaction = {
-							fee: { asset_id:  jQuery("#updateAccount-fee-asset")[0].value},
-							account: jQuery("#updateAccount-registrar")[0].value,
-							echorand_key: jQuery("#updateAccount-echorandKey")[0].value,
-							active: {
-								weight_threshold: 1,
-								account_auths: [],
-								key_auths: [
-									[jQuery("#updateAccount-activeKey")[0].value, 1 ],
-								]
-							}
-						};
+				const transaction = {
+					fee: { asset_id:  jQuery("#updateAccount-fee-asset")[0].value},
+					account: jQuery("#updateAccount-registrar")[0].value,
+					echorand_key: jQuery("#updateAccount-echorandKey")[0].value,
+					active: {
+						weight_threshold: 1,
+						account_auths: [],
+						key_auths: [
+							[jQuery("#updateAccount-activeKey")[0].value, 1 ],
+						]
+					}
+				};
 
-						const tr = window.echojslib.echo.createTransaction();
+				const tr = window.echojslib.echo.createTransaction();
 
-						tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_UPDATE, transaction);
+				tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_UPDATE, transaction);
 
-						tr.signWithBridge()
-								.then(result => {
-									result.broadcast()
-											.then((res) => {
-												jQuery("#updateAccount-info").html(
-														`<p>RESULT: ${JSON.stringify(res)}</p>`
-												);
-											}).catch(err => {
-										jQuery("#updateAccount-info").html(
-												`<p>ERROR: ${JSON.stringify(err)}</p>`
-										);
-									});
-								})
-								.catch(err => {
+				tr.signWithBridge()
+					.then(result => {
+						result.broadcast()
+								.then((res) => {
 									jQuery("#updateAccount-info").html(
-											`<p>ERROR: ${JSON.stringify(err)}</p>`
+											`<p>RESULT: ${JSON.stringify(res)}</p>`
 									);
-								});
+								}).catch(err => {
+							jQuery("#updateAccount-info").html(
+									`<p>ERROR: ${JSON.stringify(err)}</p>`
+							);
+						});
 					})
-					.catch((err) => console.log('error:' , err));
+					.catch(err => {
+						jQuery("#updateAccount-info").html(
+								`<p>ERROR: ${JSON.stringify(err)}</p>`
+						);
+					});
 			});
 
 			$("#upgradeAccount-click").click(function (e) {
-				window.echojslib.extension.getAccess()
-					.then(() => {
-						const transaction = {
-							account_to_upgrade: jQuery("#upgradeAccount-registrar")[0].value,
-							upgrade_to_lifetime_member: true
-						};
+				const transaction = {
+					account_to_upgrade: jQuery("#upgradeAccount-registrar")[0].value,
+					upgrade_to_lifetime_member: true
+				};
 
-						const tr = window.echojslib.echo.createTransaction();
+				const tr = window.echojslib.echo.createTransaction();
 
-						tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_UPGRADE, transaction);
+				tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_UPGRADE, transaction);
 
-						tr.signWithBridge()
-								.then(result => {
-									result.broadcast()
-											.then((res) => {
-												jQuery("#upgradeAccount-info").html(
-														`<p>RESULT: ${JSON.stringify(res)}</p>`
-												);
-											}).catch(err => {
-										jQuery("#upgradeAccount-info").html(
-												`<p>ERROR: ${JSON.stringify(err)}</p>`
-										);
-									});
-								})
-								.catch(err => {
+				tr.signWithBridge()
+					.then(result => {
+						result.broadcast()
+								.then((res) => {
 									jQuery("#upgradeAccount-info").html(
-											`<p>ERROR: ${JSON.stringify(err)}</p>`
+											`<p>RESULT: ${JSON.stringify(res)}</p>`
 									);
-								});
+								}).catch(err => {
+							jQuery("#upgradeAccount-info").html(
+									`<p>ERROR: ${JSON.stringify(err)}</p>`
+							);
+						});
 					})
-					.catch((err) => console.log('error:' , err));
-
+					.catch(err => {
+						jQuery("#upgradeAccount-info").html(
+								`<p>ERROR: ${JSON.stringify(err)}</p>`
+						);
+					});
 			});
 
 			$("#signMessage-click").click(function (e) {
-				echojslib.extension
-					.getAccess()
-					.then(() => {
-						echojslib.extension.proofOfAuthority('This is example message!', jQuery("#signMessage-account")[0].value)
-								.then(res => {
-									jQuery("#signMessage-info").html(
-											`<p>Signature: ${JSON.stringify(res)}</p>`
-									);
-								})
-								.catch(err => {
-									jQuery("#signMessage-info").html(
-											`<p>${err}</p>`
-									);
-									console.log('result: ', err);
-								});
+				echojslib.extension.proofOfAuthority('This is example message!', jQuery("#signMessage-account")[0].value)
+					.then(res => {
+						jQuery("#signMessage-info").html(
+							`<p>Signature: ${JSON.stringify(res)}</p>`
+						);
 					})
-					.catch((err) => console.log('error:' , err))
+					.catch(err => {
+						jQuery("#signMessage-info").html(
+							`<p>${err}</p>`
+						);
+						console.log('result: ', err);
+					});
 			});
 		});
 	</script>

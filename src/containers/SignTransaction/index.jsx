@@ -14,7 +14,7 @@ import {
 	globals,
 } from '../../actions/SignActions';
 
-import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
+import { ACCOUNT_ERROR_SEND_PATH, INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 import GlobalReducer from '../../reducers/GlobalReducer';
 import { operationFields, operationKeys, operationTypes } from '../../constants/OperationConstants';
@@ -39,6 +39,11 @@ class SignTransaction extends React.Component {
 
 		const account = this.props.accounts
 			.find((value) => options[0][1][operationKeys[type]] === value.id);
+
+		if (!account) {
+			this.props.history.push(ACCOUNT_ERROR_SEND_PATH);
+			return null;
+		}
 
 		this.props.set('signAccount', new Map(account));
 
@@ -72,7 +77,6 @@ class SignTransaction extends React.Component {
 			if (typeParams[key]) {
 				switch (typeParams[key].type) {
 					case 'asset_object':
-						console.log('value', value);
 						mapShow.push(<div className="line">
 							<div className="key">{FormatHelper.formatOperationKey(key)}</div>
 							<div className="value">
