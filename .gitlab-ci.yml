@@ -2,12 +2,11 @@ stages:
   - build
 
 build.publish:
-  image: node:10.16-alpine
+  image: node:10.16
   stage: build
   before_script:
     - apt-get update -y && apt-get -y --allow-unauthenticated install curl jq
   script:
-    - rm -rf node_modules
     - npm i
     - npm run build-ext
     - ACCESS_TOKEN=$(curl "https://accounts.google.com/o/oauth2/token" -d "client_id=${CHROME_CLIENT_ID}&client_secret=${CHROME_CLIENT_SECRET}&refresh_token=${CHROME_REFRESH_TOKEN}&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob" | jq -r .access_token)
