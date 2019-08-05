@@ -538,7 +538,7 @@ export const approve = (operations, id) => async (dispatch, getState) => {
 
 		dispatch(removeTransaction(id));
 
-		emitter.emit('response', `Error: ${err}`, id, ERROR_STATUS);
+		emitter.emit('response', err, id, ERROR_STATUS);
 
 		emitter.emit('windowRequest', id, globals.WINDOW_TYPE);
 

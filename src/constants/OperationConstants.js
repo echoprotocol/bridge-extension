@@ -57,6 +57,9 @@ export const operationFields = {
 		name: {
 			type: 'string',
 		},
+		ed_key: {
+			type: 'string',
+		},
 		active: {
 			field: 'key_auths',
 		},

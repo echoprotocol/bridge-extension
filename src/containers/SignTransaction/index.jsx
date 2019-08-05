@@ -72,6 +72,7 @@ class SignTransaction extends React.Component {
 			if (typeParams[key]) {
 				switch (typeParams[key].type) {
 					case 'asset_object':
+						console.log('value', value);
 						mapShow.push(<div className="line">
 							<div className="key">{FormatHelper.formatOperationKey(key)}</div>
 							<div className="value">

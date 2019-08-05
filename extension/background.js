@@ -288,7 +288,13 @@ const onMessage = (request, sender, sendResponse) => {
 		triggerPopup(INCOMING_CONNECTION_PATH, providerNotification);
 		return true;
 	} else if (request.method === 'getAccess') {
-		sendResponse({ id: request.id, status: processedOrigins[hostname] });
+		const isAccess = processedOrigins[hostname];
+		if (isAccess) {
+			sendResponse({ id: request.id, status: isAccess });
+		} else {
+			sendResponse({ id: request.id, status: isAccess, error: { isAccess: false } });
+		}
+
 		return true;
 	}
 
@@ -340,6 +346,8 @@ const onMessage = (request, sender, sendResponse) => {
 	if (request.method === 'confirm' && request.data) {
 
 		const operations = JSON.parse(request.data);
+
+		console.log('operations', operations);
 
 		requestQueue.push({
 			data: operations, sender, id, cb: sendResponse,
@@ -396,6 +404,8 @@ const onPinUnlock = () => {
  * @returns null
  */
 const removeTransaction = (id, err = null) => {
+	console.log('hehehe', err);
+
 	requestQueue = requestQueue.filter((r) => {
 		if (r.id === id) {
 			r.cb({ error: err, id: r.id });
@@ -424,7 +434,6 @@ export const onResponse = (err, id, status) => {
 		}
 
 		removeTransaction(id);
-
 
 		return null;
 	}
