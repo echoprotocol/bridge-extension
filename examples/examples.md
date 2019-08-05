@@ -44,13 +44,12 @@ const tr = window.echojslib.echo.createTransaction();
 tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_UPDATE,  {
     fee: { asset_id: '1.3.0' },
     account: '1.2.1',
-    ed_key: 'DET9enh5vJko3eTTbjmoLaCaY4FP9nxDk2KdqrSkJwq97rG',
+    echorand_key: 'ECHOCUB669Mb6wbqTwAX4ioZ2w9e3CXBXchai9NoGppcR9zX',
     active: {
         weight_threshold: 1,
         account_auths: [],
         key_auths: [
-            ['DET6vDKmRF6PLP6Y5J1MVg1YwBYfNF1RJs1eDcJoPwwvW92', 1 ],
-            ['DETBwrdNr45VgXgzH7LicfnSNedeqcsgbMrjfejwrgsfGG6', 1 ],
+            ['ECHOCUB669Mb6wbqTwAX4ioZ2w9e3CXBXchai9NoGppcR9zX', 1 ]
         ]
     }
 });  
@@ -82,7 +81,7 @@ await tr.broadcast();
 const tr = window.echojslib.echo.createTransaction();  
 
 tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_CREATE, {
-        ed_key: 'DETCgtBQvQvT4aKvKRmdRYEiWdtEeG4bDEfhcpYmdFbiHCo',
+        echorand_key: 'ECHOCUB669Mb6wbqTwAX4ioZ2w9e3CXBXchai9NoGppcR9zX',
         registrar: '1.2.1',
         referrer: '1.2.1',
         referrer_percent: 0,
@@ -91,14 +90,13 @@ tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_CREATE, {
             weight_threshold: 1,
             account_auths: [],
             key_auths: [[
-                'DETCgtBQvQvT4aKvKRmdRYEiWdtEeG4bDEfhcpYmdFbiHCo',
+                'ECHOCUB669Mb6wbqTwAX4ioZ2w9e3CXBXchai9NoGppcR9zX',
                 1,
             ]]
         },
         options: {
-            memo_key: 'ECHO1111111111111111111111111111111114T1Anm',
             voting_account: "1.2.3",
-            delegating_account: "1.2.3",
+            delegating_account: "1.2.1",
             num_committee: 0,
             votes: [],
             extensions: [],

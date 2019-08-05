@@ -503,10 +503,11 @@ export const approve = (operations, id) => async (dispatch, getState) => {
 		const accountKeys = (await echoService.getChainLib().api.getAccountByName(currentAccount.get('name')))
 			.active.key_auths;
 
-		const keyPromises = await Promise.all(accountKeys.map((key) => echoService.getCrypto().getInByNetwork(
-			networkName,
-			key[0],
-		)));
+		const keyPromises =
+			await Promise.all(accountKeys.map((key) => echoService.getCrypto().getInByNetwork(
+				networkName,
+				key[0],
+			)));
 
 		const indexPublicKey = keyPromises.findIndex((key) => !!key);
 
