@@ -2,7 +2,7 @@ stages:
   - build
 
 build.publish:
-  image: node:10.15
+  image: node:10.15-alpine
   stage: build
   cache:
     key: $CI_COMMIT_REF_NAME
