@@ -1,71 +1,5 @@
 stages:
-  - lint
   - build
-  - artifacts
-
-
-cache:
-  key: $CI_COMMIT_REF_NAME
-  paths:
-  - node_modules/
-
-
-lint.test:
-  image: node:10.15
-  stage: lint
-  script:
-    - if [ -d node_modules/echojs-lib ]; then rm -rf node_modules/echojs-lib; fi
-    - npm config set unsafe-perm true
-    - npm i
-    - npm run lint
-  tags:
-    - docker
-
-
-build.develop:
-  stage: build
-  script:
-    - cd /home/devuser/DevProjects/649.bridge/extension
-    - git pull origin develop
-    - npm i
-    - npm run build-dev
-  only:
-    - develop
-  environment:
-    name: development
-  tags:
-    - pp-projects
-
-
-artifacts.build:
-  stage: artifacts
-  script:
-    - npm i
-    - npm run build-ext
-  artifacts:
-    paths:
-      - build/zip/echo_bridge.zip
-  only:
-    - develop
-    - master
-  tags:
-    - pp-projects
-
-
-build.master:
-  stage: build
-  script:
-    - cd /home/devuser/Projects/649.bridge/extension
-    - git pull origin master
-    - npm install
-    - npm run build-stage
-  only:
-    - master
-  environment:
-    name: stage
-  tags:
-    - pp-projects
-
 
 build.publish:
   image: node:10.15
@@ -74,19 +8,15 @@ build.publish:
     key: $CI_COMMIT_REF_NAME
     paths:
       - node_modules
-  script:
+  before_script:
     - apt-get update -y && apt-get -y --allow-unauthenticated install curl jq
-    - if [ -d node_modules/echojs-lib ]; then rm -rf node_modules/echojs-lib; fi
-    - npm config set unsafe-perm true
+  script:
     - npm i
     - npm run build-ext
-    - cd build/zip
-    - ACCESS_TOKEN=$(curl "https://accounts.google.com/o/oauth2/token" -d "client_id=${CLIENT_ID}&client_secret=${CLIENT_SECRET}&refresh_token=${REFRESH_TOKEN}&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob" | jq -r .access_token)
-    - 'curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -X PUT -T echo_bridge.zip -v "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${APP_ID}"'
-    - 'curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -H "Content-Length: 0" -X POST -v "https://www.googleapis.com/chromewebstore/v1.1/items/${APP_ID}/publish?publishTarget=default"'
-  only:
-    - tags
+    - ACCESS_TOKEN=$(curl "https://accounts.google.com/o/oauth2/token" -d "client_id=${CHROME_CLIENT_ID}&client_secret=${CHROME_CLIENT_SECRET}&refresh_token=${CHROME_REFRESH_TOKEN}&grant_type=refresh_token&redirect_uri=urn:ietf:wg:oauth:2.0:oob" | jq -r .access_token)
+    - 'curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -X PUT -T build/zip/echo_bridge.zip -v "https://www.googleapis.com/upload/chromewebstore/v1.1/items/${CHROME_APP_ID}"'
+    - 'curl -H "Authorization: Bearer ${ACCESS_TOKEN}" -H "x-goog-api-version: 2" -H "Content-Length: 0" -X POST -v "https://www.googleapis.com/chromewebstore/v1.1/items/${CHROME_APP_ID}/publish?publishTarget=default"'
+#  only:
+#    - tags
   tags:
     - docker
-  environment:
-    name: development
