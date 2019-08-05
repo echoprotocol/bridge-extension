@@ -1,5 +1,7 @@
 # Echo Bridge Browser Extension
 
+[![Build Status](https://travis-ci.com/echoprotocol/bridge-extension.svg?token=FbPpGfasAys9FvssGPyt&branch=master)](https://travis-ci.com/echoprotocol/bridge-extension)
+
 Bridge is a tool designed to make running Echo dApps for people as easy as possible.
 
 As an extension for browser, Bridge can act as a dedicated Echo wallet,
@@ -46,33 +48,33 @@ There is an example of connecting to the node and subscribe to switch network
 
 ```javascript  
 window.onload = async () => {
-    // you do not need to use the isEchoBridge flag, 
-    // but you can be sure that you did not override 
-    // the variable above
-    if (echojslib && echojslib.isEchoBridge) {
+  // you do not need to use the isEchoBridge flag, 
+  // but you can be sure that you did not override 
+  // the variable above
+  if (echojslib && echojslib.isEchoBridge) {
 
-        /**
-        * Get access
-        */
-        await echojslib.extension.getAccess();
+    /**
+    * Get access
+    */
+    await echojslib.extension.getAccess();
+    
+    /**
+    * Subscribe to current Echo network selected in Bridge
+    */
+    await echojslib.extension.subscribeSwitchNetwork(async () => {
 
-        /**
-        * Subscribe to current Echo network selected in Bridge
-        */
-        await echojslib.extension.subscribeSwitchNetwork(async () => {
+      if (echojslib.echo.isConnected) {
+        await window.echojslib.echo.disconnect();
+      }
 
-            if (echojslib.echo.isConnected) {
-                await window.echojslib.echo.disconnect();
-            }
+      /**
+      * Connect to current Echo network selected in Bridge
+      */
+      await echojslib.echo.connect();
 
-            /**
-            * Connect to current Echo network selected in Bridge
-            */
-            await echojslib.echo.connect();
+    });
 
-        });
-
-    }
+  }
 };  
 ```
 
@@ -123,7 +125,7 @@ const sendTransaction = async () => {
 
 See the [examples](./examples/examples.md) for more different transactions.
 
-#### Payload Signing
+### Payload Signing
 In order for the user to confirm ownership of the account's private key, the extension suggests using the proofOfAuthority method. The method provides an opportunity to sign payload by account private key. Because the raw signing can potentially sign transactions or even leak its private key we have to add an extra layer of encryption. So the extension will sign payload instead of raw data.
 
 ```javascript  
