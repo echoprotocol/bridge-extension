@@ -23,7 +23,7 @@ import FormatHelper from '../../helpers/FormatHelper';
 class SignTransaction extends React.Component {
 
 	componentDidMount() {
-		if (!this.props.transaction) {
+		if (!this.props.transaction || !this.props.transactionShow) {
 			if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
 				this.props.history.push(INDEX_PATH);
 			} else {
@@ -33,8 +33,8 @@ class SignTransaction extends React.Component {
 			return null;
 		}
 
-		const { transactionShow } = this.props;
-		const options = this.props.transaction.get('options');
+		const { transactionShow, transaction } = this.props;
+		const options = transaction.get('options');
 		const type = transactionShow.get('type');
 
 		const account = this.props.accounts
