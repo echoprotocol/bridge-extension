@@ -5,7 +5,7 @@ import { connect } from 'react-redux';
 import CustomScroll from 'react-custom-scroll';
 import _ from 'lodash';
 
-import { SIGN_MEASSAGE_ERROR } from '../../constants/ErrorsConstants';
+import { ERROR_ACTIVE_ACCOUNT } from '../../constants/ErrorsConstants';
 import { chooseSignMessageResponse } from '../../actions/GlobalActions';
 import { INDEX_PATH } from '../../constants/RouterConstants';
 
@@ -41,7 +41,7 @@ class Sign extends React.Component {
 
 		if (!accounts.get(network).size || typeof signerIndex === 'undefined') {
 			this.setState({
-				accountError: SIGN_MEASSAGE_ERROR,
+				accountError: ERROR_ACTIVE_ACCOUNT,
 			});
 			return;
 		}

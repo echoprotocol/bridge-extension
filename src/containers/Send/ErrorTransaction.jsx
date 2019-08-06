@@ -7,6 +7,7 @@ import { closePopup, globals } from '../../actions/SignActions';
 
 import { NOT_LOGGED_STATUS, DISCONNECT_STATUS, POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 import { INDEX_PATH } from '../../constants/RouterConstants';
+import { ERROR_ACTIVE_ACCOUNT } from '../../constants/ErrorsConstants';
 
 class ErrorTransaction extends React.PureComponent {
 
@@ -52,7 +53,7 @@ class ErrorTransaction extends React.PureComponent {
 		}
 
 		if (account) {
-			error = (<div className="description">You have to add account first</div>);
+			error = (<div className="description">{ERROR_ACTIVE_ACCOUNT}</div>);
 		}
 
 		return (

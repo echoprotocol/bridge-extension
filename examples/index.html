@@ -327,6 +327,7 @@
 			});
 
 			$("#accounts-click").click(function(e) {
+				if (isAccess) return;
 				window.echojslib.extension
 					.getAccounts()
 					.then(result => {
@@ -340,6 +341,7 @@
 			});
 
 			$("#transfer-click").click(function(e) {
+				if (isAccess) return;
 				const transaction = {
 					type: 0,
 					from: jQuery("#transfer-fromAddress")[0].value,
@@ -392,64 +394,62 @@
 			});
 
 			$("#contract-click").click(function(e) {
-				window.echojslib.extension.getAccess()
-					.then(() => {
-						const transaction = {
-							type: window.echojslib.constants.OPERATIONS_IDS.CALL_CONTRACT,
-							registrar: jQuery("#contract-registrar")[0].value,
-							code: jQuery("#contract-code")[0].value,
-							value: {
-								amount: jQuery("#contract-value")[0].value,
-								asset_id: jQuery("#contract-asset")[0].value
-							}
-						};
+				if (isAccess) return;
+				const transaction = {
+					type: window.echojslib.constants.OPERATIONS_IDS.CALL_CONTRACT,
+					registrar: jQuery("#contract-registrar")[0].value,
+					code: jQuery("#contract-code")[0].value,
+					value: {
+						amount: jQuery("#contract-value")[0].value,
+						asset_id: jQuery("#contract-asset")[0].value
+					}
+				};
 
-						if (jQuery("#contract-receiver")[0].value) {
-							transaction.receiver = jQuery("#contract-receiver")[0].value;
-						}
+				if (jQuery("#contract-receiver")[0].value) {
+					transaction.receiver = jQuery("#contract-receiver")[0].value;
+				}
 
-						if (jQuery("#contract-fee-asset")[0].value) {
-							transaction.fee = {
-								amount: 0,
-								asset_id: jQuery("#contract-fee-asset")[0].value
-							};
-						}
+				if (jQuery("#contract-fee-asset")[0].value) {
+					transaction.fee = {
+						amount: 0,
+						asset_id: jQuery("#contract-fee-asset")[0].value
+					};
+				}
 
-						const tr = window.echojslib.echo.createTransaction();
+				const tr = window.echojslib.echo.createTransaction();
 
-						tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.CALL_CONTRACT, {
-							registrar: transaction.registrar,
-							value: {
-								asset_id: transaction.value.asset_id,
-								amount: transaction.value.amount
-							},
-							code: transaction.code,
-							callee: transaction.receiver
-						});
+				tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.CALL_CONTRACT, {
+					registrar: transaction.registrar,
+					value: {
+						asset_id: transaction.value.asset_id,
+						amount: transaction.value.amount
+					},
+					code: transaction.code,
+					callee: transaction.receiver
+				});
 
-						tr.signWithBridge()
-								.then(result => {
-									result.broadcast()
-											.then((res) => {
-												jQuery("#contract-info").html(
-														`<p>RESULT: ${JSON.stringify(res)}</p>`
-												);
-											}).catch(err => {
+				tr.signWithBridge()
+						.then(result => {
+							result.broadcast()
+									.then((res) => {
 										jQuery("#contract-info").html(
-												`<p>ERROR: ${JSON.stringify(err)}</p>`
+												`<p>RESULT: ${JSON.stringify(res)}</p>`
 										);
-									});
-								})
-								.catch(err => {
-									jQuery("#contract-info").html(
-											`<p>ERROR: ${JSON.stringify(err)}</p>`
-									);
-								});
-					})
-					.catch((err) => console.log('error:' , err));
+									}).catch(err => {
+								jQuery("#contract-info").html(
+										`<p>ERROR: ${JSON.stringify(err)}</p>`
+								);
+							});
+						})
+						.catch(err => {
+							jQuery("#contract-info").html(
+									`<p>ERROR: ${JSON.stringify(err)}</p>`
+							);
+						});
 			});
 
 			$("#contactCreate-click").click(function (e) {
+				if (isAccess) return;
 				const transaction = {
 					type: window.echojslib.constants.OPERATIONS_IDS.CREATE_CONTRACT,
 					registrar: jQuery("#contactCreate-fromAddress")[0].value,
@@ -500,6 +500,7 @@
 			});
 
             $("#createAccount-click").click(function (e) {
+				if (isAccess) return;
 				const transaction = {
 					registrar: jQuery("#createAccount-registrar")[0].value,
 					referrer: jQuery("#createAccount-registrar")[0].value,
@@ -547,6 +548,7 @@
             });
 
 			$("#updateAccount-click").click(function (e) {
+				if (isAccess) return;
 				const transaction = {
 					fee: { asset_id:  jQuery("#updateAccount-fee-asset")[0].value},
 					account: jQuery("#updateAccount-registrar")[0].value,
@@ -585,6 +587,7 @@
 			});
 
 			$("#upgradeAccount-click").click(function (e) {
+				if (isAccess) return;
 				const transaction = {
 					account_to_upgrade: jQuery("#upgradeAccount-registrar")[0].value,
 					upgrade_to_lifetime_member: true
@@ -615,6 +618,7 @@
 			});
 
 			$("#signMessage-click").click(function (e) {
+				if (isAccess) return;
 				echojslib.extension.proofOfAuthority('This is example message!', jQuery("#signMessage-account")[0].value)
 					.then(res => {
 						jQuery("#signMessage-info").html(
