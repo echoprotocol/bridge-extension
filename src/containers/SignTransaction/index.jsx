@@ -23,7 +23,7 @@ import FormatHelper from '../../helpers/FormatHelper';
 class SignTransaction extends React.Component {
 
 	componentDidMount() {
-		if (!this.props.transaction || !this.props.transactionShow) {
+		if (!this.props.transaction) {
 			if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
 				this.props.history.push(INDEX_PATH);
 			} else {
@@ -33,16 +33,19 @@ class SignTransaction extends React.Component {
 			return null;
 		}
 
-		const { transactionShow, transaction } = this.props;
-		const options = transaction.get('options');
-		const type = transactionShow.get('type');
+		if (!this.props.transactionShow) {
+			return null;
+		}
 
-		const account = this.props.accounts
-			.find((value) => options[0][1][operationKeys[type]] === value.id);
-
-		this.props.set('signAccount', new Map(account));
+		this.loadInfo();
 
 		return null;
+	}
+
+	componentDidUpdate(prevProps) {
+		if (!prevProps.transactionShow && this.props.transactionShow) {
+			this.loadInfo();
+		}
 	}
 
 	onApprove() {
@@ -130,6 +133,17 @@ class SignTransaction extends React.Component {
 		});
 
 		return mapShow;
+	}
+
+	loadInfo() {
+		const { transactionShow, transaction } = this.props;
+		const options = transaction.get('options');
+		const type = transactionShow.get('type');
+
+		const account = this.props.accounts
+			.find((value) => options[0][1][operationKeys[type]] === value.id);
+
+		this.props.set('signAccount', new Map(account));
 	}
 
 	render() {
