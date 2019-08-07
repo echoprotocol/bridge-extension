@@ -287,7 +287,7 @@ export const addAccount = (name, keys, networkName, path) => async (dispatch, ge
 			id: account.id, active: true, icon, iconColor, name, keys,
 		}));
 
-		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+		await dispatch(setCryptoInfo('accounts', accounts.get(networkName), networkName));
 
 		dispatch(set('accounts', accounts));
 		await dispatch(initAccount({ name, icon, iconColor }));
@@ -350,14 +350,10 @@ export const onLogout = (name) => async (dispatch, getState) => {
 
 		dispatch(removeBalances(id));
 
-		/* eslint-disable no-await-in-loop, no-plusplus */
-		for (let i = 0; i < keys.length; i++) {
-			await dispatch(removeCryptoInfo(keys[i]));
-		}
-		/* eslint-enable no-await-in-loop, no-plusplus */
+		await Promise.all(keys.map((k) => dispatch(removeCryptoInfo(k, networkName))));
 
 		accounts = accounts.set(networkName, accounts.get(networkName).filter((i) => i.name !== name));
-		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+		await dispatch(setCryptoInfo('accounts', accounts.get(networkName), networkName));
 		dispatch(set('accounts', accounts));
 		if (accountName !== name) {
 			return false;
@@ -374,7 +370,7 @@ export const onLogout = (name) => async (dispatch, getState) => {
 			accounts.get(networkName).set(0, { ...accounts.getIn([networkName, 0]), active: true }),
 		);
 
-		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+		await dispatch(setCryptoInfo('accounts', accounts.get(networkName), networkName));
 		dispatch(set('accounts', accounts));
 
 		await dispatch(initAccount(accounts.getIn([networkName, 0])));
@@ -405,7 +401,7 @@ export const switchAccount = (name) => async (dispatch, getState) => {
 	);
 
 	try {
-		await dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+		await dispatch(setCryptoInfo('accounts', accounts.get(networkName), networkName));
 		dispatch(set('accounts', accounts));
 
 		const account = accounts.get(networkName).find((i) => i.active);
@@ -428,6 +424,7 @@ export const loadInfo = () => async (dispatch, getState) => {
 
 	try {
 		const networks = getState().global.get('networks');
+		const currentNetworkName = getState().global.getIn(['network', 'name']);
 		let accountsNetworks = new Map();
 
 		const resultPromises = networks.concat(NETWORKS).map(async (network) => {
@@ -483,7 +480,7 @@ export const loadInfo = () => async (dispatch, getState) => {
 		});
 
 
-		const accounts = await dispatch(getCryptoInfo('accounts'));
+		const accounts = await dispatch(getCryptoInfo('accounts', currentNetworkName));
 
 		if (accounts && accounts.length) {
 			await dispatch(initAccount(accounts.find((account) => account.active)));
@@ -722,7 +719,7 @@ export const changeAccountIcon = (icon, iconColor) => async (dispatch, getState)
 	account = account.set('icon', icon).set('iconColor', iconColor);
 
 	try {
-		dispatch(setCryptoInfo('accounts', accounts.get(networkName)));
+		dispatch(setCryptoInfo('accounts', accounts.get(networkName), networkName));
 
 		dispatch(batchActions([
 			GlobalReducer.actions.set({ field: 'accounts', value: accounts }),
@@ -786,7 +783,7 @@ export const addKeyToAccount = (accountId, active) => async (dispatch, getState)
 
 	}));
 
-	await dispatch(setCryptoInfo('accounts', accounts.get(networkName).toJS()));
+	await dispatch(setCryptoInfo('accounts', accounts.get(networkName).toJS(), networkName));
 	dispatch(set('accounts', accounts));
 
 };
