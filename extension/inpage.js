@@ -100,7 +100,7 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 				return;
 			}
 
-			resolve();
+			resolve(data.res);
 
 			if (!networkSubscribers.length) {
 				networkSubscription();
