@@ -327,15 +327,14 @@
                 });
         }
 
-        window.onload = () => {
-            getAccess();
-        };
-
 		$(document).ready(function() {
 			$("#subscribeSwitchNetwork-click").click(function(e) {
 				window.echojslib.extension.subscribeSwitchNetwork(async (data) => {
 					console.log("subscriber: ", data);
 					await reconnectEcho();
+					jQuery("#subscribeSwitchNetwork-info").html(
+							`<p>NETWORK: ${JSON.stringify(data)}</p>`
+					);
 				});
 			});
 

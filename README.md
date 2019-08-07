@@ -37,7 +37,7 @@ Before connecting to Bridge you should get access:
 echojslib.extension.getAccess();
 ```
 
-This method returns Promise which will be resolved when a user approves the request or rejected.
+This method returns Promise which will be resolved when a user approves the request or rejected when failure.
 This request should always go first, even if access has already been granted earlier.
 In this case, the extension will not request access again and just resolves the promise.
 
