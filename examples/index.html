@@ -6,6 +6,16 @@
 	</head>
 	<body>
 		<h1>Examples</h1>
+
+		<!-- Subscribe switch network -->
+		<div style="padding-bottom: 15px;">
+			<h4>Subscribe switch network</h4>
+			<div id="subscribeSwitchNetwork"></div>
+			<button id="subscribeSwitchNetwork-click">submit</button>
+			<div id="subscribeSwitchNetwork-info"></div>
+		</div>
+		<!---->
+
 		<!-- Get access -->
 			<div style="padding-bottom: 15px;">
 				<h4>Get access</h4>
@@ -287,9 +297,6 @@
 
 	</body>
 	<script>
-		[...$('button')].forEach(btn => $(btn).prop('disabled', true));
-		$("#getAccess-click").prop('disabled', false);
-
 		let isAccess = false;
 
 		async function reconnectEcho() {
@@ -300,34 +307,45 @@
 			await window.echojslib.echo.connect();
 		}
 
-		window.onload = () => {
-			window.echojslib.extension.subscribeSwitchNetwork(async (data) => {
-				console.log("subscriber: ", data);
-				await reconnectEcho();
-			});
-		};
+        function getAccess() {
+            window.echojslib.extension.getAccess()
+                .then(async result => {
+                    await reconnectEcho();
+                    isAccess = true;
+                    [...$('button')].forEach(btn => $(btn).prop('disabled', false));
+
+                    jQuery("#getAccess-info").html(
+                        `<p>RESULT: ${JSON.stringify(result)}</p>`
+                    );
+                })
+                .catch(err => {
+					isAccess = false;
+                    [...$('button')].forEach(btn => $(btn).prop('disabled', true));
+                    $("#getAccess-click").prop('disabled', false);
+                    $("#subscribeSwitchNetwork-click").prop('disabled', false);
+                    jQuery("#getAccess-info").html(`<p>ERROR: ${JSON.stringify(err)}</p>`);
+                });
+        }
+
+        window.onload = () => {
+            getAccess();
+        };
 
 		$(document).ready(function() {
+			$("#subscribeSwitchNetwork-click").click(function(e) {
+				window.echojslib.extension.subscribeSwitchNetwork(async (data) => {
+					console.log("subscriber: ", data);
+					await reconnectEcho();
+				});
+			});
+
 			$("#getAccess-click").click(function(e) {
 				if (isAccess) return;
-
-				window.echojslib.extension.getAccess()
-					.then(async result => {
-						await reconnectEcho();
-						isAccess = true;
-						[...$('button')].forEach(btn => $(btn).prop('disabled', false));
-
-						jQuery("#getAccess-info").html(
-							`<p>RESULT: ${JSON.stringify(result)}</p>`
-						);
-					})
-					.catch(err => {
-						jQuery("#getAccess-info").html(`<p>ERROR: ${JSON.stringify(err)}</p>`);
-					});
+				getAccess();
 			});
 
 			$("#accounts-click").click(function(e) {
-				if (isAccess) return;
+				if (!isAccess) return;
 				window.echojslib.extension
 					.getAccounts()
 					.then(result => {
@@ -341,7 +359,7 @@
 			});
 
 			$("#transfer-click").click(function(e) {
-				if (isAccess) return;
+				if (!isAccess) return;
 				const transaction = {
 					type: 0,
 					from: jQuery("#transfer-fromAddress")[0].value,
@@ -394,7 +412,7 @@
 			});
 
 			$("#contract-click").click(function(e) {
-				if (isAccess) return;
+				if (!isAccess) return;
 				const transaction = {
 					type: window.echojslib.constants.OPERATIONS_IDS.CALL_CONTRACT,
 					registrar: jQuery("#contract-registrar")[0].value,
@@ -449,7 +467,7 @@
 			});
 
 			$("#contactCreate-click").click(function (e) {
-				if (isAccess) return;
+				if (!isAccess) return;
 				const transaction = {
 					type: window.echojslib.constants.OPERATIONS_IDS.CREATE_CONTRACT,
 					registrar: jQuery("#contactCreate-fromAddress")[0].value,
@@ -500,7 +518,7 @@
 			});
 
             $("#createAccount-click").click(function (e) {
-				if (isAccess) return;
+				if (!isAccess) return;
 				const transaction = {
 					registrar: jQuery("#createAccount-registrar")[0].value,
 					referrer: jQuery("#createAccount-registrar")[0].value,
@@ -548,7 +566,7 @@
             });
 
 			$("#updateAccount-click").click(function (e) {
-				if (isAccess) return;
+				if (!isAccess) return;
 				const transaction = {
 					fee: { asset_id:  jQuery("#updateAccount-fee-asset")[0].value},
 					account: jQuery("#updateAccount-registrar")[0].value,
@@ -587,7 +605,7 @@
 			});
 
 			$("#upgradeAccount-click").click(function (e) {
-				if (isAccess) return;
+				if (!isAccess) return;
 				const transaction = {
 					account_to_upgrade: jQuery("#upgradeAccount-registrar")[0].value,
 					upgrade_to_lifetime_member: true
@@ -618,7 +636,7 @@
 			});
 
 			$("#signMessage-click").click(function (e) {
-				if (isAccess) return;
+				if (!isAccess) return;
 				echojslib.extension.proofOfAuthority('This is example message!', jQuery("#signMessage-account")[0].value)
 					.then(res => {
 						jQuery("#signMessage-info").html(
