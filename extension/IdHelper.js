@@ -1,19 +1,12 @@
+import * as randomize from 'randomatic';
+import { LENGTH_ID_MESSAGE, PATTERN_ID_MESSAGE } from '../src/constants/GlobalConstants';
+
 class IdHelper {
 
-	static getUniqueNumber() {
-		let date = Date.now();
-
-		if (date <= IdHelper.getUniqueNumber.previous) {
-			date = IdHelper.getUniqueNumber.previous + 1;
-		} else {
-			IdHelper.getUniqueNumber.previous = date;
-		}
-
-		return date;
+	static getId() {
+		return randomize(PATTERN_ID_MESSAGE, LENGTH_ID_MESSAGE);
 	}
 
 }
-
-IdHelper.getUniqueNumber.previous = 0;
 
 export default IdHelper;
