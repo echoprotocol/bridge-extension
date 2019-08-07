@@ -206,13 +206,13 @@ export const initCrypto = () => async (dispatch) => {
  *
  * 	@param {String} field
  * 	@param {*} value
- * 	@param {String?} networkName
+ * 	@param {String} networkName
  */
-export const setCryptoInfo = (field, value, networkName) => async (dispatch, getState) => {
+export const setCryptoInfo = (field, value, networkName) => async (dispatch) => {
 	const crypto = echoService.getCrypto();
 	try {
 		if (!networkName) {
-			networkName = getState().global.getIn(['network', 'name']);
+			throw new Error('Network is required');
 		}
 
 		await crypto.setInByNetwork(networkName, field, value);
@@ -229,12 +229,12 @@ export const setCryptoInfo = (field, value, networkName) => async (dispatch, get
  * 	@param {String} field
  * 	@param {String} networkName
  */
-export const getCryptoInfo = (field, networkName) => async (dispatch, getState) => {
+export const getCryptoInfo = (field, networkName) => async (dispatch) => {
 	const crypto = echoService.getCrypto();
 
 	try {
 		if (!networkName) {
-			networkName = getState().global.getIn(['network', 'name']);
+			throw new Error('Network is required');
 		}
 
 		const value = await crypto.getInByNetwork(networkName, field);
@@ -250,20 +250,22 @@ export const getCryptoInfo = (field, networkName) => async (dispatch, getState) 
 /**
  *  @method transitPublicKey
  *
+ * 	@param {String} accountId
+ * 	@param {String} networkName
  */
-export const transitPublicKey = () => async (dispatch, getState) => {
+export const transitPublicKey = (accountId, networkName) => async (dispatch) => {
 
 	try {
 		const keys = [];
 		let wifs = [];
-		const networkName = getState().global.getIn(['network', 'name']);
-		const account = getState().global.get('account');
 
-		if (!account) {
-			return null;
+		if (!accountId) {
+			throw new Error('Account is required');
 		}
 
-		const accountId = getState().global.getIn(['account', 'id']);
+		if (!networkName) {
+			throw new Error('Network is required');
+		}
 
 		const accountChain = [];
 		try {
@@ -303,14 +305,15 @@ export const transitPublicKey = () => async (dispatch, getState) => {
  *  Remove value by field in network storage
  *
  * 	@param {String} field
+ * 	@param {String} networkName
  */
-export const removeCryptoInfo = (field, networkName) => async (dispatch, getState) => {
+export const removeCryptoInfo = (field, networkName) => async (dispatch) => {
 
 	const crypto = echoService.getCrypto();
 
 	try {
 		if (!networkName) {
-			networkName = getState().global.getIn(['network', 'name']);
+			throw new Error('Network is required');
 		}
 
 		await crypto.removeInByNetwork(networkName, field);
