@@ -14,7 +14,7 @@ import {
 	globals,
 } from '../../actions/SignActions';
 
-import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
+import { ACCOUNT_ERROR_SEND_PATH, INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 import GlobalReducer from '../../reducers/GlobalReducer';
 import { operationFields, operationKeys, operationTypes } from '../../constants/OperationConstants';
@@ -43,6 +43,11 @@ class SignTransaction extends React.Component {
 	}
 
 	componentDidUpdate(prevProps) {
+		if (prevProps.loadingTransaction &&
+			!this.props.loadingTransaction && !this.props.transactionShow) {
+			this.props.history.push(NETWORK_ERROR_SEND_PATH);
+			return;
+		}
 		if (!prevProps.transactionShow && this.props.transactionShow) {
 			this.loadInfo();
 		}
@@ -214,6 +219,7 @@ class SignTransaction extends React.Component {
 
 SignTransaction.propTypes = {
 	loading: PropTypes.bool,
+	loadingTransaction: PropTypes.bool,
 	transaction: PropTypes.any,
 	transactionShow: PropTypes.any,
 	accounts: PropTypes.object,
@@ -230,6 +236,7 @@ SignTransaction.defaultProps = {
 	accounts: null,
 	account: null,
 	loading: false,
+	loadingTransaction: false,
 };
 
 export default connect(
@@ -237,6 +244,7 @@ export default connect(
 		loading: state.global.get('loading'),
 		transaction: state.global.getIn(['sign', 'current']),
 		transactionShow: state.global.getIn(['sign', 'dataToShow']),
+		loadingTransaction: state.global.getIn(['sign', 'loading']),
 		accounts: state.global.getIn([
 			'accounts',
 			state.global.getIn(['network', 'name']),

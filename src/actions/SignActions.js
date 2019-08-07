@@ -373,14 +373,17 @@ export const loadRequests = () => async (dispatch) => {
 		const { pathname } = history.location;
 		const requests = JSON.parse(JSON.stringify(echoService.getRequests()));
 
-
 		if (!requests.length) {
 			return null;
 		}
 
-		const dataToShow = await getFetchedData(requests[0].options);
-
 		dispatch(batchActions([
+			GlobalReducer.actions.set({
+				field: 'sign',
+				value: new Map({
+					loading: true,
+				}),
+			}),
 			GlobalReducer.actions.set({
 				field: 'sign',
 				value: new Map({
@@ -397,6 +400,11 @@ export const loadRequests = () => async (dispatch) => {
 					}),
 				},
 			}),
+		]));
+
+		const dataToShow = await getFetchedData(requests[0].options);
+
+		dispatch(batchActions([
 			GlobalReducer.actions.setIn({
 				field: 'sign',
 				params: {
@@ -406,6 +414,13 @@ export const loadRequests = () => async (dispatch) => {
 		]));
 	} catch (err) {
 		console.warn('Loading requests error', err);
+	} finally {
+		dispatch(GlobalReducer.actions.set({
+			field: 'sign',
+			value: new Map({
+				loading: false,
+			}),
+		}));
 	}
 
 	return null;
