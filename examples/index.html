@@ -7,8 +7,17 @@
 	<body>
 		<h1>Examples</h1>
 
+		<!-- Get access -->
+		<div style="padding-bottom: 10px;">
+			<h4>Get access</h4>
+			<div id="getAccess"></div>
+			<button id="getAccess-click">submit</button>
+			<div id="getAccess-info"></div>
+		</div>
+		<!---->
+
 		<!-- Subscribe switch network -->
-		<div style="padding-bottom: 15px;">
+		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
 			<h4>Subscribe switch network</h4>
 			<div id="subscribeSwitchNetwork"></div>
 			<button id="subscribeSwitchNetwork-click">submit</button>
@@ -16,17 +25,17 @@
 		</div>
 		<!---->
 
-		<!-- Get access -->
-			<div style="padding-bottom: 15px;">
-				<h4>Get access</h4>
-				<div id="getAccess"></div>
-				<button id="getAccess-click">submit</button>
-				<div id="getAccess-info"></div>
-			</div>
+		<!-- Subscribe switch account -->
+		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
+			<h4>Subscribe switch account</h4>
+			<div id="subscribeSwitchAccount"></div>
+			<button id="subscribeSwitchAccount-click">submit</button>
+			<div id="subscribeSwitchAccount-info"></div>
+		</div>
 		<!---->
 
 		<!-- Accounts (current network) -->
-		<div style="padding-bottom: 15px;">
+		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
 			<h4>Accounts</h4>
 			<button id="accounts-click">submit</button>
 			<div id="accounts-info"></div>
@@ -299,6 +308,12 @@
 	<script>
 		let isAccess = false;
 
+		function resetData() {
+			isAccess = false;
+			[...$('button')].forEach(btn => $(btn).prop('disabled', true));
+			$("#getAccess-click").prop('disabled', false);
+		}
+
 		async function reconnectEcho() {
 			if (window.echojslib.echo.isConnected) {
 				await window.echojslib.echo.disconnect();
@@ -319,15 +334,21 @@
                     );
                 })
                 .catch(err => {
-					isAccess = false;
-                    [...$('button')].forEach(btn => $(btn).prop('disabled', true));
-                    $("#getAccess-click").prop('disabled', false);
-                    $("#subscribeSwitchNetwork-click").prop('disabled', false);
+					resetData();
                     jQuery("#getAccess-info").html(`<p>ERROR: ${JSON.stringify(err)}</p>`);
                 });
         }
 
+		window.onload = () => {
+			resetData();
+		};
+
 		$(document).ready(function() {
+			$("#getAccess-click").click(function(e) {
+				if (isAccess) return;
+				getAccess();
+			});
+
 			$("#subscribeSwitchNetwork-click").click(function(e) {
 				window.echojslib.extension.subscribeSwitchNetwork(async (data) => {
 					console.log("subscriber: ", data);
@@ -338,9 +359,14 @@
 				});
 			});
 
-			$("#getAccess-click").click(function(e) {
-				if (isAccess) return;
-				getAccess();
+			$("#subscribeSwitchAccount-click").click(function(e) {
+				window.echojslib.extension.subscribeSwitchAccount(async (data) => {
+					console.log("current account: ", data);
+					await reconnectEcho();
+					jQuery("#subscribeSwitchAccount-info").html(
+							`<p>ACCOUNT: ${JSON.stringify(data)}</p>`
+					);
+				});
 			});
 
 			$("#accounts-click").click(function(e) {
