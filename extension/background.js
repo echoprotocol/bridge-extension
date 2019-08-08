@@ -437,10 +437,6 @@ export const onResponse = (err, id, status) => {
 		createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
 	}
 
-	if (status === DISCONNECT_STATUS && requestQueue.length === 1) {
-		removeTransaction(requestQueue[0].id, status);
-	}
-
 	if (NOT_LOGGED_STATUS === status) {
 		requestQueue.forEach((r) => removeTransaction(r.id, status));
 	}

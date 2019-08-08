@@ -14,7 +14,7 @@ import {
 	globals,
 } from '../../actions/SignActions';
 
-import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
+import { INDEX_PATH, NETWORK_ERROR_SEND_PATH, TRANSACTION_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 import { operationFields, operationKeys, operationTypes } from '../../constants/OperationConstants';
 
@@ -36,7 +36,7 @@ class SignTransaction extends React.Component {
 		}
 
 		if (!this.props.loadingTransaction && !this.props.transactionShow) {
-			this.props.history.push(NETWORK_ERROR_SEND_PATH);
+			this.props.history.push(TRANSACTION_ERROR_SEND_PATH);
 			return null;
 		}
 
@@ -52,7 +52,7 @@ class SignTransaction extends React.Component {
 	componentDidUpdate(prevProps) {
 		if (prevProps.loadingTransaction &&
 			!this.props.loadingTransaction && !this.props.transactionShow) {
-			this.props.history.push(NETWORK_ERROR_SEND_PATH);
+			this.props.history.push(TRANSACTION_ERROR_SEND_PATH);
 			return;
 		}
 		if (!prevProps.transactionShow && this.props.transactionShow) {

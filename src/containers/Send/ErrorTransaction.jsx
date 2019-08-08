@@ -17,12 +17,15 @@ class ErrorTransaction extends React.PureComponent {
 
 		if (account) {
 			closePopup(NOT_LOGGED_STATUS);
-		} else if (network) {
+		} else if (network && network === '1') {
 			closePopup(DISCONNECT_STATUS);
 		} else {
 			closePopup();
 		}
 
+		if (network && network === '2') {
+			this.props.cancel(this.props.transaction.get('id'));
+		}
 
 		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
 			this.props.history.goBack();
@@ -80,6 +83,8 @@ ErrorTransaction.propTypes = {
 	isReturn: PropTypes.bool,
 	history: PropTypes.object.isRequired,
 	location: PropTypes.object.isRequired,
+	transaction: PropTypes.object.isRequired,
+	cancel: PropTypes.func.isRequired,
 };
 
 ErrorTransaction.defaultProps = {
