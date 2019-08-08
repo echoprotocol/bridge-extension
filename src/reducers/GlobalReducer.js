@@ -28,12 +28,12 @@ const DEFAULT_FIELDS = Map({
 		error: null,
 		goTo: null,
 	}),
-	sign: {
+	sign: new Map({
 		current: null,
 		dataToShow: null,
 		transactions: [],
 		goTo: null,
-	},
+	}),
 	headBlockNum: 0,
 	history: new List([]),
 	formattedHistory: new OrderedMap({}),
