@@ -41,7 +41,9 @@ class Welcome extends React.Component {
 	}
 
 	getKeys() {
-		const keys = this.props.transitPublicKey();
+		const { account, networkName } = this.props;
+
+		const keys = this.props.transitPublicKey(account.get('id'), networkName);
 
 		keys.then((value) => {
 			this.setState({ keys: value });
@@ -149,10 +151,11 @@ class Welcome extends React.Component {
 
 
 Welcome.propTypes = {
-	transitPublicKey: PropTypes.func.isRequired,
+	account: PropTypes.object,
+	networkName: PropTypes.string.isRequired,
 	location: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
-	account: PropTypes.object,
+	transitPublicKey: PropTypes.func.isRequired,
 };
 
 Welcome.defaultProps = {
@@ -163,8 +166,12 @@ Welcome.defaultProps = {
 export default withRouter(connect(
 	(state) => ({
 		account: state.global.get('account'),
+		networkName: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
-		transitPublicKey: () => dispatch(transitPublicKey()),
+		transitPublicKey: (accountId, networkName) => dispatch(transitPublicKey(
+			accountId,
+			networkName,
+		)),
 	}),
 )(Welcome));

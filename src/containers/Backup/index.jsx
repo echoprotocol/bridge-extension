@@ -21,18 +21,17 @@ class Backup extends React.Component {
 	}
 
 	componentWillReceiveProps(nextProps) {
-		if (nextProps.accountName !== this.props.accountName) {
+		if (nextProps.accountId !== this.props.accountId) {
 			this.getKeys();
 		}
 	}
 
 
-	getKeys() {
-		const keys = this.props.transitPublicKey();
+	async getKeys() {
+		const { accountId, networkName } = this.props;
+		const keys = await this.props.transitPublicKey(accountId, networkName);
 
-		keys.then((value) => {
-			this.setState({ keys: value });
-		});
+		this.setState({ keys });
 	}
 
 	render() {
@@ -85,13 +84,20 @@ class Backup extends React.Component {
 }
 
 Backup.propTypes = {
+	accountId: PropTypes.string.isRequired,
+	networkName: PropTypes.string.isRequired,
 	transitPublicKey: PropTypes.func.isRequired,
-	accountName: PropTypes.string.isRequired,
 };
 
 export default connect(
-	(state) => ({ accountName: state.global.getIn(['account', 'name']) }),
+	(state) => ({
+		accountId: state.global.getIn(['account', 'id']),
+		networkName: state.global.getIn(['network', 'name']),
+	}),
 	(dispatch) => ({
-		transitPublicKey: () => dispatch(transitPublicKey()),
+		transitPublicKey: (accountId, networkName) => dispatch(transitPublicKey(
+			accountId,
+			networkName,
+		)),
 	}),
 )(Backup);
