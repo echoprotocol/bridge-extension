@@ -90,7 +90,8 @@ const connectSubscribe = (status) => {
  */
 const getNetwork = async () => {
 	const network = await storage.get('current_network') || NETWORKS[0];
-	return network;
+	const chainId = await echoService.getChainLib().api.getChainId();
+	return { ...network, chainId };
 };
 
 /**

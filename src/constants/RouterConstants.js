@@ -36,6 +36,7 @@ export const SEND_PATH = '/send';
 export const SUCCESS_SEND_PATH = '/send/success';
 export const SUCCESS_SEND_INDEX_PATH = '/send/success?index=1';
 export const ERROR_SEND_PATH = '/send/error';
+export const PARSE_ERROR_SEND_PATH = '/send/error?parse=1';
 export const NETWORK_ERROR_SEND_PATH = '/send/error?network=1';
 export const ACCOUNT_ERROR_SEND_PATH = '/send/error?account=1';
 

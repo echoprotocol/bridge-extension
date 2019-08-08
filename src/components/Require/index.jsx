@@ -156,5 +156,4 @@ export function required(Component) {
 		connected: state.global.get('connected'),
 		loading: state.global.get('loading'),
 	}))(RequiredComponent);
-
 }

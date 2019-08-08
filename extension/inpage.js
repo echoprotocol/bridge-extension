@@ -9,18 +9,19 @@ import {
 	PING_TIMEOUT,
 } from '../src/constants/GlobalConstants';
 
+import IdHelper from './IdHelper';
+
 const requestQueue = [];
 
 const networkSubscribers = [];
 const accountSubscribers = [];
-
 
 /**
  * network subscription
  *
  */
 const networkSubscription = () => {
-	const id = Date.now();
+	const id = IdHelper.getId();
 
 	const callback = ({ data }) => {
 		/**
@@ -38,7 +39,7 @@ const networkSubscription = () => {
 };
 
 const accountSubscription = () => {
-	const id = Date.now();
+	const id = IdHelper.getId();
 
 	const callback = ({ data }) => {
 		/**
@@ -60,7 +61,8 @@ const accountSubscription = () => {
  * @returns {Promise}
  */
 const getCurrentNetwork = () => {
-	const id = Date.now();
+	const id = IdHelper.getId();
+
 	const result = new Promise((resolve, reject) => {
 		const callback = ({ data }) => {
 			if (data.error) {
@@ -87,7 +89,8 @@ const getCurrentNetwork = () => {
  * @returns {Promise}
  */
 const subscribeSwitchNetwork = (subscriberCb) => {
-	const id = Date.now();
+	const id = IdHelper.getId();
+
 	const result = new Promise((resolve, reject) => {
 		if (!lodash.isFunction(subscriberCb)) {
 			reject(new Error('Is not a function'));
@@ -121,7 +124,8 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 };
 
 const subscribeSwitchAccount = (subscriberCb) => {
-	const id = Date.now();
+	const id = IdHelper.getId();
+
 	const result = new Promise((resolve, reject) => {
 		if (!lodash.isFunction(subscriberCb)) {
 			reject(new Error('Is not a function'));
@@ -174,7 +178,8 @@ echojslib.echo.connect = (url, params) => {
 		apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
 	};
 
-	const id = Date.now();
+	const id = IdHelper.getId();
+
 	const result = new Promise((resolve, reject) => {
 
 		const cb = async ({ data }) => {
@@ -219,7 +224,8 @@ const onMessage = (event) => {
  * @returns {Promise}
  */
 const sendTransaction = (options) => {
-	const id = Date.now();
+	const id = IdHelper.getId();
+
 	const result = new Promise((resolve, reject) => {
 		const cb = ({ data }) => {
 
@@ -248,7 +254,8 @@ const sendTransaction = (options) => {
  * @returns {Promise}
  */
 const getAccounts = () => {
-	const id = Date.now();
+	const id = IdHelper.getId();
+
 	const result = new Promise((resolve, reject) => {
 
 		const cb = ({ data }) => {
@@ -270,7 +277,7 @@ const getAccounts = () => {
 };
 
 const proofOfAuthority = (message, accountId) => {
-	const id = Date.now();
+	const id = IdHelper.getId();
 	const result = new Promise((resolve, reject) => {
 
 		const cb = ({ data }) => {
@@ -300,7 +307,8 @@ const proofOfAuthority = (message, accountId) => {
  * @returns {Promise}
  */
 const getAccess = () => {
-	const id = Date.now();
+	const id = IdHelper.getId();
+
 	const result = new Promise((resolve, reject) => {
 
 		const cb = ({ data }) => {
@@ -339,7 +347,7 @@ class Signat {
 }
 
 echojslib.Transaction.prototype.signWithBridge = async function signWithBridge() {
-	const id = Date.now();
+	const id = IdHelper.getId();
 
 	if (!this.hasAllFees) {
 		await this.setRequiredFees();

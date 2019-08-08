@@ -1,9 +1,10 @@
 import React from 'react';
+import { connect } from 'react-redux';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import query from 'query-string';
 
-import { closePopup, globals } from '../../actions/SignActions';
+import { cancelTransaction, closePopup, globals } from '../../actions/SignActions';
 
 import { NOT_LOGGED_STATUS, DISCONNECT_STATUS, POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 import { INDEX_PATH } from '../../constants/RouterConstants';
@@ -11,7 +12,7 @@ import { ERROR_ACTIVE_ACCOUNT } from '../../constants/ErrorsConstants';
 
 class ErrorTransaction extends React.PureComponent {
 
-	onClick(e, network, account) {
+	onClick(e, network, account, parse) {
 		if (!this.props.isReturn) {
 			closePopup(DISCONNECT_STATUS);
 		}
@@ -20,10 +21,11 @@ class ErrorTransaction extends React.PureComponent {
 			closePopup(NOT_LOGGED_STATUS);
 		} else if (network) {
 			closePopup(DISCONNECT_STATUS);
+		} else if (parse) {
+			this.props.cancel(this.props.transaction.get('id'));
 		} else {
 			closePopup();
 		}
-
 
 		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
 			this.props.history.goBack();
@@ -37,7 +39,7 @@ class ErrorTransaction extends React.PureComponent {
 	}
 
 	render() {
-		const { network, account } = query.parse(this.props.location.search);
+		const { network, account, parse } = query.parse(this.props.location.search);
 
 		const { isReturn } = this.props;
 
@@ -48,6 +50,14 @@ class ErrorTransaction extends React.PureComponent {
 				<div className="description">
 					Connection was interrupted.
 					<br /> Please, check transaction history to verify if transaction was sent.
+				</div>
+			);
+		}
+
+		if (parse) {
+			error = (
+				<div className="description">
+					<br /> Transaction can&apos;t be processed
 				</div>
 			);
 		}
@@ -67,7 +77,7 @@ class ErrorTransaction extends React.PureComponent {
 						<Button
 							className="btn-inverted error"
 							content={<span className="btn-text">Return</span>}
-							onClick={(e) => this.onClick(e, network, account)}
+							onClick={(e) => this.onClick(e, network, account, parse)}
 						/>
 					</div>
 				</div>
@@ -81,10 +91,17 @@ ErrorTransaction.propTypes = {
 	isReturn: PropTypes.bool,
 	history: PropTypes.object.isRequired,
 	location: PropTypes.object.isRequired,
+	transaction: PropTypes.object.isRequired,
+	cancel: PropTypes.func.isRequired,
 };
 
 ErrorTransaction.defaultProps = {
 	isReturn: true,
 };
 
-export default ErrorTransaction;
+export default connect(
+	(state) => ({ transaction: state.global.getIn(['sign', 'current']) }),
+	(dispatch) => ({
+		cancel: (transaction) => dispatch(cancelTransaction(transaction)),
+	}),
+)(ErrorTransaction);

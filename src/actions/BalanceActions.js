@@ -661,7 +661,7 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
 
 		tokens[accountId].push(contractId.split('.')[2]);
 
-		dispatch(setCryptoInfo('tokens', tokens));
+		dispatch(setCryptoInfo('tokens', tokens, networkName));
 
 		let stateTokens = getState().balance.get('tokens');
 
@@ -828,7 +828,7 @@ export const removeToken = (contractId) => async (dispatch, getState) => {
 
 	tokens[accountId] = tokens[accountId].filter((id) => contractId.split('.')[2] !== id);
 
-	dispatch(setCryptoInfo('tokens', tokens));
+	dispatch(setCryptoInfo('tokens', tokens, networkName));
 
 
 	const stateTokens = getState().balance.get('tokens');
