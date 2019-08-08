@@ -14,10 +14,12 @@ import {
 	globals,
 } from '../../actions/SignActions';
 
-import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
+import { INDEX_PATH, NETWORK_ERROR_SEND_PATH, PARSE_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
-import GlobalReducer from '../../reducers/GlobalReducer';
 import { operationFields, operationKeys, operationTypes } from '../../constants/OperationConstants';
+
+import GlobalReducer from '../../reducers/GlobalReducer';
+
 import FormatHelper from '../../helpers/FormatHelper';
 
 class SignTransaction extends React.Component {
@@ -33,16 +35,29 @@ class SignTransaction extends React.Component {
 			return null;
 		}
 
-		const { transactionShow } = this.props;
-		const options = this.props.transaction.get('options');
-		const type = transactionShow.get('type');
+		if (!this.props.loadingTransaction && !this.props.transactionShow) {
+			this.props.history.push(PARSE_ERROR_SEND_PATH);
+			return null;
+		}
 
-		const account = this.props.accounts
-			.find((value) => options[0][1][operationKeys[type]] === value.id);
+		if (!this.props.transactionShow) {
+			return null;
+		}
 
-		this.props.set('signAccount', new Map(account));
+		this.loadInfo();
 
 		return null;
+	}
+
+	componentDidUpdate(prevProps) {
+		if (prevProps.loadingTransaction &&
+			!this.props.loadingTransaction && !this.props.transactionShow) {
+			this.props.history.push(PARSE_ERROR_SEND_PATH);
+			return;
+		}
+		if (!prevProps.transactionShow && this.props.transactionShow) {
+			this.loadInfo();
+		}
 	}
 
 	onApprove() {
@@ -132,6 +147,17 @@ class SignTransaction extends React.Component {
 		return mapShow;
 	}
 
+	loadInfo() {
+		const { transactionShow, transaction } = this.props;
+		const options = transaction.get('options');
+		const type = transactionShow.get('type');
+
+		const account = this.props.accounts
+			.find((value) => options[0][1][operationKeys[type]] === value.id);
+
+		this.props.set('signAccount', new Map(account));
+	}
+
 	render() {
 		const {
 			transaction, account, loading, transactionShow,
@@ -200,6 +226,7 @@ class SignTransaction extends React.Component {
 
 SignTransaction.propTypes = {
 	loading: PropTypes.bool,
+	loadingTransaction: PropTypes.bool,
 	transaction: PropTypes.any,
 	transactionShow: PropTypes.any,
 	accounts: PropTypes.object,
@@ -216,6 +243,7 @@ SignTransaction.defaultProps = {
 	accounts: null,
 	account: null,
 	loading: false,
+	loadingTransaction: true,
 };
 
 export default connect(
@@ -223,6 +251,7 @@ export default connect(
 		loading: state.global.get('loading'),
 		transaction: state.global.getIn(['sign', 'current']),
 		transactionShow: state.global.getIn(['sign', 'dataToShow']),
+		loadingTransaction: state.global.getIn(['sign', 'loading']),
 		accounts: state.global.getIn([
 			'accounts',
 			state.global.getIn(['network', 'name']),
