@@ -14,7 +14,7 @@ import {
 	globals,
 } from '../../actions/SignActions';
 
-import { INDEX_PATH, NETWORK_ERROR_SEND_PATH, PARSE_ERROR_SEND_PATH } from '../../constants/RouterConstants';
+import { ACCOUNT_ERROR_SEND_PATH, INDEX_PATH, NETWORK_ERROR_SEND_PATH, PARSE_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 import { operationFields, operationKeys, operationTypes } from '../../constants/OperationConstants';
 
@@ -43,8 +43,6 @@ class SignTransaction extends React.Component {
 		if (!this.props.transactionShow) {
 			return null;
 		}
-
-		this.loadInfo();
 
 		return null;
 	}
@@ -155,7 +153,14 @@ class SignTransaction extends React.Component {
 		const account = this.props.accounts
 			.find((value) => options[0][1][operationKeys[type]] === value.id);
 
+		if (!account) {
+			this.props.history.push(ACCOUNT_ERROR_SEND_PATH);
+			return null;
+		}
+
 		this.props.set('signAccount', new Map(account));
+
+		return null;
 	}
 
 	render() {

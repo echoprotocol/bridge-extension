@@ -289,7 +289,13 @@ const onMessage = (request, sender, sendResponse) => {
 		triggerPopup(INCOMING_CONNECTION_PATH, providerNotification);
 		return true;
 	} else if (request.method === 'getAccess') {
-		sendResponse({ id: request.id, status: processedOrigins[hostname] });
+		const isAccess = processedOrigins[hostname];
+		if (isAccess) {
+			sendResponse({ id: request.id, status: isAccess });
+		} else {
+			sendResponse({ id: request.id, status: isAccess, error: { isAccess: false } });
+		}
+
 		return true;
 	}
 
@@ -425,7 +431,6 @@ export const onResponse = (err, id, status) => {
 		}
 
 		removeTransaction(id);
-
 
 		return null;
 	}
