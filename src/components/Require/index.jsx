@@ -112,7 +112,7 @@ export function required(Component) {
 			if (
 				(isProviderApproval || isSign || isSignMessage)
 				&& ![SIGN_TRANSACTION_PATH, INCOMING_CONNECTION_PATH, SIGN_MESSAGE_PATH].includes(pathname)
-                && ![SUCCESS_SEND_PATH, ERROR_SEND_PATH, NETWORK_ERROR_SEND_PATH].includes(pathname)
+                && ![SUCCESS_SEND_PATH, ERROR_SEND_PATH].includes(pathname)
 			) {
 				return null;
 			}

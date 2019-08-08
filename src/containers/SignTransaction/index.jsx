@@ -16,8 +16,10 @@ import {
 
 import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
-import GlobalReducer from '../../reducers/GlobalReducer';
 import { operationFields, operationKeys, operationTypes } from '../../constants/OperationConstants';
+
+import GlobalReducer from '../../reducers/GlobalReducer';
+
 import FormatHelper from '../../helpers/FormatHelper';
 
 class SignTransaction extends React.Component {

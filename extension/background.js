@@ -429,16 +429,16 @@ export const onResponse = (err, id, status) => {
 		return null;
 	}
 
-	if (status === DISCONNECT_STATUS && requestQueue.length === 1) {
-		removeTransaction(requestQueue[0].id, status);
-	}
-
 	if ([CANCELED_STATUS, ERROR_STATUS].includes(status)) {
 		removeTransaction(id, status);
 	}
 
 	if (COMPLETE_STATUS !== status) {
 		createNotification('Transaction', `${status} ${err ? err.toLowerCase() : ''}`);
+	}
+
+	if (status === DISCONNECT_STATUS && requestQueue.length === 1) {
+		removeTransaction(requestQueue[0].id, status);
 	}
 
 	if (NOT_LOGGED_STATUS === status) {
