@@ -209,6 +209,8 @@ export const removeTransaction = (id, isClose) => async (dispatch, getState) => 
 				current: null,
 			},
 		}));
+
+		return;
 	}
 
 	const dataToShow = await getFetchedData(transactions.get(0).options);
@@ -546,7 +548,7 @@ export const approve = (operations, id) => async (dispatch, getState) => {
 
 		dispatch(removeTransaction(id));
 
-		emitter.emit('response', `Error: ${err}`, id, ERROR_STATUS);
+		emitter.emit('response', err, id, ERROR_STATUS);
 
 		emitter.emit('windowRequest', id, globals.WINDOW_TYPE);
 

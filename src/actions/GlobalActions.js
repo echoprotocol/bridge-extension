@@ -187,7 +187,8 @@ export const chooseProviderAccess = (id, status) => (dispatch) => {
 	const emitter = echoService.getEmitter();
 
 	try {
-		emitter.emit('providerResponse', null, id, status);
+		const error = status ? null : { isAccess: false };
+		emitter.emit('providerResponse', error, id, status);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}

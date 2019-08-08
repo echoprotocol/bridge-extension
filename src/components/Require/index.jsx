@@ -117,7 +117,7 @@ export function required(Component) {
 				return null;
 			}
 
-			if (!isLogin && !(isProviderApproval || isSign || isSignMessage)) {
+			if (!isLogin && !isProviderApproval && !isSign && !isSignMessage) {
 				return null;
 			}
 
