@@ -16,7 +16,7 @@ import {
 	INCOMING_CONNECTION_PATH,
 	SIGN_MESSAGE_PATH,
 } from '../../constants/RouterConstants';
-import { cancelTransaction, globals } from '../../actions/SignActions';
+import { globals } from '../../actions/SignActions';
 
 export function required(Component) {
 
@@ -155,9 +155,5 @@ export function required(Component) {
 		isSignMessage: !!state.global.get('signMessageRequests').size,
 		connected: state.global.get('connected'),
 		loading: state.global.get('loading'),
-		transaction: state.global.getIn(['sign', 'current']),
-	}), (dispatch) => ({
-		cancel: (transaction) => dispatch(cancelTransaction(transaction)),
 	}))(RequiredComponent);
-
 }
