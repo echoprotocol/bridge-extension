@@ -429,6 +429,10 @@ export const onResponse = (err, id, status) => {
 		return null;
 	}
 
+	if (status === DISCONNECT_STATUS && requestQueue.length === 1) {
+		removeTransaction(requestQueue[0].id, status);
+	}
+
 	if ([CANCELED_STATUS, ERROR_STATUS].includes(status)) {
 		removeTransaction(id, status);
 	}

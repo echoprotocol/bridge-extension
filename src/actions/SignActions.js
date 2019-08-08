@@ -382,11 +382,6 @@ export const loadRequests = () => async (dispatch) => {
 				field: 'sign',
 				value: new Map({
 					loading: true,
-				}),
-			}),
-			GlobalReducer.actions.set({
-				field: 'sign',
-				value: new Map({
 					goTo: !NOT_RETURNED_PATHS.includes(pathname) ? pathname : null,
 					transactions: new List(requests),
 				}),
@@ -404,22 +399,20 @@ export const loadRequests = () => async (dispatch) => {
 
 		const dataToShow = await getFetchedData(requests[0].options);
 
-		dispatch(batchActions([
-			GlobalReducer.actions.setIn({
-				field: 'sign',
-				params: {
-					dataToShow: new Map(dataToShow),
-				},
-			}),
-		]));
+		dispatch(GlobalReducer.actions.setIn({
+			field: 'sign',
+			params: {
+				dataToShow: new Map(dataToShow),
+			},
+		}));
 	} catch (err) {
 		console.warn('Loading requests error', err);
 	} finally {
-		dispatch(GlobalReducer.actions.set({
+		dispatch(GlobalReducer.actions.setIn({
 			field: 'sign',
-			value: new Map({
+			params: {
 				loading: false,
-			}),
+			},
 		}));
 	}
 

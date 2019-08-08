@@ -14,7 +14,7 @@ import {
 	globals,
 } from '../../actions/SignActions';
 
-import { ACCOUNT_ERROR_SEND_PATH, INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
+import { INDEX_PATH, NETWORK_ERROR_SEND_PATH } from '../../constants/RouterConstants';
 import { POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 import GlobalReducer from '../../reducers/GlobalReducer';
 import { operationFields, operationKeys, operationTypes } from '../../constants/OperationConstants';
@@ -30,6 +30,11 @@ class SignTransaction extends React.Component {
 				this.props.history.push(NETWORK_ERROR_SEND_PATH);
 			}
 
+			return null;
+		}
+
+		if (!this.props.loadingTransaction && !this.props.transactionShow) {
+			this.props.history.push(NETWORK_ERROR_SEND_PATH);
 			return null;
 		}
 
@@ -236,7 +241,7 @@ SignTransaction.defaultProps = {
 	accounts: null,
 	account: null,
 	loading: false,
-	loadingTransaction: false,
+	loadingTransaction: true,
 };
 
 export default connect(
