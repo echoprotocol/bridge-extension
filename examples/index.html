@@ -104,7 +104,7 @@
 						id="contract-receiver"
 						name="contract-receiver"
 						placeholder="callee"
-						value="1.14.442"
+						value="1.9.442"
 					/>
 					<input
 						type="text"
@@ -271,22 +271,6 @@
 		</div>
 		<!---->
 
-		<!-- Upgrade account -->
-		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
-			<h4>Upgrade account</h4>
-			<div style="padding: 5px 0;">
-				<input
-						type="text"
-						id="upgradeAccount-registrar"
-						name="upgradeAccount-registrar"
-						placeholder="registrar"
-						value="1.2.1204"
-				/>
-				<button id="upgradeAccount-click">submit</button>
-			</div>
-			<div id="upgradeAccount-info"></div>
-		</div>
-
 		<!-- Sign message -->
 		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
 			<h4>Sign message</h4>
@@ -439,7 +423,7 @@
 			$("#contract-click").click(function(e) {
 				if (!isAccess) return;
 				const transaction = {
-					type: window.echojslib.constants.OPERATIONS_IDS.CALL_CONTRACT,
+					type: window.echojslib.constants.OPERATIONS_IDS.CONTRACT_CALL,
 					registrar: jQuery("#contract-registrar")[0].value,
 					code: jQuery("#contract-code")[0].value,
 					value: {
@@ -461,7 +445,7 @@
 
 				const tr = window.echojslib.echo.createTransaction();
 
-				tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.CALL_CONTRACT, {
+				tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.CONTRACT_CALL, {
 					registrar: transaction.registrar,
 					value: {
 						asset_id: transaction.value.asset_id,
@@ -494,7 +478,7 @@
 			$("#contactCreate-click").click(function (e) {
 				if (!isAccess) return;
 				const transaction = {
-					type: window.echojslib.constants.OPERATIONS_IDS.CREATE_CONTRACT,
+					type: window.echojslib.constants.OPERATIONS_IDS.CONTRACT_CREATE,
 					registrar: jQuery("#contactCreate-fromAddress")[0].value,
 					code: jQuery("#contactCreate-code")[0].value,
 					value: {
@@ -512,7 +496,7 @@
 
 				const tr = window.echojslib.echo.createTransaction();
 
-				tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.CREATE_CONTRACT, {
+				tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.CONTRACT_CREATE, {
 					registrar: transaction.registrar,
 					value: {
 						amount: transaction.value.amount,
@@ -624,37 +608,6 @@
 					})
 					.catch(err => {
 						jQuery("#updateAccount-info").html(
-								`<p>ERROR: ${JSON.stringify(err)}</p>`
-						);
-					});
-			});
-
-			$("#upgradeAccount-click").click(function (e) {
-				if (!isAccess) return;
-				const transaction = {
-					account_to_upgrade: jQuery("#upgradeAccount-registrar")[0].value,
-					upgrade_to_lifetime_member: true
-				};
-
-				const tr = window.echojslib.echo.createTransaction();
-
-				tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_UPGRADE, transaction);
-
-				tr.signWithBridge()
-					.then(result => {
-						result.broadcast()
-								.then((res) => {
-									jQuery("#upgradeAccount-info").html(
-											`<p>RESULT: ${JSON.stringify(res)}</p>`
-									);
-								}).catch(err => {
-							jQuery("#upgradeAccount-info").html(
-									`<p>ERROR: ${JSON.stringify(err)}</p>`
-							);
-						});
-					})
-					.catch(err => {
-						jQuery("#upgradeAccount-info").html(
 								`<p>ERROR: ${JSON.stringify(err)}</p>`
 						);
 					});

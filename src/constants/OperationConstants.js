@@ -76,18 +76,6 @@ export const operationFields = {
 			field: 'key_auths',
 		},
 	},
-	upgradeAccount: {
-		account_to_upgrade: {
-			type: 'account_id',
-		},
-		fee: {
-			type: 'asset_object',
-			hasProperties: 'asset_id',
-		},
-		upgrade_to_lifetime_member: {
-			field: 'string',
-		},
-	},
 };
 
 export const operationFieldsSend = {
@@ -111,7 +99,7 @@ export const operationFieldsSend = {
 			hasProperties: ['amount', 'asset_id'],
 		},
 	},
-	[OPERATIONS_IDS.CALL_CONTRACT]: {
+	[OPERATIONS_IDS.CONTRACT_CALL]: {
 		fee: {
 			type: 'asset_object',
 			required: false,
@@ -143,8 +131,7 @@ export const operationKeys = {
 	createContract: 'registrar',
 	createAccount: 'registrar',
 	updateAccount: 'account',
-	upgradeAccount: 'account_to_upgrade',
-	[OPERATIONS_IDS.CALL_CONTRACT]: 'registrar',
+	[OPERATIONS_IDS.CONTRACT_CALL]: 'registrar',
 };
 
 export const operationTypes = {
@@ -154,11 +141,11 @@ export const operationTypes = {
 	},
 	contract: {
 		name: 'Contract call',
-		code: OPERATIONS_IDS.CALL_CONTRACT,
+		code: OPERATIONS_IDS.CONTRACT_CALL,
 	},
 	createContract: {
 		name: 'Contract create',
-		code: OPERATIONS_IDS.CREATE_CONTRACT,
+		code: OPERATIONS_IDS.CONTRACT_CREATE,
 	},
 	createAccount: {
 		name: 'Account create',
@@ -167,10 +154,6 @@ export const operationTypes = {
 	updateAccount: {
 		name: 'Update account',
 		code: OPERATIONS_IDS.ACCOUNT_UPDATE,
-	},
-	upgradeAccount: {
-		name: 'Upgrade account',
-		code: OPERATIONS_IDS.ACCOUNT_UPGRADE,
 	},
 };
 

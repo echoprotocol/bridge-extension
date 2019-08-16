@@ -24,7 +24,7 @@
     "classnames": "^2.2.6",
     "config": "^1.30.0",
     "crypto-random-string": "^1.0.0",
-    "echojs-lib": "^1.4.0",
+    "echojs-lib": "^1.6.0-rc.2",
     "events": "^3.0.0",
     "file-loader": "^1.1.11",
     "focus-trap-react": "^4.0.1",
