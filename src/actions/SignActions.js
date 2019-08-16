@@ -48,7 +48,7 @@ const getOperationFee = async (type, transaction) => {
 
 	let tr = echoService.getChainLib().createTransaction();
 
-	if (type === OPERATIONS_IDS.CALL_CONTRACT) {
+	if (type === OPERATIONS_IDS.CONTRACT_CALL) {
 		options.fee = undefined;
 	}
 

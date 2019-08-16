@@ -264,7 +264,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 				},
 				callee: receiver,
 				registrar: fromAccount,
-				type: OPERATIONS_IDS.CALL_CONTRACT,
+				type: OPERATIONS_IDS.CONTRACT_CALL,
 				value: {
 					amount: 0,
 					asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
@@ -376,7 +376,7 @@ export const send = () => async (dispatch, getState) => {
 			},
 			callee: receiver,
 			registrar: fromAccount,
-			type: OPERATIONS_IDS.CALL_CONTRACT,
+			type: OPERATIONS_IDS.CONTRACT_CALL,
 			value: {
 				asset_id: coreAsset,
 				amount: 0,
