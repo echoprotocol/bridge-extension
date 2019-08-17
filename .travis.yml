@@ -21,14 +21,26 @@ jobs:
       if: branch IN (develop, master) AND type = pull_request
       script: npm run test
 
+#    - stage: build
+#      name: "Build Artifacts"
+#      if: (branch = master OR branch = develop) AND type = push
+#      addons:
+#        artifacts:
+#          working_dir: build/zip/
+#          paths:
+#            - echo_bridge.zip
+#      script:
+#        - npm run build-ext
+#        - "echo \"Download URL: https://${ARTIFACTS_BUCKET}.s3.amazonaws.com/echoprotocol/bridge-extension/${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}/echo_bridge.zip\""
     - stage: build
-      name: "Build Artifacts"
-      if: (branch = master OR tag IS present) AND type = push
-      addons:
-        artifacts:
-          working_dir: build/zip/
-          paths:
-            - echo_bridge.zip
+      name: "Build Tag Artifacts"
+      if: tag IS present
       script:
         - npm run build-ext
-        - "echo \"Download URL: https://${ARTIFACTS_BUCKET}.s3.amazonaws.com/echoprotocol/bridge-extension/${TRAVIS_BUILD_NUMBER}/${TRAVIS_JOB_NUMBER}/echo_bridge.zip\""
+      deploy:
+        provider: releases
+        api_key: $GITHUB_OAUTH_TOKEN
+        file: build/zip/echo_bridge.zip
+        skip_cleanup: true
+        on:
+          tags: true
