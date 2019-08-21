@@ -10,17 +10,20 @@ import { initAssetsBalances, updateTokens } from './BalanceActions';
 import echoService from '../services/echo';
 
 import {
-	CONNECT_STATUS,
+	CONNECT_STATUS, DRAFT_STORAGE_KEY,
 	NETWORKS,
 } from '../constants/GlobalConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
 import { CONNECTION_ERROR_PATH } from '../constants/RouterConstants';
+import { FORM_SIGN_UP } from '../constants/FormConstants';
 
 import storage from '../services/storage';
 import history from '../history';
 
-import FormatHelper from '../helpers/FormatHelper';
 import { updateHistory } from './HistoryActions';
+import { setValue } from './FormActions';
+
+import FormatHelper from '../helpers/FormatHelper';
 
 /**
  * copy object from ChainStore lib to redux every time when triggered, check connection
@@ -50,6 +53,9 @@ export const connect = () => async (dispatch) => {
 
 	try {
 		let network = await storage.get('current_network');
+
+		const loadingSignUp = !!(await storage.get(DRAFT_STORAGE_KEY));
+		dispatch(setValue(FORM_SIGN_UP, 'loading', loadingSignUp));
 
 		if (!network) {
 			[network] = NETWORKS;
