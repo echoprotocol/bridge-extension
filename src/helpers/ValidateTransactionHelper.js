@@ -1,4 +1,5 @@
 import BN from 'bignumber.js';
+import { ERC20_HASHES } from '../constants/GlobalConstants';
 
 class ValidateTransactionHelper {
 
@@ -71,6 +72,20 @@ class ValidateTransactionHelper {
 		}
 
 		return null;
+	}
+
+	/**
+	 *
+	 * @param {String} scriptHex
+	 * @returns {boolean}
+	 */
+	static isErc20Contract(scriptHex) {
+		if (scriptHex) {
+			const hashes = Object.values(ERC20_HASHES);
+			return hashes.every((hash) => scriptHex.includes(hash.toString()));
+		}
+
+		return false;
 	}
 
 }
