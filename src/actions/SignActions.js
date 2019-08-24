@@ -304,18 +304,15 @@ export const requestHandler = (id, options) => async (dispatch, getState) => {
 
 	const transactions = getState().global.getIn(['sign', 'transactions']);
 
-	if (!transactions.size) {
-		dispatch(GlobalReducer.actions.setIn({
-			field: 'sign',
-			params: {
-				current: new Map({
-					id,
-					options,
-				}),
-			},
-		}));
-		// await dispatch(setTransaction({ id, options }));
-	}
+	dispatch(GlobalReducer.actions.setIn({
+		field: 'sign',
+		params: {
+			current: new Map({
+				id,
+				options,
+			}),
+		},
+	}));
 
 	dispatch(GlobalReducer.actions.setIn({
 		field: 'sign',
