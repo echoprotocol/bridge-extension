@@ -10,7 +10,8 @@ import { initAssetsBalances, updateTokens } from './BalanceActions';
 import echoService from '../services/echo';
 
 import {
-	CONNECT_STATUS, DRAFT_STORAGE_KEY,
+	CONNECT_STATUS,
+	DRAFT_STORAGE_KEY,
 	NETWORKS,
 } from '../constants/GlobalConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
@@ -42,6 +43,15 @@ export const subscribe = () => (dispatch) => {
 };
 
 /**
+ * check loading create account
+ * @returns {Function}
+ */
+export const checkActiveLoading = () => async (dispatch) => {
+	const loadingSignUp = !!(await storage.get(DRAFT_STORAGE_KEY));
+	dispatch(setValue(FORM_SIGN_UP, 'loading', loadingSignUp));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: loadingSignUp }));
+};
+/**
  * connect socket current network
  * @returns {Function}
  */
@@ -53,9 +63,6 @@ export const connect = () => async (dispatch) => {
 
 	try {
 		let network = await storage.get('current_network');
-
-		const loadingSignUp = !!(await storage.get(DRAFT_STORAGE_KEY));
-		dispatch(setValue(FORM_SIGN_UP, 'loading', loadingSignUp));
 
 		if (!network) {
 			[network] = NETWORKS;
