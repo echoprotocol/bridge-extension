@@ -82,7 +82,7 @@ class ValidateTransactionHelper {
 	static isErc20Contract(scriptHex) {
 		if (scriptHex) {
 			const hashes = Object.values(ERC20_HASHES);
-			return hashes.every((hash) => scriptHex.includes(hash.toString()));
+			return hashes.every((hash) => scriptHex.includes(hash));
 		}
 
 		return false;
