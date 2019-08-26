@@ -2,6 +2,7 @@
 
 const extensionizer = require('./extensionizer');
 const { APP_ID } = require('../src/constants/GlobalConstants');
+const getAccessRequest = {};
 
 /**
  * inpage script injection to web page
@@ -49,14 +50,28 @@ const onResponse = (res, origin = '*') => {
  * On Inpage message
  * @param event
  */
-const onMessage = (event) => {
-
-	const { data } = event;
+const onMessage = async (event) => {
+	const { data, origin } = event;
 
 	if (data.target !== 'content' || !data.appId || data.appId !== APP_ID) return;
 
 	try {
-		extensionizer.runtime.sendMessage(data, (res) => onResponse(res, event.origin));
+		if (data.method !== 'getAccess') {
+			extensionizer.runtime.sendMessage(data, (res) => onResponse(res, event.origin));
+			return;
+		}
+		if (!getAccessRequest[origin]) {
+			getAccessRequest[origin] = new Promise((resolve) => {
+				extensionizer.runtime.sendMessage(data, (res) => {
+					onResponse(res, event.origin);
+					resolve(res);
+				});
+			});
+		} else {
+			const result = await getAccessRequest[origin];
+			result.id = event.data.id;
+			onResponse(result, event.origin);
+		}
 	} catch (err) {
 		if (err.message.match(/Invocation of form runtime\.connect/) && err.message.match(/doesn't match definition runtime\.connect/)) {
 			console.error('Connection to background error, please reload the page', err);
