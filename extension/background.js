@@ -199,10 +199,12 @@ const createNotification = (title = '', message = '') => {
  */
 const createAccount = async (name, path) => {
 	try {
+		storageSetDraft(FORM_SIGN_UP, 'loading', true);
 		const network = await getNetwork();
 		const { error, example } = await validateAccountExist(name);
 
 		if (error) {
+			storageSetDraft(FORM_SIGN_UP, 'loading', false);
 			storageSetDraft(FORM_SIGN_UP, 'error', { error, example });
 			emitter.emit('offerName', error, example);
 			return null;
@@ -217,8 +219,9 @@ const createAccount = async (name, path) => {
 		storage.remove(DRAFT_STORAGE_KEY);
 	} catch (err) {
 		await emitter.emit('addAccountError', FormatHelper.formatError(err));
-
 		storageSetDraft(FORM_SIGN_UP, 'error', { error: FormatHelper.formatError(err), example: '' });
+	} finally {
+		storageSetDraft(FORM_SIGN_UP, 'loading', false);
 	}
 	return null;
 

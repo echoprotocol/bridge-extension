@@ -6,12 +6,13 @@ import BalanceReducer from '../reducers/BalanceReducer';
 import BlockchainReducer from '../reducers/BlockchainReducer';
 
 import { initAssetsBalances, updateTokens } from './BalanceActions';
+import { setValue } from './FormActions';
+import { storageGetDraft } from './GlobalActions';
 
 import echoService from '../services/echo';
 
 import {
 	CONNECT_STATUS,
-	DRAFT_STORAGE_KEY,
 	NETWORKS,
 } from '../constants/GlobalConstants';
 import ChainStoreCacheNames from '../constants/ChainStoreConstants';
@@ -22,9 +23,9 @@ import storage from '../services/storage';
 import history from '../history';
 
 import { updateHistory } from './HistoryActions';
-import { setValue } from './FormActions';
 
 import FormatHelper from '../helpers/FormatHelper';
+
 
 /**
  * copy object from ChainStore lib to redux every time when triggered, check connection
@@ -47,9 +48,11 @@ export const subscribe = () => (dispatch) => {
  * @returns {Function}
  */
 export const checkActiveLoading = () => async (dispatch) => {
-	const loadingSignUp = !!(await storage.get(DRAFT_STORAGE_KEY));
-	dispatch(setValue(FORM_SIGN_UP, 'loading', loadingSignUp));
-	dispatch(GlobalReducer.actions.set({ field: 'loading', value: loadingSignUp }));
+	const draftStorage = await storageGetDraft();
+	const signUp = draftStorage[FORM_SIGN_UP];
+	const loading = signUp && signUp.loading;
+	dispatch(setValue(FORM_SIGN_UP, 'loading', loading));
+	dispatch(GlobalReducer.actions.set({ field: 'loading', value: loading }));
 };
 /**
  * connect socket current network
