@@ -6,13 +6,11 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { Dimmer, Sidebar } from 'semantic-ui-react';
 
-
 import { globalInit, initListeners as init } from '../actions/GlobalActions';
 
 import Navigator from '../components/Navigator';
 import Modals from '../components/Modals';
 
-import { FORM_SIGN_UP } from '../constants/FormConstants';
 import { PIN_PATHS, SIGN_TRANSACTION_PATH, CONNECTION_ERROR_PATH } from '../constants/RouterConstants';
 
 import bridgeLogo from '../assets/images/bridge-logo-hor-bw.svg';
@@ -42,7 +40,7 @@ class App extends React.Component {
 
 	renderApp() {
 		const {
-			children, loading, pathname, loadingCreateAccount,
+			children, loading, pathname,
 		} = this.props;
 
 		return (
@@ -53,7 +51,7 @@ class App extends React.Component {
 					<Modals />
 				</Sidebar.Pushable>
 				{
-					(loading || loadingCreateAccount) ?
+					loading ?
 						<Dimmer
 							active
 							className={classnames({
@@ -79,7 +77,6 @@ class App extends React.Component {
 App.propTypes = {
 	children: PropTypes.element.isRequired,
 	loading: PropTypes.bool.isRequired,
-	loadingCreateAccount: PropTypes.bool.isRequired,
 	pathname: PropTypes.string.isRequired,
 	initApp: PropTypes.func.isRequired,
 	initListeners: PropTypes.func.isRequired,
@@ -87,7 +84,6 @@ App.propTypes = {
 export default connect(
 	(state) => ({
 		loading: state.global.get('loading'),
-		loadingCreateAccount: state.form.getIn([FORM_SIGN_UP, 'loading']),
 		pathname: state.router.location.pathname,
 	}),
 	(dispatch) => {

@@ -680,8 +680,8 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
  */
 export const globalInit = () => async (dispatch) => {
 	await dispatch(connect());
-	dispatch(checkActiveLoading());
 	await dispatch(initCrypto());
+	dispatch(checkActiveLoading());
 };
 
 /**
