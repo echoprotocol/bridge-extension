@@ -163,5 +163,7 @@ export const ERC20_HASHES = {
 	'approve(address,uint256)': '095ea7b3',
 	'transferFrom(address,address,uint256)': '23b872dd',
 	'Transfer(address,address,uint256)': 'ddf252ad',
+	'decimals()': '313ce567',
+	'symbol()': '95d89b41',
 };
 
