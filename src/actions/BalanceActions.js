@@ -621,6 +621,15 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
 		}
 
 		const accountId = getState().global.getIn(['account', 'id']);
+		const [, { code }] = contract;
+
+		const isErc20Token = ValidateTransactionHelper.isErc20Contract(code);
+
+		if (!isErc20Token) {
+			dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Invalid token contract'));
+			dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+			return null;
+		}
 
 		const { symbol, precision, balance } = await getTokenDetails(contractId, accountId);
 
