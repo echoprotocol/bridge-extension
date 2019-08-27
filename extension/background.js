@@ -104,7 +104,7 @@ const getNetwork = async () => {
 const createSocket = async (url) => {
 
 	if (!url) {
-		const network = await getNetwork();
+		const network = await storage.get('current_network') || NETWORKS[0];
 
 		({ url } = network);
 
