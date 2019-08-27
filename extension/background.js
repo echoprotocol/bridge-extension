@@ -273,7 +273,7 @@ const onMessage = (request, sender, sendResponse) => {
 		const indexFindRequest = providerRequests.findIndex((rq) => rq.origin === hostname);
 		if (indexFindRequest === -1) return true;
 		const indexTabId = providerRequests[indexFindRequest].tabs
-			.findIndex((id) => parseInt(id, 10) === parseInt(tabId, 10));
+			.findIndex((id) => id === tabId);
 		if (indexTabId === -1) return true;
 		providerRequests[indexFindRequest].cbs.splice(indexTabId, 1);
 		providerRequests[indexFindRequest].ids.splice(indexTabId, 1);
