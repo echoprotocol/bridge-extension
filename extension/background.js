@@ -65,6 +65,8 @@ let signMessageRequests = [];
 const providerNotification = new NotificationManager();
 const signNotification = new NotificationManager();
 
+const tabUrls = {};
+
 const connectSubscribe = (status) => {
 	try {
 		switch (status) {
@@ -261,6 +263,7 @@ const resolveAccounts = async () => {
  */
 const onMessage = (request, sender, sendResponse) => {
 	const { hostname } = urlParse(sender.tab.url);
+	const { id: tabId } = sender.tab;
 
 	request = JSON.parse(JSON.stringify(request));
 
@@ -273,14 +276,21 @@ const onMessage = (request, sender, sendResponse) => {
 			return true;
 		}
 
+		tabUrls[tabId] = hostname;
 		const indexRequest = providerRequests.findIndex((p) => p.origin === hostname);
 		if (indexRequest !== -1) {
 			providerRequests[indexRequest].ids.push(request.id);
 			providerRequests[indexRequest].cbs.push(sendResponse);
+			providerRequests[indexRequest].tabs.push(tabId);
 			return true;
 		}
 
-		providerRequests.push({ origin: hostname, ids: [request.id], cbs: [sendResponse] });
+		providerRequests.push({
+			origin: hostname,
+			tabs: [tabId],
+			ids: [request.id],
+			cbs: [sendResponse],
+		});
 
 		setBadge();
 
@@ -740,3 +750,15 @@ crypto.on('unlocked', onPinUnlock);
 extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });
+
+chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
+	if (!tab.discarded) return;
+	const tabUrl = tabUrls[tabId];
+	if (!tabUrl) return;
+	const request = providerRequests.find((rq) => rq.origin === tabUrl);
+	const indexTabId = request.tabs((id) => parseInt(id, 10) === parseInt(tabId, 10));
+	request.cbs.splice(indexTabId);
+	request.ids.splice(indexTabId);
+	request.tabs.splice(indexTabId);
+});
+
