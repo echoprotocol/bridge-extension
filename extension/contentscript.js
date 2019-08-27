@@ -81,5 +81,12 @@ const onMessage = async (event) => {
 	}
 };
 
+window.addEventListener('beforeunload', () => {
+	extensionizer.runtime.sendMessage({
+		method: 'closeTab',
+		appId: APP_ID,
+	});
+});
+
 window.addEventListener('message', onMessage, false);
 

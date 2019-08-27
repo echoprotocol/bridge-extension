@@ -269,6 +269,18 @@ const onMessage = (request, sender, sendResponse) => {
 
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
+	if (request.method === 'closeTab') {
+		const indexFindRequest = providerRequests.findIndex((rq) => rq.origin === hostname);
+		if (indexFindRequest === -1) return true;
+		const indexTabId = providerRequests[indexFindRequest].tabs
+			.findIndex((id) => parseInt(id, 10) === parseInt(tabId, 10));
+		if (indexTabId === -1) return true;
+		providerRequests[indexFindRequest].cbs.splice(indexTabId, 1);
+		providerRequests[indexFindRequest].ids.splice(indexTabId, 1);
+		providerRequests[indexFindRequest].tabs.splice(indexTabId, 1);
+		return true;
+	}
+
 	if (typeof processedOrigins[hostname] !== 'boolean') {
 
 		if (request.method !== 'getAccess') {
@@ -276,7 +288,6 @@ const onMessage = (request, sender, sendResponse) => {
 			return true;
 		}
 
-		tabUrls[tabId] = hostname;
 		const indexRequest = providerRequests.findIndex((p) => p.origin === hostname);
 		if (indexRequest !== -1) {
 			providerRequests[indexRequest].ids.push(request.id);
@@ -751,14 +762,5 @@ extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });
 
-chrome.tabs.onUpdated.addListener(async (tabId, changeInfo, tab) => {
-	if (!tab.discarded) return;
-	const tabUrl = tabUrls[tabId];
-	if (!tabUrl) return;
-	const request = providerRequests.find((rq) => rq.origin === tabUrl);
-	const indexTabId = request.tabs((id) => parseInt(id, 10) === parseInt(tabId, 10));
-	request.cbs.splice(indexTabId);
-	request.ids.splice(indexTabId);
-	request.tabs.splice(indexTabId);
-});
+
 
