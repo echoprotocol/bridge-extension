@@ -44,6 +44,8 @@ class SignTransaction extends React.Component {
 			return null;
 		}
 
+		this.loadInfo();
+
 		return null;
 	}
 

@@ -377,7 +377,7 @@ export const onLogout = (name) => async (dispatch, getState) => {
 		await dispatch(initAccount(accounts.getIn([networkName, 0])));
 
 		emitter.emit('activeAccountResponse', accounts.getIn([networkName, 0]));
-		history.push(CREATE_ACCOUNT_PATH);
+		history.push(INDEX_PATH);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}

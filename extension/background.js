@@ -65,6 +65,8 @@ let signMessageRequests = [];
 const providerNotification = new NotificationManager();
 const signNotification = new NotificationManager();
 
+const tabUrls = {};
+
 const connectSubscribe = (status) => {
 	try {
 		switch (status) {
@@ -102,7 +104,7 @@ const getNetwork = async () => {
 const createSocket = async (url) => {
 
 	if (!url) {
-		const network = await getNetwork();
+		const network = await storage.get('current_network') || NETWORKS[0];
 
 		({ url } = network);
 
@@ -264,10 +266,23 @@ const resolveAccounts = async () => {
  */
 const onMessage = (request, sender, sendResponse) => {
 	const { hostname } = urlParse(sender.tab.url);
+	const { id: tabId } = sender.tab;
 
 	request = JSON.parse(JSON.stringify(request));
 
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
+
+	if (request.method === 'closeTab') {
+		const indexFindRequest = providerRequests.findIndex((rq) => rq.origin === hostname);
+		if (indexFindRequest === -1) return true;
+		const indexTabId = providerRequests[indexFindRequest].tabs
+			.findIndex((id) => id === tabId);
+		if (indexTabId === -1) return true;
+		providerRequests[indexFindRequest].cbs.splice(indexTabId, 1);
+		providerRequests[indexFindRequest].ids.splice(indexTabId, 1);
+		providerRequests[indexFindRequest].tabs.splice(indexTabId, 1);
+		return true;
+	}
 
 	if (typeof processedOrigins[hostname] !== 'boolean') {
 
@@ -276,12 +291,20 @@ const onMessage = (request, sender, sendResponse) => {
 			return true;
 		}
 
-		if (providerRequests.find((p) => p.origin === hostname)) {
-			sendResponse({ id: request.id, error: 'Access has already requested' });
+		const indexRequest = providerRequests.findIndex((p) => p.origin === hostname);
+		if (indexRequest !== -1) {
+			providerRequests[indexRequest].ids.push(request.id);
+			providerRequests[indexRequest].cbs.push(sendResponse);
+			providerRequests[indexRequest].tabs.push(tabId);
 			return true;
 		}
 
-		providerRequests.push({ origin: hostname, id: request.id, cb: sendResponse });
+		providerRequests.push({
+			origin: hostname,
+			tabs: [tabId],
+			ids: [request.id],
+			cbs: [sendResponse],
+		});
 
 		setBadge();
 
@@ -622,15 +645,16 @@ const onSwitchActiveAccount = (res) => {
  * 	@param {Boolean} status
  */
 export const onProviderApproval = (err, id, status) => {
-	const request = providerRequests.find((r) => String(r.id) === id);
+	const request = providerRequests.find(({ ids }) => String(ids[0]) === id);
 
 	if (!request) {
 		return;
 	}
 
-	request.cb({ error: err, id: request.id, status });
 
-	providerRequests = providerRequests.filter((p) => p.id !== request.id);
+	request.ids.forEach((rId, index) => request.cbs[index]({ error: err, id: rId, status }));
+
+	providerRequests = providerRequests.filter(({ ids }) => ids[0] !== request.ids[0]);
 	processedOrigins[request.origin] = status;
 
 	if (!providerRequests.length) {
@@ -716,8 +740,8 @@ window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }
 window.getPrivateKey = () => PrivateKey;
 window.getAes = () => aes;
 window.Transaction = () => Transaction;
-window.getProviderMap = () => providerRequests.reduce((map, { id, origin }) => {
-	map[id] = origin;
+window.getProviderMap = () => providerRequests.reduce((map, { ids: [reqId], origin }) => {
+	map[reqId] = origin;
 	return map;
 }, {});
 
@@ -740,3 +764,6 @@ crypto.on('unlocked', onPinUnlock);
 extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });
+
+
+
