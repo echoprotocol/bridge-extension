@@ -154,3 +154,16 @@ export const STORE = 'keyval';
 
 export const PATTERN_ID_MESSAGE = '*';
 export const LENGTH_ID_MESSAGE = 10;
+
+export const ERC20_HASHES = {
+	'totalSupply()': '18160ddd',
+	'balanceOf(address)': '70a08231',
+	'allowance(address,address)': 'dd62ed3e',
+	'transfer(address,uint256)': 'a9059cbb',
+	'approve(address,uint256)': '095ea7b3',
+	'transferFrom(address,address,uint256)': '23b872dd',
+	'Transfer(address,address,uint256)': 'ddf252ad',
+	'decimals()': '313ce567',
+	'symbol()': '95d89b41',
+};
+
