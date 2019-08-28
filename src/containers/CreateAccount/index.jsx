@@ -67,7 +67,11 @@ class CreateAccount extends React.Component {
 	}
 
 	componentWillUnmount() {
-		storageRemoveDraft();
+		const { accounts, networkName } = this.props;
+		if (accounts.get(networkName).size) {
+			storageRemoveDraft();
+		}
+
 
 		this.props.clearForm();
 	}

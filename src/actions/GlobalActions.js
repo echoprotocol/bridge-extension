@@ -6,7 +6,7 @@ import { initCrypto, setCryptoInfo, getCryptoInfo, removeCryptoInfo } from './Cr
 import history from '../history';
 
 import { setFormError, setValue, toggleLoading } from './FormActions';
-import { disconnect, connect } from './ChainStoreAction';
+import { disconnect, connect, checkActiveLoading } from './ChainStoreAction';
 import { getTokenDetails, initAssetsBalances, removeBalances } from './BalanceActions';
 import { globals, loadRequests } from './SignActions';
 
@@ -680,8 +680,8 @@ export const switchAccountNetwork = (accountName, network) => async (dispatch) =
  */
 export const globalInit = () => async (dispatch) => {
 	await dispatch(connect());
-
 	await dispatch(initCrypto());
+	dispatch(checkActiveLoading());
 };
 
 /**
