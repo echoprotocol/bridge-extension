@@ -48,7 +48,7 @@ const getOperationFee = async (type, transaction) => {
 
 	let tr = echoService.getChainLib().createTransaction();
 
-	if (type === OPERATIONS_IDS.CALL_CONTRACT) {
+	if (type === OPERATIONS_IDS.CONTRACT_CALL) {
 		options.fee = undefined;
 	}
 
@@ -206,6 +206,7 @@ export const removeTransaction = (id, isClose) => async (dispatch, getState) => 
 		dispatch(GlobalReducer.actions.setIn({
 			field: 'sign',
 			params: {
+				transactions: new List(),
 				current: null,
 			},
 		}));
@@ -296,13 +297,7 @@ export const requestHandler = (id, options) => async (dispatch, getState) => {
 		return null;
 	}
 
-	// const error = await dispatch(validateTransaction(options));
-	// if (error) {
-	// 	emitter.emit('response', `${error}`, id, ERROR_STATUS);
-	// 	return null;
-	// }
-
-	const transactions = getState().global.getIn(['sign', 'transactions']);
+	let transactions = getState().global.getIn(['sign', 'transactions']);
 
 	if (!transactions.size) {
 		dispatch(GlobalReducer.actions.setIn({
@@ -314,12 +309,17 @@ export const requestHandler = (id, options) => async (dispatch, getState) => {
 				}),
 			},
 		}));
-		// await dispatch(setTransaction({ id, options }));
 	}
 
+	transactions = transactions.push({ id, options });
+
+	const dataToShow = await getFetchedData(transactions.get(0).options);
 	dispatch(GlobalReducer.actions.setIn({
 		field: 'sign',
-		params: { transactions: transactions.push({ id, options }) },
+		params: {
+			transactions,
+			dataToShow: new Map(dataToShow),
+		},
 	}));
 
 	return null;
