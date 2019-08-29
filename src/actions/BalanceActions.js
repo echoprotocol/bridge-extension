@@ -264,7 +264,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 				},
 				callee: receiver,
 				registrar: fromAccount,
-				type: OPERATIONS_IDS.CALL_CONTRACT,
+				type: OPERATIONS_IDS.CONTRACT_CALL,
 				value: {
 					amount: 0,
 					asset_id: assets.get(balances.getIn([selectedFeeBalance, 'asset_type'])),
@@ -376,7 +376,7 @@ export const send = () => async (dispatch, getState) => {
 			},
 			callee: receiver,
 			registrar: fromAccount,
-			type: OPERATIONS_IDS.CALL_CONTRACT,
+			type: OPERATIONS_IDS.CONTRACT_CALL,
 			value: {
 				asset_id: coreAsset,
 				amount: 0,
@@ -621,6 +621,15 @@ export const watchToken = (contractId) => async (dispatch, getState) => {
 		}
 
 		const accountId = getState().global.getIn(['account', 'id']);
+		const [, { code }] = contract;
+
+		const isErc20Token = ValidateTransactionHelper.isErc20Contract(code);
+
+		if (!isErc20Token) {
+			dispatch(setFormError(FORM_WATCH_TOKEN, 'contractId', 'Invalid token contract'));
+			dispatch(GlobalReducer.actions.set({ field: 'loading', value: false }));
+			return null;
+		}
 
 		const { symbol, precision, balance } = await getTokenDetails(contractId, accountId);
 

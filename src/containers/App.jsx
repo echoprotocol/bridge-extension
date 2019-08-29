@@ -15,7 +15,6 @@ import { PIN_PATHS, SIGN_TRANSACTION_PATH, CONNECTION_ERROR_PATH } from '../cons
 
 import bridgeLogo from '../assets/images/bridge-logo-hor-bw.svg';
 
-
 class App extends React.Component {
 
 
@@ -40,7 +39,9 @@ class App extends React.Component {
 	}
 
 	renderApp() {
-		const { children, loading, pathname } = this.props;
+		const {
+			children, loading, pathname,
+		} = this.props;
 
 		return (
 			<div className={classnames('app-wrap', { dark: PIN_PATHS.includes(pathname) || CONNECTION_ERROR_PATH === pathname })}>

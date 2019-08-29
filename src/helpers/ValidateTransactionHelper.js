@@ -1,4 +1,5 @@
 import BN from 'bignumber.js';
+import { ERC20_HASHES } from '../constants/GlobalConstants';
 
 class ValidateTransactionHelper {
 
@@ -6,7 +7,7 @@ class ValidateTransactionHelper {
 
 		id = id.split('.');
 
-		if (id.length !== 3 || parseInt(id[2], 10).toString() !== id[2] || id.splice(0, 2).join('.') !== '1.14') {
+		if (id.length !== 3 || parseInt(id[2], 10).toString() !== id[2] || id.splice(0, 2).join('.') !== '1.9') {
 			return 'Invalid contract ID';
 		}
 
@@ -71,6 +72,20 @@ class ValidateTransactionHelper {
 		}
 
 		return null;
+	}
+
+	/**
+	 *
+	 * @param {String} scriptHex
+	 * @returns {boolean}
+	 */
+	static isErc20Contract(scriptHex) {
+		if (scriptHex) {
+			const hashes = Object.values(ERC20_HASHES);
+			return hashes.every((hash) => scriptHex.includes(hash));
+		}
+
+		return false;
 	}
 
 }
