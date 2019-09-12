@@ -42,11 +42,11 @@
 		</div>
 		<!---->
 
-        <!-- Accounts sync (current network) -->
+        <!-- Active account(current network) -->
         <div style="padding-bottom: 10px; border-top: 1px solid #000;">
-            <h4>Accounts Sync</h4>
-            <button id="accountsSync-click">submit</button>
-            <div id="accountsSync-info"></div>
+            <h4>Active account</h4>
+            <button id="activeAccount-click">submit</button>
+            <div id="activeAccount-info"></div>
         </div>
         <!---->
 
@@ -373,10 +373,10 @@
 					});
 			});
 
-            $("#accountsSync-click").click(function(e) {
+            $("#activeAccount-click").click(function(e) {
                 if (!isAccess) return;
                 const result = window.echojslib.extension.account;
-				jQuery("#accountsSync-info").html(
+				jQuery("#activeAccount-info").html(
 					`<p>RESULT: ${JSON.stringify(result)}</p>`
 				);
             });
