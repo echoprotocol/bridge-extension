@@ -16,6 +16,8 @@ const requestQueue = [];
 const networkSubscribers = [];
 const accountSubscribers = [];
 
+let accounts = [];
+
 /**
  * network subscription
  *
@@ -123,6 +125,11 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 	return result;
 };
 
+/**
+ * notify about switch account
+ * @param subscriberCb
+ * @returns {Promise}
+ */
 const subscribeSwitchAccount = (subscriberCb) => {
 	const id = IdHelper.getId();
 
@@ -276,6 +283,39 @@ const getAccounts = () => {
 	return result;
 };
 
+/**
+ * Get accounts if unlocked synchronously
+ * @returns {[]}
+ */
+const getAccountsSync = () => accounts;
+
+/**
+ * Load accounts when load inpage
+ * @returns {undefined}
+ */
+const loadAccounts = () => {
+	const id = IdHelper.getId();
+
+	const cb = ({ data }) => {
+		window.postMessage({
+			method: 'accountsSync', id, target: 'content', appId: APP_ID,
+		}, '*');
+
+		requestQueue.push({ id, cb });
+
+		if (data.error || data.res.error) {
+			accounts = [];
+		} else {
+			accounts = data.res;
+		}
+	};
+
+	requestQueue.push({ id, cb });
+	window.postMessage({
+		method: 'accountsSync', id, target: 'content', appId: APP_ID,
+	}, '*');
+};
+
 const proofOfAuthority = (message, accountId) => {
 	const id = IdHelper.getId();
 	const result = new Promise((resolve, reject) => {
@@ -402,6 +442,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 
 const extension = {
 	getAccounts: () => getAccounts(),
+	getAccountsSync: () => getAccountsSync(),
 	sendTransaction: (data) => sendTransaction(data),
 	getCurrentNetwork: () => getCurrentNetwork(),
 	subscribeSwitchNetwork: (subscriberCb) => subscribeSwitchNetwork(subscriberCb),
@@ -417,3 +458,5 @@ window.echojslib.extension = extension;
 window.echojslib.Buffer = Buffer;
 
 window.addEventListener('message', onMessage, false);
+
+window.onload = () => loadAccounts();

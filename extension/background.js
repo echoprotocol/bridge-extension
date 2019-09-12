@@ -54,6 +54,7 @@ const crypto = new Crypto();
 
 let lastRequestType = '';
 const accountsRequests = [];
+let accountsRequestsSync = [];
 
 let requestQueue = [];
 const networkSubscribers = [];
@@ -64,8 +65,6 @@ let providerRequests = [];
 let signMessageRequests = [];
 const providerNotification = new NotificationManager();
 const signNotification = new NotificationManager();
-
-const tabUrls = {};
 
 const connectSubscribe = (status) => {
 	try {
@@ -256,6 +255,60 @@ const resolveAccounts = async () => {
 
 };
 
+/**
+ * Get accounts by network
+ * @param {String} switchNetwork
+ * @returns {Promise<[accounts]>}
+ */
+const getAccounts = async (switchNetwork) => {
+	const network = switchNetwork || await getNetwork();
+
+	let accounts = [];
+
+	if (!crypto.isLocked()) {
+		accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+	}
+
+	return accounts;
+};
+
+/**
+ * Resolve request from inpage to get accounts
+ * @param request
+ * @returns {Promise<void>}
+ */
+const resolveAccountsSync = async (request) => {
+	try {
+		const accounts = await getAccounts();
+		request.cb({ id: request.id, res: accounts });
+	} catch (e) {
+		console.log(e.message);
+	}
+};
+
+
+/**
+ * Update account on inpage
+ * @returns {Promise<null|{error: *}>}
+ */
+const updateAccountSyncInpage = async (network) => {
+	try {
+		const accounts = await getAccounts(network);
+
+		accountsRequestsSync.forEach((request) => {
+			try {
+				request.cb({ id: request.id, res: accounts });
+			} catch (e) {
+				console.log(e.message);
+			}
+		});
+
+		return null;
+
+	} catch (e) {
+		return { error: e.message };
+	}
+};
 
 /**
  * On content script request
@@ -273,6 +326,8 @@ const onMessage = (request, sender, sendResponse) => {
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
 	if (request.method === 'closeTab') {
+		accountsRequestsSync = accountsRequestsSync
+			.filter((accountsRequest) => accountsRequest.tabId !== tabId);
 		const indexFindRequest = providerRequests.findIndex((rq) => rq.origin === hostname);
 		if (indexFindRequest === -1) return true;
 		const indexTabId = providerRequests[indexFindRequest].tabs
@@ -281,6 +336,20 @@ const onMessage = (request, sender, sendResponse) => {
 		providerRequests[indexFindRequest].cbs.splice(indexTabId, 1);
 		providerRequests[indexFindRequest].ids.splice(indexTabId, 1);
 		providerRequests[indexFindRequest].tabs.splice(indexTabId, 1);
+		return true;
+	}
+
+	if (request.method === 'accountsSync') {
+		const tabIndex = accountsRequestsSync.findIndex(({ tabId: reqTabId }) => tabId === reqTabId);
+		const req = {
+			id: request.id, cb: sendResponse, tabId,
+		};
+		if (tabIndex === -1) {
+			resolveAccountsSync(req);
+			accountsRequestsSync.push(req);
+			return true;
+		}
+		accountsRequestsSync[tabIndex] = req;
 		return true;
 	}
 
@@ -415,8 +484,13 @@ const onPinUnlock = () => {
 		resolveAccounts();
 		closePopup();
 	}
+	updateAccountSyncInpage();
 	return null;
+};
 
+const onLock = () => {
+	updateAccountSyncInpage();
+	return null;
 };
 
 /**
@@ -611,6 +685,7 @@ export const onSend = async (options, networkName) => {
 export const onSwitchNetwork = async (network) => {
 	try {
 		await createSocket(network.url);
+		updateAccountSyncInpage(network);
 	} catch (e) {
 		console.warn('Switch network error', e);
 	} finally {
@@ -621,13 +696,13 @@ export const onSwitchNetwork = async (network) => {
 				console.warn('Switch network callback error', error);
 			}
 		});
-
 	}
 
 };
 
 
 const onSwitchActiveAccount = (res) => {
+	updateAccountSyncInpage();
 	activeAccountSubscribers.forEach(({ id, cb }) => {
 		try {
 			cb({ id, res });
@@ -759,11 +834,9 @@ window.getSignMessageMap = () => signMessageRequests.reduce((map, {
 extensionizer.runtime.onMessage.addListener(onMessage);
 
 crypto.on('unlocked', onPinUnlock);
-
+crypto.on('locked', onLock);
 
 extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });
-
-
 
