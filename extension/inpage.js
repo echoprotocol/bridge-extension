@@ -453,4 +453,4 @@ window.echojslib.Buffer = Buffer;
 
 window.addEventListener('message', onMessage, false);
 
-window.onload = () => loadAccounts();
+loadAccounts();
