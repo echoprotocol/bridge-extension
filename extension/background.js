@@ -271,7 +271,7 @@ const getActiveAccount = async (switchNetwork) => {
 		if (!activeAccount) {
 			activeAccount = [];
 		} else {
-			activeAccount = [activeAccount];
+			activeAccount = [activeAccount.id];
 		}
 	}
 
