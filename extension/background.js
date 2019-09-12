@@ -256,20 +256,26 @@ const resolveAccounts = async () => {
 };
 
 /**
- * Get accounts by network
+ * Get active accounts by network
  * @param {String} switchNetwork
- * @returns {Promise<[accounts]>}
+ * @returns {Promise<[activeAccount]>}
  */
-const getAccounts = async (switchNetwork) => {
+const getActiveAccount = async (switchNetwork) => {
 	const network = switchNetwork || await getNetwork();
 
-	let accounts = [];
+	let activeAccount = [];
 
 	if (!crypto.isLocked()) {
-		accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		activeAccount = accounts.find((account) => account.active);
+		if (!activeAccount) {
+			activeAccount = [];
+		} else {
+			activeAccount = [activeAccount];
+		}
 	}
 
-	return accounts;
+	return activeAccount;
 };
 
 /**
@@ -279,8 +285,8 @@ const getAccounts = async (switchNetwork) => {
  */
 const resolveAccountsSync = async (request) => {
 	try {
-		const accounts = await getAccounts();
-		request.cb({ id: request.id, res: accounts });
+		const account = await getActiveAccount();
+		request.cb({ id: request.id, res: account });
 	} catch (e) {
 		console.log(e.message);
 	}
@@ -293,11 +299,11 @@ const resolveAccountsSync = async (request) => {
  */
 const updateAccountSyncInpage = async (network) => {
 	try {
-		const accounts = await getAccounts(network);
+		const account = await getActiveAccount(network);
 
 		accountsRequestsSync.forEach((request) => {
 			try {
-				request.cb({ id: request.id, res: accounts });
+				request.cb({ id: request.id, res: account });
 			} catch (e) {
 				console.log(e.message);
 			}

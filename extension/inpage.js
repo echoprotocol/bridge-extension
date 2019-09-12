@@ -284,12 +284,6 @@ const getAccounts = () => {
 };
 
 /**
- * Get accounts if unlocked synchronously
- * @returns {[]}
- */
-const getAccountsSync = () => accounts;
-
-/**
  * Load accounts when load inpage
  * @returns {undefined}
  */
@@ -441,8 +435,8 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 };
 
 const extension = {
+	get account() { return !accounts.length ? [] : [accounts[0].id]; },
 	getAccounts: () => getAccounts(),
-	getAccountsSync: () => getAccountsSync(),
 	sendTransaction: (data) => sendTransaction(data),
 	getCurrentNetwork: () => getCurrentNetwork(),
 	subscribeSwitchNetwork: (subscriberCb) => subscribeSwitchNetwork(subscriberCb),

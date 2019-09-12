@@ -375,7 +375,7 @@
 
             $("#accountsSync-click").click(function(e) {
                 if (!isAccess) return;
-                const result = window.echojslib.extension.getAccountsSync();
+                const result = window.echojslib.extension.account;
 				jQuery("#accountsSync-info").html(
 					`<p>RESULT: ${JSON.stringify(result)}</p>`
 				);
