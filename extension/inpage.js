@@ -16,7 +16,7 @@ const requestQueue = [];
 const networkSubscribers = [];
 const accountSubscribers = [];
 
-let account = [];
+let activeAccount = [];
 
 /**
  * network subscription
@@ -126,8 +126,8 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 };
 
 /**
- * notify about switch account
- * @param subscriberCb
+ * Notify about switch account
+ * @param {Function} subscriberCb
  * @returns {Promise}
  */
 const subscribeSwitchAccount = (subscriberCb) => {
@@ -292,21 +292,21 @@ const loadAccounts = () => {
 
 	const cb = ({ data }) => {
 		window.postMessage({
-			method: 'accountsSync', id, target: 'content', appId: APP_ID,
+			method: 'getActiveAccount', id, target: 'content', appId: APP_ID,
 		}, '*');
 
 		requestQueue.push({ id, cb });
 
 		if (data.error || data.res.error) {
-			account = [];
+			activeAccount = [];
 		} else {
-			account = data.res;
+			activeAccount = data.res;
 		}
 	};
 
 	requestQueue.push({ id, cb });
 	window.postMessage({
-		method: 'accountsSync', id, target: 'content', appId: APP_ID,
+		method: 'getActiveAccount', id, target: 'content', appId: APP_ID,
 	}, '*');
 };
 
@@ -435,7 +435,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 };
 
 const extension = {
-	get account() { return account },
+	get account() { return activeAccount; },
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
 	getCurrentNetwork: () => getCurrentNetwork(),

@@ -54,7 +54,7 @@ const crypto = new Crypto();
 
 let lastRequestType = '';
 const accountsRequests = [];
-let accountsRequestsSync = [];
+let activeAccountRequests = [];
 
 let requestQueue = [];
 const networkSubscribers = [];
@@ -256,7 +256,7 @@ const resolveAccounts = async () => {
 };
 
 /**
- * Get active accounts by network
+ * Get active account by network
  * @param {String} switchNetwork
  * @returns {Promise<[activeAccount]>}
  */
@@ -279,11 +279,11 @@ const getActiveAccount = async (switchNetwork) => {
 };
 
 /**
- * Resolve request from inpage to get accounts
+ * Resolve request to get active account from inpage
  * @param request
  * @returns {Promise<void>}
  */
-const resolveAccountsSync = async (request) => {
+const resolveActiveAccount = async (request) => {
 	try {
 		const account = await getActiveAccount();
 		request.cb({ id: request.id, res: account });
@@ -294,14 +294,14 @@ const resolveAccountsSync = async (request) => {
 
 
 /**
- * Update account on inpage
+ * Update active account on all requested inpage
  * @returns {Promise<null|{error: *}>}
  */
-const updateAccountSyncInpage = async (network) => {
+const updateActiveAccountInpage = async (network) => {
 	try {
 		const account = await getActiveAccount(network);
 
-		accountsRequestsSync.forEach((request) => {
+		activeAccountRequests.forEach((request) => {
 			try {
 				request.cb({ id: request.id, res: account });
 			} catch (e) {
@@ -332,8 +332,8 @@ const onMessage = (request, sender, sendResponse) => {
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
 	if (request.method === 'closeTab') {
-		accountsRequestsSync = accountsRequestsSync
-			.filter((accountsRequest) => accountsRequest.tabId !== tabId);
+		activeAccountRequests = activeAccountRequests
+			.filter((accountRequest) => accountRequest.tabId !== tabId);
 		const indexFindRequest = providerRequests.findIndex((rq) => rq.origin === hostname);
 		if (indexFindRequest === -1) return true;
 		const indexTabId = providerRequests[indexFindRequest].tabs
@@ -345,17 +345,17 @@ const onMessage = (request, sender, sendResponse) => {
 		return true;
 	}
 
-	if (request.method === 'accountsSync') {
-		const tabIndex = accountsRequestsSync.findIndex(({ tabId: reqTabId }) => tabId === reqTabId);
+	if (request.method === 'getActiveAccount') {
+		const tabIndex = activeAccountRequests.findIndex(({ tabId: reqTabId }) => tabId === reqTabId);
 		const req = {
 			id: request.id, cb: sendResponse, tabId,
 		};
 		if (tabIndex === -1) {
-			resolveAccountsSync(req);
-			accountsRequestsSync.push(req);
+			resolveActiveAccount(req);
+			activeAccountRequests.push(req);
 			return true;
 		}
-		accountsRequestsSync[tabIndex] = req;
+		activeAccountRequests[tabIndex] = req;
 		return true;
 	}
 
@@ -490,12 +490,12 @@ const onPinUnlock = () => {
 		resolveAccounts();
 		closePopup();
 	}
-	updateAccountSyncInpage();
+	updateActiveAccountInpage();
 	return null;
 };
 
 const onLock = () => {
-	updateAccountSyncInpage();
+	updateActiveAccountInpage();
 	return null;
 };
 
@@ -691,7 +691,7 @@ export const onSend = async (options, networkName) => {
 export const onSwitchNetwork = async (network) => {
 	try {
 		await createSocket(network.url);
-		updateAccountSyncInpage(network);
+		updateActiveAccountInpage(network);
 	} catch (e) {
 		console.warn('Switch network error', e);
 	} finally {
@@ -708,7 +708,7 @@ export const onSwitchNetwork = async (network) => {
 
 
 const onSwitchActiveAccount = (res) => {
-	updateAccountSyncInpage();
+	updateActiveAccountInpage();
 	activeAccountSubscribers.forEach(({ id, cb }) => {
 		try {
 			cb({ id, res });
