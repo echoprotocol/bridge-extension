@@ -284,10 +284,10 @@ const getAccounts = () => {
 };
 
 /**
- * Load accounts when load inpage
+ * Load active bridge account
  * @returns {undefined}
  */
-const loadAccounts = () => {
+const loadActiveAccount = () => {
 	const id = IdHelper.getId();
 
 	const cb = ({ data }) => {
@@ -453,4 +453,4 @@ window.echojslib.Buffer = Buffer;
 
 window.addEventListener('message', onMessage, false);
 
-loadAccounts();
+loadActiveAccount();
