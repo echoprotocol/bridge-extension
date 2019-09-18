@@ -54,6 +54,7 @@ const crypto = new Crypto();
 
 let lastRequestType = '';
 const accountsRequests = [];
+let activeAccountRequests = [];
 
 let requestQueue = [];
 const networkSubscribers = [];
@@ -64,8 +65,6 @@ let providerRequests = [];
 let signMessageRequests = [];
 const providerNotification = new NotificationManager();
 const signNotification = new NotificationManager();
-
-const tabUrls = {};
 
 const connectSubscribe = (status) => {
 	try {
@@ -239,7 +238,9 @@ const resolveAccounts = async () => {
 	const network = await getNetwork();
 
 	try {
-		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		let accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		accounts = accounts.filter((account) => account.active);
+
 		accountsRequests.forEach((request) => {
 			try {
 				request.cb({ id: request.id, res: accounts });
@@ -256,6 +257,64 @@ const resolveAccounts = async () => {
 
 };
 
+/**
+ * Get active account by network
+ * @param {String} switchNetwork
+ * @returns {Promise<[activeAccount]>}
+ */
+const getActiveAccount = async (switchNetwork) => {
+	const network = switchNetwork || await getNetwork();
+
+	let activeAccount = null;
+
+	if (!crypto.isLocked()) {
+		let accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		accounts = accounts.filter((account) => account.active);
+		if (accounts.length > 0) {
+			activeAccount = accounts[0].id;
+		}
+	}
+
+	return activeAccount;
+};
+
+/**
+ * Resolve request to get active account from inpage
+ * @param request
+ * @returns {Promise<void>}
+ */
+const resolveActiveAccount = async (request) => {
+	try {
+		const account = await getActiveAccount();
+		request.cb({ id: request.id, res: account });
+	} catch (e) {
+		console.log(e.message);
+	}
+};
+
+
+/**
+ * Update active account on all requested inpage
+ * @returns {Promise<null|{error: *}>}
+ */
+const updateActiveAccountInpage = async (network) => {
+	try {
+		const account = await getActiveAccount(network);
+
+		activeAccountRequests.forEach((request) => {
+			try {
+				request.cb({ id: request.id, res: account });
+			} catch (e) {
+				console.log(e.message);
+			}
+		});
+
+		return null;
+
+	} catch (e) {
+		return { error: e.message };
+	}
+};
 
 /**
  * On content script request
@@ -273,6 +332,8 @@ const onMessage = (request, sender, sendResponse) => {
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
 	if (request.method === 'closeTab') {
+		activeAccountRequests = activeAccountRequests
+			.filter((accountRequest) => accountRequest.tabId !== tabId);
 		const indexFindRequest = providerRequests.findIndex((rq) => rq.origin === hostname);
 		if (indexFindRequest === -1) return true;
 		const indexTabId = providerRequests[indexFindRequest].tabs
@@ -405,6 +466,18 @@ const onMessage = (request, sender, sendResponse) => {
 			triggerPopup();
 		}
 
+	} else if (request.method === 'getActiveAccount') {
+		const tabIndex = activeAccountRequests.findIndex(({ tabId: reqTabId }) => tabId === reqTabId);
+		const req = {
+			id: request.id, cb: sendResponse, tabId,
+		};
+		if (tabIndex === -1) {
+			resolveActiveAccount(req);
+			activeAccountRequests.push(req);
+			return true;
+		}
+		activeAccountRequests[tabIndex] = req;
+		return true;
 	}
 
 	return true;
@@ -415,8 +488,13 @@ const onPinUnlock = () => {
 		resolveAccounts();
 		closePopup();
 	}
+	updateActiveAccountInpage();
 	return null;
+};
 
+const onLock = () => {
+	updateActiveAccountInpage();
+	return null;
 };
 
 /**
@@ -611,6 +689,7 @@ export const onSend = async (options, networkName) => {
 export const onSwitchNetwork = async (network) => {
 	try {
 		await createSocket(network.url);
+		updateActiveAccountInpage(network);
 	} catch (e) {
 		console.warn('Switch network error', e);
 	} finally {
@@ -621,13 +700,14 @@ export const onSwitchNetwork = async (network) => {
 				console.warn('Switch network callback error', error);
 			}
 		});
-
 	}
 
 };
 
 
 const onSwitchActiveAccount = (res) => {
+	updateActiveAccountInpage();
+	if (!res) return;
 	activeAccountSubscribers.forEach(({ id, cb }) => {
 		try {
 			cb({ id, res });
@@ -759,11 +839,9 @@ window.getSignMessageMap = () => signMessageRequests.reduce((map, {
 extensionizer.runtime.onMessage.addListener(onMessage);
 
 crypto.on('unlocked', onPinUnlock);
-
+crypto.on('locked', onLock);
 
 extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });
-
-
 
