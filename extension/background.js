@@ -345,20 +345,6 @@ const onMessage = (request, sender, sendResponse) => {
 		return true;
 	}
 
-	if (request.method === 'getActiveAccount') {
-		const tabIndex = activeAccountRequests.findIndex(({ tabId: reqTabId }) => tabId === reqTabId);
-		const req = {
-			id: request.id, cb: sendResponse, tabId,
-		};
-		if (tabIndex === -1) {
-			resolveActiveAccount(req);
-			activeAccountRequests.push(req);
-			return true;
-		}
-		activeAccountRequests[tabIndex] = req;
-		return true;
-	}
-
 	if (typeof processedOrigins[hostname] !== 'boolean') {
 
 		if (request.method !== 'getAccess') {
@@ -480,6 +466,18 @@ const onMessage = (request, sender, sendResponse) => {
 			triggerPopup();
 		}
 
+	} else if (request.method === 'getActiveAccount') {
+		const tabIndex = activeAccountRequests.findIndex(({ tabId: reqTabId }) => tabId === reqTabId);
+		const req = {
+			id: request.id, cb: sendResponse, tabId,
+		};
+		if (tabIndex === -1) {
+			resolveActiveAccount(req);
+			activeAccountRequests.push(req);
+			return true;
+		}
+		activeAccountRequests[tabIndex] = req;
+		return true;
 	}
 
 	return true;

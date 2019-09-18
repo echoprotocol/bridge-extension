@@ -295,12 +295,13 @@ const loadActiveAccount = () => {
 			method: 'getActiveAccount', id, target: 'content', appId: APP_ID,
 		}, '*');
 
-		requestQueue.push({ id, cb });
+		const error = data.error || (data.res && data.res.error);
 
-		if (data.error || (data.res && data.res.error)) {
+		if (error) {
 			activeAccount = null;
 		} else {
 			activeAccount = data.res;
+			requestQueue.push({ id, cb });
 		}
 	};
 
@@ -349,6 +350,7 @@ const getAccess = () => {
 			if (data.error) {
 				reject(data.error);
 			} else {
+				loadActiveAccount();
 				resolve(data.status);
 			}
 		};
