@@ -87,7 +87,15 @@ echojslib.extension.subscribeSwitchAccount((account) => console.log(account))
 ```
 
 ### Get active account synchronously
+If you don't get access or there isn't active account, then you get null, else account id.
 ```javascript
+/**
+  *  @example
+  *     echojslib.extension.activeAccount // null 
+  *  @example
+  *     echojslib.extension.activeAccount // "1.2.1" 
+  * @return {null|string}
+*/
 echojslib.extension.activeAccount
 ```
 ### Sign transaction with Bridge  
