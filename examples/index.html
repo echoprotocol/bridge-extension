@@ -42,6 +42,14 @@
 		</div>
 		<!---->
 
+        <!-- Active account(current network) -->
+        <div style="padding-bottom: 10px; border-top: 1px solid #000;">
+            <h4>Active account</h4>
+            <button id="activeAccount-click">submit</button>
+            <div id="activeAccount-info"></div>
+        </div>
+        <!---->
+
 		<!-- Transfer -->
 		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
 			<h4>Transfer</h4>
@@ -323,9 +331,7 @@
                 });
         }
 
-		window.onload = () => {
-			resetData();
-		};
+		window.addEventListener("load", resetData);
 
 		$(document).ready(function() {
 			$("#getAccess-click").click(function(e) {
@@ -366,6 +372,14 @@
 						jQuery("#accounts-info").html(`<p>ERROR: ${JSON.stringify(err)}</p>`);
 					});
 			});
+
+            $("#activeAccount-click").click(function(e) {
+                if (!isAccess) return;
+                const result = window.echojslib.extension.activeAccount;
+				jQuery("#activeAccount-info").html(
+					`<p>RESULT: ${JSON.stringify(result)}</p>`
+				);
+            });
 
 			$("#transfer-click").click(function(e) {
 				if (!isAccess) return;

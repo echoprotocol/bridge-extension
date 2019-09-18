@@ -49,7 +49,7 @@ export const subscribe = () => (dispatch) => {
  */
 export const checkActiveLoading = () => async (dispatch) => {
 	const draftStorage = await storageGetDraft();
-	const signUp = draftStorage[FORM_SIGN_UP];
+	const signUp = draftStorage && draftStorage[FORM_SIGN_UP];
 	const loading = signUp && signUp.loading;
 	dispatch(setValue(FORM_SIGN_UP, 'loading', loading));
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value: loading }));

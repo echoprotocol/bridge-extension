@@ -16,6 +16,8 @@ const requestQueue = [];
 const networkSubscribers = [];
 const accountSubscribers = [];
 
+let activeAccount = null;
+
 /**
  * network subscription
  *
@@ -123,6 +125,11 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 	return result;
 };
 
+/**
+ * Notify about switch account
+ * @param {Function} subscriberCb
+ * @returns {Promise}
+ */
 const subscribeSwitchAccount = (subscriberCb) => {
 	const id = IdHelper.getId();
 
@@ -276,6 +283,34 @@ const getAccounts = () => {
 	return result;
 };
 
+/**
+ * Load active bridge account
+ * @returns {undefined}
+ */
+const loadActiveAccount = () => {
+	const id = IdHelper.getId();
+
+	const cb = ({ data }) => {
+		window.postMessage({
+			method: 'getActiveAccount', id, target: 'content', appId: APP_ID,
+		}, '*');
+
+		const error = data.error || (data.res && data.res.error);
+
+		if (error) {
+			activeAccount = null;
+		} else {
+			activeAccount = data.res;
+			requestQueue.push({ id, cb });
+		}
+	};
+
+	requestQueue.push({ id, cb });
+	window.postMessage({
+		method: 'getActiveAccount', id, target: 'content', appId: APP_ID,
+	}, '*');
+};
+
 const proofOfAuthority = (message, accountId) => {
 	const id = IdHelper.getId();
 	const result = new Promise((resolve, reject) => {
@@ -315,6 +350,7 @@ const getAccess = () => {
 			if (data.error) {
 				reject(data.error);
 			} else {
+				loadActiveAccount();
 				resolve(data.status);
 			}
 		};
@@ -401,6 +437,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 };
 
 const extension = {
+	get activeAccount() { return activeAccount; },
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
 	getCurrentNetwork: () => getCurrentNetwork(),
@@ -417,3 +454,5 @@ window.echojslib.extension = extension;
 window.echojslib.Buffer = Buffer;
 
 window.addEventListener('message', onMessage, false);
+
+loadActiveAccount();
