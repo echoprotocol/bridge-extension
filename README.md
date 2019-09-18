@@ -86,6 +86,10 @@ Subscribe to change active account. Callback will be triggered when active accou
 echojslib.extension.subscribeSwitchAccount((account) => console.log(account))
 ```
 
+### Get active account synchronously
+```javascript
+echojslib.extension.activeAccount
+```
 ### Sign transaction with Bridge  
 
 #### Transfer  

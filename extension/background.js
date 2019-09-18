@@ -238,7 +238,9 @@ const resolveAccounts = async () => {
 	const network = await getNetwork();
 
 	try {
-		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		let accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		accounts = accounts.filter((account) => account.active);
+
 		accountsRequests.forEach((request) => {
 			try {
 				request.cb({ id: request.id, res: accounts });
@@ -263,15 +265,13 @@ const resolveAccounts = async () => {
 const getActiveAccount = async (switchNetwork) => {
 	const network = switchNetwork || await getNetwork();
 
-	let activeAccount = [];
+	let activeAccount = null;
 
 	if (!crypto.isLocked()) {
-		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
-		activeAccount = accounts.find((account) => account.active);
-		if (!activeAccount) {
-			activeAccount = [];
-		} else {
-			activeAccount = [activeAccount.id];
+		let accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+		accounts = accounts.filter((account) => account.active);
+		if (accounts.length > 0) {
+			activeAccount = accounts[0].id;
 		}
 	}
 
@@ -709,6 +709,7 @@ export const onSwitchNetwork = async (network) => {
 
 const onSwitchActiveAccount = (res) => {
 	updateActiveAccountInpage();
+	if (!res) return;
 	activeAccountSubscribers.forEach(({ id, cb }) => {
 		try {
 			cb({ id, res });

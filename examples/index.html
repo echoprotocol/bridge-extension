@@ -375,7 +375,7 @@
 
             $("#activeAccount-click").click(function(e) {
                 if (!isAccess) return;
-                const result = window.echojslib.extension.account;
+                const result = window.echojslib.extension.activeAccount;
 				jQuery("#activeAccount-info").html(
 					`<p>RESULT: ${JSON.stringify(result)}</p>`
 				);

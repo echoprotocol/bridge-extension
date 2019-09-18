@@ -361,6 +361,7 @@ export const onLogout = (name) => async (dispatch, getState) => {
 		}
 
 		if (!accounts.get(networkName).size) {
+			emitter.emit('activeAccountResponse', null);
 			dispatch(GlobalReducer.actions.logout());
 			history.push(CREATE_ACCOUNT_PATH);
 			return false;

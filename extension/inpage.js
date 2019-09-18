@@ -16,7 +16,7 @@ const requestQueue = [];
 const networkSubscribers = [];
 const accountSubscribers = [];
 
-let activeAccount = [];
+let activeAccount = null;
 
 /**
  * network subscription
@@ -297,8 +297,8 @@ const loadActiveAccount = () => {
 
 		requestQueue.push({ id, cb });
 
-		if (data.error || data.res.error) {
-			activeAccount = [];
+		if (data.error || (data.res && data.res.error)) {
+			activeAccount = null;
 		} else {
 			activeAccount = data.res;
 		}
@@ -435,7 +435,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 };
 
 const extension = {
-	get account() { return activeAccount; },
+	get activeAccount() { return activeAccount; },
 	getAccounts: () => getAccounts(),
 	sendTransaction: (data) => sendTransaction(data),
 	getCurrentNetwork: () => getCurrentNetwork(),
