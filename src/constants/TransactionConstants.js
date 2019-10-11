@@ -41,16 +41,6 @@ export default {
 			asset: null,
 		},
 	},
-	account_transfer: {
-		value: OPERATIONS_IDS.ACCOUNT_TRANSFER,
-		name: 'Transfer Account',
-		options: {
-			from: 'account_id',
-			subject: ['new_owner', 'name'],
-			value: null,
-			asset: null,
-		},
-	},
 	asset_create: {
 		value: OPERATIONS_IDS.ASSET_CREATE,
 		name: 'Create asset',
@@ -271,14 +261,14 @@ export default {
 			asset: 'amount.asset_id',
 		},
 	},
-	change_sidechain_config: {
-		value: OPERATIONS_IDS.SIDECHAIN_CHANGE_CONFIG,
-		name: 'Change sidechain config',
+	contract_update: {
+		value: OPERATIONS_IDS.CONTRACT_UPDATE,
+		name: 'Contract update',
 		options: {
-			from: null,
-			subject: null,
+			from: 'sender',
+			subject: ['contract'],
 			amount: null,
-			asset: null,
+			asset: 'fee',
 		},
 	},
 	account_address_create: {
@@ -372,7 +362,7 @@ export default {
 		},
 	},
 	sidechain_issue: {
-		value: OPERATIONS_IDS.SIDECHAIN_ETH_ISSUE,
+		value: OPERATIONS_IDS.SIDECHAIN_ISSUE,
 		name: 'Sidechain issue',
 		options: {
 			from: 'account',
@@ -382,7 +372,7 @@ export default {
 		},
 	},
 	sidechain_burn: {
-		value: OPERATIONS_IDS.SIDECHAIN_ETH_BURN,
+		value: OPERATIONS_IDS.SIDECHAIN_BURN,
 		name: 'Sidechain burn',
 		options: {
 			from: 'account',
@@ -428,16 +418,6 @@ export default {
 			from: 'account',
 			subject: ['to'],
 			amount: 'value',
-			asset: 'fee',
-		},
-	},
-	contract_update: {
-		value: OPERATIONS_IDS.CONTRACT_UPDATE,
-		name: 'Contract update',
-		options: {
-			from: 'sender',
-			subject: ['contract'],
-			amount: null,
 			asset: 'fee',
 		},
 	},
