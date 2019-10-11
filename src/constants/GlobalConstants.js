@@ -86,7 +86,7 @@ export const NETWORKS = [
 	},
 	{
 		name: 'Devnet',
-		url: 'ws://195.201.164.54:36311/ws',
+		url: 'wss://devnet.echo-dev.io/ws',
 		explorer: 'http://656-echo-explorer.pixelplex-test.by',
 	},
 ];
