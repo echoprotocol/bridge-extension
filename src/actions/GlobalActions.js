@@ -26,6 +26,7 @@ import {
 	ICONS_COUNT,
 	NETWORKS,
 	POPUP_WINDOW_TYPE,
+	CONTRACT_PREFIX,
 } from '../constants/GlobalConstants';
 import {
 	CREATE_ACCOUNT_PATH,
@@ -447,7 +448,7 @@ export const loadInfo = () => async (dispatch, getState) => {
 
 			Object.entries(tokens).forEach(([accountId, tokensArray]) => {
 				tokensArray.forEach((id) => {
-					stateTokens = stateTokens.setIn([accountId, `1.9.${id}`], new Map({}));
+					stateTokens = stateTokens.setIn([accountId, `${CONTRACT_PREFIX}.${id}`], new Map({}));
 				});
 			});
 

@@ -353,7 +353,7 @@ Send.defaultProps = {
 	account: null,
 	loading: false,
 	validating: false,
-	selectedBalance: '1.3.0',
+	selectedBalance: CORE_ID,
 };
 
 export default connect(
