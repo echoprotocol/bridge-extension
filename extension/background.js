@@ -27,7 +27,11 @@ import {
 	PING_INTERVAL,
 	PING_TIMEOUT,
 	CONNECTION_TIMEOUT,
-	MAX_RETRIES, SIGN_STATUS, DRAFT_STORAGE_KEY, GLOBAL_ID_1, EXPIRATION_INFELICITY,
+	MAX_RETRIES,
+	SIGN_STATUS,
+	DRAFT_STORAGE_KEY,
+	GLOBAL_ID_1,
+	EXPIRATION_INFELICITY,
 } from '../src/constants/GlobalConstants';
 
 import { operationKeys } from '../src/constants/OperationConstants';
@@ -844,4 +848,3 @@ crypto.on('locked', onLock);
 extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });
-
