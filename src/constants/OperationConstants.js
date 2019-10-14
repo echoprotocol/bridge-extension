@@ -79,7 +79,7 @@ export const operationFields = {
 };
 
 export const operationFieldsSend = {
-	transfer: {
+	[OPERATIONS_IDS.TRANSFER]: {
 		fee: {
 			type: 'asset_object',
 			required: false,
@@ -132,6 +132,7 @@ export const operationKeys = {
 	createAccount: 'registrar',
 	updateAccount: 'account',
 	[OPERATIONS_IDS.CONTRACT_CALL]: 'registrar',
+	[OPERATIONS_IDS.TRANSFER]: 'from',
 };
 
 export const operationTypes = {

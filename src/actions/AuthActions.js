@@ -282,7 +282,16 @@ export const importAccount = (name, password) => async (dispatch, getState) => {
 
 			const active = PrivateKey.fromWif(password).toPublicKey().toString();
 
-			const [[accountId]] = await echoService.getChainLib().api.getKeyReferences([active]);
+			const [accounts] = await echoService.getChainLib().api.getKeyReferences([active]);
+			let accountId = accounts[0];
+
+			if (name) {
+				const account = await echoService.getChainLib().api.getAccountByName(name);
+
+				if (accounts.find((id) => id === account.id)) {
+					accountId = account.id;
+				}
+			}
 
 			if (!accountId) {
 				dispatch(setValue(FORM_SIGN_IN, 'passwordError', 'Invalid WIF'));

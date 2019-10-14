@@ -211,6 +211,16 @@ export default {
 			asset: null,
 		},
 	},
+	balance_freeze: {
+		value: OPERATIONS_IDS.BALANCE_FREEZE,
+		name: 'Freeze balance',
+		options: {
+			from: 'account',
+			subject: null,
+			value: 'amount.amount',
+			asset: 'amount.asset_id',
+		},
+	},
 	override_transfer: {
 		value: OPERATIONS_IDS.OVERRIDE_TRANSFER,
 		name: 'Override transfer',

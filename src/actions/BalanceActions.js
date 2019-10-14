@@ -245,7 +245,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 				},
 				from: fromAccount,
 				to: toAccount,
-				type: 'transfer',
+				type: OPERATIONS_IDS.TRANSFER,
 			};
 
 			if (!options.amount.asset || !options.fee.asset || !options.from) {
@@ -394,7 +394,7 @@ export const send = () => async (dispatch, getState) => {
 			},
 			from: fromAccount,
 			to: toAccount,
-			type: 'transfer',
+			type: OPERATIONS_IDS.TRANSFER,
 		};
 
 		if (fee.value) {
