@@ -1,3 +1,5 @@
+import { constants } from 'echojs-lib';
+
 import {
 	CREATE_ACCOUNT_PATH,
 	CREATE_SUCCESS_PATH,
@@ -113,10 +115,11 @@ export const OWNER_KEY = 'owner';
 export const ACTIVE_KEY = 'active';
 export const MEMO_KEY = 'memo';
 export const CORE_SYMBOL = 'ECHO';
-export const CORE_ID = '1.3.0';
-export const GLOBAL_ID_0 = '2.0.0';
-export const GLOBAL_ID_1 = '2.1.0';
-export const NATHAN_ACCOUNT_ID = '1.2.12';
+export const CONTRACT_PREFIX = `${constants.CHAIN_TYPES.RESERVED_SPACE_ID.PROTOCOL}.${constants.PROTOCOL_OBJECT_TYPE_ID.CONTRACT}`;
+export const ASSET_PREFIX = `${constants.CHAIN_TYPES.RESERVED_SPACE_ID.PROTOCOL}.${constants.PROTOCOL_OBJECT_TYPE_ID.ASSET}`;
+export const CORE_ID = `${ASSET_PREFIX}.0`;
+export const GLOBAL_ID_0 = `${constants.CHAIN_TYPES.RESERVED_SPACE_ID.IMPLEMENTATION}.${constants.CHAIN_TYPES.IMPLEMENTATION_OBJECT_TYPE_ID.GLOBAL_PROPERTY}.0`;
+export const GLOBAL_ID_1 = `${constants.CHAIN_TYPES.RESERVED_SPACE_ID.IMPLEMENTATION}.${constants.CHAIN_TYPES.IMPLEMENTATION_OBJECT_TYPE_ID.DYNAMIC_GLOBAL_PROPERTY}.0`;
 export const EXPIRATION_INFELICITY = 5 * 60;
 export const KEY_CODE_ENTER = 13;
 export const KEY_CODE_SPACE = 32;
@@ -166,4 +169,3 @@ export const ERC20_HASHES = {
 	'decimals()': '313ce567',
 	'symbol()': '95d89b41',
 };
-

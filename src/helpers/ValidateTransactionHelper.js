@@ -1,5 +1,5 @@
 import BN from 'bignumber.js';
-import { ERC20_HASHES } from '../constants/GlobalConstants';
+import { ERC20_HASHES, CONTRACT_PREFIX } from '../constants/GlobalConstants';
 
 class ValidateTransactionHelper {
 
@@ -7,7 +7,7 @@ class ValidateTransactionHelper {
 
 		id = id.split('.');
 
-		if (id.length !== 3 || parseInt(id[2], 10).toString() !== id[2] || id.splice(0, 2).join('.') !== '1.9') {
+		if (id.length !== 3 || parseInt(id[2], 10).toString() !== id[2] || id.splice(0, 2).join('.') !== CONTRACT_PREFIX) {
 			return 'Invalid contract ID';
 		}
 

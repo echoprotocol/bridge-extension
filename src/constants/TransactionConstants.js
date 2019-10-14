@@ -41,16 +41,6 @@ export default {
 			asset: null,
 		},
 	},
-	account_transfer: {
-		value: OPERATIONS_IDS.ACCOUNT_TRANSFER,
-		name: 'Transfer Account',
-		options: {
-			from: 'account_id',
-			subject: ['new_owner', 'name'],
-			value: null,
-			asset: null,
-		},
-	},
 	asset_create: {
 		value: OPERATIONS_IDS.ASSET_CREATE,
 		name: 'Create asset',
@@ -221,6 +211,16 @@ export default {
 			asset: null,
 		},
 	},
+	balance_freeze: {
+		value: OPERATIONS_IDS.BALANCE_FREEZE,
+		name: 'Freeze balance',
+		options: {
+			from: 'account',
+			subject: null,
+			value: 'amount.amount',
+			asset: 'amount.asset_id',
+		},
+	},
 	override_transfer: {
 		value: OPERATIONS_IDS.OVERRIDE_TRANSFER,
 		name: 'Override transfer',
@@ -271,14 +271,14 @@ export default {
 			asset: 'amount.asset_id',
 		},
 	},
-	change_sidechain_config: {
-		value: OPERATIONS_IDS.SIDECHAIN_CHANGE_CONFIG,
-		name: 'Change sidechain config',
+	contract_update: {
+		value: OPERATIONS_IDS.CONTRACT_UPDATE,
+		name: 'Contract update',
 		options: {
-			from: null,
-			subject: null,
+			from: 'sender',
+			subject: ['contract'],
 			amount: null,
-			asset: null,
+			asset: 'fee',
 		},
 	},
 	account_address_create: {
@@ -372,7 +372,7 @@ export default {
 		},
 	},
 	sidechain_issue: {
-		value: OPERATIONS_IDS.SIDECHAIN_ETH_ISSUE,
+		value: OPERATIONS_IDS.SIDECHAIN_ISSUE,
 		name: 'Sidechain issue',
 		options: {
 			from: 'account',
@@ -382,7 +382,7 @@ export default {
 		},
 	},
 	sidechain_burn: {
-		value: OPERATIONS_IDS.SIDECHAIN_ETH_BURN,
+		value: OPERATIONS_IDS.SIDECHAIN_BURN,
 		name: 'Sidechain burn',
 		options: {
 			from: 'account',
@@ -431,14 +431,84 @@ export default {
 			asset: 'fee',
 		},
 	},
-	contract_update: {
-		value: OPERATIONS_IDS.CONTRACT_UPDATE,
-		name: 'Contract update',
+	sidechain_erc20_issue: {
+		value: OPERATIONS_IDS.SIDECHAIN_ERC20_ISSUE,
+		name: 'Issue ERC20 token',
 		options: {
-			from: 'sender',
-			subject: ['contract'],
+			from: 'account',
+			subject: ['token'],
+			amount: 'amount',
+			asset: null,
+		},
+	},
+	sidechain_erc20_burn: {
+		value: OPERATIONS_IDS.SIDECHAIN_ERC20_BURN,
+		name: 'Burn ERC20 token',
+		options: {
+			from: 'account',
+			subject: ['token'],
+			amount: 'amount',
+			asset: null,
+		},
+	},
+	sidechain_btc_create_address: {
+		value: OPERATIONS_IDS.SIDECHAIN_BTC_CREATE_ADDRESS,
+		name: 'Create BTC address',
+		options: {
+			from: 'account',
+			subject: null,
 			amount: null,
-			asset: 'fee',
+			asset: null,
+		},
+	},
+	sidechain_btc_intermediate_deposit: {
+		value: OPERATIONS_IDS.SIDECHAIN_BTC_INTERMEDIATE_DEPOSIT,
+		name: 'Intermediate BTC deposit',
+		options: {
+			from: 'account',
+			subject: ['intermediate_address'],
+			amount: null,
+			asset: null,
+		},
+	},
+	sidechain_btc_deposit: {
+		value: OPERATIONS_IDS.SIDECHAIN_BTC_DEPOSIT,
+		name: 'BTC deposit',
+		options: {
+			from: 'account',
+			subject: ['intermediate_deposit_id'],
+			amount: null,
+			asset: null,
+		},
+	},
+	sidechain_btc_withdraw: {
+		value: OPERATIONS_IDS.SIDECHAIN_BTC_WITHDRAW,
+		name: 'BTC withdraw',
+		options: {
+			from: 'account',
+			subject: ['btc_addr'],
+			amount: 'value',
+			asset: null,
+		},
+	},
+	sidechain_btc_approve_withdraw: {
+		value: OPERATIONS_IDS.SIDECHAIN_BTC_APPROVE_WITHDRAW,
+		name: 'Approve BTC withdraw',
+		options: {
+			from: 'committee_member_id',
+			subject: ['withdraw_id'],
+			amount: null,
+			asset: null,
+		},
+	},
+	sidechain_btc_aggregate: {
+		value: OPERATIONS_IDS.SIDECHAIN_BTC_AGGREGATE,
+		name: 'Aggregate BTC',
+		options: {
+			from: null,
+			subject: ['transaction_id'],
+			amount: null,
+			asset: null,
 		},
 	},
 };

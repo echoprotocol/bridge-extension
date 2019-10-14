@@ -14,7 +14,7 @@ import {
 	CORE_ID,
 	GET_TOKENS_TIMEOUT,
 	GLOBAL_ID_1,
-	NATHAN_ACCOUNT_ID,
+	// NATHAN_ACCOUNT_ID,
 } from '../constants/GlobalConstants';
 import { ERROR_SEND_PATH, WALLET_PATH, SEND_PATH } from '../constants/RouterConstants';
 
@@ -245,7 +245,7 @@ export const setFeeFormValue = () => async (dispatch, getState) => {
 				},
 				from: fromAccount,
 				to: toAccount,
-				type: 'transfer',
+				type: OPERATIONS_IDS.TRANSFER,
 			};
 
 			if (!options.amount.asset || !options.fee.asset || !options.from) {
@@ -365,7 +365,7 @@ export const send = () => async (dispatch, getState) => {
 
 		if (!coreAsset) {
 			await echoService.getChainLib().api.getObject(CORE_ID, true);
-			coreAsset = getState().blockchain.getIn(['objectsById', '1.3.0']);
+			coreAsset = getState().blockchain.getIn(['objectsById', CORE_ID]);
 		}
 
 		options = {
@@ -394,7 +394,7 @@ export const send = () => async (dispatch, getState) => {
 			},
 			from: fromAccount,
 			to: toAccount,
-			type: 'transfer',
+			type: OPERATIONS_IDS.TRANSFER,
 		};
 
 		if (fee.value) {
@@ -531,7 +531,7 @@ export const getTokenDetails = async (contractId, accountId) => {
 			tokenDetails
 				.push(echoService.getChainLib()
 					.api
-					.callContractNoChangingState(contractId, NATHAN_ACCOUNT_ID, CORE_ID, methodId));
+					.callContractNoChangingState(contractId, accountId, CORE_ID, methodId));
 		});
 
 		const start = new Date().getTime();
