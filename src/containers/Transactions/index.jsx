@@ -99,7 +99,7 @@ class Transactions extends React.Component {
 												<div className="content">
 													<div className="transaction-element-content">
 														{
-															accountName !== elem.getIn(['content', 'sender']) ?
+															elem.getIn(['content', 'sender']) && accountName !== elem.getIn(['content', 'sender']) ?
 																<div className="row">
 																	<div className="left-block">Sender</div>
 																	<div className="right-block">{elem.getIn(['content', 'sender'])}</div>
@@ -113,10 +113,14 @@ class Transactions extends React.Component {
 																	<div className="right-block">{elem.getIn(['content', 'receiver'])}</div>
 																</div> : null
 														}
-														<div className="row">
-															<div className="left-block">Fee</div>
-															<div className="right-block">{elem.getIn(['content', 'fee'])}<span className="currency">{elem.getIn(['content', 'feeCurrency'])}</span></div>
-														</div>
+														{
+															elem.getIn(['content', 'fee']) ? (
+																<div className="row">
+																	<div className="left-block">Fee</div>
+																	<div className="right-block">{elem.getIn(['content', 'fee'])}<span className="currency">{elem.getIn(['content', 'feeCurrency'])}</span></div>
+																</div>
+															) : null
+														}
 														{NETWORKS.find((item) => item.name === network.get('name')) &&
 															<div className="row">
 																<a

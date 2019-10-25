@@ -221,6 +221,16 @@ export default {
 			asset: 'amount.asset_id',
 		},
 	},
+	balance_unfreeze: {
+		value: OPERATIONS_IDS.BALANCE_UNFREEZE,
+		name: 'Unfreeze balance',
+		options: {
+			from: 'account',
+			subject: null,
+			value: 'amount.amount',
+			asset: 'amount.asset_id',
+		},
+	},
 	override_transfer: {
 		value: OPERATIONS_IDS.OVERRIDE_TRANSFER,
 		name: 'Override transfer',
@@ -277,7 +287,7 @@ export default {
 		options: {
 			from: 'sender',
 			subject: ['contract'],
-			amount: null,
+			value: null,
 			asset: 'fee',
 		},
 	},
@@ -287,7 +297,7 @@ export default {
 		options: {
 			from: 'owner',
 			subject: null,
-			amount: null,
+			value: null,
 			asset: null,
 		},
 	},
@@ -297,7 +307,7 @@ export default {
 		options: {
 			from: 'from',
 			subject: ['to'],
-			amount: 'amount.amount',
+			value: 'amount.amount',
 			asset: 'amount.asset_id',
 		},
 	},
@@ -307,7 +317,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: null,
-			amount: null,
+			value: null,
 			asset: null,
 		},
 	},
@@ -317,7 +327,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: null,
-			amount: null,
+			value: null,
 			asset: null,
 		},
 	},
@@ -327,7 +337,7 @@ export default {
 		options: {
 			from: 'committee_member_id',
 			subject: ['account', 'name'],
-			amount: 'value',
+			value: 'value',
 			asset: null,
 		},
 	},
@@ -337,7 +347,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['eth_addr'],
-			amount: 'value',
+			value: 'value',
 			asset: null,
 		},
 	},
@@ -347,7 +357,7 @@ export default {
 		options: {
 			from: 'committee_member_id',
 			subject: ['withdraw_id'],
-			amount: null,
+			value: null,
 			asset: null,
 		},
 	},
@@ -357,7 +367,7 @@ export default {
 		options: {
 			from: 'sender',
 			subject: ['contract'],
-			amount: 'value',
+			value: 'value',
 			asset: 'fee',
 		},
 	},
@@ -367,7 +377,7 @@ export default {
 		options: {
 			from: 'sender',
 			subject: ['contract'],
-			amount: 'value',
+			value: 'value',
 			asset: 'fee',
 		},
 	},
@@ -377,7 +387,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['deposit_id'],
-			amount: 'value',
+			value: 'value',
 			asset: 'fee',
 		},
 	},
@@ -387,7 +397,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['withdraw_id'],
-			amount: 'value',
+			value: 'value',
 			asset: 'fee',
 		},
 	},
@@ -397,7 +407,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['eth_addr'],
-			amount: null,
+			value: null,
 			asset: 'fee',
 		},
 	},
@@ -407,7 +417,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['erc20_token_addr'],
-			amount: 'value',
+			value: 'value',
 			asset: 'fee',
 		},
 	},
@@ -417,7 +427,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['to'],
-			amount: 'value',
+			value: 'value',
 			asset: 'fee',
 		},
 	},
@@ -427,7 +437,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['to'],
-			amount: 'value',
+			value: 'value',
 			asset: 'fee',
 		},
 	},
@@ -437,7 +447,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['token'],
-			amount: 'amount',
+			value: 'amount',
 			asset: null,
 		},
 	},
@@ -447,7 +457,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['token'],
-			amount: 'amount',
+			value: 'amount',
 			asset: null,
 		},
 	},
@@ -457,7 +467,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: null,
-			amount: null,
+			value: null,
 			asset: null,
 		},
 	},
@@ -467,7 +477,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['intermediate_address'],
-			amount: null,
+			value: null,
 			asset: null,
 		},
 	},
@@ -477,7 +487,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['intermediate_deposit_id'],
-			amount: null,
+			value: null,
 			asset: null,
 		},
 	},
@@ -487,7 +497,7 @@ export default {
 		options: {
 			from: 'account',
 			subject: ['btc_addr'],
-			amount: 'value',
+			value: 'value',
 			asset: null,
 		},
 	},
@@ -497,7 +507,7 @@ export default {
 		options: {
 			from: 'committee_member_id',
 			subject: ['withdraw_id'],
-			amount: null,
+			value: null,
 			asset: null,
 		},
 	},
@@ -507,7 +517,17 @@ export default {
 		options: {
 			from: null,
 			subject: ['transaction_id'],
-			amount: null,
+			value: null,
+			asset: null,
+		},
+	},
+	block_reward: {
+		value: OPERATIONS_IDS.BLOCK_REWARD,
+		name: 'Block reward',
+		options: {
+			from: null,
+			subject: ['reciever', 'name'],
+			value: 'amount',
 			asset: null,
 		},
 	},
