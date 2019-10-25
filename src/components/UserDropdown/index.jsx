@@ -140,7 +140,7 @@ class UserDropdown extends React.Component {
 						tabSelect
 						avatar={`ava${account.icon}`}
 					/>
-					<div className="user-name">{account.name}</div>
+					<div className="user-name">{account.name}({account.id})</div>
 
 					{ userBalance && asset ?
 						<div className={classnames('user-balance', { positive: !!userBalance.get('balance') })}>
