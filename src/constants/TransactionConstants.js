@@ -11,6 +11,8 @@ export default {
 			asset: 'amount.asset_id',
 		},
 	},
+	// transfer_to_address
+	// override_transfer
 	account_create: {
 		value: OPERATIONS_IDS.ACCOUNT_CREATE,
 		name: 'Account created',
@@ -41,6 +43,7 @@ export default {
 			asset: null,
 		},
 	},
+	// account_address_create_operation
 	asset_create: {
 		value: OPERATIONS_IDS.ASSET_CREATE,
 		name: 'Create asset',
@@ -181,6 +184,10 @@ export default {
 			asset: null,
 		},
 	},
+	// committee_member_activate_operation,
+	// committee_member_deactivate_operation,
+	// committee_frozen_balance_deposit_operation,
+	// committee_frozen_balance_withdraw_operation,
 	vesting_balance_create: {
 		value: OPERATIONS_IDS.VESTING_BALANCE_CREATE,
 		name: 'Create vesting balance',
@@ -261,6 +268,9 @@ export default {
 			asset: 'value.asset_id',
 		},
 	},
+	// contract_internal_create_operation, // VIRTUAL
+	// contract_internal_call_operation, // VIRTUAL
+	// contract_selfdestruct_operation, // VIRTUAL
 	contract_transfer: {
 		value: OPERATIONS_IDS.CONTRACT_TRANSFER,
 		name: 'Contract transfer',
@@ -461,6 +471,7 @@ export default {
 			asset: null,
 		},
 	},
+	// sidechain_btc_create_intermediate_deposit_operation
 	sidechain_btc_intermediate_deposit: {
 		value: OPERATIONS_IDS.SIDECHAIN_BTC_INTERMEDIATE_DEPOSIT,
 		name: 'Intermediate BTC deposit',
