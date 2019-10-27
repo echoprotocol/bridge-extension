@@ -400,6 +400,11 @@ const onMessage = (request, sender, sendResponse) => {
 
 	if (['proofOfAuthority', 'signData'].includes(request.method)) {
 
+		if (request.method === 'signData' && !Buffer.isBuffer(request.data.message)) {
+			sendResponse(({ id: request.id, error: 'Message isn\'t a Buffer' }));
+			return true;
+		}
+
 		signMessageRequests.push({
 			origin: hostname,
 			id: request.id,
