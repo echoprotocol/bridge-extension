@@ -337,6 +337,32 @@ const proofOfAuthority = (message, accountId) => {
 	return result;
 };
 
+const signData = (message, accountId) => {
+	const id = IdHelper.getId();
+	const result = new Promise((resolve, reject) => {
+
+		const cb = ({ data }) => {
+			if (data.error) {
+				reject(data.error);
+			} else {
+				resolve(data.signature);
+			}
+		};
+
+		requestQueue.push({ id, cb });
+		window.postMessage({
+			method: 'signData',
+			id,
+			data: { message, accountId },
+			target: 'content',
+			appId: APP_ID,
+		}, '*');
+
+	});
+
+	return result;
+};
+
 /**
  * Get provider approval
  * @returns {Promise}
@@ -445,6 +471,7 @@ const extension = {
 	subscribeSwitchAccount: (subscriberCb) => subscribeSwitchAccount(subscriberCb),
 	getAccess: () => getAccess(),
 	proofOfAuthority: (message, accountId) => proofOfAuthority(message, accountId),
+	signData: (message, accountId) => signData(message, accountId),
 };
 
 window._.noConflict();

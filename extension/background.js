@@ -1,5 +1,5 @@
 /* eslint-disable no-nested-ternary */
-import echo, { Transaction, PrivateKey, aes, ED25519 } from 'echojs-lib';
+import echo, { Transaction, PrivateKey, aes, ED25519, crypto as echojsCrypto } from 'echojs-lib';
 import { throttle } from 'lodash';
 import urlParse from 'url-parse';
 
@@ -398,20 +398,32 @@ const onMessage = (request, sender, sendResponse) => {
 		return true;
 	}
 
-	if (request.method === 'proofOfAuthority') {
+	if (['proofOfAuthority', 'signData'].includes(request.method)) {
+
+		if (request.method === 'signData' && !Buffer.isBuffer(request.data.message)) {
+			sendResponse(({ id: request.id, error: 'Message isn\'t a Buffer' }));
+			return true;
+		}
 
 		signMessageRequests.push({
 			origin: hostname,
 			id: request.id,
 			message: request.data.message,
 			signer: request.data.accountId,
+			method: request.method,
 			cb: sendResponse,
 		});
 
 		setBadge();
 
 		try {
-			emitter.emit('addSignMessageRequest', request.id, hostname, request.data.accountId, request.data.message);
+			emitter.emit(
+				'addSignMessageRequest',
+				request.id,
+				hostname,
+				request.data.accountId,
+				request.method === 'proofOfAuthority' ? request.data.message : request.data.message.toString('hex'),
+			);
 		} catch (e) { return null; }
 
 		triggerPopup(SIGN_MESSAGE_PATH, signNotification);
@@ -772,6 +784,28 @@ const removeSignMessageRequest = (err, id, signature) => {
 	}
 };
 
+const signMessage = async (method, message, account, networkName) => {
+	if (method === 'proofOfAuthority') {
+		const publicKey = account.keys[0];
+		const wif = await crypto.getWIFByPublicKey(networkName, publicKey);
+		const privateKeyBuffer = PrivateKey.fromWif(wif).toBuffer();
+		const publicKeyBuffer = PrivateKey.fromWif(wif).toPublicKey().toBuffer();
+		return ED25519.signMessage(Buffer.from(message, 'utf8'), publicKeyBuffer, privateKeyBuffer);
+	}
+
+	if (method === 'signData') {
+		const keys = await account.keys.reduce(async (promise, publicKey) => {
+			const arr = await promise;
+			const wif = await crypto.getWIFByPublicKey(networkName, publicKey);
+			return wif ? [...arr, PrivateKey.fromWif(wif)] : arr;
+		}, Promise.resolve([]));
+
+		return echojsCrypto.utils.signData(message, keys);
+	}
+
+	throw new Error('Method is not allowed');
+};
+
 export const onSignMessageApproval = async (err, id, status, message, signer) => {
 
 	if (!status) {
@@ -784,15 +818,11 @@ export const onSignMessageApproval = async (err, id, status, message, signer) =>
 	try {
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
 		const accountIndex = accounts.findIndex((i) => i.id === signer);
+		const request = signMessageRequests.find((i) => i.id === id);
 
 		if (accountIndex >= 0) {
 			const account = accounts[accountIndex];
-			const publicKey = account.keys[0];
-			const wif = await crypto.getWIFByPublicKey(network.name, publicKey);
-			const privateKeyBuffer = PrivateKey.fromWif(wif).toBuffer();
-			const publicKeyBuffer = PrivateKey.fromWif(wif).toPublicKey().toBuffer();
-
-			const signature = ED25519.signMessage(Buffer.from(message, 'utf8'), publicKeyBuffer, privateKeyBuffer);
+			const signature = await signMessage(request.method, request.message, account, network.name);
 			const signatureHex = signature.toString('hex');
 			removeSignMessageRequest(err, id, signatureHex);
 		}
@@ -830,12 +860,12 @@ window.getProviderMap = () => providerRequests.reduce((map, { ids: [reqId], orig
 }, {});
 
 window.getSignMessageMap = () => signMessageRequests.reduce((map, {
-	id, origin, message, signer,
+	id, origin, message, signer, method,
 }) => {
 	map[id] = {
 		origin,
 		signer,
-		message,
+		message: method === 'proofOfAuthority' ? message : message.toString('hex'),
 	};
 	return map;
 }, {});
