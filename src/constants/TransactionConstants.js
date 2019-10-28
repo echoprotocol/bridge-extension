@@ -11,8 +11,26 @@ export default {
 			asset: 'amount.asset_id',
 		},
 	},
-	// transfer_to_address
-	// override_transfer
+	transfer_to_address: {
+		value: OPERATIONS_IDS.TRANSFER_TO_ADDRESS,
+		name: 'Transfer to address',
+		options: {
+			from: 'from',
+			subject: ['to', null],
+			value: 'amount.amount',
+			asset: 'amount.asset_id',
+		},
+	},
+	override_transfer: {
+		value: OPERATIONS_IDS.OVERRIDE_TRANSFER,
+		name: 'Override transfer',
+		options: {
+			from: 'from',
+			subject: ['to', 'name'],
+			value: 'amount.amount',
+			asset: 'amount.asset_id',
+		},
+	},
 	account_create: {
 		value: OPERATIONS_IDS.ACCOUNT_CREATE,
 		name: 'Account created',
@@ -43,7 +61,16 @@ export default {
 			asset: null,
 		},
 	},
-	// account_address_create_operation
+	account_address_create: {
+		value: OPERATIONS_IDS.ACCOUNT_ADDRESS_CREATE,
+		name: 'Account address create',
+		options: {
+			from: 'owner',
+			subject: null,
+			value: null,
+			asset: null,
+		},
+	},
 	asset_create: {
 		value: OPERATIONS_IDS.ASSET_CREATE,
 		name: 'Create asset',
@@ -124,6 +151,16 @@ export default {
 			asset: 'asset_id',
 		},
 	},
+	asset_claim_fees: {
+		value: OPERATIONS_IDS.ASSET_CLAIM_FEES,
+		name: 'Claim asset fees',
+		options: {
+			from: 'issuer',
+			subject: null,
+			value: 'amount_to_claim.amount',
+			asset: 'amount_to_claim.asset_id',
+		},
+	},
 	proposal_create: {
 		value: OPERATIONS_IDS.PROPOSAL_CREATE,
 		name: 'Create proposal',
@@ -184,10 +221,46 @@ export default {
 			asset: null,
 		},
 	},
-	// committee_member_activate_operation,
-	// committee_member_deactivate_operation,
-	// committee_frozen_balance_deposit_operation,
-	// committee_frozen_balance_withdraw_operation,
+	committee_member_activate: {
+		value: OPERATIONS_IDS.COMMITTEE_MEMBER_ACTIVATE,
+		name: 'Committee member activate',
+		options: {
+			from: null,
+			subject: null,
+			value: null,
+			asset: null,
+		},
+	},
+	committee_member_deactivate: {
+		value: OPERATIONS_IDS.COMMITTEE_MEMBER_DEACTIVATE,
+		name: 'Committee member deactivate',
+		options: {
+			from: null,
+			subject: null,
+			value: null,
+			asset: null,
+		},
+	},
+	committee_frozen_balance_deposit: {
+		value: OPERATIONS_IDS.COMMITTEE_FROZEN_BALANCE_DEPOSIT,
+		name: 'Committee frozen balance deposit',
+		options: {
+			from: 'committee_member_account',
+			subject: null,
+			value: 'amount.amount',
+			asset: 'amount.asset_id',
+		},
+	},
+	committee_frozen_balance_withdraw: {
+		value: OPERATIONS_IDS.COMMITTEE_FROZEN_BALANCE_WITHDRAW,
+		name: 'Committee frozen balance withdraw',
+		options: {
+			from: 'committee_member_account',
+			subject: null,
+			value: 'amount.amount',
+			asset: 'amount.asset_id',
+		},
+	},
 	vesting_balance_create: {
 		value: OPERATIONS_IDS.VESTING_BALANCE_CREATE,
 		name: 'Create vesting balance',
@@ -238,27 +311,7 @@ export default {
 			asset: 'amount.asset_id',
 		},
 	},
-	override_transfer: {
-		value: OPERATIONS_IDS.OVERRIDE_TRANSFER,
-		name: 'Override transfer',
-		options: {
-			from: 'from',
-			subject: ['to', 'name'],
-			value: 'amount.amount',
-			asset: 'amount.asset_id',
-		},
-	},
-	asset_claim_fees: {
-		value: OPERATIONS_IDS.ASSET_CLAIM_FEES,
-		name: 'Claim asset fees',
-		options: {
-			from: 'issuer',
-			subject: null,
-			value: 'amount_to_claim.amount',
-			asset: 'amount_to_claim.asset_id',
-		},
-	},
-	contract: {
+	contract_create: {
 		value: OPERATIONS_IDS.CONTRACT_CREATE,
 		name: 'Contract created',
 		options: {
@@ -273,22 +326,39 @@ export default {
 		name: 'Contract call',
 		options: {
 			from: 'registrar',
-			subject: null,
+			subject: ['callee'],
 			value: 'value.amount',
 			asset: 'value.asset_id',
 		},
 	},
-	// contract_internal_create_operation, // VIRTUAL
-	// contract_internal_call_operation, // VIRTUAL
-	// contract_selfdestruct_operation, // VIRTUAL
-	contract_transfer: {
-		value: OPERATIONS_IDS.CONTRACT_TRANSFER,
-		name: 'Contract transfer',
+	contract_internal_create: {
+		value: OPERATIONS_IDS.CONTRACT_INTERNAL_CREATE,
+		name: 'Contract internal create',
 		options: {
-			from: 'from',
-			subject: ['to', null],
-			value: 'amount.amount',
-			asset: 'amount.asset_id',
+			from: 'caller',
+			subject: ['new_contract'],
+			value: 'value.amount',
+			asset: 'value.asset_id',
+		},
+	},
+	contract_internal_call: {
+		value: OPERATIONS_IDS.CONTRACT_INTERNAL_CALL,
+		name: 'Contract internal call',
+		options: {
+			from: 'caller',
+			subject: ['callee'],
+			value: 'value.amount',
+			asset: 'value.asset_id',
+		},
+	},
+	contract_selfdestruct: {
+		value: OPERATIONS_IDS.CONTRACT_SELFDESTRUCT,
+		name: 'Contract selfdestruct',
+		options: {
+			from: 'contract',
+			subject: ['recipient'],
+			value: null,
+			asset: null,
 		},
 	},
 	contract_update: {
@@ -301,24 +371,24 @@ export default {
 			asset: 'fee',
 		},
 	},
-	account_address_create: {
-		value: OPERATIONS_IDS.ACCOUNT_ADDRESS_CREATE,
-		name: 'Account address create',
+	contract_fund_pool: {
+		value: OPERATIONS_IDS.CONTRACT_FUND_POOL,
+		name: 'Contract fund pool',
 		options: {
-			from: 'owner',
-			subject: null,
-			value: null,
-			asset: null,
+			from: 'sender',
+			subject: ['contract'],
+			value: 'value',
+			asset: 'fee',
 		},
 	},
-	transfer_to_address: {
-		value: OPERATIONS_IDS.TRANSFER_TO_ADDRESS,
-		name: 'Transfer to address',
+	contract_whitelist: {
+		value: OPERATIONS_IDS.CONTRACT_WHITELIST,
+		name: 'Contract whitelist',
 		options: {
-			from: 'from',
-			subject: ['to'],
-			value: 'amount.amount',
-			asset: 'amount.asset_id',
+			from: 'sender',
+			subject: ['contract'],
+			value: 'value',
+			asset: 'fee',
 		},
 	},
 	sidechain_eth_create_address: {
@@ -371,26 +441,6 @@ export default {
 			asset: null,
 		},
 	},
-	contract_fund_pool: {
-		value: OPERATIONS_IDS.CONTRACT_FUND_POOL,
-		name: 'Contract fund pool',
-		options: {
-			from: 'sender',
-			subject: ['contract'],
-			value: 'value',
-			asset: 'fee',
-		},
-	},
-	contract_whitelist: {
-		value: OPERATIONS_IDS.CONTRACT_WHITELIST,
-		name: 'Contract whitelist',
-		options: {
-			from: 'sender',
-			subject: ['contract'],
-			value: 'value',
-			asset: 'fee',
-		},
-	},
 	sidechain_issue: {
 		value: OPERATIONS_IDS.SIDECHAIN_ISSUE,
 		name: 'Sidechain issue',
@@ -411,7 +461,7 @@ export default {
 			asset: 'fee',
 		},
 	},
-	register_erc20_token: {
+	sidechain_erc20_register_token: {
 		value: OPERATIONS_IDS.SIDECHAIN_ERC20_REGISTER_TOKEN,
 		name: 'Register ERC20 token',
 		options: {
@@ -421,7 +471,7 @@ export default {
 			asset: 'fee',
 		},
 	},
-	deposit_erc20_token: {
+	sidechain_erc20_deposit_token: {
 		value: OPERATIONS_IDS.SIDECHAIN_ERC20_DEPOSIT_TOKEN,
 		name: 'Deposit ERC20 token',
 		options: {
@@ -431,7 +481,7 @@ export default {
 			asset: 'fee',
 		},
 	},
-	withdraw_erc20_token: {
+	sidechain_erc20_withdraw_token: {
 		value: OPERATIONS_IDS.SIDECHAIN_ERC20_WITHDRAW_TOKEN,
 		name: 'Withdraw ERC20 token',
 		options: {
@@ -441,7 +491,7 @@ export default {
 			asset: 'fee',
 		},
 	},
-	approve_erc20_token_withdraw: {
+	sidechain_erc20_approve_token_withdraw: {
 		value: OPERATIONS_IDS.SIDECHAIN_ERC20_APPROVE_TOKEN_WITHDRAW,
 		name: 'Approve ERC20 token withdraw',
 		options: {
@@ -481,13 +531,22 @@ export default {
 			asset: null,
 		},
 	},
-	// sidechain_btc_create_intermediate_deposit_operation
+	sidechain_btc_create_intermediate_deposit: {
+		value: OPERATIONS_IDS.SIDECHAIN_BTC_CREATE_INTERMEDIATE_DEPOSIT,
+		name: 'Create Intermediate BTC deposit',
+		options: {
+			from: 'account',
+			subject: ['btc_address_id'],
+			value: null,
+			asset: null,
+		},
+	},
 	sidechain_btc_intermediate_deposit: {
 		value: OPERATIONS_IDS.SIDECHAIN_BTC_INTERMEDIATE_DEPOSIT,
 		name: 'Intermediate BTC deposit',
 		options: {
 			from: 'account',
-			subject: ['intermediate_address'],
+			subject: ['intermediate_address_id'],
 			value: null,
 			asset: null,
 		},
