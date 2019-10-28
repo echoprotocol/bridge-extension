@@ -97,7 +97,7 @@ const formatOperation = async (data, result, accountName) => {
 		result = result.setIn(['transaction', 'currency'], response.symbol);
 	}
 
-	if (type === operations.contract.value) {
+	if (type === operations.contract_create.value) {
 		result = result.setIn(['content', 'receiver'], data.getIn(['result', '1']));
 	}
 
