@@ -6,23 +6,23 @@
 Bridge is a tool designed to make running Echo dApps for people as easy as possible.
 
 As an extension for browser, Bridge can act as a dedicated Echo wallet,
-allowing to access and manage account data, manage multiple accounts, 
+allowing to access and manage account data, manage multiple accounts,
 and use it for making, signing transactions & viewing account history.
 
-The Echo Bridge is a bridge between a website that uses the Echo network 
-and directly the Echo network itself. Implementing DApps using the extension, 
-developers do not need to spend time implementing connections to network nodes, 
-launching nodes, and managing user private keys, since all this has been 
+The Echo Bridge is a bridge between a website that uses the Echo network
+and directly the Echo network itself. Implementing DApps using the extension,
+developers do not need to spend time implementing connections to network nodes,
+launching nodes, and managing user private keys, since all this has been
 moved to the Echo Bridge side.
 
 ## How To Use
 
-On a site that is open in a browser with Echo Bridge, an object is available 
-`window.echojslib`, which is initialized by the extension. Using this object 
-you can communicate with the Echo node, work with user accounts, and also 
-sign and send transactions to the network. 
+On a site that is open in a browser with Echo Bridge, an object is available
+`window.echojslib`, which is initialized by the extension. Using this object
+you can communicate with the Echo node, work with user accounts, and also
+sign and send transactions to the network.
 
-Most actions that affect work with accounts and private keys must be confirmed 
+Most actions that affect work with accounts and private keys must be confirmed
 by the user through the Bridge UI.
 
 ### Get access to use Bridge data
@@ -43,13 +43,13 @@ In this case, the extension will not request access again and just resolves the 
 
 ### Connect to node  
 
-There is an example of connecting to the node and subscribe to switch network 
+There is an example of connecting to the node and subscribe to switch network
 (recommended to use inside `window.onload`)  
 
 ```javascript  
 window.onload = async () => {
-  // you do not need to use the isEchoBridge flag, 
-  // but you can be sure that you did not override 
+  // you do not need to use the isEchoBridge flag,
+  // but you can be sure that you did not override
   // the variable above
   if (echojslib && echojslib.isEchoBridge) {
 
@@ -57,7 +57,7 @@ window.onload = async () => {
     * Get access
     */
     await echojslib.extension.getAccess();
-    
+
     /**
     * Subscribe to current Echo network selected in Bridge
     */
@@ -91,9 +91,9 @@ If you don't get access or there isn't active account, then you get null, else a
 ```javascript
 /**
   *  @example
-  *     echojslib.extension.activeAccount // null 
+  *     echojslib.extension.activeAccount // null
   *  @example
-  *     echojslib.extension.activeAccount // "1.2.1" 
+  *     echojslib.extension.activeAccount // "1.2.1"
   * @return {null|string}
 */
 echojslib.extension.activeAccount
@@ -129,7 +129,7 @@ const sendTransaction = async () => {
   /**
   * Send the transaction to blockchain
   */
-  await tr.broadcast(); 
+  await tr.broadcast();
 }
 ```
 
@@ -159,6 +159,17 @@ const message = Buffer.from('This is example message!', 'utf8');
 const publicKey = bs58.decode('ECHOJDpsaMaR9qWM2922ZYvQ3xpavsN8oeNN8zBx1VNKdQBf'.slice(4));
 
 ED25519.verifyMessage(signature, message, publicKey);
+```
+
+### Data Signing
+You can sign payload by account private keys.
+
+```javascript  
+/**
+* Get signature
+* @returns {Promise.<String>} signature
+*/
+await echojslib.extension.signData(Buffer.from('This is example message!', 'utf8'), '1.2.134');
 ```
 
 ## License
