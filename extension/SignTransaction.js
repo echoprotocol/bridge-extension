@@ -1,4 +1,4 @@
-import { serializer, Signature } from 'echojs-lib';
+import { serializers, Signature } from 'echojs-lib';
 
 import { EXPIRATION_INFELICITY, GLOBAL_ID_1 } from '../src/constants/GlobalConstants';
 
@@ -31,13 +31,13 @@ class SignTransaction {
 
 		tr._refBlockPrefix = Buffer.from(dynamicGlobalChainData.head_block_id, 'hex').readUInt32LE(4);
 
-		const transactionBuffer = serializer.toBuffer(serializer.transaction, {
+		const transactionBuffer = serializers.transaction.serialize({
 			ref_block_num: tr._refBlockNum,
 			ref_block_prefix: tr._refBlockPrefix,
 			expiration: tr.expiration,
 			operations,
 			extensions: [],
-		});
+		});		
 
 		tr._signatures = tr._signers.map(({ privateKey }) => {
 			const chainBuffer = Buffer.from(chainId, 'hex');
