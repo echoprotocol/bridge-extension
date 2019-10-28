@@ -37,7 +37,7 @@ class SignTransaction {
 			expiration: tr.expiration,
 			operations,
 			extensions: [],
-		});		
+		});
 
 		tr._signatures = tr._signers.map(({ privateKey }) => {
 			const chainBuffer = Buffer.from(chainId, 'hex');
