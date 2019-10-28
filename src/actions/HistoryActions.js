@@ -5,7 +5,7 @@ import { validators } from 'echojs-lib';
 import GlobalReducer from '../reducers/GlobalReducer';
 
 import operations from '../constants/TransactionConstants';
-import { CORE_SYMBOL } from '../constants/GlobalConstants';
+import { CORE_SYMBOL, CORE_ID } from '../constants/GlobalConstants';
 import { historyOperations } from '../constants/OperationConstants';
 
 import FormatHelper from '../helpers/FormatHelper';
@@ -30,8 +30,6 @@ const formatOperation = async (data, result, accountName) => {
 
 	const block = await echoService.getChainLib().api.getBlock(data.get('block_num'));
 
-	const feeAsset = await echoService.getChainLib().api.getObject(operation.getIn(['fee', 'asset_id']));
-
 	const { name, options } = Object.values(operations).find((i) => i.value === type);
 
 	const typeOperation = historyOperations.find((item) => item.value.includes(name));
@@ -42,9 +40,14 @@ const formatOperation = async (data, result, accountName) => {
 		.setIn(['transaction', 'blockNumber'], block.round)
 		.setIn(['transaction', 'date'], moment.utc(block.timestamp).local().format('DD MMM, HH:mm'))
 		.setIn(['transaction', 'value'], 0)
-		.setIn(['transaction', 'currency'], CORE_SYMBOL)
-		.setIn(['content', 'fee'], FormatHelper.formatAmount(operation.getIn(['fee', 'amount']), feeAsset.precision))
-		.setIn(['content', 'feeCurrency'], feeAsset.symbol);
+		.setIn(['transaction', 'currency'], CORE_SYMBOL);
+
+	if (operation.getIn(['fee', 'asset_id'])) {
+		const asset = await echoService.getChainLib().api.getObject(operation.getIn(['fee', 'asset_id']));
+		result = result
+			.setIn(['content', 'fee'], FormatHelper.formatAmount(operation.getIn(['fee', 'amount']), asset.precision))
+			.setIn(['content', 'feeCurrency'], asset.symbol);
+	}
 
 	if (options.subject) {
 		if (options.subject[1]) {
@@ -83,16 +86,13 @@ const formatOperation = async (data, result, accountName) => {
 	}
 
 	if (options.value) {
-		result = result.setIn(['transaction', 'value'], operation.getIn(options.value.split('.')));
-	}
-
-	if (options.asset) {
-		const request = operation.getIn(options.asset.split('.'));
-
+		const value = operation.getIn(options.value.split('.'));
+		const request = options.asset ? operation.getIn(options.asset.split('.')) : CORE_ID;
 		const response = await echoService.getChainLib().api.getObject(request);
 
-		const resultValue = result.getIn(['transaction', 'value']) !== 0 ? `${numberSign} ${FormatHelper.formatAmount(result.getIn(['transaction', 'value']), response.precision)}` :
-			FormatHelper.formatAmount(result.getIn(['transaction', 'value']), response.precision);
+		let resultValue = value !== 0 ? `${numberSign} ` : '';
+		resultValue = `${resultValue}${FormatHelper.formatAmount(value, response.precision)}`;
+
 		result = result.setIn(['transaction', 'value'], resultValue);
 		result = result.setIn(['transaction', 'currency'], response.symbol);
 	}
