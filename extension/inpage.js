@@ -341,6 +341,11 @@ const signData = (message, accountId) => {
 	const id = IdHelper.getId();
 	const result = new Promise((resolve, reject) => {
 
+		if (!Buffer.isBuffer(message)) {
+			reject(new Error('Message isn\'t a Buffer'));
+			return;
+		}
+
 		const cb = ({ data }) => {
 			if (data.error) {
 				reject(data.error);
@@ -353,7 +358,10 @@ const signData = (message, accountId) => {
 		window.postMessage({
 			method: 'signData',
 			id,
-			data: { message, accountId },
+			data: {
+				message: message.toString('hex'),
+				accountId,
+			},
 			target: 'content',
 			appId: APP_ID,
 		}, '*');
