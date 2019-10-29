@@ -399,11 +399,6 @@ const onMessage = (request, sender, sendResponse) => {
 
 	if (['proofOfAuthority', 'signData'].includes(request.method)) {
 
-		if (request.method === 'signData' && !Buffer.isBuffer(request.data.message)) {
-			sendResponse(({ id: request.id, error: 'Message isn\'t a Buffer' }));
-			return true;
-		}
-
 		signMessageRequests.push({
 			origin: hostname,
 			id: request.id,
@@ -421,7 +416,7 @@ const onMessage = (request, sender, sendResponse) => {
 				request.id,
 				hostname,
 				request.data.accountId,
-				request.method === 'proofOfAuthority' ? request.data.message : request.data.message.toString('hex'),
+				request.data.message,
 			);
 		} catch (e) { return null; }
 
@@ -799,7 +794,7 @@ const signMessage = async (method, message, account, networkName) => {
 			return wif ? [...arr, PrivateKey.fromWif(wif)] : arr;
 		}, Promise.resolve([]));
 
-		return echojsCrypto.utils.signData(message, keys);
+		return echojsCrypto.utils.signData(Buffer.from(message, 'hex'), keys);
 	}
 
 	throw new Error('Method is not allowed');
