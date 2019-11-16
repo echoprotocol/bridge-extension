@@ -47,6 +47,7 @@ import {
 	SUCCESS_SEND_INDEX_PATH,
 	INCOMING_CONNECTION_PATH,
 	SIGN_MESSAGE_PATH,
+	CLOSE_AFTER_UNLOCK_PATH
 } from '../src/constants/RouterConstants';
 
 import { FORM_SIGN_UP, FORM_SEND } from '../src/constants/FormConstants';
@@ -55,6 +56,8 @@ import FormatHelper from '../src/helpers/FormatHelper';
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
+
+const requestAccountMethodCallbacks = [];
 
 let lastRequestType = '';
 const accountsRequests = [];
@@ -145,7 +148,6 @@ const createSocket = async (url) => {
 	}
 
 };
-
 
 /**
  * show popup
@@ -252,6 +254,28 @@ const resolveAccounts = async () => {
 			}
 		});
 		return accountsRequests.splice(0, accountsRequests.length);
+
+
+	} catch (e) {
+		return { error: e.message };
+	}
+
+};
+
+const requestAccountMethodCallbacksRequests = async () => {
+
+	try {
+		const account = await getActiveAccount();
+
+		requestAccountMethodCallbacks.forEach((request) => {
+			try {
+				request.cb({ id: request.id, res: account });
+			} catch (e) {
+				console.log(e.message);
+			}
+		});
+
+		return requestAccountMethodCallbacks.splice(0, accountsRequests.length);
 
 
 	} catch (e) {
@@ -389,6 +413,20 @@ const onMessage = (request, sender, sendResponse) => {
 		return true;
 	}
 
+	if (request.method === 'requestAccount') {
+
+		requestAccountMethodCallbacks.push({
+			id: request.id, cb: sendResponse,
+		});
+
+		if (!crypto.isLocked()) {
+			requestAccountMethodCallbacksRequests();		
+		} else {
+			triggerPopup(CLOSE_AFTER_UNLOCK_PATH);
+		}
+		return true;
+	}
+
 	if (request.method === 'getNetwork') {
 
 		getNetwork().then((result) => {
@@ -498,6 +536,7 @@ const onPinUnlock = () => {
 		resolveAccounts();
 		closePopup();
 	}
+	requestAccountMethodCallbacksRequests();
 	updateActiveAccountInpage();
 	return null;
 };

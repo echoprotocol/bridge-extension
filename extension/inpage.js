@@ -283,6 +283,38 @@ const getAccounts = () => {
 	return result;
 };
 
+const requestAccount = () => {
+	return backgroundRequest('requestAccount');
+}
+
+/**
+ * 
+ * @param {String} method 
+ */
+const backgroundRequest = (method) => {
+	const id = IdHelper.getId();
+
+	const result = new Promise((resolve, reject) => {
+
+		const cb = ({ data }) => {
+			if (data.error || data.res.error) {
+				reject(data.error || data.res.error);
+			} else {
+				resolve(data.res);
+			}
+		};
+
+		requestQueue.push({ id, cb });
+
+		window.postMessage({
+			method, id, target: 'content', appId: APP_ID,
+		}, '*');
+
+	});
+
+	return result;
+}
+
 /**
  * Load active bridge account
  * @returns {undefined}
@@ -473,6 +505,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 const extension = {
 	get activeAccount() { return activeAccount; },
 	getAccounts: () => getAccounts(),
+	requestAccount: () => requestAccount(),
 	sendTransaction: (data) => sendTransaction(data),
 	getCurrentNetwork: () => getCurrentNetwork(),
 	subscribeSwitchNetwork: (subscriberCb) => subscribeSwitchNetwork(subscriberCb),

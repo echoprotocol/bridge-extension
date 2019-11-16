@@ -28,6 +28,7 @@ class NotificationManager {
 		if (creation && creation.then) {
 			creation.then(cb);
 		}
+
 	}
 
 	/**
