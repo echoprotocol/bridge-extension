@@ -144,7 +144,7 @@ const subscribeAccountChanged = (subscriberCb) => {
 
 /**
  * @method notifyAccountChanged
- * @param {String|null} activeAccount
+ * @param {String|null} accountId
  */
 const notifyAccountChanged = (accountId) => {
 	accountChangedSubscribers.forEach((cb) => {
