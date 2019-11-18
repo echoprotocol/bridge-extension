@@ -15,6 +15,7 @@ const requestQueue = [];
 
 const networkSubscribers = [];
 const accountSubscribers = [];
+const accountChangedSubscribers = [];
 
 let activeAccount = null;
 
@@ -123,6 +124,32 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 	});
 
 	return result;
+};
+
+/**
+ * Notify about switch account
+ * @param {Function} subscriberCb
+ * @returns {Promise}
+ */
+const subscribeAccountChanged = (subscriberCb) => {
+	accountChangedSubscribers.push(subscriberCb);
+
+	if (!lodash.isFunction(subscriberCb)) {
+		throw new Error('Is not a function');
+	}
+
+	subscriberCb(activeAccount);
+
+};
+
+/**
+ * @method notifyAccountChanged
+ * @param {String|null} activeAccount
+ */
+const notifyAccountChanged = (accountId) => {
+	accountChangedSubscribers.forEach((cb) => {
+		cb(accountId);
+	});
 };
 
 /**
@@ -283,16 +310,13 @@ const getAccounts = () => {
 	return result;
 };
 
-const requestAccount = () => {
-	return backgroundRequest('requestAccount');
-}
 
 /**
- * 
- * @param {String} method 
+ * @method backgroundRequest
+ * @param {String} method
  */
 const backgroundRequest = (method) => {
-	const id = IdHelper.getId();
+	const id = `${method}_${IdHelper.getId()}`;
 
 	const result = new Promise((resolve, reject) => {
 
@@ -313,8 +337,9 @@ const backgroundRequest = (method) => {
 	});
 
 	return result;
-}
+};
 
+const requestAccount = () => backgroundRequest('requestAccount');
 /**
  * Load active bridge account
  * @returns {undefined}
@@ -335,6 +360,7 @@ const loadActiveAccount = () => {
 			activeAccount = data.res;
 			requestQueue.push({ id, cb });
 		}
+		notifyAccountChanged(activeAccount);
 	};
 
 	requestQueue.push({ id, cb });
@@ -513,6 +539,7 @@ const extension = {
 	getAccess: () => getAccess(),
 	proofOfAuthority: (message, accountId) => proofOfAuthority(message, accountId),
 	signData: (message, accountId) => signData(message, accountId),
+	subscribeAccountChanged: (subscriberCb) => subscribeAccountChanged(subscriberCb),
 };
 
 window._.noConflict();

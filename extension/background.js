@@ -47,7 +47,7 @@ import {
 	SUCCESS_SEND_INDEX_PATH,
 	INCOMING_CONNECTION_PATH,
 	SIGN_MESSAGE_PATH,
-	CLOSE_AFTER_UNLOCK_PATH
+	CLOSE_AFTER_UNLOCK_PATH,
 } from '../src/constants/RouterConstants';
 
 import { FORM_SIGN_UP, FORM_SEND } from '../src/constants/FormConstants';
@@ -262,28 +262,6 @@ const resolveAccounts = async () => {
 
 };
 
-const requestAccountMethodCallbacksRequests = async () => {
-
-	try {
-		const account = await getActiveAccount();
-
-		requestAccountMethodCallbacks.forEach((request) => {
-			try {
-				request.cb({ id: request.id, res: account });
-			} catch (e) {
-				console.log(e.message);
-			}
-		});
-
-		return requestAccountMethodCallbacks.splice(0, accountsRequests.length);
-
-
-	} catch (e) {
-		return { error: e.message };
-	}
-
-};
-
 /**
  * Get active account by network
  * @param {String} switchNetwork
@@ -341,6 +319,29 @@ const updateActiveAccountInpage = async (network) => {
 	} catch (e) {
 		return { error: e.message };
 	}
+};
+
+
+const requestAccountMethodCallbacksRequests = async () => {
+
+	try {
+		const account = await getActiveAccount();
+
+		requestAccountMethodCallbacks.forEach((request) => {
+			try {
+				request.cb({ id: request.id, res: account });
+			} catch (e) {
+				console.log(e.message);
+			}
+		});
+
+		return requestAccountMethodCallbacks.splice(0, requestAccountMethodCallbacks.length);
+
+
+	} catch (e) {
+		return { error: e.message };
+	}
+
 };
 
 /**
@@ -420,7 +421,7 @@ const onMessage = (request, sender, sendResponse) => {
 		});
 
 		if (!crypto.isLocked()) {
-			requestAccountMethodCallbacksRequests();		
+			requestAccountMethodCallbacksRequests();
 		} else {
 			triggerPopup(CLOSE_AFTER_UNLOCK_PATH);
 		}
