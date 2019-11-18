@@ -321,7 +321,7 @@ const backgroundRequest = (method) => {
 	const result = new Promise((resolve, reject) => {
 
 		const cb = ({ data }) => {
-			if (data.error || data.res.error) {
+			if (data.error || (data.res && data.res.error)) {
 				reject(data.error || data.res.error);
 			} else {
 				resolve(data.res);
