@@ -366,8 +366,8 @@
 				});
 			});
 
-			$("#subscribeSwitchAccount-click").click(async function(e) {
-				window.echojslib.extension.subscribeSwitchAccount((data) => {
+			$("#subscribeSwitchAccount-click").click(function(e) {
+				window.echojslib.extension.subscribeSwitchAccount(async (data) => {
 					console.log("current account: ", data);
 					await reconnectEcho();
 					jQuery("#subscribeSwitchAccount-info").html(
