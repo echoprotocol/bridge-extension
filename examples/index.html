@@ -366,7 +366,7 @@
 				});
 			});
 
-			$("#subscribeSwitchAccount-click").click(function(e) {
+			$("#subscribeSwitchAccount-click").click(async function(e) {
 				window.echojslib.extension.subscribeSwitchAccount((data) => {
 					console.log("current account: ", data);
 					await reconnectEcho();
