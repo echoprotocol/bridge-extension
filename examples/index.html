@@ -368,19 +368,17 @@
 
 			$("#subscribeSwitchAccount-click").click(function(e) {
 				window.echojslib.extension.subscribeSwitchAccount((data) => {
-					console.log("current account: ", data);					
+					console.log("current account: ", data);
+					await reconnectEcho();
 					jQuery("#subscribeSwitchAccount-info").html(
 							`<p>ACCOUNT: ${JSON.stringify(data)}</p>`
 					);
 				});
 			});
 
-			$("#subscribeAccountChanged-click").click(function(e) {
-				console.log('ee');
-				
+			$("#subscribeAccountChanged-click").click(function(e) {				
 				window.echojslib.extension.subscribeAccountChanged(async (data) => {
-					console.log("current account: ", data);
-					await reconnectEcho();
+					console.log("current account: ", data);					
 					jQuery("#subscribeAccountChanged-info").html(
 							`<p>ACCOUNT: ${JSON.stringify(data)}</p>`
 					);
