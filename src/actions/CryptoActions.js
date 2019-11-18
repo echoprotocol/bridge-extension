@@ -25,6 +25,7 @@ import { globals } from './SignActions';
 import FormatHelper from '../helpers/FormatHelper';
 import ValidatePinHelper from '../helpers/ValidatePinHelper';
 import { FORM_SEND } from '../constants/FormConstants';
+import { initHistory } from './HistoryActions';
 
 
 /**
@@ -95,6 +96,7 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 
 		dispatch(changeCrypto({ isLocked: false }));
 		await dispatch(loadInfo());
+		dispatch(initHistory());
 
 		if (
 			globals.WINDOW_TYPE === POPUP_WINDOW_TYPE
