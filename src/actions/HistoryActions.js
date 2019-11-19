@@ -193,3 +193,40 @@ export const updateHistory = () => async (dispatch, getState) => {
 
 	return true;
 };
+
+/**
+ * @method initHistory
+ *
+ * Init user's history
+ */
+export const initHistory = () => (dispatch, getState) => {
+
+	try {
+		const accountName = getState().global.getIn(['account', 'name']);
+		if (!accountName) {
+			return false;
+		}
+
+		const stateHistory = getState().global.get('history');
+		if (stateHistory.size) {
+			return false;
+		}
+
+		const currentAccountId = getState().global.getIn(['account', 'id']);
+		const history = echoService.getChainLib().cache.fullAccounts.getIn([currentAccountId, 'history']);
+
+		dispatch(GlobalReducer.actions.set({
+			field: 'history',
+			value: history,
+		}));
+		dispatch(formatHistory(history));
+	} catch (err) {
+		console.warn('Init history error', err);
+		dispatch(GlobalReducer.actions.set({
+			field: 'error',
+			value: FormatHelper.formatError(err),
+		}));
+	}
+
+	return true;
+};
