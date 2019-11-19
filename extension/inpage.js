@@ -15,6 +15,7 @@ const requestQueue = [];
 
 const networkSubscribers = [];
 const accountSubscribers = [];
+const accountChangedSubscribers = [];
 
 let activeAccount = null;
 
@@ -123,6 +124,33 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 	});
 
 	return result;
+};
+
+/**
+ * Notify about switch account
+ * @param {Function} subscriberCb
+ * @returns {Promise}
+ */
+const subscribeAccountChanged = (subscriberCb) => {
+
+	if (!lodash.isFunction(subscriberCb)) {
+		throw new Error('Is not a function');
+	}
+
+	accountChangedSubscribers.push(subscriberCb);
+
+	subscriberCb(activeAccount);
+
+};
+
+/**
+ * @method notifyAccountChanged
+ * @param {String|null} accountId
+ */
+const notifyAccountChanged = (accountId) => {
+	accountChangedSubscribers.forEach((cb) => {
+		cb(accountId);
+	});
 };
 
 /**
@@ -283,6 +311,36 @@ const getAccounts = () => {
 	return result;
 };
 
+
+/**
+ * @method backgroundRequest
+ * @param {String} method
+ */
+const backgroundRequest = (method) => {
+	const id = `${method}_${IdHelper.getId()}`;
+
+	const result = new Promise((resolve, reject) => {
+
+		const cb = ({ data }) => {
+			if (data.error || (data.res && data.res.error)) {
+				reject(data.error || data.res.error);
+			} else {
+				resolve(data.res);
+			}
+		};
+
+		requestQueue.push({ id, cb });
+
+		window.postMessage({
+			method, id, target: 'content', appId: APP_ID,
+		}, '*');
+
+	});
+
+	return result;
+};
+
+const requestAccount = () => backgroundRequest('requestAccount');
 /**
  * Load active bridge account
  * @returns {undefined}
@@ -303,6 +361,7 @@ const loadActiveAccount = () => {
 			activeAccount = data.res;
 			requestQueue.push({ id, cb });
 		}
+		notifyAccountChanged(activeAccount);
 	};
 
 	requestQueue.push({ id, cb });
@@ -473,6 +532,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 const extension = {
 	get activeAccount() { return activeAccount; },
 	getAccounts: () => getAccounts(),
+	requestAccount: () => requestAccount(),
 	sendTransaction: (data) => sendTransaction(data),
 	getCurrentNetwork: () => getCurrentNetwork(),
 	subscribeSwitchNetwork: (subscriberCb) => subscribeSwitchNetwork(subscriberCb),
@@ -480,6 +540,7 @@ const extension = {
 	getAccess: () => getAccess(),
 	proofOfAuthority: (message, accountId) => proofOfAuthority(message, accountId),
 	signData: (message, accountId) => signData(message, accountId),
+	subscribeAccountChanged: (subscriberCb) => subscribeAccountChanged(subscriberCb),
 };
 
 window._.noConflict();

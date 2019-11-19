@@ -60,6 +60,8 @@ export const INCOMING_CONNECTION_PATH = '/incoming-connection';
 
 export const SIGN_MESSAGE_PATH = '/sign-message';
 
+export const CLOSE_AFTER_UNLOCK_PATH = '/?closeAfterUnlock=1';
+
 export const PIN_PATHS = [
 	CREATE_PIN_PATH,
 	UNLOCK_PATH,
