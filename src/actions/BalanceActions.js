@@ -531,7 +531,12 @@ export const getTokenDetails = async (contractId, accountId) => {
 			tokenDetails
 				.push(echoService.getChainLib()
 					.api
-					.callContractNoChangingState(contractId, accountId, CORE_ID, methodId));
+					.callContractNoChangingState(
+						contractId,
+						accountId,
+						{ asset_id: CORE_ID, amount: 0 },
+						methodId,
+					));
 		});
 
 		const start = new Date().getTime();
