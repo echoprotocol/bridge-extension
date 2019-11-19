@@ -80,10 +80,10 @@ window.onload = async () => {
 
 Callback will be called, when network will be changed in extension.
 
-Subscribe to change active account. Callback will be triggered when active account is changed
+Subscribe to change active account. Callback will be triggered when active account is changed or bridge will be locked/unlocked
 
 ```javascript
-echojslib.extension.subscribeSwitchAccount((account) => console.log(account))
+echojslib.extension.subscribeAccountChanged((account) => console.log(account)); // null or "1.2.3"
 ```
 
 ### Get active account synchronously
@@ -98,6 +98,18 @@ If you don't get access or there isn't active account, then you get null, else a
 */
 echojslib.extension.activeAccount
 ```
+
+### Request active account
+This method returns Promise which will be resolved when a user unlock Bridge.
+```javascript
+/**
+  *  @example
+  *     await echojslib.extension.requestAccount(); // null|"1.2.3"  
+  * @return {null|string}
+*/
+await echojslib.extension.requestAccount()
+```
+
 ### Sign transaction with Bridge  
 
 #### Transfer  

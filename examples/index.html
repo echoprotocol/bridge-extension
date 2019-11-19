@@ -27,6 +27,15 @@
 
 		<!-- Subscribe switch account -->
 		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
+			<h4>Subscribe account changed</h4>
+			<div id="subscribeAccountChanged"></div>
+			<button id="subscribeAccountChanged-click">submit</button>
+			<div id="subscribeAccountChanged-info"></div>
+		</div>
+		<!---->
+
+		<!-- Subscribe switch account -->
+		<div style="padding-bottom: 10px; border-top: 1px solid #000;">
 			<h4>Subscribe switch account</h4>
 			<div id="subscribeSwitchAccount"></div>
 			<button id="subscribeSwitchAccount-click">submit</button>
@@ -47,6 +56,14 @@
             <h4>Active account</h4>
             <button id="activeAccount-click">submit</button>
             <div id="activeAccount-info"></div>
+        </div>
+		<!---->
+		
+		<!-- Request account(current network) -->
+        <div style="padding-bottom: 10px; border-top: 1px solid #000;">
+            <h4>Request account</h4>
+            <button id="requestAccount-click">submit</button>
+            <div id="requestAccount-info"></div>
         </div>
         <!---->
 
@@ -359,6 +376,15 @@
 				});
 			});
 
+			$("#subscribeAccountChanged-click").click(function(e) {				
+				window.echojslib.extension.subscribeAccountChanged(async (data) => {
+					console.log("current account: ", data);					
+					jQuery("#subscribeAccountChanged-info").html(
+							`<p>ACCOUNT: ${JSON.stringify(data)}</p>`
+					);
+				});
+			});
+
 			$("#accounts-click").click(function(e) {
 				if (!isAccess) return;
 				window.echojslib.extension
@@ -377,6 +403,14 @@
                 if (!isAccess) return;
                 const result = window.echojslib.extension.activeAccount;
 				jQuery("#activeAccount-info").html(
+					`<p>RESULT: ${JSON.stringify(result)}</p>`
+				);
+            });
+
+            $("#requestAccount-click").click(async function(e) {
+                if (!isAccess) return;
+                const result = await window.echojslib.extension.requestAccount();
+				jQuery("#requestAccount-info").html(
 					`<p>RESULT: ${JSON.stringify(result)}</p>`
 				);
             });

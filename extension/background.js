@@ -47,6 +47,7 @@ import {
 	SUCCESS_SEND_INDEX_PATH,
 	INCOMING_CONNECTION_PATH,
 	SIGN_MESSAGE_PATH,
+	CLOSE_AFTER_UNLOCK_PATH,
 } from '../src/constants/RouterConstants';
 
 import { FORM_SIGN_UP, FORM_SEND } from '../src/constants/FormConstants';
@@ -55,6 +56,8 @@ import FormatHelper from '../src/helpers/FormatHelper';
 const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
+
+const requestAccountMethodCallbacks = [];
 
 let lastRequestType = '';
 const accountsRequests = [];
@@ -145,7 +148,6 @@ const createSocket = async (url) => {
 	}
 
 };
-
 
 /**
  * show popup
@@ -319,6 +321,29 @@ const updateActiveAccountInpage = async (network) => {
 	}
 };
 
+
+const execGetAccountCallbacks = async () => {
+
+	try {
+		const account = await getActiveAccount();
+
+		requestAccountMethodCallbacks.forEach((request) => {
+			try {
+				request.cb({ id: request.id, res: account });
+			} catch (e) {
+				console.log(e.message);
+			}
+		});
+
+		return requestAccountMethodCallbacks.splice(0, requestAccountMethodCallbacks.length);
+
+
+	} catch (e) {
+		return { error: e.message };
+	}
+
+};
+
 /**
  * On content script request
  * @param request
@@ -386,6 +411,20 @@ const onMessage = (request, sender, sendResponse) => {
 			sendResponse({ id: request.id, status: isAccess, error: { isAccess: false } });
 		}
 
+		return true;
+	}
+
+	if (request.method === 'requestAccount') {
+
+		requestAccountMethodCallbacks.push({
+			id: request.id, cb: sendResponse,
+		});
+
+		if (!crypto.isLocked()) {
+			execGetAccountCallbacks();
+		} else {
+			triggerPopup(CLOSE_AFTER_UNLOCK_PATH);
+		}
 		return true;
 	}
 
@@ -498,6 +537,7 @@ const onPinUnlock = () => {
 		resolveAccounts();
 		closePopup();
 	}
+	execGetAccountCallbacks();
 	updateActiveAccountInpage();
 	return null;
 };
