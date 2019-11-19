@@ -183,6 +183,7 @@ const notifyAccountChanged = (accountId) => {
 	accountChangedSubscribers.forEach((cb) => {
 		cb(accountId);
 	});
+
 };
 
 /**
@@ -392,13 +393,18 @@ const loadActiveAccount = () => {
 
 		const error = data.error || (data.res && data.res.error);
 
+		const prevAccount = activeAccount;
+
 		if (error) {
 			activeAccount = null;
 		} else {
 			activeAccount = data.res;
 			requestQueue.push({ id, cb });
 		}
-		notifyAccountChanged(activeAccount);
+		if (prevAccount !== activeAccount) {
+			notifyAccountChanged(activeAccount);
+		}
+
 	};
 
 	const id = IdHelper.getId();
