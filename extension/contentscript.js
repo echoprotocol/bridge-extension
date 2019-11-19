@@ -2,6 +2,7 @@
 
 const extensionizer = require('./extensionizer');
 const { APP_ID } = require('../src/constants/GlobalConstants');
+
 const getAccessRequest = {};
 
 /**

@@ -19,6 +19,8 @@ const accountChangedSubscribers = [];
 
 let activeAccount = null;
 
+const INPAGE_ID = IdHelper.getId();
+
 /**
  * network subscription
  *
@@ -134,12 +136,42 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 const subscribeAccountChanged = (subscriberCb) => {
 
 	if (!lodash.isFunction(subscriberCb)) {
-		throw new Error('Is not a function');
+		throw new Error('The first argument is not a function');
 	}
 
-	accountChangedSubscribers.push(subscriberCb);
+	const id = IdHelper.getId();
 
-	subscriberCb(activeAccount);
+	const result = new Promise((resolve, reject) => {		
+
+		const callback = ({ data }) => {
+
+			if (data.error) {
+				reject(data.error);
+				return;
+			}
+
+			if (data.response) {
+
+				accountChangedSubscribers.push(subscriberCb);
+
+				resolve(activeAccount);
+				subscriberCb(activeAccount);
+				return;
+			}
+
+			reject(new Error('No access'));
+		};
+
+		requestQueue.push({ id, cb: callback });
+
+		window.postMessage({
+			method: 'checkAccess', target: 'content', appId: APP_ID, id,
+		}, '*');
+
+	});
+
+	return result;
+
 
 };
 
@@ -151,6 +183,7 @@ const notifyAccountChanged = (accountId) => {
 	accountChangedSubscribers.forEach((cb) => {
 		cb(accountId);
 	});
+
 };
 
 /**
@@ -242,6 +275,7 @@ echojslib.echo.connect = (url, params) => {
  * @param event
  */
 const onMessage = (event) => {
+
 	const { id, target, appId } = event.data;
 
 	if (!id || target !== 'inpage' || !appId || appId !== APP_ID) return;
@@ -249,7 +283,9 @@ const onMessage = (event) => {
 	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
 	if (requestIndex === -1) return;
 
-	requestQueue.splice(requestIndex, 1)[0].cb(event);
+	const request = requestQueue.splice(requestIndex, 1);
+	request[0].cb(event);
+
 };
 
 
@@ -346,14 +382,18 @@ const requestAccount = () => backgroundRequest('requestAccount');
  * @returns {undefined}
  */
 const loadActiveAccount = () => {
-	const id = IdHelper.getId();
 
 	const cb = ({ data }) => {
+
+		const id = IdHelper.getId();
+
 		window.postMessage({
-			method: 'getActiveAccount', id, target: 'content', appId: APP_ID,
+			method: 'getActiveAccount', id, target: 'content', appId: APP_ID, inPageId: INPAGE_ID,
 		}, '*');
 
 		const error = data.error || (data.res && data.res.error);
+
+		const prevAccount = activeAccount;
 
 		if (error) {
 			activeAccount = null;
@@ -361,12 +401,17 @@ const loadActiveAccount = () => {
 			activeAccount = data.res;
 			requestQueue.push({ id, cb });
 		}
-		notifyAccountChanged(activeAccount);
+		if (prevAccount !== activeAccount) {
+			notifyAccountChanged(activeAccount);
+		}
+
 	};
+
+	const id = IdHelper.getId();
 
 	requestQueue.push({ id, cb });
 	window.postMessage({
-		method: 'getActiveAccount', id, target: 'content', appId: APP_ID,
+		method: 'getActiveAccount', id, target: 'content', appId: APP_ID, inPageId: INPAGE_ID,
 	}, '*');
 };
 

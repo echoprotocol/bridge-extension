@@ -254,8 +254,6 @@ const resolveAccounts = async () => {
 			}
 		});
 		return accountsRequests.splice(0, accountsRequests.length);
-
-
 	} catch (e) {
 		return { error: e.message };
 	}
@@ -292,6 +290,7 @@ const resolveActiveAccount = async (request) => {
 	try {
 		const account = await getActiveAccount();
 		request.cb({ id: request.id, res: account });
+		request.cb = function cb() {};
 	} catch (e) {
 		console.log(e.message);
 	}
@@ -313,7 +312,7 @@ const updateActiveAccountInpage = async (network) => {
 				console.log(e.message);
 			}
 		});
-
+		activeAccountRequests.splice(0, activeAccountRequests.length);
 		return null;
 
 	} catch (e) {
@@ -352,6 +351,7 @@ const execGetAccountCallbacks = async () => {
  * @returns {boolean}
  */
 const onMessage = (request, sender, sendResponse) => {
+
 	const { hostname } = urlParse(sender.tab.url);
 	const { id: tabId } = sender.tab;
 
@@ -370,6 +370,11 @@ const onMessage = (request, sender, sendResponse) => {
 		providerRequests[indexFindRequest].cbs.splice(indexTabId, 1);
 		providerRequests[indexFindRequest].ids.splice(indexTabId, 1);
 		providerRequests[indexFindRequest].tabs.splice(indexTabId, 1);
+		return true;
+	}
+
+	if (request.method === 'checkAccess') {
+		sendResponse({ id: request.id, response: !!processedOrigins[hostname] });
 		return true;
 	}
 
@@ -399,7 +404,9 @@ const onMessage = (request, sender, sendResponse) => {
 
 		try {
 			emitter.emit('addProviderRequest', request.id, hostname);
-		} catch (e) { return null; }
+		} catch (e) {
+			return null;
+		}
 
 		triggerPopup(INCOMING_CONNECTION_PATH, providerNotification);
 		return true;
@@ -457,7 +464,9 @@ const onMessage = (request, sender, sendResponse) => {
 				request.data.accountId,
 				request.data.message,
 			);
-		} catch (e) { return null; }
+		} catch (e) {
+			return null;
+		}
 
 		triggerPopup(SIGN_MESSAGE_PATH, signNotification);
 		return true;
@@ -492,7 +501,9 @@ const onMessage = (request, sender, sendResponse) => {
 
 		try {
 			emitter.emit('request', id, operations);
-		} catch (e) { return null; }
+		} catch (e) {
+			return null;
+		}
 
 		notificationManager.getPopup()
 			.then((popup) => {
@@ -516,16 +527,20 @@ const onMessage = (request, sender, sendResponse) => {
 		}
 
 	} else if (request.method === 'getActiveAccount') {
-		const tabIndex = activeAccountRequests.findIndex(({ tabId: reqTabId }) => tabId === reqTabId);
+		const { inPageId } = request;
+		const tabIndex = activeAccountRequests
+			.findIndex(({ inPageId: reqInPageId }) => inPageId === reqInPageId);
 		const req = {
-			id: request.id, cb: sendResponse, tabId,
+			id: request.id, cb: sendResponse, inPageId,
 		};
 		if (tabIndex === -1) {
 			resolveActiveAccount(req);
 			activeAccountRequests.push(req);
 			return true;
 		}
+
 		activeAccountRequests[tabIndex] = req;
+
 		return true;
 	}
 
@@ -750,6 +765,7 @@ export const onSwitchNetwork = async (network) => {
 				console.warn('Switch network callback error', error);
 			}
 		});
+		networkSubscribers.splice(0, networkSubscribers.length);
 	}
 
 };
@@ -765,6 +781,7 @@ const onSwitchActiveAccount = (res) => {
 			console.warn('Switch account callback error', error);
 		}
 	});
+	activeAccountSubscribers.splice(0, activeAccountSubscribers.length);
 };
 
 /**
