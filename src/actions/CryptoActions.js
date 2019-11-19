@@ -1,5 +1,6 @@
 /* eslint-disable no-empty */
 import { batchActions } from 'redux-batched-actions';
+import query from 'query-string';
 import history from '../history';
 
 import storage from '../services/storage';
@@ -20,7 +21,7 @@ import {
 import { DRAFT_STORAGE_KEY, NETWORKS, POPUP_WINDOW_TYPE, STORE } from '../constants/GlobalConstants';
 import { setValue } from './FormActions';
 import { loadInfo, set, addAccount, storageGetDraft } from './GlobalActions';
-import { globals } from './SignActions';
+import { globals, closePopup } from './SignActions';
 
 import FormatHelper from '../helpers/FormatHelper';
 import ValidatePinHelper from '../helpers/ValidatePinHelper';
@@ -94,6 +95,15 @@ export const unlockCrypto = (form, pin) => async (dispatch) => {
 		await crypto.unlock(pin);
 
 		dispatch(changeCrypto({ isLocked: false }));
+
+		if (globals.WINDOW_TYPE === POPUP_WINDOW_TYPE) {
+			const queryResult = query.parseUrl(globals.WINDOW_PATH || '');
+			if (queryResult.query.closeAfterUnlock) {
+				closePopup();
+				return true;
+			}
+		}
+
 		await dispatch(loadInfo());
 
 		if (
