@@ -322,7 +322,7 @@ const updateActiveAccountInpage = async (network) => {
 };
 
 
-const requestAccountMethodCallbacksRequests = async () => {
+const execGetAccountCallbacks = async () => {
 
 	try {
 		const account = await getActiveAccount();
@@ -421,7 +421,7 @@ const onMessage = (request, sender, sendResponse) => {
 		});
 
 		if (!crypto.isLocked()) {
-			requestAccountMethodCallbacksRequests();
+			execGetAccountCallbacks();
 		} else {
 			triggerPopup(CLOSE_AFTER_UNLOCK_PATH);
 		}

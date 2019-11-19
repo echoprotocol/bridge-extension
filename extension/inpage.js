@@ -132,11 +132,12 @@ const subscribeSwitchNetwork = (subscriberCb) => {
  * @returns {Promise}
  */
 const subscribeAccountChanged = (subscriberCb) => {
-	accountChangedSubscribers.push(subscriberCb);
 
 	if (!lodash.isFunction(subscriberCb)) {
 		throw new Error('Is not a function');
 	}
+
+	accountChangedSubscribers.push(subscriberCb);
 
 	subscriberCb(activeAccount);
 
