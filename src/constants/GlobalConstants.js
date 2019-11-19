@@ -156,7 +156,7 @@ export const ALGORITHM_IV_BYTES_LENGTH = 16;
 export const STORE = 'keyval';
 
 export const PATTERN_ID_MESSAGE = '*';
-export const LENGTH_ID_MESSAGE = 10;
+export const LENGTH_ID_MESSAGE = 20;
 
 export const ERC20_HASHES = {
 	'totalSupply()': '18160ddd',
