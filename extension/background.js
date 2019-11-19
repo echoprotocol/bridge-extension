@@ -537,7 +537,7 @@ const onPinUnlock = () => {
 		resolveAccounts();
 		closePopup();
 	}
-	requestAccountMethodCallbacksRequests();
+	execGetAccountCallbacks();
 	updateActiveAccountInpage();
 	return null;
 };
