@@ -350,21 +350,12 @@ const execGetAccountCallbacks = async () => {
  * @param sendResponse
  * @returns {boolean}
  */
-const onMessage = (request, sender, responseCb) => {
-
-	const sendResponse = (data) => {
-		try {
-			responseCb(data);
-		} catch (e) {
-			console.log('Response Callback error', e);
-		}
-	};
+const onMessage = (request, sender, sendResponse) => {
 
 	const { hostname } = urlParse(sender.tab.url);
 	const { id: tabId } = sender.tab;
 
 	request = JSON.parse(JSON.stringify(request));
-	const { inPageId } = request;
 
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
@@ -536,6 +527,7 @@ const onMessage = (request, sender, responseCb) => {
 		}
 
 	} else if (request.method === 'getActiveAccount') {
+		const { inPageId } = request;
 		const tabIndex = activeAccountRequests
 			.findIndex(({ inPageId: reqInPageId }) => inPageId === reqInPageId);
 		const req = {
@@ -930,14 +922,6 @@ window.getSignMessageMap = () => signMessageRequests.reduce((map, {
 }, {});
 
 extensionizer.runtime.onMessage.addListener(onMessage);
-extensionizer.tabs.onRemoved.addListener((tabEvent) => {
-	console.log('tabEvent onRemoved', tabEvent);
-});
-
-extensionizer.tabs.onUpdated.addListener((tabEvent) => {
-	console.log('tabEvent onUpdated', tabEvent);
-});
-
 
 crypto.on('unlocked', onPinUnlock);
 crypto.on('locked', onLock);
