@@ -38,6 +38,11 @@ class FormatHelper {
 		return symbol ? `${resultNumber} ${symbol}` : resultNumber;
 	}
 
+	static zipAmount(amount, sumbolLength) {
+		const length = amount.indexOf('.') === -1 ? 16 - sumbolLength : 17 - sumbolLength;
+		return amount.substring(0, length).concat('...');
+	}
+
 	static formatError(err) {
 		return err instanceof Error || (_.isObject(err) && err.message) ? err.message : err;
 	}
