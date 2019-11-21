@@ -1,18 +1,18 @@
 /* global EXTENSION */
-
 const extensionizer = require('./extensionizer');
 const { APP_ID } = require('../src/constants/GlobalConstants');
+const inpageContent = require('!!raw-loader!../dist/inpage');
 
 const getAccessRequest = {};
 
 /**
  * inpage script injection to web page
  */
-function setupInjection() {
+function setupInjection(content) {
 	try {
 		const scriptTag = document.createElement('script');
-
-		scriptTag.src = extensionizer.extension.getURL('inpage.js');
+		scriptTag.textContent = content;
+		scriptTag.setAttribute('async', false);
 		scriptTag.onload = function () {
 			this.parentNode.removeChild(this);
 		};
@@ -27,7 +27,7 @@ function setupInjection() {
 }
 
 // eslint-disable-next-line no-unused-expressions
-EXTENSION && setupInjection();
+EXTENSION && setupInjection(inpageContent.default);
 
 /**
  * On background response
