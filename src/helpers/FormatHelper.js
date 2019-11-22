@@ -14,7 +14,6 @@ class FormatHelper {
 			return '–';
 		}
 		const number = new BN(amount).div(10 ** precision);
-
 		const base = `${this.toFixed(number, precision).split('.')[0]}`;
 		const mod = base.length > 3 ? base.length % 3 : 0;
 		let postfix = `.${this.toFixed(number, precision).split('.')[1]}`;
@@ -30,8 +29,8 @@ class FormatHelper {
 		}
 
 		const resultNumber = (mod ? `${base.substr(0, mod)} ` : '')
-            + base.substr(mod).replace(/(\d{3})(?=\d)/g, `$1${' '}`)
-            + (precision ? postfix : '');
+			+ base.substr(mod).replace(/(\d{3})(?=\d)/g, `$1${' '}`)
+			+ (precision ? postfix : '');
 
 		return symbol ? `${resultNumber} ${symbol}` : resultNumber;
 	}
