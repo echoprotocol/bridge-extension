@@ -22,7 +22,7 @@ import GlobalReducer from '../reducers/GlobalReducer';
  * 	@param {String} form
  * 	@param {Boolean} value
  */
-const toggleLoading = (form, value) => (dispatch) => {
+export const toggleLoading = (form, value) => (dispatch) => {
 	dispatch(GlobalReducer.actions.set({ field: 'loading', value }));
 	dispatch(setValue(form, 'loading', value));
 };
@@ -110,7 +110,6 @@ export const createAccount = (name, path) => async (dispatch, getState) => {
 
 		return null;
 	} finally {
-		dispatch(toggleLoading(FORM_SIGN_UP, false));
 		getCrypto().updateLockTimeout();
 	}
 };

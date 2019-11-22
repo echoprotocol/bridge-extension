@@ -9,8 +9,9 @@ import BridgeBtnCopy from '../../components/BridgeBtnCopy';
 import UserIcon from '../../components/UserIcon';
 import ArrowDown from '../../assets/images/icons/arrow_dark_bot.svg';
 import { INDEX_PATH, SETTINGS_PATH, NEW_KEY_PATH } from '../../constants/RouterConstants';
-import { FORM_WELCOME } from '../../constants/FormConstants';
+import { FORM_WELCOME, FORM_SIGN_UP } from '../../constants/FormConstants';
 import { storageRemoveDraft, storageSetDraft } from '../../actions/GlobalActions';
+import { toggleLoading } from '../../actions/AuthActions';
 
 class Welcome extends React.Component {
 
@@ -45,6 +46,9 @@ class Welcome extends React.Component {
 
 		const keys = this.props.transitPublicKey(account.get('id'), networkName);
 
+		if (keys.length) {
+			this.props.toggleLoading(false);
+		}
 		keys.then((value) => {
 			this.setState({ keys: value });
 		});
@@ -156,6 +160,7 @@ Welcome.propTypes = {
 	location: PropTypes.object.isRequired,
 	history: PropTypes.object.isRequired,
 	transitPublicKey: PropTypes.func.isRequired,
+	toggleLoading: PropTypes.func.isRequired,
 };
 
 Welcome.defaultProps = {
@@ -173,5 +178,6 @@ export default withRouter(connect(
 			accountId,
 			networkName,
 		)),
+		toggleLoading: (value) => dispatch(toggleLoading(FORM_SIGN_UP, value)),
 	}),
 )(Welcome));
