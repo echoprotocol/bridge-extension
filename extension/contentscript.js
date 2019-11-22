@@ -1,8 +1,13 @@
 /* global EXTENSION */
+/* global INPAGE_PATH_PACK_FOLDER */
+
 const extensionizer = require('./extensionizer');
 const { APP_ID } = require('../src/constants/GlobalConstants');
-const inpageContent = require('!!raw-loader!../dist/inpage');
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
+const inpage = require(`../${INPAGE_PATH_PACK_FOLDER}/inpage`);
 
+const inpageContent = inpage.default;
 const getAccessRequest = {};
 
 /**
@@ -13,13 +18,10 @@ function setupInjection(content) {
 		const scriptTag = document.createElement('script');
 		scriptTag.textContent = content;
 		scriptTag.setAttribute('async', false);
-		scriptTag.onload = function () {
-			this.parentNode.removeChild(this);
-		};
 		const container = document.head || document.documentElement;
 
 		container.insertBefore(scriptTag, container.children[0]);
-
+		container.removeChild(scriptTag);
 	} catch (e) {
 		console.error('Bridge injection failed.', e);
 	}
@@ -27,7 +29,7 @@ function setupInjection(content) {
 }
 
 // eslint-disable-next-line no-unused-expressions
-EXTENSION && setupInjection(inpageContent.default);
+EXTENSION && setupInjection(inpageContent);
 
 /**
  * On background response

@@ -21,21 +21,18 @@ const extractSass = new ExtractTextPlugin({
 	disable: process.env.NODE_ENV === 'local',
 });
 
-
 const publicPath = process.env.EXTENSION ? './' : '/';
 const pathToPack = process.env.EXTENSION ? path.resolve('build/src') : path.resolve('dist');
 const pathsToClean = process.env.EXTENSION ? ['build'] : ['dist'];
 
-module.exports = {
+const inpageConfig = {
+	name: 'inpageConfig',
 	optimization: {
 		minimize: false, // <---- disables uglify.
 		// minimizer: [new UglifyJsPlugin()] if you want to customize it.
 	},
 	entry: {
-		app: path.resolve('src/index.js'),
-		content: path.resolve('extension/contentscript.js'),
 		inpage: path.resolve('extension/inpage.js'),
-		background: path.resolve('extension/background.js'),
 	},
 	output: {
 		publicPath,
@@ -48,6 +45,61 @@ module.exports = {
 	devtool: 'inline-source-map', // process.env.NODE_ENV !== 'local' ? 'cheap-module-source-map' : 'eval',
 	module: {
 		rules: [
+			{
+				test: /\.js$/,
+				exclude: /node_modules/,
+				use: {
+					loader: 'babel-loader',
+				},
+			},
+		],
+	},
+	resolve: {
+		modules: [
+			'node_modules',
+			path.resolve('src'),
+		],
+		extensions: ['.js', '.jsx', '.json'],
+	},
+	plugins: [
+		new CleanWebpackPlugin(pathsToClean),
+		extractSass,
+		new webpack.DefinePlugin({
+			NODE_ENV: JSON.stringify(process.env.NODE_ENV),
+			VERSION: JSON.stringify(packageJson.version),
+			EXTENSION: !!process.env.EXTENSION,
+		}),
+	],
+	node: {
+		fs: 'empty',
+		net: 'empty',
+		tls: 'empty',
+	},
+};
+
+const buildConfig = {
+	dependencies: ['inpageConfig'],
+	optimization: {
+		minimize: false, // <---- disables uglify.
+		// minimizer: [new UglifyJsPlugin()] if you want to customize it.
+	},
+	entry: {
+		app: path.resolve('src/index.js'),
+		content: path.resolve('extension/contentscript.js'),
+		// inpage: path.resolve('extension/inpage.js'),
+		background: path.resolve('extension/background.js'),
+	},
+	output: {
+		publicPath,
+		path: pathToPack,
+		filename: '[name].js',
+		pathinfo: process.env.NODE_ENV === 'local',
+		sourceMapFilename: '[name].js.map',
+		chunkFilename: '[name].bundle.js',
+	},
+	devtool: 'inline-source-map', // process.env.NODE_ENV !== 'local' ? 'cheap-module-source-map' : 'eval',
+	module: {
+		rules: [			
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
@@ -91,6 +143,13 @@ module.exports = {
 					fallback: 'style-loader',
 				}),
 			},
+			{
+				test: /inpage\.js$/,
+				exclude: /node_modules/,
+				use: {
+					loader: 'raw-loader',
+				},
+			},
 		],
 	},
 	resolve: {
@@ -101,13 +160,13 @@ module.exports = {
 		extensions: ['.js', '.jsx', '.json'],
 	},
 	plugins: [
-		new CleanWebpackPlugin(pathsToClean),
 		HTMLWebpackPluginConfig,
 		extractSass,
 		new webpack.DefinePlugin({
 			NODE_ENV: JSON.stringify(process.env.NODE_ENV),
 			VERSION: JSON.stringify(packageJson.version),
 			EXTENSION: !!process.env.EXTENSION,
+			INPAGE_PATH_PACK_FOLDER: JSON.stringify(process.env.EXTENSION ? 'build/src' : 'dist'),
 		}),
 		new CopyWebpackPlugin([
 			{
@@ -125,3 +184,5 @@ module.exports = {
 		tls: 'empty',
 	},
 };
+
+module.exports = [inpageConfig, buildConfig];
