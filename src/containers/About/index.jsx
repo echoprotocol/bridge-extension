@@ -14,7 +14,7 @@ class About extends React.Component {
 
 					<img src={bridgeRoundLogo} alt="bridge" className="about-logo" />
 
-					<div className="about-copyright">© 2018-2019 Bridge.</div>
+					<div className="about-copyright">© Echo Technological Solutions LLC</div>
 
 					<a
 						href="https://echo.org"
