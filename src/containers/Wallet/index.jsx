@@ -50,7 +50,7 @@ class Wallet extends React.Component {
 													{
 														new BN(balance.get('balance')).div(10 ** asset.get('precision')).toString(10).length + asset.get('symbol').length < 18 ?
 															FormatHelper.formatAmount(balance.get('balance'), asset.get('precision')) :
-															FormatHelper.zipAmount(new BN(balance.get('balance')).div(10 ** asset.get('precision')).toString(10), asset.get('symbol').length)
+															FormatHelper.zipAmount(balance.get('balance'), asset.get('precision'), asset.get('symbol').length)
 													}
 												</span>
 												<span>{asset.get('symbol')}</span>
@@ -93,7 +93,7 @@ class Wallet extends React.Component {
 									{
 										new BN(token.get('balance')).div(10 ** token.get('precision')).toString(10).length + token.get('symbol').length < 18 ?
 											FormatHelper.formatAmount(token.get('balance'), token.get('precision')) :
-											FormatHelper.zipAmount(new BN(token.get('balance')).div(10 ** token.get('precision')).toString(10), token.get('symbol').length)
+											FormatHelper.zipAmount(token.get('balance'), token.get('precision'), token.get('symbol').length)
 									}
 								</span>
 								<span>{token.get('symbol')}</span>
