@@ -38,11 +38,14 @@ class FormatHelper {
 
 	static convertAmount(amount, precision, sumbol) {
 		const formatAmount = this.formatAmount(amount, precision);
-		if (new BN(amount).div(10 ** precision).toString(10).length + sumbol.length < 18) {
+		if (!this.isAmountVeryBig(amount, precision, sumbol)) {
 			return formatAmount;
 		}
 		const length = amount.indexOf('.') === -1 ? 18 - sumbol.length : 19 - sumbol.length;
-		return formatAmount.substring(0, length).concat('...');
+		return formatAmount.substring(0, length).trim().concat('...');
+	}
+	static isAmountVeryBig(amount = 0, precision = 0, sumbol = '') {
+		return new BN(amount).div(10 ** precision).toString(10).length + sumbol.length > 17;
 	}
 
 	static formatError(err) {

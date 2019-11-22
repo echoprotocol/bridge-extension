@@ -6,7 +6,6 @@ import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button, Popup } from 'semantic-ui-react';
-import BN from 'bignumber.js';
 
 import { sendRedirect, removeToken } from '../../actions/BalanceActions';
 
@@ -41,7 +40,7 @@ class Wallet extends React.Component {
 						onKeyPress={() => this.sendRedirect(balanceId)}
 					>
 						{
-							new BN(balance.get('balance')).div(10 ** asset.get('precision')).toString(10).length + asset.get('symbol').length < 18 ?
+							!FormatHelper.isAmountVeryBig(balance.get('balance'), asset.get('precision'), asset.get('symbol')) ?
 								<div className="balance-info">
 									{
 										asset ?
@@ -107,7 +106,7 @@ class Wallet extends React.Component {
 						onKeyPress={() => this.sendRedirect(contractId)}
 					>
 						{
-							new BN(token.get('balance')).div(10 ** token.get('precision')).toString(10).length + token.get('symbol').length < 18 ?
+							!FormatHelper.isAmountVeryBig(token.get('balance'), token.get('precision'), token.get('symbol')) ?
 								<div className="balance-info">
 									<span>
 										{
