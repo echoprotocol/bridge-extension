@@ -3,9 +3,8 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {
-	INDEX_PATH, SETTINGS_PATH,
-	WELCOME_PATH, NEW_KEY_PATH,
-	IMPORT_ACCOUNT_PATH, IMPORT_SUCCESS_PATH,
+	INDEX_PATH, SETTINGS_PATH, NEW_KEY_PATH,
+	IMPORT_ACCOUNT_PATH, IMPORT_SUCCESS_PATH, WALLET_PATH,
 } from '../../constants/RouterConstants';
 import { FORM_SIGN_IN } from '../../constants/FormConstants';
 
@@ -110,7 +109,7 @@ class ImportAccount extends React.Component {
 				this.props.history.push(NEW_KEY_PATH);
 				return null;
 			}
-			this.props.history.push(WELCOME_PATH);
+			this.props.history.push(WALLET_PATH);
 		}
 		return null;
 	}
