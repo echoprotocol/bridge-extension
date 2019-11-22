@@ -6,7 +6,6 @@ import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button, Popup } from 'semantic-ui-react';
-import BN from 'bignumber.js';
 
 import { sendRedirect, removeToken } from '../../actions/BalanceActions';
 
