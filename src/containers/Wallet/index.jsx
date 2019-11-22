@@ -64,7 +64,7 @@ class Wallet extends React.Component {
 								</div>
 							}
 							content={
-								<span>{new BN(balance.get('balance')).div(10 ** asset.get('precision')).toString(10)}</span>
+								<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
 							}
 						/>
 					</a>
@@ -100,7 +100,7 @@ class Wallet extends React.Component {
 							</div>
 							}
 							content={
-								<span>{new BN(token.get('balance')).div(10 ** token.get('precision')).toString(10)}</span>
+								<span>{FormatHelper.formatAmount(token.get('balance'), token.get('precision'))}</span>
 							}
 						/>
 						<div className="token-info">
