@@ -29,15 +29,18 @@ class FormatHelper {
 		}
 
 		const resultNumber = (mod ? `${base.substr(0, mod)} ` : '')
-            + base.substr(mod).replace(/(\d{3})(?=\d)/g, `$1${' '}`)
-            + (precision ? postfix : '');
+			+ base.substr(mod).replace(/(\d{3})(?=\d)/g, `$1${' '}`)
+			+ (precision ? postfix : '');
 
 		return symbol ? `${resultNumber} ${symbol}` : resultNumber;
 	}
 
-	static zipAmount(amount, precision, sumbolLength) {
+	static convertAmount(amount, precision, sumbol) {
+		if (new BN(amount).div(10 ** precision).toString(10).length + sumbol.length < 18) {
+			return new BN(amount).div(10 ** precision).toString(10);
+		}
 		const formatAmount = this.formatAmount(amount, precision);
-		const length = amount.indexOf('.') === -1 ? 18 - sumbolLength : 19 - sumbolLength;
+		const length = amount.indexOf('.') === -1 ? 18 - sumbol.length : 19 - sumbol.length;
 		return formatAmount.substring(0, length).concat('...');
 	}
 

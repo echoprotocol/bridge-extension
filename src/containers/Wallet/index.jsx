@@ -5,8 +5,7 @@ import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Button } from 'semantic-ui-react';
-import BN from 'bignumber.js';
+import { Button, Popup } from 'semantic-ui-react';
 
 import { sendRedirect, removeToken } from '../../actions/BalanceActions';
 
@@ -22,7 +21,6 @@ class Wallet extends React.Component {
 		const { assets, account } = this.props;
 		const { balances, tokens } = this.sortAssets();
 
-
 		const resultBalances = balances.map((balance) => {
 			const asset = assets.get(balance.get('asset_type'));
 
@@ -33,38 +31,41 @@ class Wallet extends React.Component {
 			const balanceId = balance.get('id');
 
 			return (
-
 				<li key={balanceId}>
 					<a
+						className={balanceId}
 						role="button"
 						onClick={() => this.sendRedirect(balanceId)}
 						tabIndex={0}
 						onKeyPress={() => this.sendRedirect(balanceId)}
 					>
-						<div className="balance-info">
-							{
-								asset ?
-									<React.Fragment>
-										<span>
-											{
-												new BN(balance.get('balance')).div(10 ** asset.get('precision')).toString(10).length + asset.get('symbol').length < 18 ?
-													FormatHelper.formatAmount(balance.get('balance'), asset.get('precision')) :
-													FormatHelper.zipAmount(balance.get('balance'), asset.get('precision'), asset.get('symbol').length)
-											}
-										</span>
-										<span>{asset.get('symbol')}</span>
-									</React.Fragment>
-									:
-									<React.Fragment>
-										<span>0</span>
-										<span>ECHO</span>
-									</React.Fragment>
+						<Popup
+							trigger={
+								<div className="balance-info">
+									{
+										asset ?
+											<React.Fragment>
+												<span>
+													{
+														FormatHelper.convertAmount(balance.get('balance'), asset.get('precision'), asset.get('symbol'))
+													}
+												</span>
+												<span>{asset.get('symbol')}</span>
+											</React.Fragment>
+											:
+											<React.Fragment>
+												<span>0</span>
+												<span>ECHO</span>
+											</React.Fragment>
+									}
+								</div>
 							}
-						</div>
+							content={
+								<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
+							}
+						/>
 					</a>
-
 				</li>
-
 			);
 		});
 
@@ -77,21 +78,26 @@ class Wallet extends React.Component {
 			tokenArr.mapEntries(([contractId, token]) => {
 				resultTokens.push(<li key={contractId}>
 					<a
+						className={contractId}
 						role="button"
 						onClick={() => this.sendRedirect(contractId)}
 						tabIndex={0}
 						onKeyPress={() => this.sendRedirect(contractId)}
 					>
-						<div className="balance-info">
-							<span>
-								{
-									new BN(token.get('balance')).div(10 ** token.get('precision')).toString(10).length + token.get('symbol').length < 18 ?
-										FormatHelper.formatAmount(token.get('balance'), token.get('precision')) :
-										FormatHelper.zipAmount(token.get('balance'), token.get('precision'), token.get('symbol').length)
-								}
-							</span>
-							<span>{token.get('symbol')}</span>
-						</div>
+						<Popup
+							trigger={<div className="balance-info">
+								<span>
+									{
+										FormatHelper.convertAmount(token.get('balance'), token.get('precision'), token.get('symbol'))
+									}
+								</span>
+								<span>{token.get('symbol')}</span>
+							</div>
+							}
+							content={
+								<span>{FormatHelper.formatAmount(token.get('balance'), token.get('precision'))}</span>
+							}
+						/>
 						<div className="token-info">
 							<span>ERC20</span>
 							<span>TOKEN</span>
@@ -104,7 +110,6 @@ class Wallet extends React.Component {
 							<img src={IconClose} alt="" />
 						}
 					/>
-
 				</li>);
 			});
 
