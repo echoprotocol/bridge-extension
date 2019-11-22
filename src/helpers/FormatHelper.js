@@ -13,12 +13,9 @@ class FormatHelper {
 		if (amount === undefined) {
 			return '–';
 		}
-
 		const number = new BN(amount).div(10 ** precision);
-
-		const base = `${parseInt(this.toFixed(Math.abs(number || 0), precision), 10)}`;
+		const base = `${this.toFixed(number, precision).split('.')[0]}`;
 		const mod = base.length > 3 ? base.length % 3 : 0;
-
 		let postfix = `.${this.toFixed(number, precision).split('.')[1]}`;
 
 		for (let i = postfix.length - 1; i >= 0; i -= 1) {
@@ -38,17 +35,10 @@ class FormatHelper {
 		return symbol ? `${resultNumber} ${symbol}` : resultNumber;
 	}
 
-	static zipAmount(amount, sumbolLength) {
-		let amountBase = amount.substring(0, amount.indexOf('.')) || amount;
-		const amountPostfix = amount.substring(amount.indexOf('.')) || '';
-		if (amountBase.length > 3) {
-			for (let i = amountBase.length - 3; i >= 0; i -= 3) {
-				amountBase = amountBase.substring(0, i).concat(' ').concat(amountBase.substring(i));
-			}
-		}
-		const totalAmount = amountBase.concat(amountPostfix);
-		const length = amount.indexOf('.') === -1 ? 16 - sumbolLength : 17 - sumbolLength;
-		return totalAmount.substring(0, length).concat('...');
+	static zipAmount(amount, precision, sumbolLength) {
+		const formatAmount = this.formatAmount(amount, precision);
+		const length = amount.indexOf('.') === -1 ? 18 - sumbolLength : 19 - sumbolLength;
+		return formatAmount.substring(0, length).concat('...');
 	}
 
 	static formatError(err) {
