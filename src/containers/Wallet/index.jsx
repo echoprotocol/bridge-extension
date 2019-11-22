@@ -6,6 +6,7 @@ import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import { Button, Popup } from 'semantic-ui-react';
+import BN from 'bignumber.js';
 
 import { sendRedirect, removeToken } from '../../actions/BalanceActions';
 
@@ -39,8 +40,8 @@ class Wallet extends React.Component {
 						tabIndex={0}
 						onKeyPress={() => this.sendRedirect(balanceId)}
 					>
-						<Popup
-							trigger={
+						{
+							new BN(balance.get('balance')).div(10 ** asset.get('precision')).toString(10).length + asset.get('symbol').length < 18 ?
 								<div className="balance-info">
 									{
 										asset ?
@@ -58,14 +59,35 @@ class Wallet extends React.Component {
 												<span>ECHO</span>
 											</React.Fragment>
 									}
-								</div>
-							}
-							content={
-								<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
-							}
-						/>
+								</div> :
+								<Popup
+									trigger={
+										<div className="balance-info">
+											{
+												asset ?
+													<React.Fragment>
+														<span>
+															{
+																FormatHelper.convertAmount(balance.get('balance'), asset.get('precision'), asset.get('symbol'))
+															}
+														</span>
+														<span>{asset.get('symbol')}</span>
+													</React.Fragment>
+													:
+													<React.Fragment>
+														<span>0</span>
+														<span>ECHO</span>
+													</React.Fragment>
+											}
+										</div>
+									}
+									content={
+										<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
+									}
+								/>
+						}
 					</a>
-				</li>
+				</li >
 			);
 		});
 
@@ -84,20 +106,32 @@ class Wallet extends React.Component {
 						tabIndex={0}
 						onKeyPress={() => this.sendRedirect(contractId)}
 					>
-						<Popup
-							trigger={<div className="balance-info">
-								<span>
-									{
-										FormatHelper.convertAmount(token.get('balance'), token.get('precision'), token.get('symbol'))
+						{
+							new BN(token.get('balance')).div(10 ** token.get('precision')).toString(10).length + token.get('symbol').length < 18 ?
+								<div className="balance-info">
+									<span>
+										{
+											FormatHelper.convertAmount(token.get('balance'), token.get('precision'), token.get('symbol'))
+										}
+									</span>
+									<span>{token.get('symbol')}</span>
+								</div> :
+								<Popup
+									trigger={
+										<div className="balance-info">
+											<span>
+												{
+													FormatHelper.convertAmount(token.get('balance'), token.get('precision'), token.get('symbol'))
+												}
+											</span>
+											<span>{token.get('symbol')}</span>
+										</div>
 									}
-								</span>
-								<span>{token.get('symbol')}</span>
-							</div>
-							}
-							content={
-								<span>{FormatHelper.formatAmount(token.get('balance'), token.get('precision'))}</span>
-							}
-						/>
+									content={
+										<span>{FormatHelper.formatAmount(token.get('balance'), token.get('precision'))}</span>
+									}
+								/>
+						}
 						<div className="token-info">
 							<span>ERC20</span>
 							<span>TOKEN</span>
