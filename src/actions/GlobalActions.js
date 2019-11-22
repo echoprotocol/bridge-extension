@@ -9,6 +9,7 @@ import { setFormError, setValue, toggleLoading } from './FormActions';
 import { disconnect, connect, checkActiveLoading } from './ChainStoreAction';
 import { getTokenDetails, initAssetsBalances, removeBalances } from './BalanceActions';
 import { globals, loadRequests } from './SignActions';
+import { initHistory } from './HistoryActions';
 
 import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
 import FormatHelper from '../helpers/FormatHelper';
@@ -234,6 +235,7 @@ export const initAccount = ({ name, icon, iconColor }) => async (dispatch) => {
 		})));
 
 		await dispatch(initAssetsBalances());
+		await dispatch(initHistory());
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	} finally {

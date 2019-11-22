@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 import CustomScroll from 'react-custom-scroll';
+import query from 'query-string';
 
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
@@ -13,8 +14,12 @@ import { openModal } from '../../actions/ModalActions';
 import FormatHelper from '../../helpers/FormatHelper';
 
 import { MODAL_LOGOUT } from '../../constants/ModalConstants';
-import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
-import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
+import {
+	IMPORT_ACCOUNT_PATH,
+	CREATE_ACCOUNT_PATH,
+	INCOMING_CONNECTION_PATH,
+} from '../../constants/RouterConstants';
+import { CORE_ID, CORE_SYMBOL, POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 
 import UserIcon from '../UserIcon';
 import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
@@ -90,6 +95,10 @@ class UserDropdown extends React.Component {
 	}
 
 	toggleDropdown() {
+		const { windowType, windowPath } = query.parse(window.location.search);
+		if (windowType === POPUP_WINDOW_TYPE && windowPath === INCOMING_CONNECTION_PATH) {
+			return;
+		}
 		this.setState({ opened: !this.state.opened });
 	}
 
