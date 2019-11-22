@@ -3,11 +3,12 @@ import { validators } from 'echojs-lib';
 class ValidateAccountHelper {
 
 	static validateAccountName(accountName) {
-
 		if (!accountName) {
 			return 'Account name should not be empty';
 		}
-
+		if (!(/[.\-/0-9]/.test(accountName) || !accountName.match(/[aeiouy]/ig))) {
+			return 'Account name should contain digit, number, dash, slash or consist only of consonants';
+		}
 		if (validators.checkAccountName(accountName)) {
 			return validators.checkAccountName(accountName);
 		}

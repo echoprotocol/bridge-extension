@@ -6,6 +6,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import _ from 'lodash';
+import BN from 'bignumber.js';
 
 import { send, setFeeFormValue } from '../../actions/BalanceActions';
 import { clearForm, setFormError, setFormValue } from '../../actions/FormActions';
@@ -301,7 +302,7 @@ class Send extends React.Component {
 										},
 										path: { form: FORM_SEND, field: 'selectedFeeBalance' },
 									}}
-									value={fee.value.toString()}
+									value={fee.value ? new BN(fee.value).toString(10) : 0}
 									disabled
 									error={!!fee.error}
 									errorText={fee.error}
