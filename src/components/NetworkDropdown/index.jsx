@@ -6,6 +6,7 @@ import PropTypes from 'prop-types';
 import CustomScroll from 'react-custom-scroll';
 import { withRouter } from 'react-router';
 import classnames from 'classnames';
+import query from 'query-string';
 
 import {
 	changeNetwork,
@@ -13,8 +14,12 @@ import {
 	setNetworkInfo,
 } from '../../actions/GlobalActions';
 
-import { NETWORKS } from '../../constants/GlobalConstants';
-import { ADD_NETWORK_PATH, NETWORK_PATH } from '../../constants/RouterConstants';
+import { NETWORKS, POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
+import {
+	ADD_NETWORK_PATH,
+	INCOMING_CONNECTION_PATH,
+	NETWORK_PATH,
+} from '../../constants/RouterConstants';
 
 
 import GlobalReducer from '../../reducers/GlobalReducer';
@@ -158,6 +163,10 @@ class NetworkDropdown extends React.PureComponent {
 	}
 
 	toggleDropdown() {
+		const { windowType, windowPath } = query.parse(window.location.search);
+		if (windowType === POPUP_WINDOW_TYPE && windowPath === INCOMING_CONNECTION_PATH) {
+			return;
+		}
 		this.setState({ opened: !this.state.opened });
 	}
 

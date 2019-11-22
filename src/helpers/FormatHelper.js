@@ -13,12 +13,9 @@ class FormatHelper {
 		if (amount === undefined) {
 			return '–';
 		}
-
 		const number = new BN(amount).div(10 ** precision);
-
-		const base = `${parseInt(this.toFixed(Math.abs(number || 0), precision), 10)}`;
+		const base = `${this.toFixed(number, precision).split('.')[0]}`;
 		const mod = base.length > 3 ? base.length % 3 : 0;
-
 		let postfix = `.${this.toFixed(number, precision).split('.')[1]}`;
 
 		for (let i = postfix.length - 1; i >= 0; i -= 1) {
@@ -32,10 +29,22 @@ class FormatHelper {
 		}
 
 		const resultNumber = (mod ? `${base.substr(0, mod)} ` : '')
-            + base.substr(mod).replace(/(\d{3})(?=\d)/g, `$1${' '}`)
-            + (precision ? postfix : '');
+			+ base.substr(mod).replace(/(\d{3})(?=\d)/g, `$1${' '}`)
+			+ (precision ? postfix : '');
 
 		return symbol ? `${resultNumber} ${symbol}` : resultNumber;
+	}
+
+	static convertAmount(amount, precision, sumbol) {
+		const formatAmount = this.formatAmount(amount, precision);
+		if (!this.isAmountVeryBig(amount, precision, sumbol)) {
+			return formatAmount;
+		}
+		const length = amount.indexOf('.') === -1 ? 18 - sumbol.length : 19 - sumbol.length;
+		return formatAmount.substring(0, length).trim().concat('...');
+	}
+	static isAmountVeryBig(amount = 0, precision = 0, sumbol = '') {
+		return new BN(amount).div(10 ** precision).toString(10).length + sumbol.length > 17;
 	}
 
 	static formatError(err) {
