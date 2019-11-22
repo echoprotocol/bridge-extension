@@ -38,6 +38,19 @@ class FormatHelper {
 		return symbol ? `${resultNumber} ${symbol}` : resultNumber;
 	}
 
+	static zipAmount(amount, sumbolLength) {
+		let amountBase = amount.substring(0, amount.indexOf('.')) || amount;
+		const amountPostfix = amount.substring(amount.indexOf('.')) || '';
+		if (amountBase.length > 3) {
+			for (let i = amountBase.length - 3; i >= 0; i -= 3) {
+				amountBase = amountBase.substring(0, i).concat(' ').concat(amountBase.substring(i));
+			}
+		}
+		const totalAmount = amountBase.concat(amountPostfix);
+		const length = amount.indexOf('.') === -1 ? 16 - sumbolLength : 17 - sumbolLength;
+		return totalAmount.substring(0, length).concat('...');
+	}
+
 	static formatError(err) {
 		return err instanceof Error || (_.isObject(err) && err.message) ? err.message : err;
 	}

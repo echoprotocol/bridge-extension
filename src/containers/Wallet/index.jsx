@@ -46,7 +46,11 @@ class Wallet extends React.Component {
 								asset ?
 									<React.Fragment>
 										<span>
-											{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}
+											{
+												new BN(balance.get('balance')).div(10 ** asset.get('precision')).toString(10).length + asset.get('symbol').length < 18 ?
+													FormatHelper.formatAmount(balance.get('balance'), asset.get('precision')) :
+													FormatHelper.zipAmount(new BN(balance.get('balance')).div(10 ** asset.get('precision')).toString(10), asset.get('symbol').length)
+											}
 										</span>
 										<span>{asset.get('symbol')}</span>
 									</React.Fragment>
@@ -79,7 +83,13 @@ class Wallet extends React.Component {
 						onKeyPress={() => this.sendRedirect(contractId)}
 					>
 						<div className="balance-info">
-							<span>{new BN(token.get('balance')).div(10 ** token.get('precision')).toString(10)}</span>
+							<span>
+								{
+									new BN(token.get('balance')).div(10 ** token.get('precision')).toString(10).length + token.get('symbol').length < 18 ?
+										FormatHelper.formatAmount(token.get('balance'), token.get('precision')) :
+										FormatHelper.zipAmount(new BN(token.get('balance')).div(10 ** token.get('precision')).toString(10), token.get('symbol').length)
+								}
+							</span>
 							<span>{token.get('symbol')}</span>
 						</div>
 						<div className="token-info">
