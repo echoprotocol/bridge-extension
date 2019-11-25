@@ -32,6 +32,7 @@ import {
 	DRAFT_STORAGE_KEY,
 	GLOBAL_ID_1,
 	EXPIRATION_INFELICITY,
+	REGISTRATION_OPTIONS,
 } from '../src/constants/GlobalConstants';
 
 import { operationKeys } from '../src/constants/OperationConstants';
@@ -126,6 +127,7 @@ const createSocket = async (url) => {
 			pingInterval: PING_INTERVAL,
 			debug: false,
 			apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
+			registration: { batch: REGISTRATION_OPTIONS.BATCH, timeout: REGISTRATION_OPTIONS.TIMEOUT },
 		});
 		connectSubscribe(CONNECT_STATUS);
 		echo.subscriber.setGlobalSubscribe(throttle(() => {
