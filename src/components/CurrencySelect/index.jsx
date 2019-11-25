@@ -82,6 +82,9 @@ class CurrencySelect extends React.Component {
 		this.refList = [];
 	}
 
+	static getDerivedStateFromProps(nextProps, prevState) {
+		return { search: prevState.search };
+	}
 
 	componentDidUpdate(prevProps, prevState) {
 		const { opened } = this.state;
