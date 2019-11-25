@@ -126,6 +126,7 @@ const createSocket = async (url) => {
 			pingInterval: PING_INTERVAL,
 			debug: false,
 			apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
+			registration: { batch: 1e3, timeout: 0 },
 		});
 		connectSubscribe(CONNECT_STATUS);
 		echo.subscriber.setGlobalSubscribe(throttle(() => {
