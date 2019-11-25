@@ -6,6 +6,7 @@ const CleanWebpackPlugin = require('clean-webpack-plugin');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const ZipPlugin = require('zip-webpack-plugin');
 const CopyWebpackPlugin = require('copy-webpack-plugin');
+const UglifyJsPlugin = require('uglifyjs-webpack-plugin');
 const webpack = require('webpack');
 const packageJson = require('./package.json');
 
@@ -29,7 +30,7 @@ const inpageConfig = {
 	name: 'inpageConfig',
 	optimization: {
 		minimize: false, // <---- disables uglify.
-		// minimizer: [new UglifyJsPlugin()] if you want to customize it.
+		minimizer: [new UglifyJsPlugin()], // if you want to customize it.
 	},
 	entry: {
 		inpage: path.resolve('extension/inpage.js'),
@@ -81,12 +82,11 @@ const buildConfig = {
 	dependencies: ['inpageConfig'],
 	optimization: {
 		minimize: false, // <---- disables uglify.
-		// minimizer: [new UglifyJsPlugin()] if you want to customize it.
+		minimizer: [new UglifyJsPlugin()], // if you want to customize it.
 	},
 	entry: {
 		app: path.resolve('src/index.js'),
 		content: path.resolve('extension/contentscript.js'),
-		// inpage: path.resolve('extension/inpage.js'),
 		background: path.resolve('extension/background.js'),
 	},
 	output: {
