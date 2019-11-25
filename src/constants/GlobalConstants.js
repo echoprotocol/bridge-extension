@@ -184,3 +184,8 @@ export const ERC20_OPTIONAL_HASHES = {
 	'Withdrawal(address, uint256)': '7fcf532c',
 	'Deposit(address, uint256)': 'e1fffcc4',
 };
+
+export const REGISTRATION_OPTIONS = {
+	BATCH: 1e3,
+	TIMEOUT: 0,
+};
