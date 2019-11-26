@@ -17,7 +17,6 @@ export const IMPORT_SUCCESS_PATH = '/accounts/import?success=1';
 
 export const WELCOME_PATH = '/welcome';
 export const NEW_KEY_PATH = '/welcome?key=1';
-export const SETTINGS_PATH = '/settings';
 
 export const WALLET_PATH = '/wallet';
 

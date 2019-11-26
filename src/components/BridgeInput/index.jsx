@@ -2,7 +2,8 @@ import React from 'react';
 import PropTypes from 'prop-types';
 import { Input, Button } from 'semantic-ui-react';
 import classnames from 'classnames';
-import UserIcon from '../UserIcon';
+import Avatar from '../Avatar';
+
 import CurrencySelect from '../CurrencySelect/index';
 
 class BridgeInput extends React.Component {
@@ -74,10 +75,10 @@ class BridgeInput extends React.Component {
 		);
 	}
 
-	renderImage(color, id) {
+	renderImage(avatar) {
 		return (
 			<div className="input-image">
-				<UserIcon color={color} avatar={`ava${id}`} />
+				<Avatar name={avatar} />
 			</div>
 		);
 	}
@@ -102,7 +103,7 @@ class BridgeInput extends React.Component {
 		const {
 			name, labelText, type, error, disabled, theme, value,
 			autoFocus, privacyEye, position, descriptionText, leftLabel, placeholder,
-			defaultUp, readOnly, userIcon, innerDropdown, hintText, onKeyPress, onKeyDown,
+			defaultUp, readOnly, avatar, innerDropdown, hintText, onKeyPress, onKeyDown,
 		} = this.props;
 
 		const {
@@ -135,7 +136,7 @@ class BridgeInput extends React.Component {
 						{ 'left-label': leftLabel },
 						{ filled: defaultUp },
 						{ readOnly },
-						{ 'with-image': userIcon },
+						{ 'with-image': avatar },
 						position,
 						{ 'visible-pas': (privacyEye && showPas) },
 					)}
@@ -156,7 +157,7 @@ class BridgeInput extends React.Component {
 					onKeyDown={(e) => (onKeyDown ? onKeyDown(e) : null)}
 					onKeyPress={(e) => onKeyPress && onKeyPress(e)}
 				/>
-				{ userIcon ? this.renderImage(userIcon.color, userIcon.icon) : null}
+				{ avatar ? this.renderImage(avatar) : null}
 				{ error ? this.renderError() : null }
 				{ hintText ? this.renderHint() : null }
 				{ descriptionText ? <div className="message-description">{ descriptionText }</div> : null }
@@ -189,7 +190,7 @@ BridgeInput.propTypes = {
 	onChange: PropTypes.func,
 	privacyEye: PropTypes.bool,
 	innerDropdown: PropTypes.object,
-	userIcon: PropTypes.object,
+	avatar: PropTypes.string,
 	onHintClick: PropTypes.func,
 	onKeyDown: PropTypes.func,
 	onKeyPress: PropTypes.func,
@@ -218,7 +219,7 @@ BridgeInput.defaultProps = {
 	onChange: null,
 	privacyEye: false,
 	innerDropdown: null,
-	userIcon: null,
+	avatar: '',
 	onHintClick: null,
 	onKeyDown: null,
 	onKeyPress: null,

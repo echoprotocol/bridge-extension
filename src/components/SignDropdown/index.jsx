@@ -7,12 +7,12 @@ import classnames from 'classnames';
 import { withRouter } from 'react-router';
 import { Map } from 'immutable';
 
-import { BASE_ICON, BASE_ICON_COLOR, CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
+import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
 
 import FormatHelper from '../../helpers/FormatHelper';
-import UserIcon from '../UserIcon';
 
 import GlobalReducer from '../../reducers/GlobalReducer';
+import Avatar from '../Avatar';
 
 class SignDropdown extends React.PureComponent {
 
@@ -98,11 +98,7 @@ class SignDropdown extends React.PureComponent {
 					onSelect={() => this.onSelect(account.name)}
 				>
 
-					<UserIcon
-						color={account.iconColor}
-						tabSelect
-						avatar={`ava${account.icon}`}
-					/>
+					<Avatar name={account.name} />
 					<div className="user-name">{account.name}</div>
 					<div className={classnames('user-balance', { positive: !!userBalance.get('balance') })}>
 						{
@@ -142,20 +138,12 @@ class SignDropdown extends React.PureComponent {
 					{
 						account.size ? (
 							<React.Fragment>
-								<UserIcon
-									color={account.get('iconColor')}
-									avatar={`ava${account.get('icon')}`}
-								/>
-
+								<Avatar name={account.get('name')} />
 								<i aria-hidden="true" className="dropdown icon" />
 							</React.Fragment>
 						) : (
 							<React.Fragment>
-								<UserIcon
-									color={BASE_ICON_COLOR}
-									avatar={`ava${BASE_ICON}`}
-								/>
-
+								<Avatar />
 								<i aria-hidden="true" className="dropdown icon" />
 							</React.Fragment>
 						)
