@@ -241,7 +241,7 @@ class Send extends React.Component {
 									value={account.get('name')}
 									defaultUp
 									readOnly
-									userIcon={{ icon: account.get('icon'), color: account.get('iconColor') }}
+									avatar={account.get('name')}
 									leftLabel
 									disabled
 								/>

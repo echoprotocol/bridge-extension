@@ -17,11 +17,7 @@
         background-color: $colorBgLight;
     }
     &.dark {
-        // background-color: $colorBgDark;
-
-        // background-color: #394247;
-
-        background-color: #324045; // Цвет брал так: загружал картинку через pixelperfect и брал с неё цвет
+        background-color: #324045;
 
         input:-webkit-autofill,
         input:-webkit-autofill:hover,
@@ -70,6 +66,7 @@
         margin-top: 40px;
     }
 }
+
 .page-action-wrap {
     height: 70px;
     display: flex;
@@ -102,22 +99,12 @@
     }
 }
 
-.welcome-wrap,
-.settings-wrap {
-    & > .user-icon-wrap {
-        margin: -43px auto 0;
-        position: absolute;
-        right: 0;
-        left: 0;
-    }
-}
-.settings-wrap {
-	.user-icon-wrap {
-		&.big {
-			img {
-				width: 32px;
-				margin-bottom: 20px;
-			}
-		}
-	}
+
+.welcome-wrap > .avatar-image {
+	margin: -43px auto 0;
+	z-index: 2;
+	position: absolute;
+	max-width: 86px;
+	right: 0;
+	left: 0;
 }

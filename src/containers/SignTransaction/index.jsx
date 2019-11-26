@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { Map } from 'immutable';
 
-import UserIcon from '../../components/UserIcon';
+import Avatar from '../../components/Avatar';
 
 import {
 	approve,
@@ -190,10 +190,7 @@ class SignTransaction extends React.Component {
 							<div className="wallet-info">
 								<div className="title">Wallet</div>
 								<div className="incoming-transaction-user">
-									<UserIcon
-										avatar={`ava${account.get('icon')}`}
-										color={account.get('iconColor')}
-									/>
+									<Avatar name={account.get('name')} />
 									<div className="name">
 										{account.get('name')}
 									</div>

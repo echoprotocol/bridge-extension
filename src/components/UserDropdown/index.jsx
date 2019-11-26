@@ -21,7 +21,7 @@ import {
 } from '../../constants/RouterConstants';
 import { CORE_ID, CORE_SYMBOL, POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 
-import UserIcon from '../UserIcon';
+import Avatar from '../Avatar';
 import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
 import exit from '../../assets/images/icons/exit.svg';
 
@@ -144,11 +144,8 @@ class UserDropdown extends React.Component {
 					onSelect={() => this.onSelect(account.name)}
 				>
 
-					<UserIcon
-						color={account.iconColor}
-						tabSelect
-						avatar={`ava${account.icon}`}
-					/>
+
+					<Avatar name={account.name} />
 					<div className="user-name">{account.name}({account.id})</div>
 
 					{ userBalance && asset ?
@@ -189,10 +186,7 @@ class UserDropdown extends React.Component {
 
 				<Dropdown.Toggle noCaret>
 
-					<UserIcon
-						color={account.get('iconColor')}
-						avatar={`ava${account.get('icon')}`}
-					/>
+					<Avatar name={account.get('name')} />
 					<div className="user-name">{account.get('name')}</div>
 					<img className="ddDown" src={downArrow} alt="" />
 				</Dropdown.Toggle>

@@ -13,7 +13,6 @@
 
 @mixin onToggleFocus ($color) {
     position: relative;
-
     @include hardwareAccel();
 
     &:before {
@@ -53,7 +52,7 @@
             }
         }
 	}
-	&-menu {
+	.dropdown-menu {
 		.user-icon-wrap {
 			transition: opacity .2s ease;
 			opacity: 0.8;
@@ -77,8 +76,7 @@
 			}
 		}
 	}
-	&-toggle {
-
+	.dropdown-toggle {
 		.ddDown {
 			opacity: .4;
 			transition: opacity $speed;

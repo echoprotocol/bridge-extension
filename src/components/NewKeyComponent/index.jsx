@@ -2,27 +2,26 @@ import React from 'react';
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 
-import UserIcon from '../UserIcon';
+import Avatar from '../Avatar';
 import ArrowDown from '../../assets/images/icons/arrow_dark_bot.svg';
 
 class NewKeyComponent extends React.Component {
 
 	render() {
 		const {
-			name, icon, iconColor,
+			name,
 		} = this.props;
 
 
 		return (
 			<div className="welcome-wrap">
-
-				<UserIcon
-					color={iconColor}
-					animationChange
-					size="big"
-					avatar={`ava${icon}`}
-					onClickIcon={() => this.props.onChangeIcon()}
-				/>
+				<div className="user-icon-wrap">
+					{{ name }}
+					<Avatar
+						accountName={name}
+						size="86"
+					/>
+				</div>
 
 				<div className="page-wrap" >
 					<div className="page">
@@ -51,17 +50,9 @@ class NewKeyComponent extends React.Component {
 
 }
 
-
-NewKeyComponent.defaultProps = {
-	onChangeIcon: null,
-};
-
 NewKeyComponent.propTypes = {
 	name: PropTypes.string.isRequired,
-	icon: PropTypes.number.isRequired,
-	iconColor: PropTypes.string.isRequired,
 	proceed: PropTypes.func.isRequired,
-	onChangeIcon: PropTypes.func,
 };
 
 export default NewKeyComponent;
