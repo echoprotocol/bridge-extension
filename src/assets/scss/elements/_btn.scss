@@ -579,92 +579,6 @@
 
 
 .button {
-    &[class*="select-"] {
-        padding: 0;
-        border-radius: 50%;
-        width: 38px;
-        height: 38px;
-        position: relative;
-        border: 0;
-        background-color: transparent;
-		border: 1px solid transparent;
-		cursor: pointer;
-        transition:
-            background-color $speed,
-            border $speed;
-
-        &:hover {
-            &:not(.active) {
-                border: 1px solid #b7bdbf;
-            }
-        }
-        &:focus {
-            &:not(:active) {
-                border: 1px solid #b7bdbf;
-            }
-        }
-        &.active {
-            background-color: #fff;
-            box-shadow:
-            0 -3px 6px rgba(#3f4c4e,0.06),
-            0 3px 6px rgba(#3f4c4e,0.06);
-        }
-        &:before {
-            width: 22px;
-            height: 22px;
-            position: absolute;
-            right: 0;
-            left: 0;
-            top: 0;
-            bottom: 0;
-            margin: auto;
-            content: "";
-            border-radius: 50%;
-        }
-    }
-    &.select {
-        &-green {
-            &:before {
-                background-color:#64d3ad;
-            }
-        }
-
-        &-sky {
-            &:before {
-                background-color: #76c5d3;
-            }
-        }
-
-        &-blue {
-            &:before {
-                background-color: #7683d3;
-            }
-        }
-
-        &-pink {
-            &:before {
-                background-color: #b989cf;
-            }
-        }
-
-        &-red {
-            &:before {
-                background-color: #d36496;
-            }
-        }
-
-        &-yellow {
-            &:before {
-                background-color: #d3c564;
-            }
-        }
-
-        &-lemon {
-            &:before {
-                background-color: #cbd376;
-            }
-        }
-    }
     .btn-close {
         padding: 0;
         height: 40px;
@@ -677,19 +591,17 @@
 }
 
 .modal {
-	.btn {
-		&-transparent {
-			color: rgba(#fff, .7);
+	.btn-transparent {
+		color: rgba(#fff, .7);
 
-			&:not(.disabled) {
-				&:not(:active) {
-					@include onBtnFocus (
-						$angularMax,
-						2px,
-						2px,
-						rgba(#fff, .15)
-					);
-				}
+		&:not(.disabled) {
+			&:not(:active) {
+				@include onBtnFocus (
+					$angularMax,
+					2px,
+					2px,
+					rgba(#fff, .15)
+				);
 			}
 		}
 	}
