@@ -184,3 +184,17 @@ export const ERC20_OPTIONAL_HASHES = {
 	'Withdrawal(address, uint256)': '7fcf532c',
 	'Deposit(address, uint256)': 'e1fffcc4',
 };
+
+export const MESSAGE_METHODS = {
+	CHECK_ACCESS: 'checkAccess',
+	GET_ACCESS: 'getAccess',
+	REQUEST_ACCOUNT: 'requestAccount',
+	GET_NETWORK: 'getNetwork',
+	PROOF_OF_AUTHORITY: 'proofOfAuthority',
+	SIGN_DATA: 'signData',
+	SWITCH_NETWORK_SUBSCRIBE: 'networkSubscribe',
+	SWITCH_ACCOUNT_SUBSCRIBE: 'accountSubscribe',
+	ACTIVE_SWITCH_ACCOUNT_SUBSCRIBE: 'activeAccountSubscribe',
+	CONFIRM: 'confirm',
+	ACCOUNTS: 'accounts',
+};

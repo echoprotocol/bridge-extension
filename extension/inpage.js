@@ -7,6 +7,7 @@ import {
 	MAX_RETRIES,
 	PING_INTERVAL,
 	PING_TIMEOUT,
+	MESSAGE_METHODS,
 } from '../src/constants/GlobalConstants';
 
 import IdHelper from './IdHelper';
@@ -22,44 +23,38 @@ let activeAccount = null;
 const INPAGE_ID = IdHelper.getId();
 
 /**
- * network subscription
- *
+ * @description dispatch notify response that is received from background like switchNetwork, switchAccount, activeAccount
+ * @param {Object} eventData
  */
-const networkSubscription = () => {
-	const id = IdHelper.getId();
+const dispatchNotifyResponse = (eventData) => {
+	const { method, res } = eventData;
 
-	const callback = ({ data }) => {
-		/**
-		 *  call all subscribers and repost subscription
-		 */
-		networkSubscribers.forEach((cb) => cb(data.res));
-		networkSubscription();
-	};
+	switch (method) {
+		case MESSAGE_METHODS.SWITCH_NETWORK_SUBSCRIBE: {
+			networkSubscribers.forEach((cb) => cb(res));
+			break;
+		}
+		case MESSAGE_METHODS.SWITCH_ACCOUNT_SUBSCRIBE: {
+			accountSubscribers.forEach((cb) => cb(res));
+			break;
+		}
+		case MESSAGE_METHODS.ACTIVE_SWITCH_ACCOUNT_SUBSCRIBE: {
 
-	requestQueue.push({ id, cb: callback });
+			// accountSubscribers.forEach((cb) => cb(res.find((account) => account.active)));
+			// const prevAccount = activeAccount;
+			const error = eventData.error || (res && res.error);
 
-	window.postMessage({
-		method: 'networkSubscribe', target: 'content', appId: APP_ID, id,
-	}, '*');
+			activeAccount = error ? null : res;
+
+			// if (prevAccount !== activeAccount) {
+			accountChangedSubscribers.forEach((cb) => cb(res));
+			// }
+			break;
+		}
+		default: break;
+	}
 };
 
-const accountSubscription = () => {
-	const id = IdHelper.getId();
-
-	const callback = ({ data }) => {
-		/**
-		 *  call all subscribers and repost subscription
-		 */
-		accountSubscribers.forEach((cb) => cb(data.res));
-		accountSubscription();
-	};
-
-	requestQueue.push({ id, cb: callback });
-
-	window.postMessage({
-		method: 'accountSubscribe', target: 'content', appId: APP_ID, id,
-	}, '*');
-};
 
 /**
  * Get current network
@@ -81,7 +76,7 @@ const getCurrentNetwork = () => {
 		requestQueue.push({ id, cb: callback });
 
 		window.postMessage({
-			method: 'getNetwork', target: 'content', appId: APP_ID, id,
+			method: MESSAGE_METHODS.GET_NETWORK, target: 'content', appId: APP_ID, id,
 		}, '*');
 	});
 
@@ -102,26 +97,13 @@ const subscribeSwitchNetwork = (subscriberCb) => {
 			return;
 		}
 
-		const callback = ({ data }) => {
-			if (data.error) {
-				reject(data.error);
-				return;
-			}
+		networkSubscribers.push(subscriberCb);
 
-			resolve(data.res);
-
-			if (!networkSubscribers.length) {
-				networkSubscription();
-			}
-
-			networkSubscribers.push(subscriberCb);
-			subscriberCb(data.res);
-		};
-
+		const callback = ({ data }) => (data.error ? reject(data.error) : resolve(data.res));
 		requestQueue.push({ id, cb: callback });
 
 		window.postMessage({
-			method: 'getNetwork', target: 'content', appId: APP_ID, id,
+			method: MESSAGE_METHODS.GET_NETWORK, target: 'content', appId: APP_ID, id,
 		}, '*');
 	});
 
@@ -135,15 +117,17 @@ const subscribeSwitchNetwork = (subscriberCb) => {
  */
 const subscribeAccountChanged = (subscriberCb) => {
 
+	// TODO
 	if (!lodash.isFunction(subscriberCb)) {
 		throw new Error('The first argument is not a function');
 	}
 
 	const id = IdHelper.getId();
 
-	const result = new Promise((resolve, reject) => {		
+	const result = new Promise((resolve, reject) => {
 
 		const callback = ({ data }) => {
+			console.log('TCL: callback -> subscribeAccountChanged', data);
 
 			if (data.error) {
 				reject(data.error);
@@ -165,7 +149,7 @@ const subscribeAccountChanged = (subscriberCb) => {
 		requestQueue.push({ id, cb: callback });
 
 		window.postMessage({
-			method: 'checkAccess', target: 'content', appId: APP_ID, id,
+			method: MESSAGE_METHODS.CHECK_ACCESS, target: 'content', appId: APP_ID, id,
 		}, '*');
 
 	});
@@ -175,16 +159,16 @@ const subscribeAccountChanged = (subscriberCb) => {
 
 };
 
-/**
- * @method notifyAccountChanged
- * @param {String|null} accountId
- */
-const notifyAccountChanged = (accountId) => {
-	accountChangedSubscribers.forEach((cb) => {
-		cb(accountId);
-	});
+// /**
+//  * @method notifyAccountChanged
+//  * @param {String|null} accountId
+//  */
+// const notifyAccountChanged = (accountId) => {
+// 	accountChangedSubscribers.forEach((cb) => {
+// 		cb(accountId);
+// 	});
 
-};
+// };
 
 /**
  * Notify about switch account
@@ -200,26 +184,13 @@ const subscribeSwitchAccount = (subscriberCb) => {
 			return;
 		}
 
-		const callback = ({ data }) => {
-			if (data.error) {
-				reject(data.error);
-				return;
-			}
+		accountSubscribers.push(subscriberCb);
 
-			resolve();
-
-			if (!accountSubscribers.length) {
-				accountSubscription();
-			}
-
-			accountSubscribers.push(subscriberCb);
-			subscriberCb(data.res.find((account) => account.active));
-		};
-
+		const callback = ({ data }) => (data.error ? reject(data.error) : resolve());
 		requestQueue.push({ id, cb: callback });
 
 		window.postMessage({
-			method: 'accounts', target: 'content', appId: APP_ID, id,
+			method: MESSAGE_METHODS.ACCOUNTS, target: 'content', appId: APP_ID, id,
 		}, '*');
 	});
 
@@ -275,16 +246,24 @@ echojslib.echo.connect = (url, params) => {
  * @param event
  */
 const onMessage = (event) => {
+	console.log('TCL: onMessage -> event', event);
 
 	const { id, target, appId } = event.data;
 
-	if (!id || target !== 'inpage' || !appId || appId !== APP_ID) return;
+	if (target !== 'inpage' || !appId || appId !== APP_ID) return;
 
-	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
-	if (requestIndex === -1) return;
+	if (!id) {
+		dispatchNotifyResponse(event.data);
+	} else {
+		const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
+		console.log('TCL: onMessage -> requestQueue', requestQueue);
+		console.log('TCL: onMessage -> requestIndex', requestIndex);
+		if (requestIndex === -1) return;
 
-	const request = requestQueue.splice(requestIndex, 1);
-	request[0].cb(event);
+		const request = requestQueue.splice(requestIndex, 1);
+		request[0].cb(event);
+	}
+
 
 };
 
@@ -384,34 +363,20 @@ const requestAccount = () => backgroundRequest('requestAccount');
 const loadActiveAccount = () => {
 
 	const cb = ({ data }) => {
-
-		const id = IdHelper.getId();
-
-		window.postMessage({
-			method: 'getActiveAccount', id, target: 'content', appId: APP_ID, inPageId: INPAGE_ID,
-		}, '*');
-
 		const error = data.error || (data.res && data.res.error);
-
-		const prevAccount = activeAccount;
 
 		if (error) {
 			activeAccount = null;
 		} else {
 			activeAccount = data.res;
-			requestQueue.push({ id, cb });
 		}
-		if (prevAccount !== activeAccount) {
-			notifyAccountChanged(activeAccount);
-		}
-
 	};
 
 	const id = IdHelper.getId();
 
 	requestQueue.push({ id, cb });
 	window.postMessage({
-		method: 'getActiveAccount', id, target: 'content', appId: APP_ID, inPageId: INPAGE_ID,
+		method: MESSAGE_METHODS.ACTIVE_SWITCH_ACCOUNT_SUBSCRIBE, id, target: 'content', appId: APP_ID, inPageId: INPAGE_ID,
 	}, '*');
 };
 
@@ -488,14 +453,13 @@ const getAccess = () => {
 			if (data.error) {
 				reject(data.error);
 			} else {
-				loadActiveAccount();
 				resolve(data.status);
 			}
 		};
 
 		requestQueue.push({ id, cb });
 		window.postMessage({
-			method: 'getAccess', id, target: 'content', appId: APP_ID,
+			method: MESSAGE_METHODS.GET_ACCESS, id, target: 'content', appId: APP_ID,
 		}, '*');
 
 	});

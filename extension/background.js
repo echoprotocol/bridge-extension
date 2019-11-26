@@ -32,6 +32,7 @@ import {
 	DRAFT_STORAGE_KEY,
 	GLOBAL_ID_1,
 	EXPIRATION_INFELICITY,
+	MESSAGE_METHODS,
 } from '../src/constants/GlobalConstants';
 
 import { operationKeys } from '../src/constants/OperationConstants';
@@ -57,11 +58,23 @@ const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
 
+//-------------
+const ports = [];
+
+const notifyAllApprovedPorts = (res, method) => {
+	ports.forEach((portItem) => {
+		if (portItem.access) {
+			portItem.port.postMessage({ res, method });
+		}
+	});
+};
+//-------------
+
 const requestAccountMethodCallbacks = [];
 
 let lastRequestType = '';
 const accountsRequests = [];
-let activeAccountRequests = [];
+let activeAccountRequests = []; //+
 
 let requestQueue = [];
 const networkSubscribers = [];
@@ -70,6 +83,7 @@ const activeAccountSubscribers = [];
 const processedOrigins = [];
 let providerRequests = [];
 let signMessageRequests = [];
+
 const providerNotification = new NotificationManager();
 const signNotification = new NotificationManager();
 
@@ -281,20 +295,20 @@ const getActiveAccount = async (switchNetwork) => {
 	return activeAccount;
 };
 
-/**
- * Resolve request to get active account from inpage
- * @param request
- * @returns {Promise<void>}
- */
-const resolveActiveAccount = async (request) => {
-	try {
-		const account = await getActiveAccount();
-		request.cb({ id: request.id, res: account });
-		request.cb = function cb() {};
-	} catch (e) {
-		console.log(e.message);
-	}
-};
+// /**
+//  * Resolve request to get active account from inpage
+//  * @param request
+//  * @returns {Promise<void>}
+//  */
+// const resolveActiveAccount = async (request) => {
+// 	try {
+// 		const account = await getActiveAccount();
+// 		request.cb({ id: request.id, res: account });
+// 		request.cb = function cb() {};
+// 	} catch (e) {
+// 		console.error(e.message);
+// 	}
+// };
 
 
 /**
@@ -304,15 +318,17 @@ const resolveActiveAccount = async (request) => {
 const updateActiveAccountInpage = async (network) => {
 	try {
 		const account = await getActiveAccount(network);
+		console.log('TCL: updateActiveAccountInpage -> account', account);
 
-		activeAccountRequests.forEach((request) => {
-			try {
-				request.cb({ id: request.id, res: account });
-			} catch (e) {
-				console.log(e.message);
-			}
-		});
-		activeAccountRequests.splice(0, activeAccountRequests.length);
+		notifyAllApprovedPorts(account, MESSAGE_METHODS.ACTIVE_SWITCH_ACCOUNT_SUBSCRIBE);
+		// activeAccountRequests.forEach((request) => {
+		// 	try {
+		// 		request.cb({ id: request.id, res: account });
+		// 	} catch (e) {
+		// 		console.log(e.message);
+		// 	}
+		// });
+		// activeAccountRequests.splice(0, activeAccountRequests.length);
 		return null;
 
 	} catch (e) {
@@ -343,44 +359,26 @@ const execGetAccountCallbacks = async () => {
 
 };
 
-/**
- * On content script request
- * @param request
- * @param sender
- * @param sendResponse
- * @returns {boolean}
- */
-const onMessage = (request, sender, sendResponse) => {
 
+/**
+ *
+ * @param {Object} request
+ * @param {Object} sender
+ * @param {Function} sendResponse
+ */
+const onMessageHandler = (request, sender, sendResponse) => {
+	console.log('TCL: onMessageHandler -> request', request);
 	const { hostname } = urlParse(sender.tab.url);
 	const { id: tabId } = sender.tab;
 
-	request = JSON.parse(JSON.stringify(request));
-
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
-	if (request.method === 'closeTab') {
-		activeAccountRequests = activeAccountRequests
-			.filter((accountRequest) => accountRequest.tabId !== tabId);
-		const indexFindRequest = providerRequests.findIndex((rq) => rq.origin === hostname);
-		if (indexFindRequest === -1) return true;
-		const indexTabId = providerRequests[indexFindRequest].tabs
-			.findIndex((id) => id === tabId);
-		if (indexTabId === -1) return true;
-		providerRequests[indexFindRequest].cbs.splice(indexTabId, 1);
-		providerRequests[indexFindRequest].ids.splice(indexTabId, 1);
-		providerRequests[indexFindRequest].tabs.splice(indexTabId, 1);
-		return true;
-	}
-
-	if (request.method === 'checkAccess') {
+	if (request.method === MESSAGE_METHODS.CHECK_ACCESS) {
 		sendResponse({ id: request.id, response: !!processedOrigins[hostname] });
 		return true;
-	}
+	} else if (typeof processedOrigins[hostname] !== 'boolean') {
 
-	if (typeof processedOrigins[hostname] !== 'boolean') {
-
-		if (request.method !== 'getAccess') {
+		if (request.method !== MESSAGE_METHODS.GET_ACCESS) {
 			sendResponse({ id: request.id, error: 'No access' });
 			return true;
 		}
@@ -410,7 +408,7 @@ const onMessage = (request, sender, sendResponse) => {
 
 		triggerPopup(INCOMING_CONNECTION_PATH, providerNotification);
 		return true;
-	} else if (request.method === 'getAccess') {
+	} else if (request.method === MESSAGE_METHODS.GET_ACCESS) {
 		const isAccess = processedOrigins[hostname];
 		if (isAccess) {
 			sendResponse({ id: request.id, status: isAccess });
@@ -419,9 +417,7 @@ const onMessage = (request, sender, sendResponse) => {
 		}
 
 		return true;
-	}
-
-	if (request.method === 'requestAccount') {
+	} else if (request.method === MESSAGE_METHODS.REQUEST_ACCOUNT) {
 
 		requestAccountMethodCallbacks.push({
 			id: request.id, cb: sendResponse,
@@ -433,17 +429,12 @@ const onMessage = (request, sender, sendResponse) => {
 			triggerPopup(CLOSE_AFTER_UNLOCK_PATH);
 		}
 		return true;
-	}
-
-	if (request.method === 'getNetwork') {
-
+	} else if (request.method === MESSAGE_METHODS.GET_NETWORK) {
 		getNetwork().then((result) => {
 			sendResponse(({ id: request.id, res: JSON.parse(JSON.stringify(result)) }));
 		});
 		return true;
-	}
-
-	if (['proofOfAuthority', 'signData'].includes(request.method)) {
+	} else if ([MESSAGE_METHODS.PROOF_OF_AUTHORITY, MESSAGE_METHODS.SIGN_DATA].includes(request.method)) {
 
 		signMessageRequests.push({
 			origin: hostname,
@@ -470,17 +461,15 @@ const onMessage = (request, sender, sendResponse) => {
 
 		triggerPopup(SIGN_MESSAGE_PATH, signNotification);
 		return true;
-	}
-
-	if (request.method === 'networkSubscribe') {
-		networkSubscribers.push({ id: request.id, cb: sendResponse });
-		return true;
-	}
-
-	if (request.method === 'accountSubscribe') {
-		activeAccountSubscribers.push({ id: request.id, cb: sendResponse });
-		return true;
-	}
+	} else
+	// if (request.method === MESSAGE_METHODS.SWITCH_NETWORK_SUBSCRIBE) {
+	// 	networkSubscribers.push({ id: request.id, cb: sendResponse });
+	// 	return true;
+	// } else
+	// if (request.method === MESSAGE_METHODS.SWITCH_ACCOUNT_SUBSCRIBE) {
+	// 	activeAccountSubscribers.push({ id: request.id, cb: sendResponse });
+	// 	return true;
+	// }
 
 	if (!request.id) return false;
 
@@ -489,7 +478,7 @@ const onMessage = (request, sender, sendResponse) => {
 	lastRequestType = request.method;
 
 
-	if (request.method === 'confirm' && request.data) {
+	if (request.method === MESSAGE_METHODS.CONFIRM && request.data) {
 
 		const operations = JSON.parse(request.data);
 
@@ -513,7 +502,7 @@ const onMessage = (request, sender, sendResponse) => {
 			})
 			.catch(triggerPopup);
 
-	} else if (request.method === 'accounts') {
+	} else if (request.method === MESSAGE_METHODS.ACCOUNTS) {
 
 		accountsRequests.push({
 			id, cb: sendResponse,
@@ -526,24 +515,31 @@ const onMessage = (request, sender, sendResponse) => {
 			triggerPopup();
 		}
 
-	} else if (request.method === 'getActiveAccount') {
-		const { inPageId } = request;
-		const tabIndex = activeAccountRequests
-			.findIndex(({ inPageId: reqInPageId }) => inPageId === reqInPageId);
-		const req = {
-			id: request.id, cb: sendResponse, inPageId,
-		};
-		if (tabIndex === -1) {
-			resolveActiveAccount(req);
-			activeAccountRequests.push(req);
-			return true;
-		}
-
-		activeAccountRequests[tabIndex] = req;
-
-		return true;
+	} else if (request.method === MESSAGE_METHODS.GET_ACTIVE_ACCOUNT) {
+		getActiveAccount().then((account) => {
+			sendResponse({ id: request.id, res: account });
+		});
 	}
 
+	return true;
+};
+
+/**
+ *
+ * @param {String} tabId
+ * @param {String} hostname
+ */
+const clearAllBeforeTabUnlocad = (tabId, hostname) => {
+	activeAccountRequests = activeAccountRequests
+		.filter((accountRequest) => accountRequest.tabId !== tabId);
+	const indexFindRequest = providerRequests.findIndex((rq) => rq.origin === hostname);
+	if (indexFindRequest === -1) return true;
+	const indexTabId = providerRequests[indexFindRequest].tabs
+		.findIndex((id) => id === tabId);
+	if (indexTabId === -1) return true;
+	providerRequests[indexFindRequest].cbs.splice(indexTabId, 1);
+	providerRequests[indexFindRequest].ids.splice(indexTabId, 1);
+	providerRequests[indexFindRequest].tabs.splice(indexTabId, 1);
 	return true;
 };
 
@@ -677,6 +673,7 @@ const onFirstInstall = (details) => {
  * 	@param {String} networkName
  */
 const sendTransaction = async (transaction, networkName) => {
+	// TODO:: add validation of input variables
 	const { type } = transaction;
 	const account = transaction[operationKeys[type]];
 	const options = formatToSend(type, transaction);
@@ -684,7 +681,7 @@ const sendTransaction = async (transaction, networkName) => {
 	const publicKeys = account.active.key_auths;
 
 	const keyPromises =
-        await Promise.all(publicKeys.map((key) => crypto.getInByNetwork(networkName, key[0])));
+		await Promise.all(publicKeys.map((key) => crypto.getInByNetwork(networkName, key[0])));
 
 	const indexPublicKey = keyPromises.findIndex((key) => !!key);
 
@@ -714,8 +711,8 @@ export const onSend = async (options, networkName) => {
 
 		await Promise.race([
 			sendTransaction(options, networkName)
-				.then(() => {}, (err) => {
-					console.warn('Broadcast transaction error', err);
+				.then(() => { }, (err) => {
+					console.error('Broadcast transaction error', err);
 					if (err) { path = ERROR_SEND_PATH; }
 				}).finally(() => new Date().getTime() - start),
 			new Promise((resolve, reject) => {
@@ -726,7 +723,7 @@ export const onSend = async (options, networkName) => {
 			}),
 		]);
 	} catch (err) {
-		console.warn('Broadcast transaction error', err);
+		console.error('Broadcast transaction error', err);
 		path = NETWORK_ERROR_SEND_PATH;
 
 		try {
@@ -754,34 +751,38 @@ export const onSend = async (options, networkName) => {
 export const onSwitchNetwork = async (network) => {
 	try {
 		await createSocket(network.url);
-		updateActiveAccountInpage(network);
+		// updateActiveAccountInpage(network);
 	} catch (e) {
-		console.warn('Switch network error', e);
+		console.error('Switch network error', e);
 	} finally {
-		networkSubscribers.forEach(({ id, cb }) => {
-			try {
-				cb({ id, res: network });
-			} catch (error) {
-				console.warn('Switch network callback error', error);
-			}
-		});
-		networkSubscribers.splice(0, networkSubscribers.length);
+		notifyAllApprovedPorts(network, MESSAGE_METHODS.SWITCH_NETWORK_SUBSCRIBE);
+		// networkSubscribers.forEach(({ id, cb }) => {
+		// 	try {
+		// 		cb({ id, res: network });
+		// 	} catch (error) {
+		// 		console.error('Switch network callback error', error);
+		// 	}
+		// });
+		// networkSubscribers.splice(0, networkSubscribers.length);
 	}
 
 };
 
 
 const onSwitchActiveAccount = (res) => {
+	console.log('TCL: onSwitchActiveAccount -> res', res);
+
 	updateActiveAccountInpage();
 	if (!res) return;
-	activeAccountSubscribers.forEach(({ id, cb }) => {
-		try {
-			cb({ id, res });
-		} catch (error) {
-			console.warn('Switch account callback error', error);
-		}
-	});
-	activeAccountSubscribers.splice(0, activeAccountSubscribers.length);
+	notifyAllApprovedPorts(res, MESSAGE_METHODS.SWITCH_ACCOUNT_SUBSCRIBE);
+	// activeAccountSubscribers.forEach(({ id, cb }) => {
+	// 	try {
+	// 		cb({ id, res });
+	// 	} catch (error) {
+	// 		console.error('Switch account callback error', error);
+	// 	}
+	// });
+	// activeAccountSubscribers.splice(0, activeAccountSubscribers.length);
 };
 
 /**
@@ -798,11 +799,17 @@ export const onProviderApproval = (err, id, status) => {
 		return;
 	}
 
-
 	request.ids.forEach((rId, index) => request.cbs[index]({ error: err, id: rId, status }));
 
 	providerRequests = providerRequests.filter(({ ids }) => ids[0] !== request.ids[0]);
 	processedOrigins[request.origin] = status;
+
+	// set access status for all ports runned on `request.origin` hostname
+	ports.forEach((port) => {
+		if (port.hostname === request.origin) { port.access = status; }
+
+	});
+	updateActiveAccountInpage();
 
 	if (!providerRequests.length) {
 		closePopup(providerNotification);
@@ -879,7 +886,7 @@ export const onSignMessageApproval = async (err, id, status, message, signer) =>
 		}
 
 	} catch (error) {
-		console.warn(error);
+		console.error(error);
 	}
 };
 
@@ -921,11 +928,42 @@ window.getSignMessageMap = () => signMessageRequests.reduce((map, {
 	return map;
 }, {});
 
-extensionizer.runtime.onMessage.addListener(onMessage);
-
 crypto.on('unlocked', onPinUnlock);
 crypto.on('locked', onLock);
 
 extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });
+
+
+const connectRemote = (port) => {
+	const { sender } = port;
+	const { tab: { id, url } } = sender;
+	const { hostname, origin } = urlParse(url);
+
+	// push object with `accessPermission`, `id` and `portObject` info
+	ports.push({
+		access: processedOrigins[hostname],
+		hostname,
+		id,
+		port,
+	});
+
+	const onMessageCb = (message) => onMessageHandler(message, port.sender, (reposneObject) => {
+		port.postMessage({ ...reposneObject, origin, method: message.method });
+	});
+
+	const onDisconnectCb = () => {
+		port.onMessage.removeListener(onMessageCb);
+		port.onDisconnect.removeListener(onDisconnectCb);
+		clearAllBeforeTabUnlocad(id, hostname);
+		const portIndex = ports.findIndex((portItem) => portItem.id === id);
+		ports.splice(portIndex, 1);
+	};
+
+	port.onMessage.addListener(onMessageCb);
+	port.onDisconnect.addListener(onDisconnectCb);
+};
+
+extensionizer.runtime.onConnect.addListener(connectRemote);
+
