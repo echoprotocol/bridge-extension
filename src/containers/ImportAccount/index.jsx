@@ -3,7 +3,7 @@ import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
 
 import {
-	INDEX_PATH, SETTINGS_PATH, NEW_KEY_PATH,
+	INDEX_PATH, NEW_KEY_PATH,
 	IMPORT_ACCOUNT_PATH, IMPORT_SUCCESS_PATH, WALLET_PATH,
 } from '../../constants/RouterConstants';
 import { FORM_SIGN_IN } from '../../constants/FormConstants';
@@ -116,10 +116,6 @@ class ImportAccount extends React.Component {
 
 	onProceedClick() {
 		this.props.history.push(INDEX_PATH);
-	}
-
-	onChangeIcon() {
-		this.props.history.push(SETTINGS_PATH);
 	}
 
 

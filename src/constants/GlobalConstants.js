@@ -107,8 +107,6 @@ export const CONNECT_STATUS = 'connect';
 export const SIGN_STATUS = 'sign';
 export const NOT_LOGGED_STATUS = 'not logged';
 
-export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
-
 export const TIMEOUT = 2 * 60 * 1000;
 export const RANDOM_SIZE = 2048;
 export const OWNER_KEY = 'owner';
@@ -126,10 +124,7 @@ export const KEY_CODE_SPACE = 32;
 export const KEY_CODE_TAB = 9;
 export const KEY_CODE_ARROW_UP = 38;
 export const KEY_CODE_ARROW_DOWN = 40;
-export const ICONS_COUNT = 15;
-export const ICON_COLORS_COUNT = 7;
-export const BASE_ICON = 1;
-export const BASE_ICON_COLOR = 'green';
+
 export const POPUP_WINDOW_TYPE = 'popup';
 
 export const MAX_NOTE_LENGTH = 200 * 1000;

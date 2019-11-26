@@ -6,9 +6,9 @@ import { withRouter } from 'react-router';
 
 import { transitPublicKey } from '../../actions/CryptoActions';
 import BridgeBtnCopy from '../../components/BridgeBtnCopy';
-import UserIcon from '../../components/UserIcon';
+import Avatar from '../../components/Avatar';
 import ArrowDown from '../../assets/images/icons/arrow_dark_bot.svg';
-import { INDEX_PATH, SETTINGS_PATH, NEW_KEY_PATH } from '../../constants/RouterConstants';
+import { INDEX_PATH, NEW_KEY_PATH } from '../../constants/RouterConstants';
 import { FORM_WELCOME } from '../../constants/FormConstants';
 import { storageRemoveDraft, storageSetDraft } from '../../actions/GlobalActions';
 
@@ -19,7 +19,6 @@ class Welcome extends React.Component {
 		this.state = {
 			keys: [],
 			newKey: false,
-			nextSettings: false,
 		};
 	}
 
@@ -53,7 +52,6 @@ class Welcome extends React.Component {
 	settings() {
 		storageSetDraft(FORM_WELCOME, 'copied', false);
 		this.setState({ nextSettings: true });
-		this.props.history.push(SETTINGS_PATH);
 	}
 
 	proceed() {
@@ -82,12 +80,9 @@ class Welcome extends React.Component {
 		return (
 			<div className="welcome-wrap">
 
-				<UserIcon
-					color={account.get('iconColor')}
-					animationChange
-					size="big"
-					avatar={`ava${account.get('icon')}`}
-					onClickIcon={() => this.settings()}
+				<Avatar
+					size={86}
+					name={account.get('name')}
 				/>
 
 				<div className="page-wrap" >
