@@ -58,23 +58,51 @@ const notificationManager = new NotificationManager();
 const emitter = new EventEmitter();
 const crypto = new Crypto();
 
-//-------------
+/** @type {[PortObject]} */
 const ports = [];
 
 const notifyAllApprovedPorts = (res, method) => {
-	ports.forEach((portItem) => {
-		if (portItem.access) {
-			portItem.port.postMessage({ res, method });
+	ports.forEach(({ port, access }) => {
+		if (access) {
+			port.postMessage({ res, method });
 		}
 	});
 };
-//-------------
+
+/**
+ *
+ * @param {object} portsToSend
+ * @param {string} method
+ * @param {any?} res
+ */
+const sendOnPortsViaMethod = (portsToSend, method, res) => {
+	console.log('TCL: sendOnPortsViaMethod -> method', method);
+	console.log('TCL: sendOnPortsViaMethod -> portsToSend', portsToSend);
+	portsToSend.forEach((portObject) => {
+		const { port, access, origin } = portObject;
+
+		if (!access && ![MESSAGE_METHODS.GET_ACCESS, MESSAGE_METHODS.CHECK_ACCESS].includes(method)) {
+			return;
+		}
+
+		portObject.pendingRequests = portObject.pendingRequests.filter((request) => {
+			if (request.method === method) {
+				console.log('TCL: sendOnApprovalPortViaMethod -> { res, ...request, origin }', { res, ...request, origin });
+				port.postMessage({ res, ...request, origin });
+
+				return false;
+			}
+			return true;
+		});
+	});
+};
+
+let lastRequestType = '';
 
 const requestAccountMethodCallbacks = [];
 
-let lastRequestType = '';
 const accountsRequests = [];
-let activeAccountRequests = []; //+
+let activeAccountRequests = [];
 
 let requestQueue = [];
 const networkSubscribers = [];
@@ -247,32 +275,6 @@ const createAccount = async (name, path) => {
 
 };
 
-/**
-
- * Get user account if unlocked
- * @returns {Promise.<*>}
- */
-const resolveAccounts = async () => {
-
-	const network = await getNetwork();
-
-	try {
-		let accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
-		accounts = accounts.filter((account) => account.active);
-
-		accountsRequests.forEach((request) => {
-			try {
-				request.cb({ id: request.id, res: accounts });
-			} catch (e) {
-				console.log(e.message);
-			}
-		});
-		return accountsRequests.splice(0, accountsRequests.length);
-	} catch (e) {
-		return { error: e.message };
-	}
-
-};
 
 /**
  * Get active account by network
@@ -295,21 +297,6 @@ const getActiveAccount = async (switchNetwork) => {
 	return activeAccount;
 };
 
-// /**
-//  * Resolve request to get active account from inpage
-//  * @param request
-//  * @returns {Promise<void>}
-//  */
-// const resolveActiveAccount = async (request) => {
-// 	try {
-// 		const account = await getActiveAccount();
-// 		request.cb({ id: request.id, res: account });
-// 		request.cb = function cb() {};
-// 	} catch (e) {
-// 		console.error(e.message);
-// 	}
-// };
-
 
 /**
  * Update active account on all requested inpage
@@ -318,17 +305,8 @@ const getActiveAccount = async (switchNetwork) => {
 const updateActiveAccountInpage = async (network) => {
 	try {
 		const account = await getActiveAccount(network);
-		console.log('TCL: updateActiveAccountInpage -> account', account);
 
-		notifyAllApprovedPorts(account, MESSAGE_METHODS.ACTIVE_SWITCH_ACCOUNT_SUBSCRIBE);
-		// activeAccountRequests.forEach((request) => {
-		// 	try {
-		// 		request.cb({ id: request.id, res: account });
-		// 	} catch (e) {
-		// 		console.log(e.message);
-		// 	}
-		// });
-		// activeAccountRequests.splice(0, activeAccountRequests.length);
+		notifyAllApprovedPorts(account, MESSAGE_METHODS.ACTIVE_ACCOUNT_SUBSCRIBE);
 		return null;
 
 	} catch (e) {
@@ -337,44 +315,52 @@ const updateActiveAccountInpage = async (network) => {
 };
 
 
-const execGetAccountCallbacks = async () => {
+const resolveRequestAccount = async (portsToSend) => {
+	const account = await getActiveAccount();
+	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.REQUEST_ACCOUNT, account);
+};
 
-	try {
-		const account = await getActiveAccount();
+const resolveAccounts = async (portsToSend) => {
+	const network = await getNetwork();
+	let accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
+	accounts = accounts.filter((account) => account.active);
+	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.ACCOUNTS, accounts);
+};
 
-		requestAccountMethodCallbacks.forEach((request) => {
-			try {
-				request.cb({ id: request.id, res: account });
-			} catch (e) {
-				console.log(e.message);
-			}
-		});
+const resolveActiveAccount = async (portsToSend) => {
+	const activeAccount = await getActiveAccount();
+	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_ACTIVE_ACCOUNT, activeAccount);
+};
 
-		return requestAccountMethodCallbacks.splice(0, requestAccountMethodCallbacks.length);
+const resolveNetwork = async (portsToSend) => {
+	const result = await getNetwork();
+	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_NETWORK, JSON.parse(JSON.stringify(result)));
+};
 
-
-	} catch (e) {
-		return { error: e.message };
-	}
-
+const resolveCheckAccess = async (portsToSend) => {
+	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.CHECK_ACCESS);
 };
 
 
 /**
  *
  * @param {Object} request
- * @param {Object} sender
- * @param {Function} sendResponse
+ * @param {PortObject} portObj
  */
-const onMessageHandler = (request, sender, sendResponse) => {
-	console.log('TCL: onMessageHandler -> request', request);
-	const { hostname } = urlParse(sender.tab.url);
+const onMessageHandler = (request, portObj) => {
+	const { port: { sender } } = portObj;
 	const { id: tabId } = sender.tab;
+	const { hostname, origin } = urlParse(sender.tab.url);
+	const { id, method } = request;
+
+	const sendResponse = (reposneObject) => portObj.port.postMessage({ ...reposneObject, origin, method });
 
 	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
 
 	if (request.method === MESSAGE_METHODS.CHECK_ACCESS) {
-		sendResponse({ id: request.id, response: !!processedOrigins[hostname] });
+		// sendResponse({ id, method, res: !!processedOrigins[hostname] });
+		portObj.pendingRequests.push({ id, method, res: !!processedOrigins[hostname] });
+		resolveCheckAccess([portObj]);
 		return true;
 	} else if (typeof processedOrigins[hostname] !== 'boolean') {
 
@@ -418,21 +404,17 @@ const onMessageHandler = (request, sender, sendResponse) => {
 
 		return true;
 	} else if (request.method === MESSAGE_METHODS.REQUEST_ACCOUNT) {
-
-		requestAccountMethodCallbacks.push({
-			id: request.id, cb: sendResponse,
-		});
+		portObj.pendingRequests.push({ id, method });
 
 		if (!crypto.isLocked()) {
-			execGetAccountCallbacks();
+			resolveRequestAccount([portObj]);
 		} else {
 			triggerPopup(CLOSE_AFTER_UNLOCK_PATH);
 		}
 		return true;
 	} else if (request.method === MESSAGE_METHODS.GET_NETWORK) {
-		getNetwork().then((result) => {
-			sendResponse(({ id: request.id, res: JSON.parse(JSON.stringify(result)) }));
-		});
+		portObj.pendingRequests.push({ id, method });
+		resolveNetwork([portObj]);
 		return true;
 	} else if ([MESSAGE_METHODS.PROOF_OF_AUTHORITY, MESSAGE_METHODS.SIGN_DATA].includes(request.method)) {
 
@@ -461,19 +443,9 @@ const onMessageHandler = (request, sender, sendResponse) => {
 
 		triggerPopup(SIGN_MESSAGE_PATH, signNotification);
 		return true;
-	} else
-	// if (request.method === MESSAGE_METHODS.SWITCH_NETWORK_SUBSCRIBE) {
-	// 	networkSubscribers.push({ id: request.id, cb: sendResponse });
-	// 	return true;
-	// } else
-	// if (request.method === MESSAGE_METHODS.SWITCH_ACCOUNT_SUBSCRIBE) {
-	// 	activeAccountSubscribers.push({ id: request.id, cb: sendResponse });
-	// 	return true;
-	// }
+	}
 
 	if (!request.id) return false;
-
-	const { id } = request;
 
 	lastRequestType = request.method;
 
@@ -503,22 +475,17 @@ const onMessageHandler = (request, sender, sendResponse) => {
 			.catch(triggerPopup);
 
 	} else if (request.method === MESSAGE_METHODS.ACCOUNTS) {
-
-		accountsRequests.push({
-			id, cb: sendResponse,
-		});
+		portObj.pendingRequests.push({ id, method });
 
 		if (!crypto.isLocked()) {
-			resolveAccounts();
-
+			resolveAccounts([portObj]);
 		} else {
 			triggerPopup();
 		}
 
 	} else if (request.method === MESSAGE_METHODS.GET_ACTIVE_ACCOUNT) {
-		getActiveAccount().then((account) => {
-			sendResponse({ id: request.id, res: account });
-		});
+		portObj.pendingRequests.push({ id, method });
+		resolveActiveAccount([portObj]);
 	}
 
 	return true;
@@ -530,6 +497,7 @@ const onMessageHandler = (request, sender, sendResponse) => {
  * @param {String} hostname
  */
 const clearAllBeforeTabUnlocad = (tabId, hostname) => {
+	// TODO
 	activeAccountRequests = activeAccountRequests
 		.filter((accountRequest) => accountRequest.tabId !== tabId);
 	const indexFindRequest = providerRequests.findIndex((rq) => rq.origin === hostname);
@@ -545,10 +513,11 @@ const clearAllBeforeTabUnlocad = (tabId, hostname) => {
 
 const onPinUnlock = () => {
 	if (lastRequestType === 'accounts') {
-		resolveAccounts();
+		resolveAccounts(ports);
 		closePopup();
 	}
-	execGetAccountCallbacks();
+	resolveRequestAccount(ports);
+	// execGetAccountCallbacks();
 	updateActiveAccountInpage();
 	return null;
 };
@@ -751,38 +720,19 @@ export const onSend = async (options, networkName) => {
 export const onSwitchNetwork = async (network) => {
 	try {
 		await createSocket(network.url);
-		// updateActiveAccountInpage(network);
 	} catch (e) {
 		console.error('Switch network error', e);
 	} finally {
+		updateActiveAccountInpage(network);
 		notifyAllApprovedPorts(network, MESSAGE_METHODS.SWITCH_NETWORK_SUBSCRIBE);
-		// networkSubscribers.forEach(({ id, cb }) => {
-		// 	try {
-		// 		cb({ id, res: network });
-		// 	} catch (error) {
-		// 		console.error('Switch network callback error', error);
-		// 	}
-		// });
-		// networkSubscribers.splice(0, networkSubscribers.length);
 	}
-
 };
 
 
 const onSwitchActiveAccount = (res) => {
-	console.log('TCL: onSwitchActiveAccount -> res', res);
-
 	updateActiveAccountInpage();
 	if (!res) return;
 	notifyAllApprovedPorts(res, MESSAGE_METHODS.SWITCH_ACCOUNT_SUBSCRIBE);
-	// activeAccountSubscribers.forEach(({ id, cb }) => {
-	// 	try {
-	// 		cb({ id, res });
-	// 	} catch (error) {
-	// 		console.error('Switch account callback error', error);
-	// 	}
-	// });
-	// activeAccountSubscribers.splice(0, activeAccountSubscribers.length);
 };
 
 /**
@@ -807,7 +757,6 @@ export const onProviderApproval = (err, id, status) => {
 	// set access status for all ports runned on `request.origin` hostname
 	ports.forEach((port) => {
 		if (port.hostname === request.origin) { port.access = status; }
-
 	});
 	updateActiveAccountInpage();
 
@@ -890,7 +839,6 @@ export const onSignMessageApproval = async (err, id, status, message, signer) =>
 	}
 };
 
-
 const listeners = new Listeners(emitter, crypto);
 listeners.initBackgroundListeners(
 	createAccount,
@@ -942,21 +890,25 @@ const connectRemote = (port) => {
 	const { hostname, origin } = urlParse(url);
 
 	// push object with `accessPermission`, `id` and `portObject` info
-	ports.push({
+	const portObj = {
 		access: processedOrigins[hostname],
 		hostname,
+		origin,
 		id,
 		port,
-	});
+		pendingRequests: [],
+	};
 
-	const onMessageCb = (message) => onMessageHandler(message, port.sender, (reposneObject) => {
-		port.postMessage({ ...reposneObject, origin, method: message.method });
-	});
+	ports.push(portObj);
+
+	const onMessageCb = (message) => onMessageHandler(message, portObj);
 
 	const onDisconnectCb = () => {
 		port.onMessage.removeListener(onMessageCb);
 		port.onDisconnect.removeListener(onDisconnectCb);
+
 		clearAllBeforeTabUnlocad(id, hostname);
+
 		const portIndex = ports.findIndex((portItem) => portItem.id === id);
 		ports.splice(portIndex, 1);
 	};
@@ -967,3 +919,12 @@ const connectRemote = (port) => {
 
 extensionizer.runtime.onConnect.addListener(connectRemote);
 
+/**
+ * The complete Triforce, or one or more components of the Triforce.
+ * @typedef {Object} PortObject
+ * @property {object} port
+ * @property {boolean} access
+ * @property {string} hostname
+ * @property {number} id
+ * @property {[object]} pendingRequests
+ */

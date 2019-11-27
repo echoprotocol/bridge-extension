@@ -56,6 +56,7 @@ const onResponse = (res, origin = '*') => {
  * @return {Promise<any>}
  */
 const onBackgroundMessage = async (res) => {
+	console.log('TCL: onBackgroundMessage -> res', res);
 	if (!res) {
 		return null;
 	}

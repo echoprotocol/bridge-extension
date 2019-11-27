@@ -194,7 +194,8 @@ export const MESSAGE_METHODS = {
 	SIGN_DATA: 'signData',
 	SWITCH_NETWORK_SUBSCRIBE: 'networkSubscribe',
 	SWITCH_ACCOUNT_SUBSCRIBE: 'accountSubscribe',
-	ACTIVE_SWITCH_ACCOUNT_SUBSCRIBE: 'activeAccountSubscribe',
+	ACTIVE_ACCOUNT_SUBSCRIBE: 'activeAccountSubscribe',
+	GET_ACTIVE_ACCOUNT: 'getActiveAccount',
 	CONFIRM: 'confirm',
 	ACCOUNTS: 'accounts',
 };

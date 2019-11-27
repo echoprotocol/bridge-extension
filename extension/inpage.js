@@ -38,17 +38,11 @@ const dispatchNotifyResponse = (eventData) => {
 			accountSubscribers.forEach((cb) => cb(res));
 			break;
 		}
-		case MESSAGE_METHODS.ACTIVE_SWITCH_ACCOUNT_SUBSCRIBE: {
-
-			// accountSubscribers.forEach((cb) => cb(res.find((account) => account.active)));
-			// const prevAccount = activeAccount;
+		case MESSAGE_METHODS.ACTIVE_ACCOUNT_SUBSCRIBE: {
 			const error = eventData.error || (res && res.error);
-
 			activeAccount = error ? null : res;
 
-			// if (prevAccount !== activeAccount) {
 			accountChangedSubscribers.forEach((cb) => cb(res));
-			// }
 			break;
 		}
 		default: break;
@@ -117,7 +111,6 @@ const subscribeSwitchNetwork = (subscriberCb) => {
  */
 const subscribeAccountChanged = (subscriberCb) => {
 
-	// TODO
 	if (!lodash.isFunction(subscriberCb)) {
 		throw new Error('The first argument is not a function');
 	}
@@ -127,14 +120,14 @@ const subscribeAccountChanged = (subscriberCb) => {
 	const result = new Promise((resolve, reject) => {
 
 		const callback = ({ data }) => {
-			console.log('TCL: callback -> subscribeAccountChanged', data);
+			console.log('TCL: callback -> data', data);
 
 			if (data.error) {
 				reject(data.error);
 				return;
 			}
 
-			if (data.response) {
+			if (data.res) {
 
 				accountChangedSubscribers.push(subscriberCb);
 
@@ -159,17 +152,6 @@ const subscribeAccountChanged = (subscriberCb) => {
 
 };
 
-// /**
-//  * @method notifyAccountChanged
-//  * @param {String|null} accountId
-//  */
-// const notifyAccountChanged = (accountId) => {
-// 	accountChangedSubscribers.forEach((cb) => {
-// 		cb(accountId);
-// 	});
-
-// };
-
 /**
  * Notify about switch account
  * @param {Function} subscriberCb
@@ -186,7 +168,7 @@ const subscribeSwitchAccount = (subscriberCb) => {
 
 		accountSubscribers.push(subscriberCb);
 
-		const callback = ({ data }) => (data.error ? reject(data.error) : resolve());
+		const callback = ({ data }) => (data.error ? reject(data.error) : resolve(data.res));
 		requestQueue.push({ id, cb: callback });
 
 		window.postMessage({
@@ -256,14 +238,12 @@ const onMessage = (event) => {
 		dispatchNotifyResponse(event.data);
 	} else {
 		const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
-		console.log('TCL: onMessage -> requestQueue', requestQueue);
 		console.log('TCL: onMessage -> requestIndex', requestIndex);
 		if (requestIndex === -1) return;
 
 		const request = requestQueue.splice(requestIndex, 1);
 		request[0].cb(event);
 	}
-
 
 };
 
@@ -376,7 +356,7 @@ const loadActiveAccount = () => {
 
 	requestQueue.push({ id, cb });
 	window.postMessage({
-		method: MESSAGE_METHODS.ACTIVE_SWITCH_ACCOUNT_SUBSCRIBE, id, target: 'content', appId: APP_ID, inPageId: INPAGE_ID,
+		method: MESSAGE_METHODS.GET_ACTIVE_ACCOUNT, id, target: 'content', appId: APP_ID, inPageId: INPAGE_ID,
 	}, '*');
 };
 
