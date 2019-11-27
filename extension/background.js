@@ -60,57 +60,42 @@ const crypto = new Crypto();
 
 /** @type {[PortObject]} */
 const ports = [];
+let lastRequestType = '';
+
+let requestQueue = [];
+let signMessageRequests = [];
+
+const approvedOrigins = {};
+
+const isPortApproved = (portObj) => approvedOrigins[portObj.origin];
 
 const notifyAllApprovedPorts = (res, method) => {
-	ports.forEach(({ port, access }) => {
-		if (access) {
-			port.postMessage({ res, method });
+	ports.forEach((portObj) => {
+		if (isPortApproved(portObj)) {
+			portObj.port.postMessage({ res, method });
 		}
 	});
 };
 
-/**
- *
- * @param {object} portsToSend
- * @param {string} method
- * @param {any?} res
- */
 const sendOnPortsViaMethod = (portsToSend, method, res) => {
-	console.log('TCL: sendOnPortsViaMethod -> method', method);
-	console.log('TCL: sendOnPortsViaMethod -> portsToSend', portsToSend);
 	portsToSend.forEach((portObject) => {
-		const { port, access, origin } = portObject;
+		const { port, origin } = portObject;
 
-		if (!access && ![MESSAGE_METHODS.GET_ACCESS, MESSAGE_METHODS.CHECK_ACCESS].includes(method)) {
+		if (!isPortApproved(portObject) && ![MESSAGE_METHODS.GET_ACCESS, MESSAGE_METHODS.CHECK_ACCESS].includes(method)) {
 			return;
 		}
 
 		portObject.pendingRequests = portObject.pendingRequests.filter((request) => {
 			if (request.method === method) {
-				console.log('TCL: sendOnApprovalPortViaMethod -> { res, ...request, origin }', { res, ...request, origin });
 				port.postMessage({ res, ...request, origin });
-
+				console.log('TCL: sendOnPortsViaMethod -> portObject', portObject);
+				console.log('TCL: sendOnPortsViaMethod -> { res, ...request, origin }', { res, ...request, origin });
 				return false;
 			}
 			return true;
 		});
 	});
 };
-
-let lastRequestType = '';
-
-const requestAccountMethodCallbacks = [];
-
-const accountsRequests = [];
-let activeAccountRequests = [];
-
-let requestQueue = [];
-const networkSubscribers = [];
-const activeAccountSubscribers = [];
-
-const processedOrigins = [];
-let providerRequests = [];
-let signMessageRequests = [];
 
 const providerNotification = new NotificationManager();
 const signNotification = new NotificationManager();
@@ -155,7 +140,6 @@ const createSocket = async (url) => {
 		const network = await storage.get('current_network') || NETWORKS[0];
 
 		({ url } = network);
-
 	}
 
 	url = url || NETWORKS[0].url;
@@ -222,7 +206,11 @@ const closePopup = (manager = notificationManager) => {
  * Set count of requests
  */
 const setBadge = () => {
-	const length = requestQueue.length + providerRequests.length + signMessageRequests.length;
+	// the looking out a list of ports that contains MESSAGE_METHODS.GET_ACCESS task
+	const filterPorts = ports.filter(({ pendingRequests }) => pendingRequests.find(({ method }) => method === MESSAGE_METHODS.GET_ACCESS));
+	const approvedSizePerOrigin = _.uniqBy(filterPorts, ({ origin }) => origin).length;
+
+	const length = requestQueue.length + signMessageRequests.length + approvedSizePerOrigin;
 	const text = length === 0 ? 'BETA' : (length > 9 ? '9+' : length.toString());
 	extensionizer.browserAction.setBadgeText({ text });
 };
@@ -297,24 +285,6 @@ const getActiveAccount = async (switchNetwork) => {
 	return activeAccount;
 };
 
-
-/**
- * Update active account on all requested inpage
- * @returns {Promise<null|{error: *}>}
- */
-const updateActiveAccountInpage = async (network) => {
-	try {
-		const account = await getActiveAccount(network);
-
-		notifyAllApprovedPorts(account, MESSAGE_METHODS.ACTIVE_ACCOUNT_SUBSCRIBE);
-		return null;
-
-	} catch (e) {
-		return { error: e.message };
-	}
-};
-
-
 const resolveRequestAccount = async (portsToSend) => {
 	const account = await getActiveAccount();
 	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.REQUEST_ACCOUNT, account);
@@ -338,9 +308,22 @@ const resolveNetwork = async (portsToSend) => {
 };
 
 const resolveCheckAccess = async (portsToSend) => {
-	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.CHECK_ACCESS);
+	const { origin } = portsToSend[0];
+	const result = !!approvedOrigins[origin];
+	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.CHECK_ACCESS, result);
 };
 
+const resolveProviderApprove = (portsToSend) => {
+	const { origin } = portsToSend[0];
+	const status = approvedOrigins[origin];
+	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_ACCESS, status);
+};
+
+const resolveGetAccess = (portsToSend) => {
+	const { origin } = portsToSend[0];
+	const result = !!approvedOrigins[origin];
+	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_ACCESS, result);
+};
 
 /**
  *
@@ -349,183 +332,139 @@ const resolveCheckAccess = async (portsToSend) => {
  */
 const onMessageHandler = (request, portObj) => {
 	const { port: { sender } } = portObj;
-	const { id: tabId } = sender.tab;
-	const { hostname, origin } = urlParse(sender.tab.url);
+	const { origin } = urlParse(sender.tab.url);
 	const { id, method } = request;
 
 	const sendResponse = (reposneObject) => portObj.port.postMessage({ ...reposneObject, origin, method });
 
-	if (!request.method || !request.appId || request.appId !== APP_ID) return false;
+	if (!request.id || !request.method || !request.appId || request.appId !== APP_ID) return false;
+
+	lastRequestType = request.method;
 
 	if (request.method === MESSAGE_METHODS.CHECK_ACCESS) {
-		// sendResponse({ id, method, res: !!processedOrigins[hostname] });
-		portObj.pendingRequests.push({ id, method, res: !!processedOrigins[hostname] });
+		portObj.addTask(id, method);
 		resolveCheckAccess([portObj]);
 		return true;
-	} else if (typeof processedOrigins[hostname] !== 'boolean') {
+	} else if (!approvedOrigins[origin]) {
 
 		if (request.method !== MESSAGE_METHODS.GET_ACCESS) {
+			// TODO
 			sendResponse({ id: request.id, error: 'No access' });
 			return true;
 		}
 
-		const indexRequest = providerRequests.findIndex((p) => p.origin === hostname);
-		if (indexRequest !== -1) {
-			providerRequests[indexRequest].ids.push(request.id);
-			providerRequests[indexRequest].cbs.push(sendResponse);
-			providerRequests[indexRequest].tabs.push(tabId);
-			return true;
-		}
-
-		providerRequests.push({
-			origin: hostname,
-			tabs: [tabId],
-			ids: [request.id],
-			cbs: [sendResponse],
-		});
-
-		setBadge();
+		portObj.addTask(id, method);
 
 		try {
-			emitter.emit('addProviderRequest', request.id, hostname);
+			emitter.emit('addProviderRequest', request.id, origin);
 		} catch (e) {
 			return null;
 		}
 
+		setBadge();
 		triggerPopup(INCOMING_CONNECTION_PATH, providerNotification);
 		return true;
-	} else if (request.method === MESSAGE_METHODS.GET_ACCESS) {
-		const isAccess = processedOrigins[hostname];
-		if (isAccess) {
-			sendResponse({ id: request.id, status: isAccess });
-		} else {
-			sendResponse({ id: request.id, status: isAccess, error: { isAccess: false } });
-		}
-
-		return true;
-	} else if (request.method === MESSAGE_METHODS.REQUEST_ACCOUNT) {
-		portObj.pendingRequests.push({ id, method });
-
-		if (!crypto.isLocked()) {
-			resolveRequestAccount([portObj]);
-		} else {
-			triggerPopup(CLOSE_AFTER_UNLOCK_PATH);
-		}
-		return true;
-	} else if (request.method === MESSAGE_METHODS.GET_NETWORK) {
-		portObj.pendingRequests.push({ id, method });
-		resolveNetwork([portObj]);
-		return true;
-	} else if ([MESSAGE_METHODS.PROOF_OF_AUTHORITY, MESSAGE_METHODS.SIGN_DATA].includes(request.method)) {
-
-		signMessageRequests.push({
-			origin: hostname,
-			id: request.id,
-			message: request.data.message,
-			signer: request.data.accountId,
-			method: request.method,
-			cb: sendResponse,
-		});
-
-		setBadge();
-
-		try {
-			emitter.emit(
-				'addSignMessageRequest',
-				request.id,
-				hostname,
-				request.data.accountId,
-				request.data.message,
-			);
-		} catch (e) {
-			return null;
-		}
-
-		triggerPopup(SIGN_MESSAGE_PATH, signNotification);
-		return true;
 	}
 
-	if (!request.id) return false;
 
-	lastRequestType = request.method;
-
-
-	if (request.method === MESSAGE_METHODS.CONFIRM && request.data) {
-
-		const operations = JSON.parse(request.data);
-
-		requestQueue.push({
-			data: operations, sender, id, cb: sendResponse,
-		});
-
-		setBadge();
-
-		try {
-			emitter.emit('request', id, operations);
-		} catch (e) {
-			return null;
+	switch (method) {
+		case MESSAGE_METHODS.GET_ACCESS: {
+			portObj.addTask(id, method);
+			resolveGetAccess(ports);
+			return true;
 		}
+		case MESSAGE_METHODS.REQUEST_ACCOUNT: {
+			portObj.addTask(id, method);
+			if (!crypto.isLocked()) {
+				resolveRequestAccount([portObj]);
+			} else {
+				triggerPopup(CLOSE_AFTER_UNLOCK_PATH);
+			}
+			return true;
+		}
+		case MESSAGE_METHODS.GET_NETWORK: {
+			portObj.addTask(id, method);
+			resolveNetwork([portObj]);
+			return true;
+		}
+		case MESSAGE_METHODS.ACCOUNTS: {
+			portObj.addTask(id, method);
 
-		notificationManager.getPopup()
-			.then((popup) => {
-				if (!popup) {
-					triggerPopup();
+			if (!crypto.isLocked()) {
+				resolveAccounts([portObj]);
+			} else {
+				triggerPopup();
+			}
+			return true;
+		}
+		case MESSAGE_METHODS.GET_ACTIVE_ACCOUNT: {
+			portObj.addTask(id, method);
+			resolveActiveAccount([portObj]);
+			return true;
+		}
+		case MESSAGE_METHODS.PROOF_OF_AUTHORITY:
+		case MESSAGE_METHODS.SIGN_DATA: {
+			portObj.addTask(id, method);
+
+			signMessageRequests.push({
+				origin,
+				id: request.id,
+				message: request.data.message,
+				signer: request.data.accountId,
+				method: request.method,
+				cb: sendResponse,
+			});
+
+			setBadge();
+
+			try {
+				emitter.emit(
+					'addSignMessageRequest',
+					request.id,
+					origin,
+					request.data.accountId,
+					request.data.message,
+				);
+			} catch (e) {
+				return null;
+			}
+
+			triggerPopup(SIGN_MESSAGE_PATH, signNotification);
+			return true;
+		}
+		case MESSAGE_METHODS.CONFIRM: {
+			if (request.data) {
+				const operations = JSON.parse(request.data);
+
+				requestQueue.push({
+					data: operations, sender, id, cb: sendResponse,
+				});
+
+				setBadge();
+
+				try {
+					emitter.emit('request', id, operations);
+				} catch (e) {
+					return null;
 				}
-			})
-			.catch(triggerPopup);
 
-	} else if (request.method === MESSAGE_METHODS.ACCOUNTS) {
-		portObj.pendingRequests.push({ id, method });
-
-		if (!crypto.isLocked()) {
-			resolveAccounts([portObj]);
-		} else {
-			triggerPopup();
+				notificationManager.getPopup()
+					.then((popup) => {
+						if (!popup) {
+							triggerPopup();
+						}
+					})
+					.catch(triggerPopup);
+			}
+			return true;
 		}
-
-	} else if (request.method === MESSAGE_METHODS.GET_ACTIVE_ACCOUNT) {
-		portObj.pendingRequests.push({ id, method });
-		resolveActiveAccount([portObj]);
+		default: {
+			// TODO send error about unknown method
+			return true;
+		}
 	}
-
-	return true;
 };
 
-/**
- *
- * @param {String} tabId
- * @param {String} hostname
- */
-const clearAllBeforeTabUnlocad = (tabId, hostname) => {
-	// TODO
-	activeAccountRequests = activeAccountRequests
-		.filter((accountRequest) => accountRequest.tabId !== tabId);
-	const indexFindRequest = providerRequests.findIndex((rq) => rq.origin === hostname);
-	if (indexFindRequest === -1) return true;
-	const indexTabId = providerRequests[indexFindRequest].tabs
-		.findIndex((id) => id === tabId);
-	if (indexTabId === -1) return true;
-	providerRequests[indexFindRequest].cbs.splice(indexTabId, 1);
-	providerRequests[indexFindRequest].ids.splice(indexTabId, 1);
-	providerRequests[indexFindRequest].tabs.splice(indexTabId, 1);
-	return true;
-};
-
-const onPinUnlock = () => {
-	if (lastRequestType === 'accounts') {
-		resolveAccounts(ports);
-		closePopup();
-	}
-	resolveRequestAccount(ports);
-	// execGetAccountCallbacks();
-	updateActiveAccountInpage();
-	return null;
-};
-
-const onLock = () => {
-	updateActiveAccountInpage();
-	return null;
-};
 
 /**
  * @method removeTransaction
@@ -587,7 +526,7 @@ export const onResponse = (err, id, status) => {
 
 	if (
 		(requestQueue.length === 0 && COMPLETE_STATUS === status)
-        || [DISCONNECT_STATUS, NOT_LOGGED_STATUS].includes(status)
+		|| [DISCONNECT_STATUS, NOT_LOGGED_STATUS].includes(status)
 	) closePopup();
 
 	return null;
@@ -712,6 +651,36 @@ export const onSend = async (options, networkName) => {
 };
 
 /**
+ * Update active account on all requested inpage
+ * @returns {Promise<null|{error: *}>}
+ */
+const updateActiveAccountInpage = async (network) => {
+	try {
+		const account = await getActiveAccount(network);
+		notifyAllApprovedPorts(account, MESSAGE_METHODS.ACTIVE_ACCOUNT_SUBSCRIBE);
+		return null;
+	} catch (e) {
+		return { error: e.message };
+	}
+};
+
+const onPinUnlock = () => {
+	if (lastRequestType === MESSAGE_METHODS.REQUEST_ACCOUNT) {
+		resolveRequestAccount(ports);
+	} else if (lastRequestType === MESSAGE_METHODS.ACCOUNTS) {
+		resolveAccounts(ports);
+	}
+	updateActiveAccountInpage();
+	return null;
+};
+
+const onLock = () => {
+	updateActiveAccountInpage();
+	return null;
+};
+
+
+/**
  *  @method onSwitchNetwork
  *
  *
@@ -742,27 +711,15 @@ const onSwitchActiveAccount = (res) => {
  * 	@param {String} id
  * 	@param {Boolean} status
  */
-export const onProviderApproval = (err, id, status) => {
-	const request = providerRequests.find(({ ids }) => String(ids[0]) === id);
+export const onProviderApproval = (err, id, status, approvedOrigin) => {
+	approvedOrigins[approvedOrigin] = status;
 
-	if (!request) {
-		return;
-	}
-
-	request.ids.forEach((rId, index) => request.cbs[index]({ error: err, id: rId, status }));
-
-	providerRequests = providerRequests.filter(({ ids }) => ids[0] !== request.ids[0]);
-	processedOrigins[request.origin] = status;
-
-	// set access status for all ports runned on `request.origin` hostname
-	ports.forEach((port) => {
-		if (port.hostname === request.origin) { port.access = status; }
-	});
 	updateActiveAccountInpage();
 
-	if (!providerRequests.length) {
-		closePopup(providerNotification);
-	}
+	const portsToSend = ports.filter((portObj) => portObj.origin === approvedOrigin);
+	resolveProviderApprove(portsToSend);
+
+	closePopup(providerNotification);
 
 	try {
 		emitter.emit('removeProviderRequest', id);
@@ -860,10 +817,18 @@ window.getList = () => requestQueue.map(({ id, data }) => ({ id, options: data }
 window.getPrivateKey = () => PrivateKey;
 window.getAes = () => aes;
 window.Transaction = () => Transaction;
-window.getProviderMap = () => providerRequests.reduce((map, { ids: [reqId], origin }) => {
-	map[reqId] = origin;
-	return map;
-}, {});
+window.getProviderMap = () => {
+	const providerMap = {};
+	ports.forEach(({ pendingRequests, origin }) => {
+		pendingRequests.forEach(({ id, method }) => {
+			if (method === MESSAGE_METHODS.GET_ACCESS) {
+				providerMap[id] = origin;
+			}
+		});
+	});
+	return providerMap;
+};
+
 
 window.getSignMessageMap = () => signMessageRequests.reduce((map, {
 	id, origin, message, signer, method,
@@ -887,27 +852,29 @@ extensionizer.browserAction.setBadgeText({ text: 'BETA' });
 const connectRemote = (port) => {
 	const { sender } = port;
 	const { tab: { id, url } } = sender;
-	const { hostname, origin } = urlParse(url);
+	const { origin } = urlParse(url);
 
 	// push object with `accessPermission`, `id` and `portObject` info
 	const portObj = {
-		access: processedOrigins[hostname],
-		hostname,
 		origin,
 		id,
 		port,
 		pendingRequests: [],
+		addTask: function addTask(requestId, method) {
+			this.pendingRequests.push({ id: requestId, method });
+		},
 	};
 
-	ports.push(portObj);
+	// somethimes contentscript creates several instances of port connection
+	if (!ports.find((portItem) => portItem.id === id)) {
+		ports.push(portObj);
+	}
 
 	const onMessageCb = (message) => onMessageHandler(message, portObj);
 
 	const onDisconnectCb = () => {
 		port.onMessage.removeListener(onMessageCb);
 		port.onDisconnect.removeListener(onDisconnectCb);
-
-		clearAllBeforeTabUnlocad(id, hostname);
 
 		const portIndex = ports.findIndex((portItem) => portItem.id === id);
 		ports.splice(portIndex, 1);
@@ -923,8 +890,8 @@ extensionizer.runtime.onConnect.addListener(connectRemote);
  * The complete Triforce, or one or more components of the Triforce.
  * @typedef {Object} PortObject
  * @property {object} port
- * @property {boolean} access
- * @property {string} hostname
+ * @property {string} origin
+ * @property {function} addTask
  * @property {number} id
  * @property {[object]} pendingRequests
  */

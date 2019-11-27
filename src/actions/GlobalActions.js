@@ -185,12 +185,12 @@ export const removeProviderRequest = (id) => (dispatch) => {
  * 	@param {String} id
  * 	@param {Boolean} status
  */
-export const chooseProviderAccess = (id, status) => (dispatch) => {
+export const chooseProviderAccess = (id, status, origin) => (dispatch) => {
 	const emitter = echoService.getEmitter();
 
 	try {
 		const error = status ? null : { isAccess: false };
-		emitter.emit('providerResponse', error, id, status);
+		emitter.emit('providerResponse', error, id, status, origin);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}

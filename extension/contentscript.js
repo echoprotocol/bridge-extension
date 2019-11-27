@@ -2,10 +2,10 @@
 
 const extensionizer = require('./extensionizer');
 const { APP_ID } = require('../src/constants/GlobalConstants');
+const { MESSAGE_METHODS } = require('../src/constants/GlobalConstants');
 
 const getAccessRequest = {};
 let currentPort = null;
-
 
 /**
  * inpage script injection to web page
@@ -65,7 +65,7 @@ const onBackgroundMessage = async (res) => {
 
 	delete res.origin;
 
-	if (method === 'getAccess' && !getAccessRequest[origin]) {
+	if (method === MESSAGE_METHODS.GET_ACCESS && !getAccessRequest[origin]) {
 		getAccessRequest[origin] = res;
 	}
 
@@ -84,12 +84,10 @@ const onPageMessage = (event) => {
 	if (data.target !== 'content' || !data.appId || data.appId !== APP_ID) return;
 
 	try {
-		if (data.method !== 'getAccess') {
+		if (data.method !== MESSAGE_METHODS.GET_ACCESS) {
 			currentPort.postMessage(data);
 			return;
-		}
-
-		if (!getAccessRequest[origin]) {
+		} else if (!getAccessRequest[origin]) {
 			currentPort.postMessage(data);
 		} else {
 			const result = getAccessRequest[origin];
