@@ -38,6 +38,7 @@ const setupInjection = () => {
  * @param origin
  */
 const onResponse = (res, origin = '*') => {
+	console.log('TCL: onResponse -> res', res);
 	if (!res) {
 		return null;
 	}
@@ -56,7 +57,6 @@ const onResponse = (res, origin = '*') => {
  * @return {Promise<any>}
  */
 const onBackgroundMessage = async (res) => {
-	console.log('TCL: onBackgroundMessage -> res', res);
 	if (!res) {
 		return null;
 	}

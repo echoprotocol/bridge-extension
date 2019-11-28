@@ -115,7 +115,7 @@ const onMessage = (event) => {
  * @method backgroundRequest
  * @param {String} method
  */
-const backgroundRequest = (method) => {
+const backgroundRequest = (method, requestData) => {
 	const id = `${method}_${IdHelper.getId()}`;
 
 	const result = new Promise((resolve, reject) => {
@@ -131,7 +131,7 @@ const backgroundRequest = (method) => {
 		requestQueue.push({ id, cb });
 
 		window.postMessage({
-			method, id, target: 'content', appId: APP_ID,
+			method, id, target: 'content', appId: APP_ID, data: requestData,
 		}, '*');
 
 	});
@@ -145,11 +145,29 @@ const getCurrentNetwork = () => backgroundRequest(MESSAGE_METHODS.GET_NETWORK);
 const checkAccess = () => backgroundRequest(MESSAGE_METHODS.CHECK_ACCESS);
 const getActiveAccount = () => backgroundRequest(MESSAGE_METHODS.GET_ACTIVE_ACCOUNT);
 const getAccess = () => backgroundRequest(MESSAGE_METHODS.GET_ACCESS);
+/**
+ *
+ * @param {string} message
+ * @param {string} accountId
+ */
+const proofOfAuthority = async (message, accountId) => {
+	if (typeof message !== 'string') throw new Error('message is not a string');
+	return backgroundRequest(MESSAGE_METHODS.PROOF_OF_AUTHORITY, { message, accountId });
+};
+
+const signData = async (message, accountId) => {
+	if (!Buffer.isBuffer(message)) throw new Error('Message isn\'t a Buffer');
+	return backgroundRequest(MESSAGE_METHODS.SIGN_DATA, { message: message.toString('hex'), accountId });
+};
 
 const loadActiveAccount = () => getActiveAccount().then((account) => {
 	activeAccount = account;
 });
 
+/**
+ *
+ * @param {function} subscriberCb
+ */
 const subscribeSwitchAccount = async (subscriberCb) => {
 	if (!lodash.isFunction(subscriberCb)) throw new Error('Is not a function');
 
@@ -159,6 +177,10 @@ const subscribeSwitchAccount = async (subscriberCb) => {
 	return result;
 };
 
+/**
+ *
+ * @param {function} subscriberCb
+ */
 const subscribeSwitchNetwork = async (subscriberCb) => {
 	if (!lodash.isFunction(subscriberCb)) throw new Error('Is not a function');
 
@@ -168,6 +190,10 @@ const subscribeSwitchNetwork = async (subscriberCb) => {
 	return result;
 };
 
+/**
+ *
+ * @param {function} subscriberCb
+ */
 const subscribeAccountChanged = async (subscriberCb) => {
 	if (!lodash.isFunction(subscriberCb)) throw new Error('Is not a function');
 
@@ -212,65 +238,6 @@ const sendTransaction = (options) => {
 
 };
 
-const proofOfAuthority = (message, accountId) => {
-	const id = IdHelper.getId();
-	const result = new Promise((resolve, reject) => {
-
-		const cb = ({ data }) => {
-			if (data.error) {
-				reject(data.error);
-			} else {
-				resolve(data.signature);
-			}
-		};
-
-		requestQueue.push({ id, cb });
-		window.postMessage({
-			method: MESSAGE_METHODS.PROOF_OF_AUTHORITY,
-			id,
-			data: { message, accountId },
-			target: 'content',
-			appId: APP_ID,
-		}, '*');
-
-	});
-
-	return result;
-};
-
-const signData = (message, accountId) => {
-	const id = IdHelper.getId();
-	const result = new Promise((resolve, reject) => {
-
-		if (!Buffer.isBuffer(message)) {
-			reject(new Error('Message isn\'t a Buffer'));
-			return;
-		}
-
-		const cb = ({ data }) => {
-			if (data.error) {
-				reject(data.error);
-			} else {
-				resolve(data.signature);
-			}
-		};
-
-		requestQueue.push({ id, cb });
-		window.postMessage({
-			method: MESSAGE_METHODS.SIGN_DATA,
-			id,
-			data: {
-				message: message.toString('hex'),
-				accountId,
-			},
-			target: 'content',
-			appId: APP_ID,
-		}, '*');
-
-	});
-
-	return result;
-};
 
 class Signat {
 

@@ -62,8 +62,10 @@ const crypto = new Crypto();
 const ports = [];
 let lastRequestType = '';
 
+
+const providerNotification = new NotificationManager();
+const signNotification = new NotificationManager();
 let requestQueue = [];
-let signMessageRequests = [];
 
 const approvedOrigins = {};
 
@@ -77,7 +79,8 @@ const notifyAllApprovedPorts = (res, method) => {
 	});
 };
 
-const sendOnPortsViaMethod = (portsToSend, method, res) => {
+
+const sendOnPorts = (portsToSend, comparator, res, error) => {
 	portsToSend.forEach((portObject) => {
 		const { port, origin } = portObject;
 
@@ -85,11 +88,14 @@ const sendOnPortsViaMethod = (portsToSend, method, res) => {
 			return;
 		}
 
-		portObject.pendingRequests = portObject.pendingRequests.filter((request) => {
-			if (request.method === method) {
-				port.postMessage({ res, ...request, origin });
-				console.log('TCL: sendOnPortsViaMethod -> portObject', portObject);
-				console.log('TCL: sendOnPortsViaMethod -> { res, ...request, origin }', { res, ...request, origin });
+		portObject.pendingTasks = portObject.pendingTasks.filter((task) => {
+			if (comparator({ ...task, origin })) {
+				delete task.data;
+				const message = { ...task, origin, res };
+				if (error) {
+					message.error = error;
+				}
+				port.postMessage(message);
 				return false;
 			}
 			return true;
@@ -97,8 +103,31 @@ const sendOnPortsViaMethod = (portsToSend, method, res) => {
 	});
 };
 
-const providerNotification = new NotificationManager();
-const signNotification = new NotificationManager();
+const sendOnPortsViaMethod = (portsToSend, requestedMethod, res, error) => {
+	sendOnPorts(portsToSend, (({ method }) => method === requestedMethod), res, error);
+};
+
+const sendOnPortsViaId = (portsToSend, requestedId, res, error) => {
+	sendOnPorts(portsToSend, (({ id }) => id === requestedId), res, error);
+};
+
+const getProviderApprovalTaskCount = () => {
+	// the looking out a count of ports that contains MESSAGE_METHODS.GET_ACCESS task
+	const filterPorts = ports.filter(({ pendingTasks }) =>
+		pendingTasks.find(({ method }) =>
+			method === MESSAGE_METHODS.GET_ACCESS));
+	const providerApprovalTaskCount = _.uniqBy(filterPorts, ({ origin }) => origin).length;
+	return providerApprovalTaskCount;
+};
+
+const getSignMessageTaskCount = () => {
+	// the looking out a count of total count of signing tasks
+	const signMessageTaskCount = ports.filter(({ pendingTasks }) =>
+		pendingTasks.find(({ method }) =>
+			method === MESSAGE_METHODS.PROOF_OF_AUTHORITY
+			|| method === MESSAGE_METHODS.SIGN_DATA)).length;
+	return signMessageTaskCount;
+};
 
 const connectSubscribe = (status) => {
 	try {
@@ -206,11 +235,7 @@ const closePopup = (manager = notificationManager) => {
  * Set count of requests
  */
 const setBadge = () => {
-	// the looking out a list of ports that contains MESSAGE_METHODS.GET_ACCESS task
-	const filterPorts = ports.filter(({ pendingRequests }) => pendingRequests.find(({ method }) => method === MESSAGE_METHODS.GET_ACCESS));
-	const approvedSizePerOrigin = _.uniqBy(filterPorts, ({ origin }) => origin).length;
-
-	const length = requestQueue.length + signMessageRequests.length + approvedSizePerOrigin;
+	const length = requestQueue.length + getSignMessageTaskCount() + getProviderApprovalTaskCount();
 	const text = length === 0 ? 'BETA' : (length > 9 ? '9+' : length.toString());
 	extensionizer.browserAction.setBadgeText({ text });
 };
@@ -313,10 +338,10 @@ const resolveCheckAccess = async (portsToSend) => {
 	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.CHECK_ACCESS, result);
 };
 
-const resolveProviderApprove = (portsToSend) => {
+const resolveProviderApprove = (portsToSend, err) => {
 	const { origin } = portsToSend[0];
 	const status = approvedOrigins[origin];
-	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_ACCESS, status);
+	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_ACCESS, status, err);
 };
 
 const resolveGetAccess = (portsToSend) => {
@@ -404,26 +429,20 @@ const onMessageHandler = (request, portObj) => {
 		}
 		case MESSAGE_METHODS.PROOF_OF_AUTHORITY:
 		case MESSAGE_METHODS.SIGN_DATA: {
-			portObj.addTask(id, method);
-
-			signMessageRequests.push({
-				origin,
-				id: request.id,
+			portObj.addTask(id, method, {
 				message: request.data.message,
 				signer: request.data.accountId,
-				method: request.method,
-				cb: sendResponse,
 			});
-
 			setBadge();
 
 			try {
 				emitter.emit(
 					'addSignMessageRequest',
-					request.id,
+					id,
 					origin,
 					request.data.accountId,
 					request.data.message,
+					method,
 				);
 			} catch (e) {
 				return null;
@@ -679,7 +698,6 @@ const onLock = () => {
 	return null;
 };
 
-
 /**
  *  @method onSwitchNetwork
  *
@@ -714,42 +732,26 @@ const onSwitchActiveAccount = (res) => {
 export const onProviderApproval = (err, id, status, approvedOrigin) => {
 	approvedOrigins[approvedOrigin] = status;
 
+	const portsToSend = ports.filter((portObj) => portObj.origin === approvedOrigin);
+	resolveProviderApprove(portsToSend, err);
 	updateActiveAccountInpage();
 
-	const portsToSend = ports.filter((portObj) => portObj.origin === approvedOrigin);
-	resolveProviderApprove(portsToSend);
-
-	closePopup(providerNotification);
+	if (getProviderApprovalTaskCount() === 0) {
+		closePopup(providerNotification);
+	}
 
 	try {
 		emitter.emit('removeProviderRequest', id);
 	} catch (e) {
-		//
+		console.warn('emit removeProviderRequest: ', e);
 	}
 
 	setBadge();
 };
 
-const removeSignMessageRequest = (err, id, signature) => {
-	const request = signMessageRequests.find((r) => String(r.id) === id);
-	request.cb({ error: err, id: request.id, signature });
-
-	signMessageRequests = signMessageRequests.filter((p) => p.id !== request.id);
-	if (!signMessageRequests.length) {
-		closePopup(signNotification);
-	}
-
-	setBadge();
-
-	try {
-		emitter.emit('removeSignMessageRequest', id);
-	} catch (e) {
-		//
-	}
-};
 
 const signMessage = async (method, message, account, networkName) => {
-	if (method === 'proofOfAuthority') {
+	if (method === MESSAGE_METHODS.PROOF_OF_AUTHORITY) {
 		const publicKey = account.keys[0];
 		const wif = await crypto.getWIFByPublicKey(networkName, publicKey);
 		const privateKeyBuffer = PrivateKey.fromWif(wif).toBuffer();
@@ -757,7 +759,7 @@ const signMessage = async (method, message, account, networkName) => {
 		return ED25519.signMessage(Buffer.from(message, 'utf8'), publicKeyBuffer, privateKeyBuffer);
 	}
 
-	if (method === 'signData') {
+	if (method === MESSAGE_METHODS.SIGN_DATA) {
 		const keys = await account.keys.reduce(async (promise, publicKey) => {
 			const arr = await promise;
 			const wif = await crypto.getWIFByPublicKey(networkName, publicKey);
@@ -770,10 +772,26 @@ const signMessage = async (method, message, account, networkName) => {
 	throw new Error('Method is not allowed');
 };
 
-export const onSignMessageApproval = async (err, id, status, message, signer) => {
 
+const resolveSignMessageRequest = (err, id, signature) => {
+	sendOnPortsViaId(ports, id, signature, err);
+
+	if (getSignMessageTaskCount() === 0) {
+		closePopup(signNotification);
+	}
+
+	setBadge();
+
+	try {
+		emitter.emit('removeSignMessageRequest', id);
+	} catch (e) {
+		//
+	}
+};
+
+export const onSignMessageApproval = async (err, id, status, message, signer, method) => {
 	if (!status) {
-		removeSignMessageRequest(err, id);
+		resolveSignMessageRequest(err, id);
 		return;
 	}
 
@@ -782,19 +800,54 @@ export const onSignMessageApproval = async (err, id, status, message, signer) =>
 	try {
 		const accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
 		const accountIndex = accounts.findIndex((i) => i.id === signer);
-		const request = signMessageRequests.find((i) => i.id === id);
 
 		if (accountIndex >= 0) {
 			const account = accounts[accountIndex];
-			const signature = await signMessage(request.method, request.message, account, network.name);
+			const signature = await signMessage(method, message, account, network.name);
 			const signatureHex = signature.toString('hex');
-			removeSignMessageRequest(err, id, signatureHex);
+			resolveSignMessageRequest(err, id, signatureHex);
 		}
 
 	} catch (error) {
 		console.error(error);
 	}
 };
+
+const onPortConnect = (port) => {
+	const { sender } = port;
+	const { tab: { id, url } } = sender;
+	const { origin } = urlParse(url);
+
+	// push object with `accessPermission`, `id` and `portObject` info
+	const portObj = {
+		origin,
+		id,
+		port,
+		pendingTasks: [],
+		addTask: function addTask(requestId, method, data) {
+			this.pendingTasks.push({ id: requestId, method, data });
+		},
+	};
+
+	// somethimes contentscript creates several instances of port connection
+	if (!ports.find((portItem) => portItem.id === id)) {
+		ports.push(portObj);
+	}
+
+	const onMessageCb = (message) => onMessageHandler(message, portObj);
+
+	const onDisconnectCb = () => {
+		port.onMessage.removeListener(onMessageCb);
+		port.onDisconnect.removeListener(onDisconnectCb);
+
+		const portIndex = ports.findIndex((portItem) => portItem.id === id);
+		ports.splice(portIndex, 1);
+	};
+
+	port.onMessage.addListener(onMessageCb);
+	port.onDisconnect.addListener(onDisconnectCb);
+};
+
 
 const listeners = new Listeners(emitter, crypto);
 listeners.initBackgroundListeners(
@@ -819,8 +872,8 @@ window.getAes = () => aes;
 window.Transaction = () => Transaction;
 window.getProviderMap = () => {
 	const providerMap = {};
-	ports.forEach(({ pendingRequests, origin }) => {
-		pendingRequests.forEach(({ id, method }) => {
+	ports.forEach(({ pendingTasks, origin }) => {
+		pendingTasks.forEach(({ id, method }) => {
 			if (method === MESSAGE_METHODS.GET_ACCESS) {
 				providerMap[id] = origin;
 			}
@@ -829,62 +882,33 @@ window.getProviderMap = () => {
 	return providerMap;
 };
 
-
-window.getSignMessageMap = () => signMessageRequests.reduce((map, {
-	id, origin, message, signer, method,
-}) => {
-	map[id] = {
-		origin,
-		signer,
-		message: method === 'proofOfAuthority' ? message : message.toString('hex'),
-	};
-	return map;
-}, {});
+window.getSignMessageMap = () => {
+	const providerMap = {};
+	ports.forEach(({ pendingTasks, origin }) => {
+		pendingTasks.forEach(({ id, method, data }) => {
+			if ([MESSAGE_METHODS.SIGN_DATA, MESSAGE_METHODS.PROOF_OF_AUTHORITY].includes(method)) {
+				providerMap[id] = {
+					origin,
+					signer: data.signer,
+					message: method === MESSAGE_METHODS.PROOF_OF_AUTHORITY ? data.message : data.message.toString('hex'),
+					method,
+				};
+				console.log('TCL: window.getSignMessageMap -> providerMap', providerMap[id]);
+			}
+		});
+	});
+	return providerMap;
+};
 
 crypto.on('unlocked', onPinUnlock);
 crypto.on('locked', onLock);
+
 
 extensionizer.runtime.onInstalled.addListener(onFirstInstall);
 
 extensionizer.browserAction.setBadgeText({ text: 'BETA' });
 
-
-const connectRemote = (port) => {
-	const { sender } = port;
-	const { tab: { id, url } } = sender;
-	const { origin } = urlParse(url);
-
-	// push object with `accessPermission`, `id` and `portObject` info
-	const portObj = {
-		origin,
-		id,
-		port,
-		pendingRequests: [],
-		addTask: function addTask(requestId, method) {
-			this.pendingRequests.push({ id: requestId, method });
-		},
-	};
-
-	// somethimes contentscript creates several instances of port connection
-	if (!ports.find((portItem) => portItem.id === id)) {
-		ports.push(portObj);
-	}
-
-	const onMessageCb = (message) => onMessageHandler(message, portObj);
-
-	const onDisconnectCb = () => {
-		port.onMessage.removeListener(onMessageCb);
-		port.onDisconnect.removeListener(onDisconnectCb);
-
-		const portIndex = ports.findIndex((portItem) => portItem.id === id);
-		ports.splice(portIndex, 1);
-	};
-
-	port.onMessage.addListener(onMessageCb);
-	port.onDisconnect.addListener(onDisconnectCb);
-};
-
-extensionizer.runtime.onConnect.addListener(connectRemote);
+extensionizer.runtime.onConnect.addListener(onPortConnect);
 
 /**
  * The complete Triforce, or one or more components of the Triforce.
@@ -893,5 +917,5 @@ extensionizer.runtime.onConnect.addListener(connectRemote);
  * @property {string} origin
  * @property {function} addTask
  * @property {number} id
- * @property {[object]} pendingRequests
+ * @property {[object]} pendingTasks
  */

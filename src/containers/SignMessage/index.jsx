@@ -38,6 +38,9 @@ class Sign extends React.Component {
 		}
 
 		const signerIndex = accounts.get(network).findKey((i) => i.id === signMessage.signer);
+		console.log('TCL: Sign -> checkAccount -> signMessage', signMessage);
+		console.log('TCL: Sign -> checkAccount -> signerIndex', signerIndex);
+		console.log('TCL: Sign -> checkAccount -> accounts', accounts.toJS());
 
 		if (!accounts.get(network).size || typeof signerIndex === 'undefined') {
 			this.setState({
@@ -124,6 +127,7 @@ class Sign extends React.Component {
 								requests.keyOf(signMessage),
 								signMessage.message,
 								signMessage.signer,
+								signMessage.method,
 							)}
 						>
 							<span className="btn-text">Sign</span>
@@ -165,8 +169,8 @@ export default connect(
 		network: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
-		approve: (id, message, signer) =>
-			dispatch(chooseSignMessageResponse(id, true, message, signer)),
+		approve: (id, message, signer, method) =>
+			dispatch(chooseSignMessageResponse(id, true, message, signer, method)),
 		reject: (id) =>
 			dispatch(chooseSignMessageResponse(id, false)),
 	}),
