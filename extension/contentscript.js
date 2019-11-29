@@ -1,34 +1,36 @@
 /* global EXTENSION */
+/* global INPAGE_PATH_PACK_FOLDER */
 
 const extensionizer = require('./extensionizer');
 const { APP_ID } = require('../src/constants/GlobalConstants');
+/* eslint-disable global-require */
+/* eslint-disable import/no-dynamic-require */
+const inpage = require(`../${INPAGE_PATH_PACK_FOLDER}/inpage`);
 
-let currentPort = null;
+const inpageContent = inpage.default;
+let currentPort;
 
 /**
  * inpage script injection to web page
  */
-const setupInjection = () => {
+function setupInjection(content) {
 	try {
 		const scriptTag = document.createElement('script');
-
-		scriptTag.src = extensionizer.extension.getURL('inpage.js');
-		scriptTag.onload = function () {
-			this.parentNode.removeChild(this);
-		};
+		scriptTag.textContent = content;
+		scriptTag.setAttribute('async', false);
 		const container = document.head || document.documentElement;
 
 		container.insertBefore(scriptTag, container.children[0]);
+		container.removeChild(scriptTag);
 
 		// see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/Port
 		// the object for long-live exchanging of messages between page script and background.js
 		currentPort = extensionizer.runtime.connect();
-
 	} catch (e) {
 		console.error('Bridge injection failed.', e);
 	}
 
-};
+}
 
 /**
  *
@@ -73,7 +75,7 @@ const onPageMessage = (event) => {
 
 
 // eslint-disable-next-line no-unused-expressions
-EXTENSION && setupInjection();
+EXTENSION && setupInjection(inpageContent);
 
 // listen messages from inpage.js script injected in web page. Implemented with One-off messages
 window.addEventListener('message', onPageMessage, false);

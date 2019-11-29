@@ -15,7 +15,7 @@ import {
 	WALLET_PATH, UNLOCK_PATH,
 } from '../../constants/RouterConstants';
 
-import UserIcon from '../UserIcon';
+import Avatar from '../Avatar';
 import LockIcon from '../../assets/images/icons/lock.svg';
 import IconClose from '../../assets/images/icons/cross_big.svg';
 
@@ -56,10 +56,9 @@ class BridgeSidebar extends React.PureComponent {
 						{
 							account && account.size ?
 								<div className="sidebar-user">
-									<UserIcon
-										color={account.get('iconColor')}
-										avatar={`ava${account.get('icon')}`}
-										size="medium"
+									<Avatar
+										size={42}
+										name={account.get('name')}
 									/>
 									<div className="name">{account.get('name')}</div>
 								</div> : null

@@ -19,12 +19,7 @@ import GlobalReducer from '../reducers/GlobalReducer';
 import echoService from '../services/echo';
 
 import {
-	ACCOUNT_COLORS,
-	BASE_ICON,
-	BASE_ICON_COLOR,
 	DRAFT_STORAGE_KEY,
-	ICON_COLORS_COUNT,
-	ICONS_COUNT,
 	NETWORKS,
 	POPUP_WINDOW_TYPE,
 	CONTRACT_PREFIX,
@@ -283,25 +278,17 @@ export const addAccount = (name, keys, networkName, path) => async (dispatch, ge
 		accounts =
 			accounts.set(networkName, accounts.get(networkName).map((i) => ({ ...i, active: false })));
 
-		let icon = BASE_ICON;
-		let iconColor = BASE_ICON_COLOR;
-
-		if (accounts.get(networkName).size) {
-			icon = Math.floor(Math.random() * ICONS_COUNT) + 1;
-			iconColor = ACCOUNT_COLORS[Math.floor(Math.random() * ICON_COLORS_COUNT)];
-		}
-
 		accounts = accounts.set(networkName, accounts.get(networkName).push({
-			id: account.id, active: true, icon, iconColor, name, keys,
+			id: account.id, active: true, name, keys,
 		}));
 
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName), networkName));
 
 		dispatch(set('accounts', accounts));
-		await dispatch(initAccount({ name, icon, iconColor }));
+		await dispatch(initAccount({ name }));
 
 		emitter.emit('activeAccountResponse', {
-			id: account.id, active: true, icon, iconColor, name, keys,
+			id: account.id, active: true, name, keys,
 		});
 
 		if (path) {

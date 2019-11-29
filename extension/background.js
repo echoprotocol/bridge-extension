@@ -32,6 +32,7 @@ import {
 	DRAFT_STORAGE_KEY,
 	GLOBAL_ID_1,
 	EXPIRATION_INFELICITY,
+	REGISTRATION_OPTIONS,
 	MESSAGE_METHODS,
 } from '../src/constants/GlobalConstants';
 
@@ -90,6 +91,7 @@ const sendOnPorts = (portsToSend, comparator, method, res, error) => {
 
 		portObject.pendingTasks = portObject.pendingTasks.filter((task) => {
 			if (comparator({ ...task, origin })) {
+
 				delete task.data;
 				const message = { ...task, origin, res };
 				if (error) {
@@ -183,6 +185,7 @@ const createSocket = async (url) => {
 			pingInterval: PING_INTERVAL,
 			debug: false,
 			apis: ['database', 'network_broadcast', 'history', 'registration', 'asset', 'login', 'network_node'],
+			registration: { batch: REGISTRATION_OPTIONS.BATCH, timeout: REGISTRATION_OPTIONS.TIMEOUT },
 		});
 		connectSubscribe(CONNECT_STATUS);
 		echo.subscriber.setGlobalSubscribe(throttle(() => {
@@ -376,7 +379,7 @@ const onMessageHandler = (request, portObj) => {
 
 		if (request.method !== MESSAGE_METHODS.GET_ACCESS) {
 			// TODO
-			sendResponse({ id: request.id, error: 'No access' });
+			sendResponse({ id: request.id, data: true });
 			return true;
 		}
 
@@ -827,7 +830,7 @@ const onPortConnect = (port) => {
 		},
 	};
 
-	// somethimes contentscript creates several instances of port connection
+	// sometimes contentscript creates several instances of port connection
 	if (!ports.find((portItem) => portItem.id === id)) {
 		ports.push(portObj);
 	}
