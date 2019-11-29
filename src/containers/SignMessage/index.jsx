@@ -38,9 +38,7 @@ class Sign extends React.Component {
 		}
 
 		const signerIndex = accounts.get(network).findKey((i) => i.id === signMessage.signer);
-		console.log('TCL: Sign -> checkAccount -> signMessage', signMessage);
-		console.log('TCL: Sign -> checkAccount -> signerIndex', signerIndex);
-		console.log('TCL: Sign -> checkAccount -> accounts', accounts.toJS());
+
 
 		if (!accounts.get(network).size || typeof signerIndex === 'undefined') {
 			this.setState({

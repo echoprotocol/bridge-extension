@@ -80,11 +80,11 @@ const notifyAllApprovedPorts = (res, method) => {
 };
 
 
-const sendOnPorts = (portsToSend, comparator, res, error) => {
+const sendOnPorts = (portsToSend, comparator, method, res, error) => {
 	portsToSend.forEach((portObject) => {
 		const { port, origin } = portObject;
 
-		if (!isPortApproved(portObject) && ![MESSAGE_METHODS.GET_ACCESS, MESSAGE_METHODS.CHECK_ACCESS].includes(method)) {
+		if (!isPortApproved(portObject) && method && ![MESSAGE_METHODS.GET_ACCESS, MESSAGE_METHODS.CHECK_ACCESS].includes(method)) {
 			return;
 		}
 
@@ -104,11 +104,11 @@ const sendOnPorts = (portsToSend, comparator, res, error) => {
 };
 
 const sendOnPortsViaMethod = (portsToSend, requestedMethod, res, error) => {
-	sendOnPorts(portsToSend, (({ method }) => method === requestedMethod), res, error);
+	sendOnPorts(portsToSend, (({ method }) => method === requestedMethod), requestedMethod, res, error);
 };
 
 const sendOnPortsViaId = (portsToSend, requestedId, res, error) => {
-	sendOnPorts(portsToSend, (({ id }) => id === requestedId), res, error);
+	sendOnPorts(portsToSend, (({ id }) => id === requestedId), null, res, error);
 };
 
 const getProviderApprovalTaskCount = () => {
@@ -122,11 +122,13 @@ const getProviderApprovalTaskCount = () => {
 
 const getSignMessageTaskCount = () => {
 	// the looking out a count of total count of signing tasks
-	const signMessageTaskCount = ports.filter(({ pendingTasks }) =>
-		pendingTasks.find(({ method }) =>
+	const count = 0;
+	ports.forEach(({ pendingTasks }) => {
+		pendingTasks.forEach(({ method }) =>
 			method === MESSAGE_METHODS.PROOF_OF_AUTHORITY
-			|| method === MESSAGE_METHODS.SIGN_DATA)).length;
-	return signMessageTaskCount;
+			|| method === MESSAGE_METHODS.SIGN_DATA);
+	});
+	return count;
 };
 
 const connectSubscribe = (status) => {
@@ -565,7 +567,7 @@ export const trSignResponse = (signData) => {
 	}
 
 	const dataToSend = JSON.stringify(signData);
-	requestQueue[0].cb({ id: requestQueue[0].id, signData: dataToSend });
+	requestQueue[0].cb({ id: requestQueue[0].id, res: dataToSend });
 	removeTransaction(requestQueue[0].id);
 
 	return null;
@@ -589,7 +591,6 @@ const onFirstInstall = (details) => {
 		createNotification('Bridge', `Extension is now updated to ${thisVersion}. Restart your work pages, please.`);
 	}
 };
-
 
 /**
  *  @method sendTransaction
@@ -684,11 +685,8 @@ const updateActiveAccountInpage = async (network) => {
 };
 
 const onPinUnlock = () => {
-	if (lastRequestType === MESSAGE_METHODS.REQUEST_ACCOUNT) {
-		resolveRequestAccount(ports);
-	} else if (lastRequestType === MESSAGE_METHODS.ACCOUNTS) {
-		resolveAccounts(ports);
-	}
+	resolveRequestAccount(ports);
+	resolveAccounts(ports);
 	updateActiveAccountInpage();
 	return null;
 };
@@ -893,7 +891,6 @@ window.getSignMessageMap = () => {
 					message: method === MESSAGE_METHODS.PROOF_OF_AUTHORITY ? data.message : data.message.toString('hex'),
 					method,
 				};
-				console.log('TCL: window.getSignMessageMap -> providerMap', providerMap[id]);
 			}
 		});
 	});

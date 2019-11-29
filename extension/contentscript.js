@@ -33,25 +33,6 @@ const setupInjection = () => {
 };
 
 /**
- * Handler on background message. It send messages to web page via One-off messages
- * @param res
- * @param origin
- */
-const onResponse = (res, origin = '*') => {
-	console.log('TCL: onResponse -> res', res);
-	if (!res) {
-		return null;
-	}
-
-	res.target = 'inpage';
-	res.appId = APP_ID;
-
-	window.postMessage(res, origin);
-
-	return null;
-};
-
-/**
  *
  * @param {Object} res
  * @return {Promise<any>}
@@ -61,15 +42,13 @@ const onBackgroundMessage = async (res) => {
 		return null;
 	}
 
-	const { origin, method } = res;
+	const { origin } = res;
 
 	delete res.origin;
+	res.target = 'inpage';
+	res.appId = APP_ID;
 
-	if (method === MESSAGE_METHODS.GET_ACCESS && !getAccessRequest[origin]) {
-		getAccessRequest[origin] = res;
-	}
-
-	onResponse(res, origin);
+	window.postMessage(res, origin);
 
 	return null;
 };
@@ -79,21 +58,12 @@ const onBackgroundMessage = async (res) => {
  * @param event
  */
 const onPageMessage = (event) => {
-	const { data, origin } = event;
+	const { data } = event;
 
 	if (data.target !== 'content' || !data.appId || data.appId !== APP_ID) return;
 
 	try {
-		if (data.method !== MESSAGE_METHODS.GET_ACCESS) {
-			currentPort.postMessage(data);
-			return;
-		} else if (!getAccessRequest[origin]) {
-			currentPort.postMessage(data);
-		} else {
-			const result = getAccessRequest[origin];
-			result.id = event.data.id;
-			onResponse(result, event.origin);
-		}
+		currentPort.postMessage(data);
 	} catch (err) {
 		if (err.message.match(/Invocation of form runtime\.connect/) && err.message.match(/doesn't match definition runtime\.connect/)) {
 			console.error('Connection to background error, please reload the page', err);

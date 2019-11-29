@@ -155,6 +155,11 @@ const proofOfAuthority = async (message, accountId) => {
 	return backgroundRequest(MESSAGE_METHODS.PROOF_OF_AUTHORITY, { message, accountId });
 };
 
+/**
+ *
+ * @param {string} message
+ * @param {string} accountId
+ */
 const signData = async (message, accountId) => {
 	if (!Buffer.isBuffer(message)) throw new Error('Message isn\'t a Buffer');
 	return backgroundRequest(MESSAGE_METHODS.SIGN_DATA, { message: message.toString('hex'), accountId });
@@ -163,6 +168,17 @@ const signData = async (message, accountId) => {
 const loadActiveAccount = () => getActiveAccount().then((account) => {
 	activeAccount = account;
 });
+
+
+/**
+ *
+ * @param {string} message
+ * @param {string} accountId
+ */
+const sendTransaction = async (options) => {
+	const result = await backgroundRequest(MESSAGE_METHODS.CONFIRM, JSON.stringify(options));
+	return JSON.parse(result);
+};
 
 /**
  *
@@ -173,6 +189,7 @@ const subscribeSwitchAccount = async (subscriberCb) => {
 
 	const result = await getAccounts();
 	accountSubscribers.push(subscriberCb);
+	subscriberCb(result);
 
 	return result;
 };
@@ -186,6 +203,7 @@ const subscribeSwitchNetwork = async (subscriberCb) => {
 
 	const result = await getCurrentNetwork();
 	networkSubscribers.push(subscriberCb);
+	subscriberCb(result);
 
 	return result;
 };
@@ -207,37 +225,6 @@ const subscribeAccountChanged = async (subscriberCb) => {
 
 	return null;
 };
-
-/**
- * Send custom transaction
- * @param options
- * @returns {Promise}
- */
-const sendTransaction = (options) => {
-	const id = IdHelper.getId();
-
-	const result = new Promise((resolve, reject) => {
-		const cb = ({ data }) => {
-
-			const { status, text, resultBroadcast } = data;
-
-			if (status === 'approved') {
-				resolve({ status, resultBroadcast });
-			} else {
-				reject(data.error || text || status);
-			}
-		};
-		requestQueue.push({ id, cb });
-		window.postMessage({
-			method: MESSAGE_METHODS.CONFIRM, data: options, id, target: 'content', appId: APP_ID,
-		}, '*');
-
-	});
-
-	return result;
-
-};
-
 
 class Signat {
 
@@ -273,7 +260,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 				return;
 			}
 
-			const signData = JSON.parse(data.signData);
+			const signData = JSON.parse(data.res);
 
 			if (this._operations[0][1].from) {
 				this._operations[0][1].from = signData.accountId;
