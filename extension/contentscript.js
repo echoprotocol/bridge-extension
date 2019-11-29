@@ -2,9 +2,7 @@
 
 const extensionizer = require('./extensionizer');
 const { APP_ID } = require('../src/constants/GlobalConstants');
-const { MESSAGE_METHODS } = require('../src/constants/GlobalConstants');
 
-const getAccessRequest = {};
 let currentPort = null;
 
 /**
