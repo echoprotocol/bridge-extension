@@ -52,7 +52,8 @@ class Listeners {
 		this.addProviderRequestHandler = (id, origin) => dispatch(addProviderRequest(id, origin));
 
 		this.addSignMessageRequestHandler =
-			(id, origin, signer, message, method) => dispatch(addSignMessageRequest(id, origin, signer, message, method));
+			(id, origin, signer, message, method) =>
+				dispatch(addSignMessageRequest(id, origin, signer, message, method));
 
 		this.removeSignMessageRequestHandler = (id) => dispatch(removeSignMessageRequest(id));
 
