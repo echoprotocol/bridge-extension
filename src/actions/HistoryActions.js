@@ -207,6 +207,11 @@ export const initHistory = () => (dispatch, getState) => {
 			return false;
 		}
 
+		const stateHistory = getState().global.get('history');
+		if (stateHistory.size) {
+			return false;
+		}
+
 		const currentAccountId = getState().global.getIn(['account', 'id']);
 		const history = echoService.getChainLib().cache.fullAccounts.getIn([currentAccountId, 'history']);
 

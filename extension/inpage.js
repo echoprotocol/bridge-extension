@@ -22,7 +22,8 @@ let activeAccount = null;
 
 /**
  * @member dispatchNotifyResponse
- * @description dispatch notify response that is received from background like switchNetwork, switchAccount, activeAccount
+ * @description dispatch notify response that is received from background like switchNetwork,
+ * switchAccount, activeAccount
  * @param {Object} eventData
  */
 const dispatchNotifyResponse = (eventData) => {
@@ -98,6 +99,7 @@ echojslib.echo.connect = (url, params) => {
  * @param event
  */
 const onMessage = (event) => {
+
 	const { id, target, appId } = event.data;
 
 	if (target !== 'inpage' || !appId || appId !== APP_ID) return;
