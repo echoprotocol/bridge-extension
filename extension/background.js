@@ -488,7 +488,7 @@ const onMessageHandler = (request, portObj) => {
 			if (!crypto.isLocked()) {
 				resolveAccounts([portObj]);
 			} else {
-				triggerPopup();
+				triggerPopup(CLOSE_AFTER_UNLOCK_PATH);
 			}
 			return true;
 		}
