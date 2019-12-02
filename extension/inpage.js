@@ -194,9 +194,13 @@ const signData = async (message, accountId) => {
 /**
  * @method loadActiveAccount
  */
-const loadActiveAccount = () => getActiveAccount().then((account) => {
-	activeAccount = account;
-});
+const loadActiveAccount = async () => {
+	const isAccess = await checkAccess();
+	if (isAccess) {
+		const account = getActiveAccount();
+		activeAccount = account;
+	}
+};
 
 
 /**
