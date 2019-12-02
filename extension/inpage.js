@@ -197,7 +197,7 @@ const signData = async (message, accountId) => {
 const loadActiveAccount = async () => {
 	const isAccess = await checkAccess();
 	if (isAccess) {
-		const account = getActiveAccount();
+		const account = await getActiveAccount();
 		activeAccount = account;
 	}
 };
