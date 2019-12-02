@@ -8,7 +8,7 @@ const { APP_ID } = require('../src/constants/GlobalConstants');
 const inpage = require(`../${INPAGE_PATH_PACK_FOLDER}/inpage`);
 
 const inpageContent = inpage.default;
-const getAccessRequest = {};
+let currentPort;
 
 /**
  * inpage script injection to web page
@@ -22,25 +22,29 @@ function setupInjection(content) {
 
 		container.insertBefore(scriptTag, container.children[0]);
 		container.removeChild(scriptTag);
+
+		// see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/Port
+		// the object for long-live exchanging of messages between page script and background.js
+		currentPort = extensionizer.runtime.connect();
 	} catch (e) {
 		console.error('Bridge injection failed.', e);
 	}
 
 }
 
-// eslint-disable-next-line no-unused-expressions
-EXTENSION && setupInjection(inpageContent);
-
 /**
- * On background response
- * @param res
- * @param origin
+ *
+ * @param {Object} res
+ * @return {Promise<any>}
  */
-const onResponse = (res, origin = '*') => {
+const onBackgroundMessage = async (res) => {
 	if (!res) {
 		return null;
 	}
 
+	const { origin } = res;
+
+	delete res.origin;
 	res.target = 'inpage';
 	res.appId = APP_ID;
 
@@ -53,28 +57,13 @@ const onResponse = (res, origin = '*') => {
  * On Inpage message
  * @param event
  */
-const onMessage = async (event) => {
-	const { data, origin } = event;
+const onPageMessage = (event) => {
+	const { data } = event;
 
 	if (data.target !== 'content' || !data.appId || data.appId !== APP_ID) return;
 
 	try {
-		if (data.method !== 'getAccess') {
-			extensionizer.runtime.sendMessage(data, (res) => onResponse(res, event.origin));
-			return;
-		}
-		if (!getAccessRequest[origin]) {
-			getAccessRequest[origin] = new Promise((resolve) => {
-				extensionizer.runtime.sendMessage(data, (res) => {
-					onResponse(res, event.origin);
-					resolve(res);
-				});
-			});
-		} else {
-			const result = await getAccessRequest[origin];
-			result.id = event.data.id;
-			onResponse(result, event.origin);
-		}
+		currentPort.postMessage(data);
 	} catch (err) {
 		if (err.message.match(/Invocation of form runtime\.connect/) && err.message.match(/doesn't match definition runtime\.connect/)) {
 			console.error('Connection to background error, please reload the page', err);
@@ -84,12 +73,12 @@ const onMessage = async (event) => {
 	}
 };
 
-window.addEventListener('beforeunload', () => {
-	extensionizer.runtime.sendMessage({
-		method: 'closeTab',
-		appId: APP_ID,
-	});
-});
 
-window.addEventListener('message', onMessage, false);
+// eslint-disable-next-line no-unused-expressions
+EXTENSION && setupInjection(inpageContent);
 
+// listen messages from inpage.js script injected in web page. Implemented with One-off messages
+window.addEventListener('message', onPageMessage, false);
+
+// listen messages from background.js script by.  Implemented with Connection-based messaging
+currentPort.onMessage.addListener(onBackgroundMessage);

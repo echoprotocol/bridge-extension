@@ -7,6 +7,7 @@ import {
 	MAX_RETRIES,
 	PING_INTERVAL,
 	PING_TIMEOUT,
+	MESSAGE_METHODS,
 } from '../src/constants/GlobalConstants';
 
 import IdHelper from './IdHelper';
@@ -19,211 +20,32 @@ const accountChangedSubscribers = [];
 
 let activeAccount = null;
 
-const INPAGE_ID = IdHelper.getId();
-
 /**
- * network subscription
- *
+ * @member dispatchNotifyResponse
+ * @description dispatch notify response that is received from background like switchNetwork, switchAccount, activeAccount
+ * @param {Object} eventData
  */
-const networkSubscription = () => {
-	const id = IdHelper.getId();
+const dispatchNotifyResponse = (eventData) => {
+	const { method, res } = eventData;
 
-	const callback = ({ data }) => {
-		/**
-		 *  call all subscribers and repost subscription
-		 */
-		networkSubscribers.forEach((cb) => cb(data.res));
-		networkSubscription();
-	};
-
-	requestQueue.push({ id, cb: callback });
-
-	window.postMessage({
-		method: 'networkSubscribe', target: 'content', appId: APP_ID, id,
-	}, '*');
-};
-
-const accountSubscription = () => {
-	const id = IdHelper.getId();
-
-	const callback = ({ data }) => {
-		/**
-		 *  call all subscribers and repost subscription
-		 */
-		accountSubscribers.forEach((cb) => cb(data.res));
-		accountSubscription();
-	};
-
-	requestQueue.push({ id, cb: callback });
-
-	window.postMessage({
-		method: 'accountSubscribe', target: 'content', appId: APP_ID, id,
-	}, '*');
-};
-
-/**
- * Get current network
- * @returns {Promise}
- */
-const getCurrentNetwork = () => {
-	const id = IdHelper.getId();
-
-	const result = new Promise((resolve, reject) => {
-		const callback = ({ data }) => {
-			if (data.error) {
-				reject(data.error);
-				return;
-			}
-
-			resolve(data.res);
-		};
-
-		requestQueue.push({ id, cb: callback });
-
-		window.postMessage({
-			method: 'getNetwork', target: 'content', appId: APP_ID, id,
-		}, '*');
-	});
-
-	return result;
-};
-
-/**
- * subscribeSwitchNetwork to switch network
- * @param subscriberCb
- * @returns {Promise}
- */
-const subscribeSwitchNetwork = (subscriberCb) => {
-	const id = IdHelper.getId();
-
-	const result = new Promise((resolve, reject) => {
-		if (!lodash.isFunction(subscriberCb)) {
-			reject(new Error('Is not a function'));
-			return;
+	switch (method) {
+		case MESSAGE_METHODS.SWITCH_NETWORK_SUBSCRIBE: {
+			networkSubscribers.forEach((cb) => cb(res));
+			break;
 		}
+		case MESSAGE_METHODS.SWITCH_ACCOUNT_SUBSCRIBE: {
+			accountSubscribers.forEach((cb) => cb(res));
+			break;
+		}
+		case MESSAGE_METHODS.ACTIVE_ACCOUNT_SUBSCRIBE: {
+			const error = eventData.error || (res && res.error);
+			activeAccount = error ? null : res;
 
-		const callback = ({ data }) => {
-			if (data.error) {
-				reject(data.error);
-				return;
-			}
-
-			resolve(data.res);
-
-			if (!networkSubscribers.length) {
-				networkSubscription();
-			}
-
-			networkSubscribers.push(subscriberCb);
-			subscriberCb(data.res);
-		};
-
-		requestQueue.push({ id, cb: callback });
-
-		window.postMessage({
-			method: 'getNetwork', target: 'content', appId: APP_ID, id,
-		}, '*');
-	});
-
-	return result;
-};
-
-/**
- * Notify about switch account
- * @param {Function} subscriberCb
- * @returns {Promise}
- */
-const subscribeAccountChanged = (subscriberCb) => {
-
-	if (!lodash.isFunction(subscriberCb)) {
-		throw new Error('The first argument is not a function');
+			accountChangedSubscribers.forEach((cb) => cb(res));
+			break;
+		}
+		default: break;
 	}
-
-	const id = IdHelper.getId();
-
-	const result = new Promise((resolve, reject) => {		
-
-		const callback = ({ data }) => {
-
-			if (data.error) {
-				reject(data.error);
-				return;
-			}
-
-			if (data.response) {
-
-				accountChangedSubscribers.push(subscriberCb);
-
-				resolve(activeAccount);
-				subscriberCb(activeAccount);
-				return;
-			}
-
-			reject(new Error('No access'));
-		};
-
-		requestQueue.push({ id, cb: callback });
-
-		window.postMessage({
-			method: 'checkAccess', target: 'content', appId: APP_ID, id,
-		}, '*');
-
-	});
-
-	return result;
-
-
-};
-
-/**
- * @method notifyAccountChanged
- * @param {String|null} accountId
- */
-const notifyAccountChanged = (accountId) => {
-	accountChangedSubscribers.forEach((cb) => {
-		cb(accountId);
-	});
-
-};
-
-/**
- * Notify about switch account
- * @param {Function} subscriberCb
- * @returns {Promise}
- */
-const subscribeSwitchAccount = (subscriberCb) => {
-	const id = IdHelper.getId();
-
-	const result = new Promise((resolve, reject) => {
-		if (!lodash.isFunction(subscriberCb)) {
-			reject(new Error('Is not a function'));
-			return;
-		}
-
-		const callback = ({ data }) => {
-			if (data.error) {
-				reject(data.error);
-				return;
-			}
-
-			resolve();
-
-			if (!accountSubscribers.length) {
-				accountSubscription();
-			}
-
-			accountSubscribers.push(subscriberCb);
-			subscriberCb(data.res.find((account) => account.active));
-		};
-
-		requestQueue.push({ id, cb: callback });
-
-		window.postMessage({
-			method: 'accounts', target: 'content', appId: APP_ID, id,
-		}, '*');
-	});
-
-	return result;
 };
 
 echojslib.echo = echojslib.default;
@@ -262,7 +84,7 @@ echojslib.echo.connect = (url, params) => {
 
 		requestQueue.push({ id, cb });
 		window.postMessage({
-			method: 'getNetwork', id, target: 'content', appId: APP_ID,
+			method: MESSAGE_METHODS.GET_NETWORK, id, target: 'content', appId: APP_ID,
 		}, '*');
 
 	});
@@ -272,87 +94,30 @@ echojslib.echo.connect = (url, params) => {
 
 /**
  * On content script message
+ * @method onMessage
  * @param event
  */
 const onMessage = (event) => {
-
 	const { id, target, appId } = event.data;
 
-	if (!id || target !== 'inpage' || !appId || appId !== APP_ID) return;
+	if (target !== 'inpage' || !appId || appId !== APP_ID) return;
 
-	const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
-	if (requestIndex === -1) return;
+	if (!id) {
+		dispatchNotifyResponse(event.data);
+	} else {
+		const requestIndex = requestQueue.findIndex(({ id: requestId }) => requestId === id);
+		if (requestIndex === -1) return;
 
-	const request = requestQueue.splice(requestIndex, 1);
-	request[0].cb(event);
-
+		const request = requestQueue.splice(requestIndex, 1);
+		request[0].cb(event);
+	}
 };
-
-
-/**
- * Send custom transaction
- * @param options
- * @returns {Promise}
- */
-const sendTransaction = (options) => {
-	const id = IdHelper.getId();
-
-	const result = new Promise((resolve, reject) => {
-		const cb = ({ data }) => {
-
-			const { status, text, resultBroadcast } = data;
-
-			if (status === 'approved') {
-				resolve({ status, resultBroadcast });
-			} else {
-				reject(data.error || text || status);
-			}
-		};
-		requestQueue.push({ id, cb });
-		window.postMessage({
-			method: 'confirm', data: options, id, target: 'content', appId: APP_ID,
-		}, '*');
-
-	});
-
-	return result;
-
-};
-
-
-/**
- * Get user account if unlocked
- * @returns {Promise}
- */
-const getAccounts = () => {
-	const id = IdHelper.getId();
-
-	const result = new Promise((resolve, reject) => {
-
-		const cb = ({ data }) => {
-			if (data.error || data.res.error) {
-				reject(data.error || data.res.error);
-			} else {
-				resolve(data.res);
-			}
-		};
-
-		requestQueue.push({ id, cb });
-		window.postMessage({
-			method: 'accounts', id, target: 'content', appId: APP_ID,
-		}, '*');
-
-	});
-
-	return result;
-};
-
 
 /**
  * @method backgroundRequest
  * @param {String} method
  */
-const backgroundRequest = (method) => {
+const backgroundRequest = (method, requestData) => {
 	const id = `${method}_${IdHelper.getId()}`;
 
 	const result = new Promise((resolve, reject) => {
@@ -368,106 +133,7 @@ const backgroundRequest = (method) => {
 		requestQueue.push({ id, cb });
 
 		window.postMessage({
-			method, id, target: 'content', appId: APP_ID,
-		}, '*');
-
-	});
-
-	return result;
-};
-
-const requestAccount = () => backgroundRequest('requestAccount');
-/**
- * Load active bridge account
- * @returns {undefined}
- */
-const loadActiveAccount = () => {
-
-	const cb = ({ data }) => {
-
-		const id = IdHelper.getId();
-
-		window.postMessage({
-			method: 'getActiveAccount', id, target: 'content', appId: APP_ID, inPageId: INPAGE_ID,
-		}, '*');
-
-		const error = data.error || (data.res && data.res.error);
-
-		const prevAccount = activeAccount;
-
-		if (error) {
-			activeAccount = null;
-		} else {
-			activeAccount = data.res;
-			requestQueue.push({ id, cb });
-		}
-		if (prevAccount !== activeAccount) {
-			notifyAccountChanged(activeAccount);
-		}
-
-	};
-
-	const id = IdHelper.getId();
-
-	requestQueue.push({ id, cb });
-	window.postMessage({
-		method: 'getActiveAccount', id, target: 'content', appId: APP_ID, inPageId: INPAGE_ID,
-	}, '*');
-};
-
-const proofOfAuthority = (message, accountId) => {
-	const id = IdHelper.getId();
-	const result = new Promise((resolve, reject) => {
-
-		const cb = ({ data }) => {
-			if (data.error) {
-				reject(data.error);
-			} else {
-				resolve(data.signature);
-			}
-		};
-
-		requestQueue.push({ id, cb });
-		window.postMessage({
-			method: 'proofOfAuthority',
-			id,
-			data: { message, accountId },
-			target: 'content',
-			appId: APP_ID,
-		}, '*');
-
-	});
-
-	return result;
-};
-
-const signData = (message, accountId) => {
-	const id = IdHelper.getId();
-	const result = new Promise((resolve, reject) => {
-
-		if (!Buffer.isBuffer(message)) {
-			reject(new Error('Message isn\'t a Buffer'));
-			return;
-		}
-
-		const cb = ({ data }) => {
-			if (data.error) {
-				reject(data.error);
-			} else {
-				resolve(data.signature);
-			}
-		};
-
-		requestQueue.push({ id, cb });
-		window.postMessage({
-			method: 'signData',
-			id,
-			data: {
-				message: message.toString('hex'),
-				accountId,
-			},
-			target: 'content',
-			appId: APP_ID,
+			method, id, target: 'content', appId: APP_ID, data: requestData,
 		}, '*');
 
 	});
@@ -476,33 +142,118 @@ const signData = (message, accountId) => {
 };
 
 /**
- * Get provider approval
- * @returns {Promise}
+ * @method requestAccount
  */
-const getAccess = () => {
-	const id = IdHelper.getId();
+const requestAccount = () => backgroundRequest(MESSAGE_METHODS.REQUEST_ACCOUNT);
 
-	const result = new Promise((resolve, reject) => {
+/**
+ * @method getAccounts
+ */
+const getAccounts = () => backgroundRequest(MESSAGE_METHODS.ACCOUNTS);
 
-		const cb = ({ data }) => {
-			if (data.error) {
-				reject(data.error);
-			} else {
-				loadActiveAccount();
-				resolve(data.status);
-			}
-		};
+/**
+ * @method getCurrentNetwork
+ */
+const getCurrentNetwork = () => backgroundRequest(MESSAGE_METHODS.GET_NETWORK);
 
-		requestQueue.push({ id, cb });
-		window.postMessage({
-			method: 'getAccess', id, target: 'content', appId: APP_ID,
-		}, '*');
+/**
+ * @method checkAccess
+ */
+const checkAccess = () => backgroundRequest(MESSAGE_METHODS.CHECK_ACCESS);
 
-	});
+/**
+ * @method getActiveAccount
+ */
+const getActiveAccount = () => backgroundRequest(MESSAGE_METHODS.GET_ACTIVE_ACCOUNT);
+
+/**
+ * @method getAccess
+ */
+const getAccess = () => backgroundRequest(MESSAGE_METHODS.GET_ACCESS);
+
+/**
+ * @method proofOfAuthority
+ * @param {string} message
+ * @param {string} accountId
+ */
+const proofOfAuthority = async (message, accountId) => {
+	if (typeof message !== 'string') throw new Error('message is not a string');
+	return backgroundRequest(MESSAGE_METHODS.PROOF_OF_AUTHORITY, { message, accountId });
+};
+
+/**
+ * @method signData
+ * @param {string} message
+ * @param {string} accountId
+ */
+const signData = async (message, accountId) => {
+	if (!Buffer.isBuffer(message)) throw new Error('Message isn\'t a Buffer');
+	return backgroundRequest(MESSAGE_METHODS.SIGN_DATA, { message: message.toString('hex'), accountId });
+};
+
+/**
+ * @method loadActiveAccount
+ */
+const loadActiveAccount = () => getActiveAccount().then((account) => {
+	activeAccount = account;
+});
+
+
+/**
+ * @method sendTransaction
+ * @param {string} message
+ * @param {string} accountId
+ */
+const sendTransaction = async (options) => {
+	const result = await backgroundRequest(MESSAGE_METHODS.CONFIRM, JSON.stringify(options));
+	return JSON.parse(result);
+};
+
+/**
+ * @method subscribeSwitchAccount
+ * @param {function} subscriberCb
+ */
+const subscribeSwitchAccount = async (subscriberCb) => {
+	if (!lodash.isFunction(subscriberCb)) throw new Error('Is not a function');
+
+	const result = await getAccounts();
+	accountSubscribers.push(subscriberCb);
+	subscriberCb(result);
 
 	return result;
 };
 
+/**
+ * @method subscribeSwitchNetwork
+ * @param {function} subscriberCb
+ */
+const subscribeSwitchNetwork = async (subscriberCb) => {
+	if (!lodash.isFunction(subscriberCb)) throw new Error('Is not a function');
+
+	const result = await getCurrentNetwork();
+	networkSubscribers.push(subscriberCb);
+	subscriberCb(result);
+
+	return result;
+};
+
+/**
+ * @method subscribeAccountChanged
+ * @param {function} subscriberCb
+ */
+const subscribeAccountChanged = async (subscriberCb) => {
+	if (!lodash.isFunction(subscriberCb)) throw new Error('Is not a function');
+
+	const access = await checkAccess();
+	subscriberCb(activeAccount);
+
+	if (access) {
+		accountChangedSubscribers.push(subscriberCb);
+		return activeAccount;
+	}
+
+	return null;
+};
 
 class Signat {
 
@@ -538,7 +289,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 				return;
 			}
 
-			const signData = JSON.parse(data.signData);
+			const signData = JSON.parse(data.res);
 
 			if (this._operations[0][1].from) {
 				this._operations[0][1].from = signData.accountId;
@@ -561,7 +312,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 		const operations = JSON.stringify(this._operations);
 
 		window.postMessage({
-			method: 'confirm',
+			method: MESSAGE_METHODS.CONFIRM,
 			data: operations,
 			id,
 			target: 'content',

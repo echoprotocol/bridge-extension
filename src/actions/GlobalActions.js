@@ -111,8 +111,12 @@ export const loadSignMessageRequests = () => (dispatch) => {
  * 	Add new sign message request
  *
  */
-export const addSignMessageRequest = (id, origin, signer, message) => (dispatch) => {
-	dispatch(setIn('signMessageRequests', { [id]: { origin, signer, message } }));
+export const addSignMessageRequest = (id, origin, signer, message, method) => (dispatch) => {
+	dispatch(setIn('signMessageRequests', {
+		[id]: {
+			origin, signer, message, method,
+		},
+	}));
 };
 
 /**
@@ -180,12 +184,12 @@ export const removeProviderRequest = (id) => (dispatch) => {
  * 	@param {String} id
  * 	@param {Boolean} status
  */
-export const chooseProviderAccess = (id, status) => (dispatch) => {
+export const chooseProviderAccess = (id, status, origin) => (dispatch) => {
 	const emitter = echoService.getEmitter();
 
 	try {
 		const error = status ? null : { isAccess: false };
-		emitter.emit('providerResponse', error, id, status);
+		emitter.emit('providerResponse', error, id, status, origin);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
@@ -199,12 +203,12 @@ export const chooseProviderAccess = (id, status) => (dispatch) => {
  * 	@param {String} id
  * 	@param {Boolean} status
  */
-export const chooseSignMessageResponse = (id, status, message, signer) => (dispatch) => {
+export const chooseSignMessageResponse = (id, status, message, signer, method) => (dispatch) => {
 	const emitter = echoService.getEmitter();
 
 	try {
 		const error = status ? null : SIGN_MEASSAGE_CANCELED;
-		emitter.emit('signMessageResponse', error, id, status, message, signer);
+		emitter.emit('signMessageResponse', error, id, status, message, signer, method);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}

@@ -100,6 +100,7 @@ tr.addOperation(window.echojslib.constants.OPERATIONS_IDS.ACCOUNT_CREATE, {
             num_committee: 0,
             votes: [],
             extensions: [],
+            delegate_share: 0
         },
     }
 );

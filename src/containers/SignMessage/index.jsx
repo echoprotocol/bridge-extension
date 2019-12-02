@@ -39,6 +39,7 @@ class Sign extends React.Component {
 
 		const signerIndex = accounts.get(network).findKey((i) => i.id === signMessage.signer);
 
+
 		if (!accounts.get(network).size || typeof signerIndex === 'undefined') {
 			this.setState({
 				accountError: ERROR_ACTIVE_ACCOUNT,
@@ -124,6 +125,7 @@ class Sign extends React.Component {
 								requests.keyOf(signMessage),
 								signMessage.message,
 								signMessage.signer,
+								signMessage.method,
 							)}
 						>
 							<span className="btn-text">Sign</span>
@@ -165,8 +167,8 @@ export default connect(
 		network: state.global.getIn(['network', 'name']),
 	}),
 	(dispatch) => ({
-		approve: (id, message, signer) =>
-			dispatch(chooseSignMessageResponse(id, true, message, signer)),
+		approve: (id, message, signer, method) =>
+			dispatch(chooseSignMessageResponse(id, true, message, signer, method)),
 		reject: (id) =>
 			dispatch(chooseSignMessageResponse(id, false)),
 	}),
