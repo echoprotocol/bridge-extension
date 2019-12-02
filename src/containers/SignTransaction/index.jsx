@@ -27,6 +27,7 @@ class SignTransaction extends React.Component {
 	componentDidMount() {
 		if (!this.props.transaction) {
 			if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
+
 				this.props.history.push(INDEX_PATH);
 			} else {
 				this.props.history.push(NETWORK_ERROR_SEND_PATH);

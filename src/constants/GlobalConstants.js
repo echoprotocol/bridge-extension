@@ -184,3 +184,18 @@ export const REGISTRATION_OPTIONS = {
 	BATCH: 1e3,
 	TIMEOUT: 0,
 };
+
+export const MESSAGE_METHODS = {
+	CHECK_ACCESS: 'checkAccess',
+	GET_ACCESS: 'getAccess',
+	REQUEST_ACCOUNT: 'requestAccount',
+	GET_NETWORK: 'getNetwork',
+	PROOF_OF_AUTHORITY: 'proofOfAuthority',
+	SIGN_DATA: 'signData',
+	SWITCH_NETWORK_SUBSCRIBE: 'networkSubscribe',
+	SWITCH_ACCOUNT_SUBSCRIBE: 'accountSubscribe',
+	ACTIVE_ACCOUNT_SUBSCRIBE: 'activeAccountSubscribe',
+	GET_ACTIVE_ACCOUNT: 'getActiveAccount',
+	CONFIRM: 'confirm',
+	ACCOUNTS: 'accounts',
+};

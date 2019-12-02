@@ -36,10 +36,10 @@ class Access extends React.Component {
 				</div>
 				<div className="page-action-wrap">
 					<div className="two-btn-wrap" >
-						<Button className="btn-transparent link" onClick={() => this.props.reject(requests.keyOf(provider))}>
+						<Button className="btn-transparent link" onClick={() => this.props.reject(requests.keyOf(provider), provider)}>
 							<span className="btn-text">Reject</span>
 						</Button>
-						<Button className="btn-in-light link" onClick={() => this.props.approve(requests.keyOf(provider))}>
+						<Button className="btn-in-light link" onClick={() => this.props.approve(requests.keyOf(provider), provider)}>
 							<span className="btn-text">Approve</span>
 						</Button>
 
@@ -63,7 +63,7 @@ export default connect(
 		requests: state.global.get('providerRequests'),
 	}),
 	(dispatch) => ({
-		approve: (id) => dispatch(chooseProviderAccess(id, true)),
-		reject: (id) => dispatch(chooseProviderAccess(id, false)),
+		approve: (id, origin) => dispatch(chooseProviderAccess(id, true, origin)),
+		reject: (id, origin) => dispatch(chooseProviderAccess(id, false, origin)),
 	}),
 )(Access);
