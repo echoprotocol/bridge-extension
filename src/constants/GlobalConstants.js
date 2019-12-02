@@ -107,8 +107,6 @@ export const CONNECT_STATUS = 'connect';
 export const SIGN_STATUS = 'sign';
 export const NOT_LOGGED_STATUS = 'not logged';
 
-export const ACCOUNT_COLORS = ['green', 'sky', 'blue', 'pink', 'red', 'yellow', 'lemon'];
-
 export const TIMEOUT = 2 * 60 * 1000;
 export const RANDOM_SIZE = 2048;
 export const OWNER_KEY = 'owner';
@@ -126,10 +124,7 @@ export const KEY_CODE_SPACE = 32;
 export const KEY_CODE_TAB = 9;
 export const KEY_CODE_ARROW_UP = 38;
 export const KEY_CODE_ARROW_DOWN = 40;
-export const ICONS_COUNT = 15;
-export const ICON_COLORS_COUNT = 7;
-export const BASE_ICON = 1;
-export const BASE_ICON_COLOR = 'green';
+
 export const POPUP_WINDOW_TYPE = 'popup';
 
 export const MAX_NOTE_LENGTH = 200 * 1000;
@@ -158,14 +153,49 @@ export const STORE = 'keyval';
 export const PATTERN_ID_MESSAGE = '*';
 export const LENGTH_ID_MESSAGE = 20;
 
-export const ERC20_HASHES = {
-	'totalSupply()': '18160ddd',
-	'balanceOf(address)': '70a08231',
+export const ERC20_REQIURED_HASHES = {
 	'allowance(address,address)': 'dd62ed3e',
-	'transfer(address,uint256)': 'a9059cbb',
 	'approve(address,uint256)': '095ea7b3',
+	'balanceOf(address)': '70a08231',
+	'totalSupply()': '18160ddd',
+	'transfer(address,uint256)': 'a9059cbb',
 	'transferFrom(address,address,uint256)': '23b872dd',
 	'Transfer(address,address,uint256)': 'ddf252ad',
+	'Approval(address,address,uint256)': '8c5be1e5',
+};
+export const ERC20_OPTIONAL_HASHES = {
+	'increaseAllowance(address,uint256)': '39509351',
+	'allowance(address,address)': 'dd62ed3e',
+	'approve(address,uint256)': '095ea7b3',
+	'balanceOf(address)': '70a08231',
 	'decimals()': '313ce567',
+	'decreaseAllowance(address,uint256)': 'a457c2d7',
 	'symbol()': '95d89b41',
+	'totalSupply()': '18160ddd',
+	'transfer(address,uint256)': 'a9059cbb',
+	'transferFrom(address,address,uint256)': '23b872dd',
+	'Transfer(address,address,uint256)': 'ddf252ad',
+	'Approval(address,address,uint256)': '8c5be1e5',
+	'Withdrawal(address, uint256)': '7fcf532c',
+	'Deposit(address, uint256)': 'e1fffcc4',
+};
+
+export const REGISTRATION_OPTIONS = {
+	BATCH: 1e3,
+	TIMEOUT: 0,
+};
+
+export const MESSAGE_METHODS = {
+	CHECK_ACCESS: 'checkAccess',
+	GET_ACCESS: 'getAccess',
+	REQUEST_ACCOUNT: 'requestAccount',
+	GET_NETWORK: 'getNetwork',
+	PROOF_OF_AUTHORITY: 'proofOfAuthority',
+	SIGN_DATA: 'signData',
+	SWITCH_NETWORK_SUBSCRIBE: 'networkSubscribe',
+	SWITCH_ACCOUNT_SUBSCRIBE: 'accountSubscribe',
+	ACTIVE_ACCOUNT_SUBSCRIBE: 'activeAccountSubscribe',
+	GET_ACTIVE_ACCOUNT: 'getActiveAccount',
+	CONFIRM: 'confirm',
+	ACCOUNTS: 'accounts',
 };

@@ -9,6 +9,7 @@ import { setFormError, setValue, toggleLoading } from './FormActions';
 import { disconnect, connect, checkActiveLoading } from './ChainStoreAction';
 import { getTokenDetails, initAssetsBalances, removeBalances } from './BalanceActions';
 import { globals, loadRequests } from './SignActions';
+import { initHistory } from './HistoryActions';
 
 import ValidateNetworkHelper from '../helpers/ValidateNetworkHelper';
 import FormatHelper from '../helpers/FormatHelper';
@@ -18,12 +19,7 @@ import GlobalReducer from '../reducers/GlobalReducer';
 import echoService from '../services/echo';
 
 import {
-	ACCOUNT_COLORS,
-	BASE_ICON,
-	BASE_ICON_COLOR,
 	DRAFT_STORAGE_KEY,
-	ICON_COLORS_COUNT,
-	ICONS_COUNT,
 	NETWORKS,
 	POPUP_WINDOW_TYPE,
 	CONTRACT_PREFIX,
@@ -115,8 +111,12 @@ export const loadSignMessageRequests = () => (dispatch) => {
  * 	Add new sign message request
  *
  */
-export const addSignMessageRequest = (id, origin, signer, message) => (dispatch) => {
-	dispatch(setIn('signMessageRequests', { [id]: { origin, signer, message } }));
+export const addSignMessageRequest = (id, origin, signer, message, method) => (dispatch) => {
+	dispatch(setIn('signMessageRequests', {
+		[id]: {
+			origin, signer, message, method,
+		},
+	}));
 };
 
 /**
@@ -184,12 +184,12 @@ export const removeProviderRequest = (id) => (dispatch) => {
  * 	@param {String} id
  * 	@param {Boolean} status
  */
-export const chooseProviderAccess = (id, status) => (dispatch) => {
+export const chooseProviderAccess = (id, status, origin) => (dispatch) => {
 	const emitter = echoService.getEmitter();
 
 	try {
 		const error = status ? null : { isAccess: false };
-		emitter.emit('providerResponse', error, id, status);
+		emitter.emit('providerResponse', error, id, status, origin);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
@@ -203,12 +203,12 @@ export const chooseProviderAccess = (id, status) => (dispatch) => {
  * 	@param {String} id
  * 	@param {Boolean} status
  */
-export const chooseSignMessageResponse = (id, status, message, signer) => (dispatch) => {
+export const chooseSignMessageResponse = (id, status, message, signer, method) => (dispatch) => {
 	const emitter = echoService.getEmitter();
 
 	try {
 		const error = status ? null : SIGN_MEASSAGE_CANCELED;
-		emitter.emit('signMessageResponse', error, id, status, message, signer);
+		emitter.emit('signMessageResponse', error, id, status, message, signer, method);
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	}
@@ -234,6 +234,7 @@ export const initAccount = ({ name, icon, iconColor }) => async (dispatch) => {
 		})));
 
 		await dispatch(initAssetsBalances());
+		await dispatch(initHistory());
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	} finally {
@@ -277,25 +278,17 @@ export const addAccount = (name, keys, networkName, path) => async (dispatch, ge
 		accounts =
 			accounts.set(networkName, accounts.get(networkName).map((i) => ({ ...i, active: false })));
 
-		let icon = BASE_ICON;
-		let iconColor = BASE_ICON_COLOR;
-
-		if (accounts.get(networkName).size) {
-			icon = Math.floor(Math.random() * ICONS_COUNT) + 1;
-			iconColor = ACCOUNT_COLORS[Math.floor(Math.random() * ICON_COLORS_COUNT)];
-		}
-
 		accounts = accounts.set(networkName, accounts.get(networkName).push({
-			id: account.id, active: true, icon, iconColor, name, keys,
+			id: account.id, active: true, name, keys,
 		}));
 
 		await dispatch(setCryptoInfo('accounts', accounts.get(networkName), networkName));
 
 		dispatch(set('accounts', accounts));
-		await dispatch(initAccount({ name, icon, iconColor }));
+		await dispatch(initAccount({ name }));
 
 		emitter.emit('activeAccountResponse', {
-			id: account.id, active: true, icon, iconColor, name, keys,
+			id: account.id, active: true, name, keys,
 		});
 
 		if (path) {

@@ -35,86 +35,88 @@ function onceListener(fn) {
 }
 
 function AwaitEventEmitter() {
-	this._events = {};
+	this.events = {};
 }
 
 function on(type, fn) {
 	assertType(type);
 	assertFn(fn);
-	this._events[type] = this._events[type] || [];
-	this._events[type].push(alwaysListener(fn));
+	this.events[type] = this.events[type] || [];
+	this.events[type].push(alwaysListener(fn));
 	return this;
 }
 
 function prepend(type, fn) {
 	assertType(type);
 	assertFn(fn);
-	this._events[type] = this._events[type] || [];
-	this._events[type].unshift(alwaysListener(fn));
+	this.events[type] = this.events[type] || [];
+	this.events[type].unshift(alwaysListener(fn));
 	return this;
 }
 
 function prependOnce(type, fn) {
 	assertType(type);
 	assertFn(fn);
-	this._events[type] = this._events[type] || [];
-	this._events[type].unshift(onceListener(fn));
+	this.events[type] = this.events[type] || [];
+	this.events[type].unshift(onceListener(fn));
 	return this;
 }
 
 function listeners(type) {
-	return (this._events[type] || []).map((x) => x.fn);
+	return (this.events[type] || []).map((x) => x.fn);
 }
 
 function once(type, fn) {
 	assertType(type);
 	assertFn(fn);
-	this._events[type] = this._events[type] || [];
-	this._events[type].push(onceListener(fn));
+	this.events[type] = this.events[type] || [];
+	this.events[type].push(onceListener(fn));
 	return this;
 }
 
 function removeListener(type, nullOrFn) {
 	assertType(type);
 
-	const listeners = this.listeners(type);
+	const listenersItems = this.listeners(type);
 	if (typeof nullOrFn === 'function') {
-		let index,
-			found = false;
-		while ((index = listeners.indexOf(nullOrFn)) >= 0) {
-			listeners.splice(index, 1);
-			this._events[type].splice(index, 1);
+		let index;
+		let found = false;
+		/* eslint-disable no-cond-assign */
+		while ((index = listenersItems.indexOf(nullOrFn)) >= 0) {
+			listenersItems.splice(index, 1);
+			this.events[type].splice(index, 1);
 			found = true;
 		}
 		return found;
 	}
-	return delete this._events[type];
+	return delete this.events[type];
 
 }
 
 function removeAllListeners() {
-	Object.keys(this._events).forEach((eventType) => delete this._events[eventType]);
+	Object.keys(this.events).forEach((eventType) => delete this.events[eventType]);
 
 	return true;
 }
 
 async function emit(type, ...args) {
 	assertType(type);
-	const listeners = this.listeners(type);
+	const listenersItems = this.listeners(type);
 
 	const onceListeners = [];
-	if (listeners && listeners.length) {
-		for (let i = 0; i < listeners.length; i++) {
-			const event = listeners[i];
+	if (listenersItems && listenersItems.length) {
+		for (let i = 0; i < listenersItems.length; i += 1) {
+			const event = listenersItems[i];
 
 			try {
 				const rlt = event.apply(this, args);
 
 				if (isPromise(rlt)) {
+					/* eslint-disable no-await-in-loop */
 					await rlt;
 				}
 
-				if (this._events[type][i][TYPE_KEYNAME] === 'once') {
+				if (this.events[type][i][TYPE_KEYNAME] === 'once') {
 					onceListeners.push(event);
 				}
 			} catch (e) {
@@ -132,14 +134,14 @@ async function emit(type, ...args) {
 
 function emitSync(type, ...args) {
 	assertType(type);
-	const listeners = this.listeners(type);
+	const listenersItems = this.listeners(type);
 	const onceListeners = [];
-	if (listeners && listeners.length) {
-		for (let i = 0; i < listeners.length; i++) {
-			const event = listeners[i];
+	if (listenersItems && listenersItems.length) {
+		for (let i = 0; i < listenersItems.length; i += 1) {
+			const event = listenersItems[i];
 			event.apply(this, args);
 
-			if (this._events[type][i][TYPE_KEYNAME] === 'once') {
+			if (this.events[type][i][TYPE_KEYNAME] === 'once') {
 				onceListeners.push(event);
 			}
 		}
@@ -151,11 +153,13 @@ function emitSync(type, ...args) {
 	return false;
 }
 
-AwaitEventEmitter.prototype.on = AwaitEventEmitter.prototype.addListener = on;
+AwaitEventEmitter.prototype.on = on;
+AwaitEventEmitter.prototype.addListener = on;
 AwaitEventEmitter.prototype.once = once;
 AwaitEventEmitter.prototype.prependListener = prepend;
 AwaitEventEmitter.prototype.prependOnceListener = prependOnce;
-AwaitEventEmitter.prototype.off = AwaitEventEmitter.prototype.removeListener = removeListener;
+AwaitEventEmitter.prototype.off = removeListener;
+AwaitEventEmitter.prototype.removeListener = removeListener;
 AwaitEventEmitter.prototype.removeAllListeners = removeAllListeners;
 AwaitEventEmitter.prototype.emit = emit;
 AwaitEventEmitter.prototype.emitSync = emitSync;

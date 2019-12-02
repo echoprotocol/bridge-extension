@@ -1,6 +1,7 @@
 import React from 'react';
 import { Dropdown, MenuItem } from 'react-bootstrap';
 import CustomScroll from 'react-custom-scroll';
+import query from 'query-string';
 
 import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
@@ -13,10 +14,14 @@ import { openModal } from '../../actions/ModalActions';
 import FormatHelper from '../../helpers/FormatHelper';
 
 import { MODAL_LOGOUT } from '../../constants/ModalConstants';
-import { IMPORT_ACCOUNT_PATH, CREATE_ACCOUNT_PATH } from '../../constants/RouterConstants';
-import { CORE_ID, CORE_SYMBOL } from '../../constants/GlobalConstants';
+import {
+	IMPORT_ACCOUNT_PATH,
+	CREATE_ACCOUNT_PATH,
+	INCOMING_CONNECTION_PATH,
+} from '../../constants/RouterConstants';
+import { CORE_ID, CORE_SYMBOL, POPUP_WINDOW_TYPE } from '../../constants/GlobalConstants';
 
-import UserIcon from '../UserIcon';
+import Avatar from '../Avatar';
 import downArrow from '../../assets/images/icons/arrow_dropdown_light.svg';
 import exit from '../../assets/images/icons/exit.svg';
 
@@ -90,6 +95,10 @@ class UserDropdown extends React.Component {
 	}
 
 	toggleDropdown() {
+		const { windowType, windowPath } = query.parse(window.location.search);
+		if (windowType === POPUP_WINDOW_TYPE && windowPath === INCOMING_CONNECTION_PATH) {
+			return;
+		}
 		this.setState({ opened: !this.state.opened });
 	}
 
@@ -135,11 +144,8 @@ class UserDropdown extends React.Component {
 					onSelect={() => this.onSelect(account.name)}
 				>
 
-					<UserIcon
-						color={account.iconColor}
-						tabSelect
-						avatar={`ava${account.icon}`}
-					/>
+
+					<Avatar name={account.name} />
 					<div className="user-name">{account.name}({account.id})</div>
 
 					{ userBalance && asset ?
@@ -180,10 +186,7 @@ class UserDropdown extends React.Component {
 
 				<Dropdown.Toggle noCaret>
 
-					<UserIcon
-						color={account.get('iconColor')}
-						avatar={`ava${account.get('icon')}`}
-					/>
+					<Avatar name={account.get('name')} />
 					<div className="user-name">{account.get('name')}</div>
 					<img className="ddDown" src={downArrow} alt="" />
 				</Dropdown.Toggle>

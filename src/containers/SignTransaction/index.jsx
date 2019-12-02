@@ -6,7 +6,7 @@ import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { Map } from 'immutable';
 
-import UserIcon from '../../components/UserIcon';
+import Avatar from '../../components/Avatar';
 
 import {
 	approve,
@@ -27,6 +27,7 @@ class SignTransaction extends React.Component {
 	componentDidMount() {
 		if (!this.props.transaction) {
 			if (globals.WINDOW_TYPE !== POPUP_WINDOW_TYPE) {
+
 				this.props.history.push(INDEX_PATH);
 			} else {
 				this.props.history.push(NETWORK_ERROR_SEND_PATH);
@@ -190,10 +191,7 @@ class SignTransaction extends React.Component {
 							<div className="wallet-info">
 								<div className="title">Wallet</div>
 								<div className="incoming-transaction-user">
-									<UserIcon
-										avatar={`ava${account.get('icon')}`}
-										color={account.get('iconColor')}
-									/>
+									<Avatar name={account.get('name')} />
 									<div className="name">
 										{account.get('name')}
 									</div>

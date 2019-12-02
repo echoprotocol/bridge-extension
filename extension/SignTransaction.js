@@ -1,3 +1,5 @@
+/* eslint-disable no-underscore-dangle */
+
 import { serializers, Signature } from 'echojs-lib';
 
 import { EXPIRATION_INFELICITY, GLOBAL_ID_1 } from '../src/constants/GlobalConstants';
