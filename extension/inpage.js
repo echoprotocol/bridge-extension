@@ -83,7 +83,7 @@ echojslib.echo.connect = (url, params) => {
 
 		requestQueue.push({ id, cb });
 		window.postMessage({
-			method: 'getNetwork', id, target: 'content', appId: APP_ID,
+			method: MESSAGE_METHODS.GET_NETWORK, id, target: 'content', appId: APP_ID,
 		}, '*');
 
 	});

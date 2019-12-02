@@ -11,9 +11,7 @@ class Access extends React.Component {
 
 	render() {
 		const { requests } = this.props;
-		console.log(requests);
 		const provider = requests.first();
-		console.log(provider);
 
 		return (
 			<React.Fragment>

@@ -61,7 +61,6 @@ const crypto = new Crypto();
 
 /** @type {[PortObject]} */
 const ports = [];
-let lastRequestType = '';
 
 
 const providerNotification = new NotificationManager();
@@ -369,8 +368,6 @@ const onMessageHandler = (request, portObj) => {
 
 	if (!request.id || !request.method || !request.appId || request.appId !== APP_ID) return false;
 
-	lastRequestType = request.method;
-
 	if (request.method === MESSAGE_METHODS.CHECK_ACCESS) {
 		portObj.addTask(id, method);
 		resolveCheckAccess([portObj]);
@@ -378,8 +375,7 @@ const onMessageHandler = (request, portObj) => {
 	} else if (!approvedOrigins[origin]) {
 
 		if (request.method !== MESSAGE_METHODS.GET_ACCESS) {
-			// TODO
-			sendResponse({ id: request.id, data: true });
+			sendResponse({ id: request.id, error: 'No access' });
 			return true;
 		}
 
@@ -459,6 +455,7 @@ const onMessageHandler = (request, portObj) => {
 		case MESSAGE_METHODS.CONFIRM: {
 			if (request.data) {
 				const operations = JSON.parse(request.data);
+				portObj.addTask(id, method);
 
 				requestQueue.push({
 					data: operations, sender, id, cb: sendResponse,
@@ -510,6 +507,16 @@ const removeTransaction = (id, err = null) => {
 
 	setBadge();
 
+	return null;
+};
+
+/**
+ *
+ * @param {String} id
+ */
+const removeSigningTasks = (id) => {
+	requestQueue = requestQueue.filter((r) => r.id !== id);
+	setBadge();
 	return null;
 };
 
@@ -842,6 +849,9 @@ const onPortConnect = (port) => {
 		port.onDisconnect.removeListener(onDisconnectCb);
 
 		const portIndex = ports.findIndex((portItem) => portItem.id === id);
+		portObj.pendingTasks.forEach((item) => {
+			removeSigningTasks(item.id);
+		});
 		ports.splice(portIndex, 1);
 	};
 
