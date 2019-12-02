@@ -21,6 +21,7 @@ const accountChangedSubscribers = [];
 let activeAccount = null;
 
 /**
+ * @member dispatchNotifyResponse
  * @description dispatch notify response that is received from background like switchNetwork, switchAccount, activeAccount
  * @param {Object} eventData
  */
@@ -93,6 +94,7 @@ echojslib.echo.connect = (url, params) => {
 
 /**
  * On content script message
+ * @method onMessage
  * @param event
  */
 const onMessage = (event) => {
@@ -139,14 +141,38 @@ const backgroundRequest = (method, requestData) => {
 	return result;
 };
 
-const requestAccount = () => backgroundRequest(MESSAGE_METHODS.REQUEST_ACCOUNT);
-const getAccounts = () => backgroundRequest(MESSAGE_METHODS.ACCOUNTS);
-const getCurrentNetwork = () => backgroundRequest(MESSAGE_METHODS.GET_NETWORK);
-const checkAccess = () => backgroundRequest(MESSAGE_METHODS.CHECK_ACCESS);
-const getActiveAccount = () => backgroundRequest(MESSAGE_METHODS.GET_ACTIVE_ACCOUNT);
-const getAccess = () => backgroundRequest(MESSAGE_METHODS.GET_ACCESS);
 /**
- *
+ * @method requestAccount
+ */
+const requestAccount = () => backgroundRequest(MESSAGE_METHODS.REQUEST_ACCOUNT);
+
+/**
+ * @method getAccounts
+ */
+const getAccounts = () => backgroundRequest(MESSAGE_METHODS.ACCOUNTS);
+
+/**
+ * @method getCurrentNetwork
+ */
+const getCurrentNetwork = () => backgroundRequest(MESSAGE_METHODS.GET_NETWORK);
+
+/**
+ * @method checkAccess
+ */
+const checkAccess = () => backgroundRequest(MESSAGE_METHODS.CHECK_ACCESS);
+
+/**
+ * @method getActiveAccount
+ */
+const getActiveAccount = () => backgroundRequest(MESSAGE_METHODS.GET_ACTIVE_ACCOUNT);
+
+/**
+ * @method getAccess
+ */
+const getAccess = () => backgroundRequest(MESSAGE_METHODS.GET_ACCESS);
+
+/**
+ * @method proofOfAuthority
  * @param {string} message
  * @param {string} accountId
  */
@@ -156,7 +182,7 @@ const proofOfAuthority = async (message, accountId) => {
 };
 
 /**
- *
+ * @method signData
  * @param {string} message
  * @param {string} accountId
  */
@@ -165,13 +191,16 @@ const signData = async (message, accountId) => {
 	return backgroundRequest(MESSAGE_METHODS.SIGN_DATA, { message: message.toString('hex'), accountId });
 };
 
+/**
+ * @method loadActiveAccount
+ */
 const loadActiveAccount = () => getActiveAccount().then((account) => {
 	activeAccount = account;
 });
 
 
 /**
- *
+ * @method sendTransaction
  * @param {string} message
  * @param {string} accountId
  */
@@ -181,7 +210,7 @@ const sendTransaction = async (options) => {
 };
 
 /**
- *
+ * @method subscribeSwitchAccount
  * @param {function} subscriberCb
  */
 const subscribeSwitchAccount = async (subscriberCb) => {
@@ -195,7 +224,7 @@ const subscribeSwitchAccount = async (subscriberCb) => {
 };
 
 /**
- *
+ * @method subscribeSwitchNetwork
  * @param {function} subscriberCb
  */
 const subscribeSwitchNetwork = async (subscriberCb) => {
@@ -209,7 +238,7 @@ const subscribeSwitchNetwork = async (subscriberCb) => {
 };
 
 /**
- *
+ * @method subscribeAccountChanged
  * @param {function} subscriberCb
  */
 const subscribeAccountChanged = async (subscriberCb) => {

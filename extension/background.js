@@ -69,8 +69,18 @@ let requestQueue = [];
 
 const approvedOrigins = {};
 
+/**
+ * @method isPortApproved
+ * @param {PortObject} portObj
+ * @return {Boolean}
+ */
 const isPortApproved = (portObj) => approvedOrigins[portObj.origin];
 
+/**
+ *
+ * @param {Object} res
+ * @param {String} method
+ */
 const notifyAllApprovedPorts = (res, method) => {
 	ports.forEach((portObj) => {
 		if (isPortApproved(portObj)) {
@@ -79,7 +89,14 @@ const notifyAllApprovedPorts = (res, method) => {
 	});
 };
 
-
+/**
+ * @method sendOnPorts
+ * @param {[PortObject]} portsToSend
+ * @param {Function} comparator
+ * @param {String} method
+ * @param {Object|Number|Boolean|String} res
+ * @param {Object|String} error
+ */
 const sendOnPorts = (portsToSend, comparator, method, res, error) => {
 	portsToSend.forEach((portObject) => {
 		const { port, origin } = portObject;
@@ -104,14 +121,31 @@ const sendOnPorts = (portsToSend, comparator, method, res, error) => {
 	});
 };
 
+/**
+ * @method sendOnPortsViaMethod
+ * @param {[PortObject]} portsToSend
+ * @param {String} requestedMethod
+ * @param {Object|Number|Boolean|String} res
+ * @param {Object|String} error
+ */
 const sendOnPortsViaMethod = (portsToSend, requestedMethod, res, error) => {
 	sendOnPorts(portsToSend, (({ method }) => method === requestedMethod), requestedMethod, res, error);
 };
 
+/**
+ * @method sendOnPortsViaMethod
+ * @param {[PortObject]} portsToSend
+ * @param {String} requestedMethod
+ * @param {Object|Number|Boolean|String} res
+ * @param {Object|String} error
+ */
 const sendOnPortsViaId = (portsToSend, requestedId, res, error) => {
 	sendOnPorts(portsToSend, (({ id }) => id === requestedId), null, res, error);
 };
 
+/**
+ * @method getProviderApprovalTaskCount
+ */
 const getProviderApprovalTaskCount = () => {
 	// the looking out a count of ports that contains MESSAGE_METHODS.GET_ACCESS task
 	const filterPorts = ports.filter(({ pendingTasks }) =>
@@ -121,6 +155,9 @@ const getProviderApprovalTaskCount = () => {
 	return providerApprovalTaskCount;
 };
 
+/**
+ * @method getSignMessageTaskCount
+ */
 const getSignMessageTaskCount = () => {
 	// the looking out a count of total count of signing tasks
 	const count = 0;
@@ -132,6 +169,10 @@ const getSignMessageTaskCount = () => {
 	return count;
 };
 
+/**
+ * @method connectSubscribe
+ * @param {String} status
+ */
 const connectSubscribe = (status) => {
 	try {
 		switch (status) {
@@ -314,11 +355,19 @@ const getActiveAccount = async (switchNetwork) => {
 	return activeAccount;
 };
 
+/**
+ * @method resolveRequestAccount
+ * @param {[PortObject]} portsToSend
+ */
 const resolveRequestAccount = async (portsToSend) => {
 	const account = await getActiveAccount();
 	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.REQUEST_ACCOUNT, account);
 };
 
+/**
+ * @method resolveAccounts
+ * @param {[PortObject]} portsToSend
+ */
 const resolveAccounts = async (portsToSend) => {
 	const network = await getNetwork();
 	let accounts = await crypto.getInByNetwork(network.name, 'accounts') || [];
@@ -326,28 +375,48 @@ const resolveAccounts = async (portsToSend) => {
 	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.ACCOUNTS, accounts);
 };
 
+/**
+ * @method resolveActiveAccount
+ * @param {[PortObject]} portsToSend
+ */
 const resolveActiveAccount = async (portsToSend) => {
 	const activeAccount = await getActiveAccount();
 	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_ACTIVE_ACCOUNT, activeAccount);
 };
 
+/**
+ * @method resolveNetwork
+ * @param {[PortObject]} portsToSend
+ */
 const resolveNetwork = async (portsToSend) => {
 	const result = await getNetwork();
 	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_NETWORK, JSON.parse(JSON.stringify(result)));
 };
 
+/**
+ * @method resolveCheckAccess
+ * @param {[PortObject]} portsToSend
+ */
 const resolveCheckAccess = async (portsToSend) => {
 	const { origin } = portsToSend[0];
 	const result = !!approvedOrigins[origin];
 	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.CHECK_ACCESS, result);
 };
 
+/**
+ * @method resolveProviderApprove
+ * @param {[PortObject]} portsToSend
+ */
 const resolveProviderApprove = (portsToSend, err) => {
 	const { origin } = portsToSend[0];
 	const status = approvedOrigins[origin];
 	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_ACCESS, status, err);
 };
 
+/**
+ * @method origin
+ * @param {[PortObject]} portsToSend
+ */
 const resolveGetAccess = (portsToSend) => {
 	const { origin } = portsToSend[0];
 	const result = !!approvedOrigins[origin];
@@ -511,7 +580,7 @@ const removeTransaction = (id, err = null) => {
 };
 
 /**
- *
+ * @method removeSigningTasks
  * @param {String} id
  */
 const removeSigningTasks = (id) => {
@@ -723,7 +792,10 @@ export const onSwitchNetwork = async (network) => {
 	}
 };
 
-
+/**
+ * @method onSwitchActiveAccount
+ * @param {*} res
+ */
 const onSwitchActiveAccount = (res) => {
 	updateActiveAccountInpage();
 	if (!res) return;
@@ -757,7 +829,13 @@ export const onProviderApproval = (err, id, status, approvedOrigin) => {
 	setBadge();
 };
 
-
+/**
+ * @method signMessage
+ * @param {String} method
+ * @param {String} message
+ * @param {String} account
+ * @param {String} networkName
+ */
 const signMessage = async (method, message, account, networkName) => {
 	if (method === MESSAGE_METHODS.PROOF_OF_AUTHORITY) {
 		const publicKey = account.keys[0];
@@ -781,6 +859,12 @@ const signMessage = async (method, message, account, networkName) => {
 };
 
 
+/**
+ * @method resolveSignMessageRequest
+ * @param {*} err
+ * @param {String} id
+ * @param {String} signature
+ */
 const resolveSignMessageRequest = (err, id, signature) => {
 	sendOnPortsViaId(ports, id, signature, err);
 
@@ -797,6 +881,15 @@ const resolveSignMessageRequest = (err, id, signature) => {
 	}
 };
 
+/**
+ * @method onSignMessageApproval
+ * @param {*} err
+ * @param {String} id
+ * @param {String} status
+ * @param {String} message
+ * @param {String} signer
+ * @param {String} method
+ */
 export const onSignMessageApproval = async (err, id, status, message, signer, method) => {
 	if (!status) {
 		resolveSignMessageRequest(err, id);
@@ -821,6 +914,10 @@ export const onSignMessageApproval = async (err, id, status, message, signer, me
 	}
 };
 
+/**
+ * @method onPortConnect
+ * @param {Object} port
+ */
 const onPortConnect = (port) => {
 	const { sender } = port;
 	const { tab: { id, url } } = sender;
