@@ -99,7 +99,7 @@ const buildConfig = {
 	},
 	devtool: 'inline-source-map', // process.env.NODE_ENV !== 'local' ? 'cheap-module-source-map' : 'eval',
 	module: {
-		rules: [			
+		rules: [
 			{
 				test: /\.js$/,
 				exclude: /node_modules/,
