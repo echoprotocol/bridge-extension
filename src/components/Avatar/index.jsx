@@ -12,6 +12,7 @@ class Avatar extends React.Component {
 		return name ?
 			<div
 				className="avatar-image"
+				/* eslint-disable react/no-danger */
 				dangerouslySetInnerHTML={{ __html: svgAvatar(name, size) }}
 			/> :
 			<img
