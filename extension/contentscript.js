@@ -84,12 +84,28 @@ const onMessage = async (event) => {
 	}
 };
 
-window.addEventListener('beforeunload', () => {
-	extensionizer.runtime.sendMessage({
-		method: 'closeTab',
-		appId: APP_ID,
+if (window.addEventListener) {
+	window.addEventListener('beforeunload', () => {
+		extensionizer.runtime.sendMessage({
+			method: 'closeTab',
+			appId: APP_ID,
+		});
 	});
-});
+} else if (window.attachEvent) {
+	window.attachEvent('onbeforeunload', () => {
+		extensionizer.runtime.sendMessage({
+			method: 'closeTab',
+			appId: APP_ID,
+		});
+	});
+} else {
+	window.onload = () => {
+		extensionizer.runtime.sendMessage({
+			method: 'closeTab',
+			appId: APP_ID,
+		});
+	};
+}
 
 window.addEventListener('message', onMessage, false);
 
