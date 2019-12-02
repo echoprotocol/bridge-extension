@@ -423,6 +423,7 @@ const resolveGetAccess = (portsToSend) => {
 	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_ACCESS, result);
 };
 
+
 /**
  *
  * @param {Object} request
