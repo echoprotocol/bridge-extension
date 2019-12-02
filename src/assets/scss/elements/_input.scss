@@ -6,10 +6,14 @@
     z-index: 2;
     font-family: FNMedium;
     font-size: 18px;
-
     transition: color $speed, padding $speed;
-    padding: 0;
-    letter-spacing: .13em;
+	padding: 0;
+	letter-spacing: 0.8px;
+
+	&[type='password'] {
+		font-size: 16px;
+		font-family: FMedium;
+	}
 }
 
 .input {
@@ -339,8 +343,8 @@
     }
 
     input {
-        cursor: pointer;
 		@extend %input;
+        cursor: pointer;
         height: 42px;
 
         &::placeholder { /* Chrome, Firefox, Opera, Safari 10.1+ */
