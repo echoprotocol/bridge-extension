@@ -1,6 +1,6 @@
 /* eslint-disable no-nested-ternary */
 import echo, { Transaction, PrivateKey, aes, ED25519, crypto as echojsCrypto } from 'echojs-lib';
-import { throttle } from 'lodash';
+import { throttle, uniqBy } from 'lodash';
 import urlParse from 'url-parse';
 
 import EventEmitter from '../libs/CustomAwaitEmitter';
@@ -101,7 +101,9 @@ const sendOnPorts = (portsToSend, comparator, method, res, error) => {
 	portsToSend.forEach((portObject) => {
 		const { port, origin } = portObject;
 
-		if (!isPortApproved(portObject) && method && ![MESSAGE_METHODS.GET_ACCESS, MESSAGE_METHODS.CHECK_ACCESS].includes(method)) {
+		if (!isPortApproved(portObject)
+			&& method
+			&& ![MESSAGE_METHODS.GET_ACCESS, MESSAGE_METHODS.CHECK_ACCESS].includes(method)) {
 			return;
 		}
 
@@ -129,7 +131,13 @@ const sendOnPorts = (portsToSend, comparator, method, res, error) => {
  * @param {Object|String} error
  */
 const sendOnPortsViaMethod = (portsToSend, requestedMethod, res, error) => {
-	sendOnPorts(portsToSend, (({ method }) => method === requestedMethod), requestedMethod, res, error);
+	sendOnPorts(
+		portsToSend,
+		(({ method }) => method === requestedMethod),
+		requestedMethod,
+		res,
+		error,
+	);
 };
 
 /**
@@ -140,7 +148,13 @@ const sendOnPortsViaMethod = (portsToSend, requestedMethod, res, error) => {
  * @param {Object|String} error
  */
 const sendOnPortsViaId = (portsToSend, requestedId, res, error) => {
-	sendOnPorts(portsToSend, (({ id }) => id === requestedId), null, res, error);
+	sendOnPorts(
+		portsToSend,
+		(({ id }) => id === requestedId),
+		null,
+		res,
+		error,
+	);
 };
 
 /**
@@ -151,7 +165,7 @@ const getProviderApprovalTaskCount = () => {
 	const filterPorts = ports.filter(({ pendingTasks }) =>
 		pendingTasks.find(({ method }) =>
 			method === MESSAGE_METHODS.GET_ACCESS));
-	const providerApprovalTaskCount = _.uniqBy(filterPorts, ({ origin }) => origin).length;
+	const providerApprovalTaskCount = uniqBy(filterPorts, ({ origin }) => origin).length;
 	return providerApprovalTaskCount;
 };
 
@@ -390,7 +404,8 @@ const resolveActiveAccount = async (portsToSend) => {
  */
 const resolveNetwork = async (portsToSend) => {
 	const result = await getNetwork();
-	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_NETWORK, JSON.parse(JSON.stringify(result)));
+	const stringifiedResult = JSON.parse(JSON.stringify(result));
+	sendOnPortsViaMethod(portsToSend, MESSAGE_METHODS.GET_NETWORK, stringifiedResult);
 };
 
 /**
@@ -434,7 +449,8 @@ const onMessageHandler = (request, portObj) => {
 	const { origin } = urlParse(sender.tab.url);
 	const { id, method } = request;
 
-	const sendResponse = (reposneObject) => portObj.port.postMessage({ ...reposneObject, origin, method });
+	const sendResponse =
+		(reposneObject) => portObj.port.postMessage({ ...reposneObject, origin, method });
 
 	if (!request.id || !request.method || !request.appId || request.appId !== APP_ID) return false;
 

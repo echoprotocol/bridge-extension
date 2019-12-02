@@ -1,3 +1,4 @@
+/* eslint-disable no-underscore-dangle */
 import * as echojslib from 'echojs-lib';
 import lodash from 'lodash';
 
@@ -295,18 +296,18 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 				return;
 			}
 
-			const signData = JSON.parse(data.res);
+			const signResult = JSON.parse(data.res);
 
 			if (this._operations[0][1].from) {
-				this._operations[0][1].from = signData.accountId;
+				this._operations[0][1].from = signResult.accountId;
 			} else if (this._operations[0][1].registrar) {
-				this._operations[0][1].registrar = signData.accountId;
+				this._operations[0][1].registrar = signResult.accountId;
 			}
 
-			this._refBlockNum = signData.ref_block_num;
-			this._refBlockPrefix = signData.ref_block_prefix;
-			this._expiration = signData.expiration;
-			this._signatures = signData.serializedSignatures.map((hexString) => new Signat(hexString));
+			this._refBlockNum = signResult.ref_block_num;
+			this._refBlockPrefix = signResult.ref_block_prefix;
+			this._expiration = signResult.expiration;
+			this._signatures = signResult.serializedSignatures.map((hexString) => new Signat(hexString));
 
 			this._finalized = true;
 
