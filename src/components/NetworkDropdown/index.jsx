@@ -161,10 +161,13 @@ class NetworkDropdown extends React.PureComponent {
 			document.getElementById('dropdown-network').blur();
 		}
 	}
+	isIncomingConnection() {
+		const { windowType, windowPath } = query.parse(window.location.search);
+		return windowType === POPUP_WINDOW_TYPE && windowPath === INCOMING_CONNECTION_PATH;
+	}
 
 	toggleDropdown() {
-		const { windowType, windowPath } = query.parse(window.location.search);
-		if (windowType === POPUP_WINDOW_TYPE && windowPath === INCOMING_CONNECTION_PATH) {
+		if (this.isIncomingConnection()) {
 			return;
 		}
 		this.setState({ opened: !this.state.opened });
