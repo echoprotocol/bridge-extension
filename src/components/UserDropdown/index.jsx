@@ -193,7 +193,7 @@ class UserDropdown extends React.Component {
 
 					<Avatar name={account.get('name')} />
 					<div className="user-name">{account.get('name')}</div>
-					<img className="ddDown" src={downArrow} alt="" />
+					{!this.isIncomingConnection() && <img className="ddDown" src={downArrow} alt="" /> }
 				</Dropdown.Toggle>
 				<Dropdown.Menu >
 					<div

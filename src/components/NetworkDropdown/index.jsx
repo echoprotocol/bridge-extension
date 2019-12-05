@@ -216,7 +216,7 @@ class NetworkDropdown extends React.PureComponent {
 						/>
 						<span className="cut">{name}</span>
 					</div>
-					<img className="ddDown" src={downArrow} alt="" />
+					{!this.isIncomingConnection() && <img className="ddDown" src={downArrow} alt="" /> }
 				</Dropdown.Toggle>
 
 				<Dropdown.Menu >
