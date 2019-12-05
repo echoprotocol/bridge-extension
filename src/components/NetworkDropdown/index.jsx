@@ -162,9 +162,13 @@ class NetworkDropdown extends React.PureComponent {
 		}
 	}
 
-	toggleDropdown() {
+	isIncomingConnection() {
 		const { windowType, windowPath } = query.parse(window.location.search);
-		if (windowType === POPUP_WINDOW_TYPE && windowPath === INCOMING_CONNECTION_PATH) {
+		return windowType === POPUP_WINDOW_TYPE && windowPath === INCOMING_CONNECTION_PATH;
+	}
+
+	toggleDropdown() {
+		if (this.isIncomingConnection()) {
 			return;
 		}
 		this.setState({ opened: !this.state.opened });
@@ -198,6 +202,7 @@ class NetworkDropdown extends React.PureComponent {
 				id="dropdown-network"
 				onToggle={() => this.toggleDropdown()}
 				open={this.state.opened}
+				disabled={this.isIncomingConnection()}
 			>
 				<Dropdown.Toggle
 					className={classnames({ 'disable-hover': this.state.disableToggleHover })}
@@ -211,7 +216,7 @@ class NetworkDropdown extends React.PureComponent {
 						/>
 						<span className="cut">{name}</span>
 					</div>
-					<img className="ddDown" src={downArrow} alt="" />
+					{!this.isIncomingConnection() && <img className="ddDown" src={downArrow} alt="" /> }
 				</Dropdown.Toggle>
 
 				<Dropdown.Menu >
