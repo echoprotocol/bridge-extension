@@ -186,6 +186,7 @@ class UserDropdown extends React.Component {
 				id="dropdown-user"
 				onToggle={() => this.toggleDropdown()}
 				open={this.state.opened}
+				disabled={this.isIncomingConnection()}
 			>
 
 				<Dropdown.Toggle noCaret>
