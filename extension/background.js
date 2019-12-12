@@ -468,7 +468,7 @@ const onMessageHandler = (request, portObj) => {
 		portObj.addTask(id, method);
 
 		setBadge();
-		triggerPopup(INCOMING_CONNECTION_PATH, providerNotification)
+		triggerPopup(INCOMING_CONNECTION_PATH, providerNotification);
 		try {
 			setTimeout(() => {
 				emitter.emit('addProviderRequest', request.id, origin);
