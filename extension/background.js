@@ -467,14 +467,16 @@ const onMessageHandler = (request, portObj) => {
 
 		portObj.addTask(id, method);
 
+		setBadge();
+		triggerPopup(INCOMING_CONNECTION_PATH, providerNotification);
 		try {
-			emitter.emit('addProviderRequest', request.id, origin);
+			setTimeout(() => {
+				emitter.emit('addProviderRequest', request.id, origin);
+			}, 300);
 		} catch (e) {
 			return null;
 		}
 
-		setBadge();
-		triggerPopup(INCOMING_CONNECTION_PATH, providerNotification);
 		return true;
 	}
 

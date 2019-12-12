@@ -76,11 +76,16 @@ class App extends React.Component {
 
 App.propTypes = {
 	children: PropTypes.element.isRequired,
-	loading: PropTypes.bool.isRequired,
+	loading: PropTypes.bool,
 	pathname: PropTypes.string.isRequired,
 	initApp: PropTypes.func.isRequired,
 	initListeners: PropTypes.func.isRequired,
 };
+
+App.defaultProps = {
+	loading: false,
+};
+
 export default connect(
 	(state) => ({
 		loading: state.global.get('loading'),
