@@ -40,7 +40,7 @@ class FormatHelper {
 		if (!this.isAmountVeryBig(amount, precision, sumbol)) {
 			return formatAmount;
 		}
-		const length = amount.indexOf('.') === -1 ? 11 - sumbol.length : 12 - sumbol.length;
+		const length = new BN(amount).toString(10).indexOf('.') === -1 ? 11 - sumbol.length : 12 - sumbol.length;
 		return formatAmount.substring(0, length).trim().concat('...');
 	}
 	static isAmountVeryBig(amount = 0, precision = 0, sumbol = '') {
