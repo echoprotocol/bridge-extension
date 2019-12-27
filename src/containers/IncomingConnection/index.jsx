@@ -27,7 +27,7 @@ class Access extends React.Component {
 
 					<div className="connection-info">
 						<div className="line">
-							<span className="green">{provider}</span> is trying to connect to your Echo account using Bridge.
+							<span className="green">{provider || 'Website'}</span> is trying to connect to your Echo account using Bridge.
 						</div>
 						<div className="line">
 							Would you like to approve access?

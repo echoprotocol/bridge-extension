@@ -94,9 +94,13 @@ class UserDropdown extends React.Component {
 		return true;
 	}
 
-	toggleDropdown() {
+	isIncomingConnection() {
 		const { windowType, windowPath } = query.parse(window.location.search);
-		if (windowType === POPUP_WINDOW_TYPE && windowPath === INCOMING_CONNECTION_PATH) {
+		return windowType === POPUP_WINDOW_TYPE && windowPath === INCOMING_CONNECTION_PATH;
+	}
+
+	toggleDropdown() {
+		if (this.isIncomingConnection()) {
 			return;
 		}
 		this.setState({ opened: !this.state.opened });
@@ -182,13 +186,14 @@ class UserDropdown extends React.Component {
 				id="dropdown-user"
 				onToggle={() => this.toggleDropdown()}
 				open={this.state.opened}
+				disabled={this.isIncomingConnection()}
 			>
 
 				<Dropdown.Toggle noCaret>
 
 					<Avatar name={account.get('name')} />
 					<div className="user-name">{account.get('name')}</div>
-					<img className="ddDown" src={downArrow} alt="" />
+					{!this.isIncomingConnection() && <img className="ddDown" src={downArrow} alt="" /> }
 				</Dropdown.Toggle>
 				<Dropdown.Menu >
 					<div

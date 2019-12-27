@@ -1,45 +1,53 @@
 .dropdown-network {
-    margin-left: auto;
+	margin-left: auto;
+
+	&:not(.disabled) {
+		.dropdown-toggle {
+			cursor: pointer;
+			
+			&:hover {
+				background-color: rgba(#222F30, .25);
+			}
+		}
+	}
+
+	&.disabled {
+		.dropdown-toggle {
+			color: rgba(#7E9090, .5);
+		}
+	}
+	
+	.dropdown-toggle {
+		font-family: FNMedium;
+		position: relative;
+		display: flex;
+		justify-content: space-between;
+		align-items: center;
+		padding: 0 9px 0 15px;
+		height: 40px;
+		background-color: transparent;
+		border: 0;
+		transition: background-color 0.3s;
+		-webkit-transform: translateZ(0);
+		color: #7E9090;
+		font-size: 13px;
+
+		.current-network {
+			display: flex;
+			align-items: center;
+			width: 100px;
+			margin-right: 20px;
+			position: relative;
+			.cut {
+				margin-top: 2px;
+				letter-spacing: .7px;
+				@include cutTxt();
+			}
+		}
+	}
+
     .dropdown {
-        &-toggle {
-            font-family: FNMedium;
-            position: relative;
-            display: flex;
-            justify-content: space-between;
-            align-items: center;
-            padding: 0 9px 0 15px;
-            height: 40px;
-            background-color: transparent;
-            border: 0;
-            transition: background-color 0.3s;
-            -webkit-transform: translateZ(0);
-            color: #7E9090;
-            font-size: 13px;
-            cursor: pointer;
-
-			&:not(.disable-hover):hover {
-                background-color: rgba(#222F30, .25);
-
-                .current-network {
-                    &:after {
-                        opacity: 1;
-                    }
-                }
-            }
-
-            .current-network {
-                display: flex;
-                align-items: center;
-                width: 100px;
-                margin-right: 20px;
-                position: relative;
-                .cut {
-                    margin-top: 2px;
-                    letter-spacing: .7px;
-                    @include cutTxt();
-                }
-            }
-        }
+        
         &-menu {
             width: 350px;
             right: 6px;
