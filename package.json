@@ -1,7 +1,7 @@
 {
   "name": "echo-bridge",
   "description": "The bridge between your web site and the Echo",
-  "version": "1.15.1",
+  "version": "1.16.0",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
     "build-ext": "cross-env EXTENSION=TRUE NODE_ENV=production webpack --display-error-details --colors --mode production",
@@ -23,7 +23,7 @@
     "classnames": "^2.2.6",
     "config": "^1.30.0",
     "crypto-random-string": "^1.0.0",
-    "echojs-lib": "^1.10.0-rc.1",
+    "echojs-lib": "^1.10.0-rc.2",
     "echojs-ping": "^0.1.7",
     "events": "^3.0.0",
     "file-loader": "^1.1.11",
