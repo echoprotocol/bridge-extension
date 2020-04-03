@@ -37,7 +37,7 @@ class SuccessTransaction extends React.PureComponent {
 				<div className="transaction-status-body">
 					<div className="title">Success</div>
 					<div className="description">
-                        Your transaction has been successfully<br /> { index ? 'sent' : 'signed' }
+						Your transaction has been successfully<br /> { index ? 'sent' : 'signed' }
 					</div>
 				</div>
 				<div className="page-action-wrap">

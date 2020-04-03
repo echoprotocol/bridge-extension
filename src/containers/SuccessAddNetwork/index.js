@@ -34,7 +34,7 @@ class SuccessAddNetwork extends React.Component {
 				</div>
 				<div className="success-text"> Success </div>
 				<div className="success-desc">
-                    Network <span>{networkName}</span> was successfully created
+					Network <span>{networkName}</span> was successfully created
 				</div>
 				<div className="one-btn-wrap">
 					<Button
