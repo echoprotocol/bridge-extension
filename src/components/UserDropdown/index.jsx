@@ -220,7 +220,7 @@ class UserDropdown extends React.Component {
 							href={`#${CREATE_ACCOUNT_PATH}`}
 							eventKey={accounts.size + 1}
 						>
-                            create
+							create
 						</MenuItem>
 						<span>or </span>
 						<MenuItem
@@ -228,7 +228,7 @@ class UserDropdown extends React.Component {
 							href={`#${IMPORT_ACCOUNT_PATH}`}
 							eventKey={accounts.size + 2}
 						>
-                            import
+							import
 						</MenuItem>
 					</div>
 				</Dropdown.Menu>
