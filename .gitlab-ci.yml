@@ -20,4 +20,4 @@ build.publish:
 #  except:
 #    - /^.*rc.*$/
   tags:
-    - docker
+    - pp_builder
