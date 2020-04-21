@@ -1,6 +1,6 @@
 stages:
   - build
-  - publis
+  - publish
 
 build:
   image: node:10.16
