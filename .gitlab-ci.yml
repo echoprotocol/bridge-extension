@@ -4,7 +4,7 @@ stages:
   - publish
 
 test:lint:
-  image: node:12-alpine
+  image: node:12
   stage: test
   cache:
     paths:
@@ -18,7 +18,7 @@ test:lint:
     - docker
 
 test:test:
-  image: node:12-alpine
+  image: node:12
   stage: test
   cache:
     paths:
