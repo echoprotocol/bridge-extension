@@ -1,6 +1,35 @@
 stages:
+  - test
   - build
   - publish
+
+test:lint:
+  image: node:12-alpine
+  stage: test
+  cache:
+    paths:
+      - node_modules
+  script:
+    - npm i
+    - npm run lint
+  only:
+    - merge_requests
+  tags:
+    - docker
+
+test:test:
+  image: node:12-alpine
+  stage: test
+  cache:
+    paths:
+      - node_modules
+  script:
+    - npm i
+    - npm run test
+  only:
+    - merge_requests
+  tags:
+    - docker
 
 build:
   image: node:10.16
