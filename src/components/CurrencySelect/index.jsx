@@ -319,6 +319,7 @@ class CurrencySelect extends React.Component {
 			currentVal, search, opened, searchList,
 		} = this.state;
 
+		const cuttedCurentValue = currentVal && (currentVal.length >= 8 ? `${currentVal.substring(0, 7)}...` : currentVal);
 		if (!searchList) {
 			return null;
 		}
@@ -356,7 +357,7 @@ class CurrencySelect extends React.Component {
 						onClick={() => this.toggleDropdown()}
 						noCaret
 					>
-						<span className="val">{currentVal || 'ECHO'}</span>
+						<span className="val">{cuttedCurentValue || 'ECHO'}</span>
 						{resultList.length === 1 && !opened ? null : <img className="ddDown" src={downArrow} alt="" /> }
 					</Dropdown.Toggle>
 					<CustomMenu bsRole="menu">
