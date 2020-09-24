@@ -113,7 +113,8 @@ class Wallet extends React.Component {
 											FormatHelper.convertAmount(token.get('balance'), token.get('precision'), token.get('symbol'))
 										}
 									</span>
-									<span>{token.get('symbol')}</span>
+									<span>{token.get('symbol')}&nbsp;</span>
+									<span>({contractId})</span>
 								</div> :
 								<Popup
 									trigger={
