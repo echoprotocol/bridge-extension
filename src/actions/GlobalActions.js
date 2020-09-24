@@ -223,18 +223,20 @@ export const chooseSignMessageResponse = (id, status, message, signer, method) =
  * 	@param {Number} icon
  * 	@param {String} iconColor
  */
-export const initAccount = ({ name, icon, iconColor }) => async (dispatch) => {
+export const initAccount = ({ name, icon, iconColor }) => async (dispatch, getState) => {
 	dispatch(set('loading', true));
 
 	try {
+		const currentAccountName = getState().global.getIn(['account', 'name']);
 		const account = await echoService.getChainLib().api.getAccountByName(name);
 
+		const isAccountChanged = currentAccountName && currentAccountName !== name;
 		dispatch(set('account', new Map({
 			id: account.id, name, icon, iconColor,
 		})));
 
 		await dispatch(initAssetsBalances());
-		await dispatch(initHistory());
+		await dispatch(initHistory(isAccountChanged));
 	} catch (err) {
 		dispatch(set('error', FormatHelper.formatError(err)));
 	} finally {

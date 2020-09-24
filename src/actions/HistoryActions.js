@@ -199,20 +199,20 @@ export const updateHistory = () => async (dispatch, getState) => {
  *
  * Init user's history
  */
-export const initHistory = () => (dispatch, getState) => {
+export const initHistory = (isAccountChanged) => (dispatch, getState) => {
 
 	try {
 		const accountName = getState().global.getIn(['account', 'name']);
+		const currentAccountId = getState().global.getIn(['account', 'id']);
 		if (!accountName) {
 			return false;
 		}
 
 		const stateHistory = getState().global.get('history');
-		if (stateHistory.size) {
+		if (stateHistory.size && !isAccountChanged) {
 			return false;
 		}
 
-		const currentAccountId = getState().global.getIn(['account', 'id']);
 		const history = echoService.getChainLib().cache.fullAccounts.getIn([currentAccountId, 'history']);
 
 		dispatch(GlobalReducer.actions.set({
