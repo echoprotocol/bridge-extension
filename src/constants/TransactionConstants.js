@@ -311,6 +311,16 @@ export default {
 			asset: 'amount.asset_id',
 		},
 	},
+	request_balance_unfreeze: {
+		value: OPERATIONS_IDS.REQUEST_BALANCE_UNFREEZE,
+		name: 'Request balance unfreeze',
+		options: {
+			from: 'account',
+			subject: null,
+			value: null,
+			asset: 'amount.asset_id',
+		},
+	},
 	contract_create: {
 		value: OPERATIONS_IDS.CONTRACT_CREATE,
 		name: 'Contract created',
@@ -587,6 +597,16 @@ export default {
 		options: {
 			from: null,
 			subject: ['transaction_id'],
+			value: null,
+			asset: null,
+		},
+	},
+	sidechain_btc_block_process: {
+		value: OPERATIONS_IDS.SIDECHAIN_BTC_BLOCK_PROCESS,
+		name: 'Process BTC block',
+		options: {
+			from: 'committee_member_id',
+			subject: null,
 			value: null,
 			asset: null,
 		},
