@@ -171,3 +171,21 @@
         }
     }
 }
+
+.balance-info {
+    position: relative;
+    &:hover {
+        .balance-popup {
+            display: block;
+        }
+    }
+}
+
+.balance-popup {
+    position: absolute;
+    font-size: 14px;
+    color: #000;
+    left: 3px;
+    top: -15px;
+    display: none;
+}

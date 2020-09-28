@@ -5,7 +5,7 @@ import { Link } from 'react-router-dom';
 import classnames from 'classnames';
 import { connect } from 'react-redux';
 import PropTypes from 'prop-types';
-import { Button, Popup } from 'semantic-ui-react';
+import { Button } from 'semantic-ui-react';
 
 import { sendRedirect, removeToken } from '../../actions/BalanceActions';
 
@@ -59,31 +59,25 @@ class Wallet extends React.Component {
 											</React.Fragment>
 									}
 								</div> :
-								<Popup
-									trigger={
-										<div className="balance-info">
-											{
-												asset ?
-													<React.Fragment>
-														<span>
-															{
-																FormatHelper.convertAmount(balance.get('balance'), asset.get('precision'), asset.get('symbol'))
-															}
-														</span>
-														<span>{asset.get('symbol')}</span>
-													</React.Fragment>
-													:
-													<React.Fragment>
-														<span>0</span>
-														<span>ECHO</span>
-													</React.Fragment>
-											}
-										</div>
+								<div className="balance-info">
+									{
+										asset ?
+											<React.Fragment>
+												<span>
+													{
+														FormatHelper.convertAmount(balance.get('balance'), asset.get('precision'), asset.get('symbol'))
+													}
+												</span>
+												<span>{asset.get('symbol')}</span>
+											</React.Fragment>
+											:
+											<React.Fragment>
+												<span>0</span>
+												<span>ECHO</span>
+											</React.Fragment>
 									}
-									content={
-										<span>{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
-									}
-								/>
+									<span className="balance-popup">{FormatHelper.formatAmount(balance.get('balance'), asset.get('precision'))}</span>
+								</div>
 						}
 					</a>
 				</li >
@@ -116,21 +110,15 @@ class Wallet extends React.Component {
 									<span>{token.get('symbol')}&nbsp;</span>
 									<span>({contractId})</span>
 								</div> :
-								<Popup
-									trigger={
-										<div className="balance-info">
-											<span>
-												{
-													FormatHelper.convertAmount(token.get('balance'), token.get('precision'), token.get('symbol'))
-												}
-											</span>
-											<span>{token.get('symbol')}</span>
-										</div>
-									}
-									content={
-										<span>{FormatHelper.formatAmount(token.get('balance'), token.get('precision'))}</span>
-									}
-								/>
+								<div className="balance-info">
+									<span>
+										{
+											FormatHelper.convertAmount(token.get('balance'), token.get('precision'), token.get('symbol'))
+										}
+									</span>
+									<span>{token.get('symbol')}</span>
+									<span className="balance-popup">{FormatHelper.formatAmount(token.get('balance'), token.get('precision'))}</span>
+								</div>
 						}
 						<div className="token-info">
 							<span>ERC20</span>
