@@ -27,6 +27,7 @@
             margin-top: 40px;
             .line {
                 display: flex;
+                align-items: center;
                 justify-content: space-between;
                 font-size: 14px;
                 padding: 0 20px;
@@ -39,14 +40,13 @@
                 font-family: FNBook;
                 color: #90999A;
                 white-space: nowrap;
-
+                margin-right: auto;
             }
             .value {
                 font-family: FNMedium;
                 color: #2C393D;
                 white-space: nowrap;
 				display: flex;
-				max-width: 220px;
 				@include cutTxt();
 				max-width: 132px;
 
@@ -111,5 +111,5 @@
             }
         }
     }
-    
+
 }

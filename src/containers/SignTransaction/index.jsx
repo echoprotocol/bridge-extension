@@ -5,8 +5,10 @@ import { Button } from 'semantic-ui-react';
 import PropTypes from 'prop-types';
 import classnames from 'classnames';
 import { Map } from 'immutable';
+import { CopyToClipboard } from 'react-copy-to-clipboard';
 
 import Avatar from '../../components/Avatar';
+import iconCopy from '../../assets/images/icons/copy.svg';
 
 import {
 	approve,
@@ -23,6 +25,14 @@ import GlobalReducer from '../../reducers/GlobalReducer';
 import FormatHelper from '../../helpers/FormatHelper';
 
 class SignTransaction extends React.Component {
+
+	constructor(props) {
+		super(props);
+		this.valueRef = React.createRef();
+		this.state = {
+			inputWidth: 0,
+		};
+	}
 
 	componentDidMount() {
 		if (!this.props.transaction) {
@@ -47,6 +57,8 @@ class SignTransaction extends React.Component {
 
 		this.loadInfo();
 
+		// eslint-disable-next-line react/no-did-mount-set-state
+		this.setState({ inputWidth: this.valueRef.current.getBoundingClientRect().width });
 		return null;
 	}
 
@@ -71,7 +83,7 @@ class SignTransaction extends React.Component {
 
 	getOptions() {
 		const { transactionShow } = this.props;
-
+		const { inputWidth } = this.state;
 		if (!transactionShow) {
 			return null;
 		}
@@ -114,7 +126,13 @@ class SignTransaction extends React.Component {
 					default:
 						mapShow.push(<div className="line">
 							<div className="key">{FormatHelper.formatOperationKey(key)}</div>
-							<div className="value">
+							{inputWidth >= 132 &&
+								<CopyToClipboard text={value}>
+									<div className={classnames('btn-copy', 'sm')} >
+										<img src={iconCopy} alt="" />
+									</div>
+								</CopyToClipboard>}
+							<div className="value" ref={this.valueRef}>
 								{value}
 							</div>
 						</div>);
@@ -137,7 +155,13 @@ class SignTransaction extends React.Component {
 
 			mapShow.push(<div className="line">
 				<div className="key">{FormatHelper.formatOperationKey(key)}</div>
-				<div className="value">
+				{inputWidth >= 132 &&
+				<CopyToClipboard text={value}>
+					<div className={classnames('btn-copy', 'sm')} >
+						<img src={iconCopy} alt="" />
+					</div>
+				</CopyToClipboard> }
+				<div className="value" ref={this.valueRef}>
 					{value}
 				</div>
 			</div>);

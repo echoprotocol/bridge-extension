@@ -458,7 +458,13 @@
                 margin: 1px 0 0 0;
             }
 		}
-
+         &.sm {
+             position: relative;
+             width: 40px;
+             height: 25px;
+             font-size: 10px;
+             margin: 0 10px;
+         }
 		img {
 			margin-top: -1px;
 			width: 20px;

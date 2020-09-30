@@ -41,8 +41,15 @@ class FormatHelper {
 			return formatAmount;
 		}
 		const length = new BN(amount).toString(10).indexOf('.') === -1 ? 11 - sumbol.length : 12 - sumbol.length;
+		const dotIndex = formatAmount.indexOf('.');
+
+		if (dotIndex !== -1) {
+			return formatAmount.substring(0, dotIndex).trim().concat('...');
+		}
 		return formatAmount.substring(0, length).trim().concat('...');
+
 	}
+
 	static isAmountVeryBig(amount = 0, precision = 0, sumbol = '') {
 		return new BN(amount).div(10 ** precision).toString(10).length + sumbol.length > 10;
 	}
