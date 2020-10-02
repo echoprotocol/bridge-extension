@@ -53,7 +53,6 @@ const onBackgroundMessage = async (res) => {
  * @param event
  */
 const onPageMessage = (event) => {
-	console.log('onPageMessage', event);
 	const { data } = event;
 
 	if (data.target !== 'content' || !data.appId || data.appId !== APP_ID) return;
