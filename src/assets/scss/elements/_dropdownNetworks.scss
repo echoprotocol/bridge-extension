@@ -271,6 +271,7 @@
 	img {
 		transition: opacity .2s;
         max-width: 25px;
+        min-width: 25px;
         margin-top: -1px;
 	}
 	&:hover {
