@@ -1,9 +1,9 @@
+/* eslint-disable no-unused-expressions */
 /* global EXTENSION */
 /* global INPAGE_PATH_PACK_FOLDER */
 
 const extensionizer = require('./extensionizer');
-const { APP_ID } = require('../src/constants/GlobalConstants');
-/* eslint-disable global-require */
+const { APP_ID } = require('../src/constants/AppId');
 /* eslint-disable import/no-dynamic-require */
 const inpage = require(`../${INPAGE_PATH_PACK_FOLDER}/inpage`);
 
@@ -23,9 +23,6 @@ function setupInjection(content) {
 		container.insertBefore(scriptTag, container.children[0]);
 		container.removeChild(scriptTag);
 
-		// see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/Port
-		// the object for long-live exchanging of messages between page script and background.js
-		currentPort = extensionizer.runtime.connect();
 	} catch (e) {
 		console.error('Bridge injection failed.', e);
 	}
@@ -42,13 +39,11 @@ const onBackgroundMessage = async (res) => {
 		return null;
 	}
 
-	const { origin } = res;
-
 	delete res.origin;
 	res.target = 'inpage';
 	res.appId = APP_ID;
 
-	window.postMessage(res, origin);
+	window.postMessage(res, '*');
 
 	return null;
 };
@@ -73,12 +68,49 @@ const onPageMessage = (event) => {
 	}
 };
 
+function documentElementCheck() {
+	const documentElement = document.documentElement.nodeName;
+	if (documentElement) {
+		return documentElement.toLowerCase() === 'html';
+	}
+	return true;
+}
 
-// eslint-disable-next-line no-unused-expressions
-EXTENSION && setupInjection(inpageContent);
+function doctypeCheck() {
+	const { doctype } = window.document;
+	if (doctype) {
+		return doctype.name === 'html';
+	}
+	return true;
+}
 
-// listen messages from inpage.js script injected in web page. Implemented with One-off messages
-window.addEventListener('message', onPageMessage, false);
+async function domIsReady() {
+	// already loaded
+	if (['interactive', 'complete'].includes(document.readyState)) {
+		return undefined;
+	}
+	// wait for load
+	return new Promise((resolve) => window.addEventListener('DOMContentLoaded', resolve, { once: true }));
+}
 
-// listen messages from background.js script by.  Implemented with Connection-based messaging
-currentPort.onMessage.addListener(onBackgroundMessage);
+function shouldInjectProvider() {
+	return doctypeCheck() && documentElementCheck();
+}
+
+function setupStreams() {
+	// see https://developer.mozilla.org/en-US/docs/Mozilla/Add-ons/WebExtensions/API/runtime/Port
+	// the object for long-live exchanging of messages between page script and background.js
+	currentPort = extensionizer.runtime.connect();
+	window.addEventListener('message', onPageMessage, false);
+	currentPort.onMessage.addListener(onBackgroundMessage);
+}
+
+async function start() {
+	await setupStreams();
+	await domIsReady();
+}
+
+if (shouldInjectProvider()) {
+	EXTENSION && setupInjection(inpageContent);
+	start();
+}

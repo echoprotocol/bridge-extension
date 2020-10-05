@@ -1,4 +1,5 @@
 import { constants } from 'echojs-lib';
+import { APP_ID as appId } from './AppId';
 
 import {
 	CREATE_ACCOUNT_PATH,
@@ -91,7 +92,7 @@ export const NETWORKS = [
 	},
 ];
 
-export const APP_ID = 'BRIDGE_EXTENSION';
+export const APP_ID = appId;
 
 export const POPUP_WIDTH = 362;
 export const POPUP_HEIGHT = 591;

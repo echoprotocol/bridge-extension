@@ -1,7 +1,7 @@
 {
   "name": "echo-bridge",
   "description": "The bridge between your web site and the Echo",
-  "version": "1.16.2",
+  "version": "1.17.0",
   "scripts": {
     "build": "cross-env NODE_ENV=production webpack --progress --display-error-details --colors --mode production",
     "build-ext": "cross-env EXTENSION=TRUE NODE_ENV=production webpack --display-error-details --colors --mode production",
