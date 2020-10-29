@@ -491,6 +491,15 @@ export default {
 			asset: 'fee',
 		},
 	},
+	sidechain_erc20_send_deposit: {
+		value: OPERATIONS_IDS.SIDECHAIN_ERC20_SEND_DEPOSIT_TOKEN,
+		name: 'Sidechain erc20 send deposit',
+		options: {
+			from: 'committee_member_id',
+			subject: ['deposit_id'],
+			asset: null,
+		},
+	},
 	sidechain_erc20_withdraw_token: {
 		value: OPERATIONS_IDS.SIDECHAIN_ERC20_WITHDRAW_TOKEN,
 		name: 'Withdraw ERC20 token',
@@ -499,6 +508,15 @@ export default {
 			subject: ['to'],
 			value: 'value',
 			asset: 'fee',
+		},
+	},
+	sidechain_erc20_send_withdraw: {
+		value: OPERATIONS_IDS.SIDECHAIN_ERC20_SEND_WITHDRAW_TOKEN,
+		name: 'Sidechain erc20 send withdraw',
+		options: {
+			from: 'committee_member_id',
+			subject: ['withdraw_id'],
+			asset: null,
 		},
 	},
 	sidechain_erc20_approve_token_withdraw: {
@@ -581,16 +599,6 @@ export default {
 			asset: null,
 		},
 	},
-	sidechain_btc_approve_withdraw: {
-		value: OPERATIONS_IDS.SIDECHAIN_BTC_APPROVE_WITHDRAW,
-		name: 'Approve BTC withdraw',
-		options: {
-			from: 'committee_member_id',
-			subject: ['withdraw_id'],
-			value: null,
-			asset: null,
-		},
-	},
 	sidechain_btc_aggregate: {
 		value: OPERATIONS_IDS.SIDECHAIN_BTC_AGGREGATE,
 		name: 'Aggregate BTC',
@@ -601,12 +609,12 @@ export default {
 			asset: null,
 		},
 	},
-	sidechain_btc_block_process: {
-		value: OPERATIONS_IDS.SIDECHAIN_BTC_BLOCK_PROCESS,
-		name: 'Process BTC block',
+	sidechain_btc_approve_aggregate: {
+		value: OPERATIONS_IDS.SIDECHAIN_BTC_APPROVE_AGGREGATE,
+		name: 'Approve aggregate BTC',
 		options: {
 			from: 'committee_member_id',
-			subject: null,
+			subject: ['transaction_id'],
 			value: null,
 			asset: null,
 		},
