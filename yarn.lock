@@ -3553,10 +3553,10 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-echojs-lib@^1.12.0-rc.1:
-  version "1.12.2"
-  resolved "https://registry.yarnpkg.com/echojs-lib/-/echojs-lib-1.12.2.tgz#eda061bde670f93c8fa6e67ee1fa001441be24dc"
-  integrity sha512-qXGDxYtKqhbfUqMwS/y2QnuUnIHf6E4RqKWXqnNY0fQJ8tuSMTlFKYWS1yBABhTTW/rAX8c84ynPPEj15LWZCg==
+echojs-lib@^1.13.0:
+  version "1.13.2"
+  resolved "https://registry.yarnpkg.com/echojs-lib/-/echojs-lib-1.13.2.tgz#af3799a7e504e459c0f672313a7ac39c1fd514e0"
+  integrity sha512-TXRrs7kIcRTm6wdkDqN3lz+KaIqQcUbZi8msGJ4MxfyH7gYmdbHrD3ZqQLXd6fLzLjxi34gEj+Qj8lHJZWUSCQ==
   dependencies:
     "@babel/runtime-corejs3" "^7.6.0"
     "@types/crypto-js" "^3.1.43"
@@ -5771,9 +5771,9 @@ inherits@2.0.3:
   integrity sha1-Yzwsg+PaQqUC9SRmAiSA9CCCYd4=
 
 ini@^1.3.4, ini@^1.3.5, ini@~1.3.0:
-  version "1.3.5"
-  resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.5.tgz#eee25f56db1c9ec6085e0c22778083f596abf927"
-  integrity sha512-RZY5huIKCMRWDUqZlEi72f/lmXKMvuszcMBduliQ3nnWbx9X/ZBQO7DijMEYS9EhHBb2qacRUMtC7svLwe0lcw==
+  version "1.3.8"
+  resolved "https://registry.yarnpkg.com/ini/-/ini-1.3.8.tgz#a29da425b48806f34767a4efce397269af28432c"
+  integrity sha512-JV/yugV2uzW5iMRSiZAyDtQd+nxtUnjeLt0acNdw98kKLrvuRVyB80tsREOE7yvGVgalhZ6RNXCmEHkUKBKxew==
 
 inquirer@^0.12.0:
   version "0.12.0"
