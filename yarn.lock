@@ -3553,10 +3553,10 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-echojs-lib@^1.12.0-rc.1:
-  version "1.12.2"
-  resolved "https://registry.yarnpkg.com/echojs-lib/-/echojs-lib-1.12.2.tgz#eda061bde670f93c8fa6e67ee1fa001441be24dc"
-  integrity sha512-qXGDxYtKqhbfUqMwS/y2QnuUnIHf6E4RqKWXqnNY0fQJ8tuSMTlFKYWS1yBABhTTW/rAX8c84ynPPEj15LWZCg==
+echojs-lib@^1.13.0:
+  version "1.13.2"
+  resolved "https://registry.yarnpkg.com/echojs-lib/-/echojs-lib-1.13.2.tgz#af3799a7e504e459c0f672313a7ac39c1fd514e0"
+  integrity sha512-TXRrs7kIcRTm6wdkDqN3lz+KaIqQcUbZi8msGJ4MxfyH7gYmdbHrD3ZqQLXd6fLzLjxi34gEj+Qj8lHJZWUSCQ==
   dependencies:
     "@babel/runtime-corejs3" "^7.6.0"
     "@types/crypto-js" "^3.1.43"
@@ -11217,9 +11217,9 @@ write@^0.2.1:
     mkdirp "^0.5.1"
 
 ws@^6.1.2, ws@^6.2.1:
-  version "6.2.1"
-  resolved "https://registry.yarnpkg.com/ws/-/ws-6.2.1.tgz#442fdf0a47ed64f59b6a5d8ff130f4748ed524fb"
-  integrity sha512-GIyAXC2cB7LjvpgMt9EKS2ldqr0MTrORaleiOno6TweZ6r3TKtoFQWay/2PceJ3RuBasOHzXNn5Lrw1X0bEjqA==
+  version "6.2.2"
+  resolved "https://registry.yarnpkg.com/ws/-/ws-6.2.2.tgz#dd5cdbd57a9979916097652d78f1cc5faea0c32e"
+  integrity sha512-zmhltoSR8u1cnDsD43TX59mzoMZsLKqUweyYBAIvTngR3shc0W6aOZylZmq/7hqyVxPdi+5Ud2QInblgyE72fw==
   dependencies:
     async-limiter "~1.0.0"
 
