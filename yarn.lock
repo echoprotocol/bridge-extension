@@ -3553,10 +3553,10 @@ ecc-jsbn@~0.1.1:
     jsbn "~0.1.0"
     safer-buffer "^2.1.0"
 
-echojs-lib@^1.12.0-rc.1:
-  version "1.12.2"
-  resolved "https://registry.yarnpkg.com/echojs-lib/-/echojs-lib-1.12.2.tgz#eda061bde670f93c8fa6e67ee1fa001441be24dc"
-  integrity sha512-qXGDxYtKqhbfUqMwS/y2QnuUnIHf6E4RqKWXqnNY0fQJ8tuSMTlFKYWS1yBABhTTW/rAX8c84ynPPEj15LWZCg==
+echojs-lib@^1.13.0:
+  version "1.13.4"
+  resolved "https://registry.yarnpkg.com/echojs-lib/-/echojs-lib-1.13.4.tgz#22c2f0a5dd3acc59ba983970b6f6d78fed73f564"
+  integrity sha512-4kw1hyrlwcAWqLFhgURm7wi4faqr9AKo7vOuI3NfJ3HLFzmH1aLnCBd1X2VU2LbQkE2PZ4cpTLzOp+spXyUbUA==
   dependencies:
     "@babel/runtime-corejs3" "^7.6.0"
     "@types/crypto-js" "^3.1.43"
@@ -10694,10 +10694,10 @@ url-parse-lax@^1.0.0:
   dependencies:
     prepend-http "^1.0.1"
 
-url-parse@^1.4.3, url-parse@^1.4.7:
-  version "1.4.7"
-  resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.4.7.tgz#a8a83535e8c00a316e403a5db4ac1b9b853ae278"
-  integrity sha512-d3uaVyzDB9tQoSXFvuSUNFibTd9zxd2bkVrDRvF5TmvWWQwqE4lgYJ5m+x1DbecWkw+LK4RNl2CU1hHuOKPVlg==
+url-parse@^1.4.3, url-parse@^1.5.2:
+  version "1.5.2"
+  resolved "https://registry.yarnpkg.com/url-parse/-/url-parse-1.5.2.tgz#a4eff6fd5ff9fe6ab98ac1f79641819d13247cda"
+  integrity sha512-6bTUPERy1muxxYClbzoRo5qtQuyoGEbzbQvi0SW4/8U8UyVkAQhWFBlnigqJkRm4su4x1zDQfNbEzWkt+vchcg==
   dependencies:
     querystringify "^2.1.1"
     requires-port "^1.0.0"
