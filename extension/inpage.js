@@ -307,6 +307,7 @@ echojslib.Transaction.prototype.signWithBridge = async function signWithBridge()
 			this._refBlockNum = signResult.ref_block_num;
 			this._refBlockPrefix = signResult.ref_block_prefix;
 			this._expiration = signResult.expiration;
+			this._chainId = signResult.chainId;
 			this._signatures = signResult.serializedSignatures.map((hexString) => new Signat(hexString));
 
 			this._finalized = true;
