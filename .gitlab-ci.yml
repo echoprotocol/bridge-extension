@@ -32,7 +32,7 @@ test:test:
     - docker
 
 build:
-  image: node:10.16
+  image: node:12
   stage: build
   cache:
     paths:

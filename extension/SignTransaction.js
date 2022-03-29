@@ -54,6 +54,7 @@ class SignTransaction {
 			ref_block_prefix: tr._refBlockPrefix,
 			expiration: tr.expiration,
 			serializedSignatures,
+			chainId,
 			accountId: operations[0][1].from || operations[0][1].registrar,
 		};
 	}
