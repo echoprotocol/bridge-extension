@@ -81,15 +81,15 @@ export const HEADER_TITLE = [
 
 export const NETWORKS = [
 	{
-		name: 'Testnet',
-		url: 'wss://testnet.echo-dev.io/ws',
-		explorer: 'https://explorer.echo-dev.io',
-	},
-	{
 		name: 'Devnet',
-		url: 'wss://devnet.echo-dev.io/ws',
-		explorer: 'http://656-echo-explorer.pixelplex-test.by',
+		url: 'wss://echo-devnet.pixelplexlabs.com/ws',
+		explorer: 'https://echo-explorer.pielplexlabs.com',
 	},
+	// {
+	// 	name: 'Devnet',
+	// 	url: 'wss://devnet.echo-dev.io/ws',
+	// 	explorer: 'http://656-echo-explorer.pixelplex-test.by',
+	// },
 ];
 
 export const APP_ID = appId;
